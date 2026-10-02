@@ -4,12 +4,13 @@ export default function AuthLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="min-h-screen flex flex-col relative overflow-hidden bg-[#eef2f1]">
-      <div className="absolute -top-48 left-1/2 -translate-x-1/2 w-[620px] h-[620px] rounded-full bg-[#c9e8f1]/60 blur-[120px] pointer-events-none" />
-      <main className="relative z-10 flex-1 flex items-center justify-center px-4 py-10 sm:py-14">
-        <div className="w-full max-w-md">{children}</div>
+    <div className="min-h-screen bg-[#050607] text-white">
+      <main className="min-h-[calc(100vh-52px)] w-full px-4 py-6 sm:px-6 sm:py-10">
+        <div className="mx-auto flex min-h-[calc(100vh-100px)] w-full max-w-md items-center justify-center">
+          {children}
+        </div>
       </main>
-      <footer className="relative z-10 p-6 text-center text-xs text-[#6d7c80]">
+      <footer className="bg-[#050607] px-6 pb-5 text-center text-xs text-[#777d85]">
         © {new Date().getFullYear()} Binzeo Labs · All rights reserved
       </footer>
     </div>

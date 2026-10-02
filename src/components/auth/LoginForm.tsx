@@ -5,11 +5,28 @@ import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 
+const fieldClass =
+  "w-full rounded-2xl border border-[#4a4d51] bg-transparent px-4 py-3.5 text-sm text-white placeholder-[#8f949b] outline-none transition-colors focus:border-white focus:ring-1 focus:ring-white/30";
+
+function BrandLogo() {
+  return (
+    <Image src="/logo.svg" alt="BINZEO" width={132} height={31} priority className="mx-auto h-8 w-auto invert" />
+  );
+}
+
+function SocialActions({ onMessage }: { onMessage: (message: string) => void }) {
+  return (
+    <div className="space-y-3">
+      <button type="button" onClick={() => onMessage("Apple sign-in is not available yet.")} className="flex w-full items-center justify-center gap-2 rounded-full bg-[#15171a] py-3 text-sm font-medium text-white transition hover:bg-[#202327]"><span className="font-semibold">A</span> Sign in with Apple</button>
+      <button type="button" onClick={() => onMessage("Phone sign-in is not available yet.")} className="flex w-full items-center justify-center gap-2 rounded-full bg-[#15171a] py-3 text-sm font-medium text-white transition hover:bg-[#202327]"><Image src="/icons/phone.svg" alt="" width={16} height={16} className="invert" /> Sign in with phone</button>
+    </div>
+  );
+}
+
 export default function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const next = searchParams.get("next") ?? "/dashboard";
-
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -20,22 +37,18 @@ export default function LoginForm() {
     e.preventDefault();
     setLoading(true);
     setError("");
-
     try {
       const res = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
       });
-
       const data = await res.json();
-
       if (!data.success) {
         setError(data.error?.message ?? "Login failed");
         setLoading(false);
         return;
       }
-
       router.push(next);
       router.refresh();
     } catch {
@@ -45,94 +58,28 @@ export default function LoginForm() {
   };
 
   return (
-    <div className="rounded-2xl border border-[#d5dfdd] bg-white/90 backdrop-blur p-6 sm:p-8">
-      <Image
-        src="/logo.svg"
-        alt="BINZEO"
-        width={122}
-        height={29}
-        priority
-        className="mx-auto mb-8 h-8 w-auto"
-      />
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-[#101820] mb-2">Welcome back</h1>
-        <p className="text-sm text-[#5c6b70]">
-          Sign in to continue to your Binzeo ID
-        </p>
+    <div className="mx-auto w-full max-w-[420px] bg-[#050607] px-1 py-4 text-white sm:px-4 sm:py-8">
+      <BrandLogo />
+      <div className="mt-9 text-center">
+        <h1 className="text-[28px] font-semibold tracking-tight">Welcome back</h1>
+        <p className="mt-2 text-sm text-[#a6abb2]">Let&apos;s get you into your BINZEO ID</p>
       </div>
 
-      {error && (
-        <div className="mb-4 p-3 rounded-lg border border-[#efb8b0] bg-[#fbe5e2] text-[#b84f4b] text-sm">
-          {error}
-        </div>
-      )}
+      {error && <div className="mt-6 rounded-2xl border border-[#9d514f] bg-[#2a1516] px-4 py-3 text-sm text-[#ffb8b4]">{error}</div>}
 
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label className="block text-sm font-medium text-[#35454c] mb-1.5">
-            Email
-          </label>
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            autoComplete="email"
-            placeholder="you@example.com"
-            className="w-full px-3.5 py-2.5 rounded-lg border border-[#d5dfdd] bg-[#eef2f1] text-[#101820] placeholder-gray-600 focus:outline-none focus:border-[#79b9d5] focus:ring-2 focus:ring-[#79b9d5]/30 transition-colors"
-          />
+      <form onSubmit={handleSubmit} className="mt-7 space-y-3">
+        <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required autoComplete="email" placeholder="Your Email" aria-label="Email" className={fieldClass} />
+        <div className="relative">
+          <input type={showPassword ? "text" : "password"} value={password} onChange={(e) => setPassword(e.target.value)} required autoComplete="current-password" placeholder="Your Password" aria-label="Password" className={`${fieldClass} pr-16`} />
+          <button type="button" onClick={() => setShowPassword((s) => !s)} className="absolute right-4 top-1/2 -translate-y-1/2 text-xs text-[#a6abb2] hover:text-white">{showPassword ? "Hide" : "Show"}</button>
         </div>
-
-        <div>
-          <div className="flex items-center justify-between mb-1.5">
-            <label className="block text-sm font-medium text-[#35454c]">
-              Password
-            </label>
-            <Link
-              href="/forgot-password"
-              className="text-xs text-[#216f9e] hover:text-[#3f86b2]"
-            >
-              Forgot?
-            </Link>
-          </div>
-          <div className="relative">
-            <input
-              type={showPassword ? "text" : "password"}
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              autoComplete="current-password"
-              placeholder="••••••••"
-              className="w-full px-3.5 py-2.5 pr-10 rounded-lg border border-[#d5dfdd] bg-[#eef2f1] text-[#101820] placeholder-gray-600 focus:outline-none focus:border-[#79b9d5] focus:ring-2 focus:ring-[#79b9d5]/30 transition-colors"
-            />
-            <button
-              type="button"
-              onClick={() => setShowPassword((s) => !s)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-[#6d7c80] hover:text-[#35454c] text-xs"
-            >
-              {showPassword ? "Hide" : "Show"}
-            </button>
-          </div>
-        </div>
-
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full py-2.5 rounded-lg bg-[#101820] hover:bg-[#263746] disabled:opacity-60 disabled:cursor-not-allowed text-white font-medium transition-colors shadow-lg shadow-[#9bd8c7]/25"
-        >
-          {loading ? "Signing in..." : "Sign in"}
-        </button>
+        <div className="pt-2 text-center"><Link href="/forgot-password" className="text-sm text-[#a6abb2] transition hover:text-white">Forgot password?</Link></div>
+        <button type="submit" disabled={loading} className="mt-3 w-full rounded-full bg-white py-3.5 text-sm font-semibold text-[#050607] transition hover:bg-[#e3e6e8] disabled:cursor-not-allowed disabled:opacity-60">{loading ? "Signing in..." : "Sign in"}</button>
       </form>
 
-      <p className="mt-6 text-center text-sm text-[#5c6b70]">
-        Don&apos;t have an account?{" "}
-        <Link
-          href="/register"
-          className="text-[#216f9e] hover:text-[#3f86b2] font-medium"
-        >
-          Create one
-        </Link>
-      </p>
+      <div className="my-6 flex items-center gap-3 text-xs text-[#8f949b]"><span className="h-px flex-1 bg-[#3d4145]" /><span>or</span><span className="h-px flex-1 bg-[#3d4145]" /></div>
+      <SocialActions onMessage={setError} />
+      <p className="mt-7 text-center text-sm text-[#a6abb2]">Don&apos;t have an account? <Link href="/register" className="font-medium text-white hover:text-[#c9e8f1]">Create one</Link></p>
     </div>
   );
 }
