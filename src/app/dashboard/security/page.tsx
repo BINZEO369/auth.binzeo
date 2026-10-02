@@ -3,6 +3,8 @@
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { apiFetch } from "@/lib/api/client";
+import TemporaryLoginTokens from "@/components/security/TemporaryLoginTokens";
+import PasskeyManager from "@/components/security/PasskeyManager";
 
 type LoginEntry = {
   id: string;
@@ -123,6 +125,8 @@ export default function SecurityPage() {
           Monitor your account activity and security settings
         </p>
       </div>
+      <TemporaryLoginTokens />
+      <PasskeyManager />
 
       {/* Tabs */}
       <div className="flex gap-2 border-b border-[#d5dfdd] overflow-x-auto">

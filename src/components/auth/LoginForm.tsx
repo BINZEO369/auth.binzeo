@@ -5,6 +5,7 @@ import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { getClientDeviceId, requestPreciseLocation } from "@/lib/client-device";
+import { startAuthentication } from "@simplewebauthn/browser";
 
 const fieldClass =
   "w-full rounded-2xl border border-[#4a4d51] bg-transparent px-4 py-3.5 text-sm text-white placeholder-[#8f949b] outline-none transition-colors focus:border-white focus:ring-1 focus:ring-white/30";
@@ -32,6 +33,9 @@ export default function LoginForm() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [tokenLoading, setTokenLoading] = useState(false);
+  const [passkeyLoading, setPasskeyLoading] = useState(false);
+  const [temporaryToken, setTemporaryToken] = useState("");
   const [error, setError] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -62,6 +66,54 @@ export default function LoginForm() {
     }
   };
 
+  const handleTemporaryLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setTokenLoading(true);
+    setError("");
+    try {
+      const res = await fetch("/api/auth/temporary-login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "x-binzeo-device-id": getClientDeviceId() },
+        body: JSON.stringify({ token: temporaryToken.trim() }),
+      });
+      const data = await res.json();
+      if (!data.success) {
+        setError(data.error?.message ?? "Temporary login failed");
+        return;
+      }
+      router.push(next);
+      router.refresh();
+    } catch {
+      setError("Temporary login failed. Please try again.");
+    } finally {
+      setTokenLoading(false);
+    }
+  };
+
+  const handlePasskeyLogin = async () => {
+    setPasskeyLoading(true);
+    setError("");
+    try {
+      const optionsRes = await fetch("/api/auth/passkey/options", { method: "POST" });
+      const optionsData = await optionsRes.json();
+      if (!optionsData.success) throw new Error(optionsData.error?.message ?? "Passkey login failed");
+      const response = await startAuthentication({ optionsJSON: optionsData.data.options });
+      const verifyRes = await fetch("/api/auth/passkey/verify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "x-binzeo-device-id": getClientDeviceId() },
+        body: JSON.stringify({ challenge_id: optionsData.data.challenge_id, challenge: optionsData.data.challenge, response }),
+      });
+      const verifyData = await verifyRes.json();
+      if (!verifyData.success) throw new Error(verifyData.error?.message ?? "Passkey login failed");
+      router.push(next);
+      router.refresh();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Passkey login was cancelled");
+    } finally {
+      setPasskeyLoading(false);
+    }
+  };
+
   return (
     <div className="mx-auto w-full max-w-[420px] bg-[#050607] px-1 py-4 text-white sm:px-4 sm:py-8">
       <BrandLogo />
@@ -84,6 +136,15 @@ export default function LoginForm() {
       </form>
 
       <div className="my-6 flex items-center gap-3 text-xs text-[#8f949b]"><span className="h-px flex-1 bg-[#3d4145]" /><span>or</span><span className="h-px flex-1 bg-[#3d4145]" /></div>
+      <form onSubmit={handleTemporaryLogin} className="space-y-3 rounded-2xl border border-[#2d3135] bg-[#0b0d0f] p-4">
+        <div>
+          <div className="text-sm font-medium text-white">Temporary full-account login</div>
+          <div className="mt-1 text-xs text-[#8f949b]">Use a one-time token created from Account → Security.</div>
+        </div>
+        <input type="password" value={temporaryToken} onChange={(e) => setTemporaryToken(e.target.value)} required autoComplete="one-time-code" placeholder="Paste temporary token" aria-label="Temporary login token" className={fieldClass} />
+        <button type="submit" disabled={tokenLoading} className="w-full rounded-full border border-[#5c6269] py-3 text-sm font-semibold text-white transition hover:bg-[#15171a] disabled:opacity-60">{tokenLoading ? "Signing in..." : "Sign in with temporary token"}</button>
+      </form>
+      <button type="button" onClick={handlePasskeyLogin} disabled={passkeyLoading} className="mt-3 w-full rounded-full border border-[#5c6269] py-3 text-sm font-semibold text-white transition hover:bg-[#15171a] disabled:opacity-60">{passkeyLoading ? "Checking passkey..." : "Sign in with passkey"}</button>
       <SocialActions onMessage={setError} />
       <p className="mt-7 text-center text-sm text-[#a6abb2]">Don&apos;t have an account? <Link href="/register" className="font-medium text-white hover:text-[#c9e8f1]">Create one</Link></p>
     </div>
