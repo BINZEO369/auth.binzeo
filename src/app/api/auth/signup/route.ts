@@ -105,6 +105,7 @@ export async function POST(req: NextRequest) {
         to: email,
         subject: emailContent.subject,
         html: emailContent.html,
+        attachments: emailContent.attachments,
       });
     } catch (mailError) {
       console.error("[SIGNUP_OTP_MAIL_ERROR]", mailError);

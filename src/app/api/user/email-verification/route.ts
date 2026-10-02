@@ -69,6 +69,7 @@ export async function POST(req: NextRequest) {
         to: user.email,
         subject: email.subject,
         html: email.html,
+        attachments: email.attachments,
       });
     } catch (mailErr) {
       console.error("[OTP_MAIL_SEND_ERROR]", mailErr);
