@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { transporter, EMAIL_FROM, buildOtpEmail, getPublicSiteUrl } from "@/lib/email/transporter";
 import { ok, fail } from "@/lib/api/response";
+import { otpRateLimitResponse } from "@/lib/otp-rate-limit";
 
 export async function POST(req: NextRequest) {
   try {
@@ -36,6 +37,12 @@ export async function POST(req: NextRequest) {
 
     if (error) {
       console.error("[OTP_ISSUE_RPC_ERROR]", error);
+      const limited = otpRateLimitResponse(error.message);
+      if (limited) {
+        return fail(limited.message, limited.status, limited.code, {
+          retry_after_seconds: limited.retryAfter,
+        });
+      }
       return fail(error.message, 400, "OTP_ISSUE_FAILED");
     }
 

@@ -27,7 +27,7 @@ export default function VerifyEmailPage() {
     if (!signupChallengeId) return;
     setChallengeId(signupChallengeId);
     setStep("sent");
-    setResendIn(30);
+    setResendIn(60);
     setTimeout(() => focusIndex(0), 100);
   }, [searchParams]);
 
@@ -82,7 +82,7 @@ export default function VerifyEmailPage() {
     if (res.success) {
       setChallengeId(res.data.challenge_id);
       setStep("sent");
-      setResendIn(30);
+      setResendIn(60);
       setDigits(["", "", "", "", "", ""]);
       setMessage({
         type: "success",
@@ -90,6 +90,9 @@ export default function VerifyEmailPage() {
       });
       setTimeout(() => focusIndex(0), 100);
     } else {
+      if (res.error.retry_after_seconds) {
+        setResendIn((current) => Math.max(current, res.error.retry_after_seconds ?? 0));
+      }
       setMessage({ type: "error", text: res.error.message });
     }
     setLoading(false);
@@ -155,7 +158,7 @@ export default function VerifyEmailPage() {
           {step === "idle" &&
             "We'll send a 6-digit code to your registered email."}
           {step === "sent" &&
-            "Enter the 6-digit code sent to your email. It expires in 30 seconds."}
+            "Enter the 6-digit code sent to your email. It expires in 30 seconds. You can request a new code once per minute."}
           {step === "verified" &&
             "Your email has been verified successfully. Redirecting..."}
         </p>

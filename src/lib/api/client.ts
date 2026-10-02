@@ -1,6 +1,6 @@
 export type ApiResponse<T> =
   | { success: true; data: T }
-  | { success: false; error: { message: string; code?: string } };
+  | { success: false; error: { message: string; code?: string; retry_after_seconds?: number } };
 
 export async function apiFetch<T>(
   path: string,

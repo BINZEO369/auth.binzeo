@@ -4,6 +4,7 @@ import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { transporter, EMAIL_FROM, buildOtpEmail, getPublicSiteUrl } from "@/lib/email/transporter";
 import { resolveRequestLocation } from "@/lib/request-location";
 import { upsertUserDevice } from "@/lib/device-tracking";
+import { otpRateLimitResponse } from "@/lib/otp-rate-limit";
 import { z } from "zod";
 import { ok, fail } from "@/lib/api/response";
 
@@ -150,6 +151,12 @@ export async function POST(req: NextRequest) {
     );
     if (challengeError) {
       console.error("[SIGNUP_OTP_ISSUE_ERROR]", challengeError);
+      const limited = otpRateLimitResponse(challengeError.message);
+      if (limited) {
+        return fail(limited.message, limited.status, limited.code, {
+          retry_after_seconds: limited.retryAfter,
+        });
+      }
       return fail("Account created, but verification code could not be sent", 502, "OTP_ISSUE_FAILED");
     }
 
