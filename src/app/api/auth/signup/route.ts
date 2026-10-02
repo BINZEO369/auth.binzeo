@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
-import { transporter, EMAIL_FROM, buildOtpEmail } from "@/lib/email/transporter";
+import { transporter, EMAIL_FROM, buildOtpEmail, getPublicSiteUrl } from "@/lib/email/transporter";
 import { z } from "zod";
 import { ok, fail } from "@/lib/api/response";
 
@@ -99,7 +99,7 @@ export async function POST(req: NextRequest) {
     }
 
     try {
-      const emailContent = buildOtpEmail(String(verificationCode), 30);
+      const emailContent = buildOtpEmail(String(verificationCode), 30, getPublicSiteUrl(req.headers));
       await transporter.sendMail({
         from: EMAIL_FROM,
         to: email,

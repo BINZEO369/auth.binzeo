@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { transporter, EMAIL_FROM, buildOtpEmail } from "@/lib/email/transporter";
+import { transporter, EMAIL_FROM, buildOtpEmail, getPublicSiteUrl } from "@/lib/email/transporter";
 import { ok, fail } from "@/lib/api/response";
 
 export async function POST(req: NextRequest) {
@@ -63,7 +63,7 @@ export async function POST(req: NextRequest) {
 
     // Gmail SMTP দিয়ে OTP email পাঠানো
     try {
-      const email = buildOtpEmail(String(code), 30);
+      const email = buildOtpEmail(String(code), 30, getPublicSiteUrl(req.headers));
       await transporter.sendMail({
         from: EMAIL_FROM,
         to: user.email,

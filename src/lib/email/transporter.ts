@@ -12,9 +12,20 @@ export const transporter = nodemailer.createTransport({
 
 export const EMAIL_FROM = `"BINZEO" <${process.env.SMTP_USER}>`;
 
-export function buildOtpEmail(code: string, expiresInSeconds = 30) {
-  const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL ?? "").replace(/\/+$/, "");
-  const logoUrl = siteUrl ? `${siteUrl}/email-logo-white.png` : "/email-logo-white.png";
+export function getPublicSiteUrl(headers?: { get(name: string): string | null }) {
+  const configuredUrl = process.env.NEXT_PUBLIC_SITE_URL?.trim();
+  if (configuredUrl) return configuredUrl.replace(/\/+$/, "");
+
+  const forwardedHost = headers?.get("x-forwarded-host") ?? headers?.get("host");
+  if (!forwardedHost) {
+    throw new Error("NEXT_PUBLIC_SITE_URL or a public request host is required for email images");
+  }
+  const forwardedProto = headers?.get("x-forwarded-proto") ?? "https";
+  return `${forwardedProto.split(",")[0].trim()}://${forwardedHost.split(",")[0].trim()}`.replace(/\/+$/, "");
+}
+
+export function buildOtpEmail(code: string, expiresInSeconds = 30, siteUrl: string) {
+  const logoUrl = `${siteUrl.replace(/\/+$/, "")}/email-logo-white.png`;
 
   return {
     subject: "BINZEO Account Security — Your verification code",
