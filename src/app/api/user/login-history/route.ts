@@ -14,7 +14,7 @@ export async function GET(req: NextRequest) {
 
     const { data, error, count } = await supabase
       .from("user_login_history")
-      .select("*", { count: "exact" })
+      .select("*, user_devices(device_name, device_type, operating_system, os_version, browser, browser_version)", { count: "exact" })
       .eq("user_id", user.id)
       .order("login_at", { ascending: false })
       .range(offset, offset + limit - 1);

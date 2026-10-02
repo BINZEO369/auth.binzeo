@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { transporter, EMAIL_FROM, buildOtpEmail, getPublicSiteUrl } from "@/lib/email/transporter";
 import { resolveRequestLocation } from "@/lib/request-location";
+import { upsertUserDevice } from "@/lib/device-tracking";
 import { z } from "zod";
 import { ok, fail } from "@/lib/api/response";
 
@@ -94,11 +95,14 @@ export async function POST(req: NextRequest) {
       return fail("Account created, but profile setup failed", 500, "PROFILE_SETUP_FAILED");
     }
 
+    const device = await upsertUserDevice(supabase, user.id, req.headers, location.ip);
+
     const { error: signupHistoryError } = await supabase.from("user_login_history").insert({
       user_id: user.id,
       login_method: "signup",
       login_status: "success",
       ip_address: location.ip,
+      device_id: device.id,
       user_agent: req.headers.get("user-agent"),
       country: location.country,
       city: location.city,

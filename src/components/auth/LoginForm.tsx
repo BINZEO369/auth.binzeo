@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
+import { getClientDeviceId } from "@/lib/client-device";
 
 const fieldClass =
   "w-full rounded-2xl border border-[#4a4d51] bg-transparent px-4 py-3.5 text-sm text-white placeholder-[#8f949b] outline-none transition-colors focus:border-white focus:ring-1 focus:ring-white/30";
@@ -40,7 +41,10 @@ export default function LoginForm() {
     try {
       const res = await fetch("/api/auth/login", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "x-binzeo-device-id": getClientDeviceId(),
+        },
         body: JSON.stringify({ email, password }),
       });
       const data = await res.json();

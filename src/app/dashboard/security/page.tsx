@@ -14,6 +14,14 @@ type LoginEntry = {
   city: string | null;
   login_at: string;
   logout_at: string | null;
+  user_devices: {
+    device_name: string | null;
+    device_type: string | null;
+    operating_system: string | null;
+    os_version: string | null;
+    browser: string | null;
+    browser_version: string | null;
+  } | null;
 };
 
 type ActivityEntry = {
@@ -164,8 +172,17 @@ export default function SecurityPage() {
                     {[l.city, l.country].filter(Boolean).join(", ") ||
                       "Unknown location"}
                   </div>
+                  {l.user_devices && (
+                    <div className="text-xs text-[#5c6b70] mt-1">
+                      {l.user_devices.device_name ?? l.user_devices.device_type ?? "Unknown device"}
+                      {l.user_devices.operating_system &&
+                        ` · ${l.user_devices.operating_system}${l.user_devices.os_version ? ` ${l.user_devices.os_version}` : ""}`}
+                      {l.user_devices.browser &&
+                        ` · ${l.user_devices.browser}${l.user_devices.browser_version ? ` ${l.user_devices.browser_version}` : ""}`}
+                    </div>
+                  )}
                   {l.user_agent && (
-                    <div className="text-xs text-[#849295] mt-0.5 truncate">
+                    <div className="text-[11px] text-[#849295] mt-0.5 truncate" title={l.user_agent}>
                       {l.user_agent}
                     </div>
                   )}

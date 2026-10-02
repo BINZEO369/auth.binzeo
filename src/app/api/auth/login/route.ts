@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { loginSchema } from "@/lib/validators/auth";
 import { resolveRequestLocation } from "@/lib/request-location";
+import { upsertUserDevice } from "@/lib/device-tracking";
 import { ok, fail } from "@/lib/api/response";
 
 export async function POST(req: NextRequest) {
@@ -40,6 +41,7 @@ export async function POST(req: NextRequest) {
     }
 
     const location = await resolveRequestLocation(req.headers, true);
+    const device = await upsertUserDevice(supabase, data.user.id, req.headers, location.ip);
 
     // Fetch profile for user details
     const { data: profile } = await supabase
@@ -55,6 +57,7 @@ export async function POST(req: NextRequest) {
         login_method: "password",
         login_status: "blocked",
         ip_address: location.ip,
+        device_id: device.id,
         user_agent: req.headers.get("user-agent"),
         country: location.country,
         city: location.city,
@@ -73,6 +76,7 @@ export async function POST(req: NextRequest) {
       login_method: "password",
       login_status: "success",
       ip_address: location.ip,
+      device_id: device.id,
       user_agent: req.headers.get("user-agent"),
       country: location.country,
       city: location.city,
