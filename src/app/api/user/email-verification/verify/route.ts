@@ -14,6 +14,16 @@ export async function POST(req: NextRequest) {
       return fail("Unauthorized", 401, "UNAUTHORIZED");
     }
 
+    const { data: currentVerification } = await supabase
+      .from("user_verification_records")
+      .select("verification_status")
+      .eq("user_id", user.id)
+      .eq("verification_type", "email")
+      .maybeSingle();
+    if (currentVerification?.verification_status === "verified") {
+      return fail("Your email is already verified", 409, "ALREADY_VERIFIED");
+    }
+
     const body = await req.json();
     const challengeId = body?.challenge_id;
     const code = body?.code;

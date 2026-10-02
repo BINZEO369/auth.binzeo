@@ -55,6 +55,7 @@ type Props = {
     display_name: string | null;
     first_name: string | null;
     account_status: string | null;
+    email_verified: boolean;
   };
 };
 
@@ -116,7 +117,7 @@ export default function DashboardShell({ children, user }: Props) {
       </div>
 
       <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
-        {NAV.map((item) => {
+        {NAV.filter((item) => !(item.href === "/dashboard/verify-email" && user.email_verified)).map((item) => {
           const active =
             item.href === "/dashboard"
               ? pathname === "/dashboard"

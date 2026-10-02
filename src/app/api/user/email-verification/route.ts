@@ -20,6 +20,16 @@ export async function POST(req: NextRequest) {
       return fail("User has no email", 400, "NO_EMAIL");
     }
 
+    const { data: verification } = await supabase
+      .from("user_verification_records")
+      .select("verification_status")
+      .eq("user_id", user.id)
+      .eq("verification_type", "email")
+      .maybeSingle();
+    if (verification?.verification_status === "verified") {
+      return fail("Your email is already verified", 409, "ALREADY_VERIFIED");
+    }
+
     // Request IP বের করা
     const requestIp =
       req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||

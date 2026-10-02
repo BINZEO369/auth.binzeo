@@ -31,6 +31,10 @@ export default async function DashboardLayout({
   const isPendingVerification =
     profile?.account_status === "pending" &&
     verification?.verification_status !== "verified";
+  const emailVerified = verification?.verification_status === "verified";
+  if (emailVerified && requestPath === "/dashboard/verify-email") {
+    redirect("/dashboard");
+  }
   if (profile?.account_status !== "active" && !isPendingVerification) {
     redirect("/login?blocked=1");
   }
@@ -49,6 +53,7 @@ export default async function DashboardLayout({
         first_name: profile?.first_name ?? null,
         display_name: profile?.display_name ?? null,
         account_status: profile?.account_status ?? null,
+        email_verified: emailVerified,
       }}
     >
       {children}
