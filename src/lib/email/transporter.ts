@@ -1,5 +1,4 @@
 import nodemailer from "nodemailer";
-import path from "node:path";
 
 export const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST,
@@ -14,27 +13,23 @@ export const transporter = nodemailer.createTransport({
 export const EMAIL_FROM = `"BINZEO" <${process.env.SMTP_USER}>`;
 
 export function buildOtpEmail(code: string, expiresInSeconds = 30) {
+  const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL ?? "").replace(/\/+$/, "");
+  const logoUrl = siteUrl ? `${siteUrl}/email-logo-white.png` : "/email-logo-white.png";
+
   return {
     subject: "BINZEO Account Security — Your verification code",
-    attachments: [
-      {
-        filename: "binzeo-logo-white.png",
-        path: path.join(process.cwd(), "public", "email-logo-white.png"),
-        cid: "binzeo-logo",
-      },
-    ],
+    // Deliberately no attachments: the logo is a public HTTPS image in the
+    // email body, so Gmail and other clients do not show it as a downloadable file.
     html: `
       <div style="margin:0; padding:28px 12px; background:#000000; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif; color:#ffffff;">
         <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="max-width:560px; margin:0 auto;">
           <tr>
             <td style="padding:0;">
               <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="background:#000000; border:1px solid #27272a; border-radius:18px; overflow:hidden;">
-                <tr>
-                  <td style="height:3px; background:#ffffff; font-size:0; line-height:0;">&nbsp;</td>
-                </tr>
+                <tr><td style="height:3px; background:#ffffff; font-size:0; line-height:0;">&nbsp;</td></tr>
                 <tr>
                   <td style="padding:34px 30px 18px; text-align:center;">
-                    <img src="cid:binzeo-logo" width="190" alt="BINZEO" style="display:block; width:190px; max-width:76%; height:auto; margin:0 auto; border:0;" />
+                    <img src="${logoUrl}" width="190" alt="BINZEO" style="display:block; width:190px; max-width:76%; height:auto; margin:0 auto; border:0;" />
                   </td>
                 </tr>
                 <tr>
