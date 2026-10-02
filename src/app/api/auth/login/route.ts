@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { loginSchema } from "@/lib/validators/auth";
+import { resolveRequestLocation } from "@/lib/request-location";
 import { ok, fail } from "@/lib/api/response";
 
 export async function POST(req: NextRequest) {
@@ -38,6 +39,8 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    const location = await resolveRequestLocation(req.headers, true);
+
     // Fetch profile for user details
     const { data: profile } = await supabase
       .from("profiles")
@@ -47,6 +50,16 @@ export async function POST(req: NextRequest) {
 
     // Only active, OTP-verified accounts may establish a login session.
     if (profile?.account_status !== "active") {
+      const { error: blockedHistoryError } = await supabase.from("user_login_history").insert({
+        user_id: data.user.id,
+        login_method: "password",
+        login_status: "blocked",
+        ip_address: location.ip,
+        user_agent: req.headers.get("user-agent"),
+        country: location.country,
+        city: location.city,
+      });
+      if (blockedHistoryError) console.error("[LOGIN_BLOCKED_HISTORY_ERROR]", blockedHistoryError);
       await supabase.auth.signOut();
       return fail(
         `Account ${profile?.account_status ?? "pending"}`,
@@ -54,6 +67,17 @@ export async function POST(req: NextRequest) {
         "ACCOUNT_BLOCKED"
       );
     }
+
+    const { error: loginHistoryError } = await supabase.from("user_login_history").insert({
+      user_id: data.user.id,
+      login_method: "password",
+      login_status: "success",
+      ip_address: location.ip,
+      user_agent: req.headers.get("user-agent"),
+      country: location.country,
+      city: location.city,
+    });
+    if (loginHistoryError) console.error("[LOGIN_HISTORY_ERROR]", loginHistoryError);
 
     return ok({
       user: {

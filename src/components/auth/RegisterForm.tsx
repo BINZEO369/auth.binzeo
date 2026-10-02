@@ -44,6 +44,7 @@ export default function RegisterForm() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [acceptTerms, setAcceptTerms] = useState(false);
+  const [allowLocation, setAllowLocation] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
@@ -69,6 +70,9 @@ export default function RegisterForm() {
           last_name: lastName.trim(),
           email: email.trim(),
           password,
+          terms_accepted: acceptTerms,
+          privacy_accepted: acceptTerms,
+          location_consent: allowLocation,
         }),
       });
       const data = await res.json();
@@ -130,6 +134,10 @@ export default function RegisterForm() {
         <label className="flex items-start gap-2 px-1 pt-1 text-xs leading-5 text-[#a6abb2]">
           <input type="checkbox" checked={acceptTerms} onChange={(e) => setAcceptTerms(e.target.checked)} className="mt-1 h-3.5 w-3.5 accent-white" />
           <span>I agree to the <Link href="/terms" className="text-white underline underline-offset-2">Terms</Link> and <Link href="/privacy" className="text-white underline underline-offset-2">Privacy Policy</Link></span>
+        </label>
+        <label className="flex items-start gap-2 px-1 pt-1 text-xs leading-5 text-[#a6abb2]">
+          <input type="checkbox" checked={allowLocation} onChange={(e) => setAllowLocation(e.target.checked)} className="mt-1 h-3.5 w-3.5 accent-white" />
+          <span>I allow BINZEO to use my IP address and approximate city/country to create my default address. I can edit it later.</span>
         </label>
         <button type="submit" disabled={loading} className="mt-2 w-full rounded-full bg-white py-3.5 text-sm font-semibold text-[#050607] transition hover:bg-[#e3e6e8] disabled:cursor-not-allowed disabled:opacity-60">{loading ? "Creating your ID..." : "Create account"}</button>
       </form>

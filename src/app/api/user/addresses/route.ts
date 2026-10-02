@@ -54,17 +54,18 @@ export async function POST(req: NextRequest) {
       return fail(parsed.error.issues[0]?.message ?? "Invalid input", 422, "VALIDATION_ERROR");
     }
 
-    // If is_primary, unset others
-    if (parsed.data.is_primary) {
-      await supabase
-        .from("user_addresses")
-        .update({ is_primary: false })
-        .eq("user_id", user.id);
+    const { count: existingCount, error: countError } = await supabase
+      .from("user_addresses")
+      .select("id", { count: "exact", head: true })
+      .eq("user_id", user.id);
+    if (countError) return fail(countError.message, 400, "ADDRESS_CHECK_FAILED");
+    if ((existingCount ?? 0) > 0) {
+      return fail("Only one default address is allowed. Edit your existing address instead.", 409, "SINGLE_ADDRESS_ONLY");
     }
 
     const { data, error } = await supabase
       .from("user_addresses")
-      .insert({ ...parsed.data, user_id: user.id })
+      .insert({ ...parsed.data, user_id: user.id, is_primary: true })
       .select()
       .single();
 

@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { transporter, EMAIL_FROM, buildOtpEmail, getPublicSiteUrl } from "@/lib/email/transporter";
+import { resolveRequestLocation } from "@/lib/request-location";
 import { z } from "zod";
 import { ok, fail } from "@/lib/api/response";
 
@@ -23,15 +24,10 @@ const signupSchema = z.object({
     .string()
     .length(2, "Country code must be 2 characters")
     .optional(),
+  terms_accepted: z.literal(true, { message: "Terms acceptance is required" }),
+  privacy_accepted: z.literal(true, { message: "Privacy Policy acceptance is required" }),
+  location_consent: z.literal(true, { message: "Location permission is required" }),
 });
-
-function requestIp(req: NextRequest) {
-  return (
-    req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
-    req.headers.get("x-real-ip") ||
-    "0.0.0.0"
-  );
-}
 
 export async function POST(req: NextRequest) {
   try {
@@ -44,6 +40,8 @@ export async function POST(req: NextRequest) {
     }
 
     const { email, password, first_name, last_name, country_code } = parsed.data;
+    const location = await resolveRequestLocation(req.headers, true);
+    const consentDate = new Date().toISOString();
 
     // Supabase must not send its built-in confirmation link. The application
     // OTP below is the only email-verification step for a newly created user.
@@ -52,7 +50,15 @@ export async function POST(req: NextRequest) {
         email,
         password,
         email_confirm: true,
-        user_metadata: { first_name, last_name, country_code: country_code || null },
+        user_metadata: {
+          first_name,
+          last_name,
+          country_code: country_code || location.country || null,
+          terms_accepted: true,
+          privacy_accepted: true,
+          location_consent: true,
+          consent_date: consentDate,
+        },
       });
 
     if (createError || !created.user) {
@@ -73,7 +79,14 @@ export async function POST(req: NextRequest) {
         first_name,
         last_name,
         display_name: `${first_name} ${last_name}`.trim(),
-        country_code: country_code || null,
+        country_code: country_code || location.country || null,
+        terms_accepted: true,
+        terms_version: "2026-10-02",
+        privacy_accepted: true,
+        privacy_version: "2026-10-02",
+        location_consent: true,
+        location_consent_at: consentDate,
+        consent_date: consentDate,
       })
       .eq("id", user.id);
     if (profileError) {
@@ -81,9 +94,36 @@ export async function POST(req: NextRequest) {
       return fail("Account created, but profile setup failed", 500, "PROFILE_SETUP_FAILED");
     }
 
+    const { error: signupHistoryError } = await supabase.from("user_login_history").insert({
+      user_id: user.id,
+      login_method: "signup",
+      login_status: "success",
+      ip_address: location.ip,
+      user_agent: req.headers.get("user-agent"),
+      country: location.country,
+      city: location.city,
+    });
+    if (signupHistoryError) console.error("[SIGNUP_HISTORY_ERROR]", signupHistoryError);
+
+    if (location.city || location.region || location.country || location.latitude !== null || location.longitude !== null) {
+      const addressLine = [location.city, location.region, location.country].filter(Boolean).join(", ") || "Approximate location";
+      const { error: addressError } = await supabase.from("user_addresses").insert({
+        user_id: user.id,
+        address_type: "home",
+        address_line_1: addressLine,
+        country_code: location.country,
+        state_province: location.region,
+        city: location.city,
+        latitude: location.latitude,
+        longitude: location.longitude,
+        is_primary: true,
+      });
+      if (addressError) console.error("[SIGNUP_ADDRESS_ERROR]", addressError);
+    }
+
     const { data: challengeData, error: challengeError } = await supabase.rpc(
       "issue_email_verification_code",
-      { target_user_id: user.id, request_ip: requestIp(req) }
+      { target_user_id: user.id, request_ip: location.ip }
     );
     if (challengeError) {
       console.error("[SIGNUP_OTP_ISSUE_ERROR]", challengeError);

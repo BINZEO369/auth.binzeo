@@ -148,10 +148,10 @@ export default function AddressesPage() {
         <div>
           <h1 className="text-2xl font-bold text-[#101820] mb-1">Addresses</h1>
           <p className="text-sm text-[#5c6b70]">
-            Manage your saved addresses
+            One default address is saved per account. You can edit it anytime.
           </p>
         </div>
-        {!showForm && (
+        {!showForm && addresses.length === 0 && (
           <button
             onClick={openNew}
             className="px-4 py-2 rounded-lg bg-[#101820] hover:bg-[#263746] text-white text-sm font-medium transition-colors"
@@ -268,16 +268,6 @@ export default function AddressesPage() {
               />
             </Field>
           </div>
-
-          <label className="flex items-center gap-2 text-sm text-[#35454c] cursor-pointer">
-            <input
-              type="checkbox"
-              checked={!!form.is_primary}
-              onChange={(e) => update("is_primary", e.target.checked)}
-              className="w-4 h-4 rounded border-[#d5dfdd] bg-[#eef2f1] accent-[#101820]"
-            />
-            Set as primary address
-          </label>
 
           <div className="flex justify-end gap-3 pt-2">
             <button
