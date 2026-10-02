@@ -2,7 +2,17 @@ import Link from "next/link";
 
 export default function Hero() {
   return (
-    <section className="relative overflow-hidden">
+    <section className="relative overflow-hidden bg-[#e7f0f2]">
+      <div
+        className="absolute inset-0 bg-cover bg-center opacity-65"
+        style={{ backgroundImage: "url('/images/binzeo-cloud-hero.jpg')" }}
+        aria-hidden="true"
+      />
+      <div
+        className="absolute inset-0 bg-gradient-to-b from-white/85 via-white/55 to-[#eef2f1]"
+        aria-hidden="true"
+      />
+
       {/* Glow background */}
       <div className="absolute inset-0 -z-10 pointer-events-none">
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-[#101820]/20 rounded-full blur-[120px] animate-glow" />
@@ -45,7 +55,7 @@ export default function Hero() {
         <div className="flex flex-col sm:flex-row items-center justify-center gap-3 animate-fade-up delay-300">
           <Link
             href="/register"
-            className="w-full sm:w-auto px-6 py-3 rounded-lg bg-[#101820] hover:bg-[#263746] text-[#101820] font-medium transition-all hover:scale-105 shadow-lg shadow-[#9bd8c7]/35"
+            className="w-full sm:w-auto px-6 py-3 rounded-lg bg-[#101820] hover:bg-[#263746] text-white font-medium transition-all hover:scale-105 shadow-lg shadow-[#9bd8c7]/35"
           >
             Create your ID
           </Link>

@@ -249,7 +249,7 @@ export default function SectorsPage() {
                     className={`mt-auto w-full py-2 rounded-lg text-sm font-medium transition-colors disabled:opacity-60 ${
                       joined
                         ? "border border-[#d5dfdd] text-[#35454c] hover:border-[#efb8b0] hover:text-[#b84f4b]"
-                        : "bg-[#101820] hover:bg-[#263746] text-[#101820]"
+                        : "bg-[#101820] hover:bg-[#263746] text-white"
                     }`}
                   >
                     {busyId === s.id

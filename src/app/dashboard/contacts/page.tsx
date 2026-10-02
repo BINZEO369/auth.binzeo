@@ -153,7 +153,7 @@ export default function ContactsPage() {
         {!showForm && (
           <button
             onClick={openNew}
-            className="px-4 py-2 rounded-lg bg-[#101820] hover:bg-[#263746] text-[#101820] text-sm font-medium transition-colors"
+            className="px-4 py-2 rounded-lg bg-[#101820] hover:bg-[#263746] text-white text-sm font-medium transition-colors"
           >
             + Add contact
           </button>
@@ -237,7 +237,7 @@ export default function ContactsPage() {
             <button
               type="submit"
               disabled={saving}
-              className="px-5 py-2 rounded-lg bg-[#101820] hover:bg-[#263746] disabled:opacity-60 text-[#101820] text-sm font-medium transition-colors"
+              className="px-5 py-2 rounded-lg bg-[#101820] hover:bg-[#263746] disabled:opacity-60 text-white text-sm font-medium transition-colors"
             >
               {saving ? "Saving..." : editingId ? "Update" : "Add"}
             </button>
@@ -259,7 +259,7 @@ export default function ContactsPage() {
           </p>
           <button
             onClick={openNew}
-            className="px-4 py-2 rounded-lg bg-[#101820] hover:bg-[#263746] text-[#101820] text-sm font-medium transition-colors"
+            className="px-4 py-2 rounded-lg bg-[#101820] hover:bg-[#263746] text-white text-sm font-medium transition-colors"
           >
             Add contact
           </button>

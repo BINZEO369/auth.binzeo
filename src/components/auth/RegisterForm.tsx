@@ -95,7 +95,7 @@ export default function RegisterForm() {
         </p>
         <Link
           href="/login"
-          className="inline-block px-5 py-2.5 rounded-lg bg-[#101820] hover:bg-[#263746] text-[#101820] text-sm font-medium transition-colors"
+          className="inline-block px-5 py-2.5 rounded-lg bg-[#101820] hover:bg-[#263746] text-white text-sm font-medium transition-colors"
         >
           Go to login
         </Link>
@@ -229,7 +229,7 @@ export default function RegisterForm() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full py-2.5 rounded-lg bg-[#101820] hover:bg-[#263746] disabled:opacity-60 disabled:cursor-not-allowed text-[#101820] font-medium transition-colors shadow-lg shadow-[#9bd8c7]/25"
+          className="w-full py-2.5 rounded-lg bg-[#101820] hover:bg-[#263746] disabled:opacity-60 disabled:cursor-not-allowed text-white font-medium transition-colors shadow-lg shadow-[#9bd8c7]/25"
         >
           {loading ? "Creating your ID..." : "Create account"}
         </button>

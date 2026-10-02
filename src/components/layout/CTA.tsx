@@ -4,7 +4,16 @@ export default function CTA() {
   return (
     <section className="py-20 sm:py-28 border-t border-[#d5dfdd]">
       <div className="max-w-5xl mx-auto px-4 sm:px-6">
-        <div className="relative rounded-3xl border border-[#b4ded3] bg-gradient-to-br from-[#d8eef5] via-white to-white p-8 sm:p-16 text-center overflow-hidden">
+        <div className="relative rounded-3xl border border-[#b4ded3] bg-[#dceef0] p-8 sm:p-16 text-center overflow-hidden">
+          <div
+            className="absolute inset-0 bg-cover bg-center opacity-70"
+            style={{ backgroundImage: "url('/images/binzeo-cloud-card.jpg')" }}
+            aria-hidden="true"
+          />
+          <div
+            className="absolute inset-0 bg-gradient-to-br from-white/80 via-white/55 to-[#dff2e9]/75"
+            aria-hidden="true"
+          />
           <div className="absolute -top-32 left-1/2 -translate-x-1/2 w-[500px] h-[500px] bg-[#101820]/20 rounded-full blur-[120px] pointer-events-none" />
 
           <div className="relative">
@@ -18,7 +27,7 @@ export default function CTA() {
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
               <Link
                 href="/register"
-                className="w-full sm:w-auto px-6 py-3 rounded-lg bg-[#101820] hover:bg-[#263746] text-[#101820] font-medium transition-all hover:scale-105 shadow-lg shadow-[#9bd8c7]/35"
+                className="w-full sm:w-auto px-6 py-3 rounded-lg bg-[#101820] hover:bg-[#263746] text-white font-medium transition-all hover:scale-105 shadow-lg shadow-[#9bd8c7]/35"
               >
                 Get started — it&apos;s free
               </Link>

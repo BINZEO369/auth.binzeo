@@ -40,7 +40,7 @@ export default function Navbar() {
           </Link>
           <Link
             href="/register"
-            className="text-sm font-medium bg-[#101820] hover:bg-[#263746] text-[#101820] px-4 py-2 rounded-lg transition-colors shadow-lg shadow-[#9bd8c7]/25"
+            className="text-sm font-medium bg-[#101820] hover:bg-[#263746] text-white px-4 py-2 rounded-lg transition-colors shadow-lg shadow-[#9bd8c7]/25"
           >
             Get Started
           </Link>

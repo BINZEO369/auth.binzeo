@@ -92,7 +92,7 @@ export default function DashboardShell({ children, user }: Props) {
 
         <div className="p-3 rounded-xl border border-[#d5dfdd] bg-[#eef2f1]">
           <div className="flex items-center gap-2.5 mb-2">
-            <div className="w-8 h-8 rounded-full bg-[#101820] flex items-center justify-center text-xs font-bold text-[#101820]">
+            <div className="w-8 h-8 rounded-full bg-[#101820] flex items-center justify-center text-xs font-bold text-white">
               {initials}
             </div>
             <div className="min-w-0 flex-1">
