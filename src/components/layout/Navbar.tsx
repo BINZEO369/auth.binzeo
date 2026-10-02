@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 
 export default function Navbar() {
@@ -5,12 +6,14 @@ export default function Navbar() {
     <header className="sticky top-0 z-50 border-b border-[#1f1f2e] bg-[#0a0a0f]/80 backdrop-blur-xl">
       <nav className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
         <Link href="/" className="flex items-center gap-2 group">
-          <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-indigo-500 to-indigo-700 flex items-center justify-center font-bold text-white text-sm shadow-lg shadow-indigo-600/30 group-hover:shadow-indigo-500/50 transition-shadow">
-            B
-          </div>
-          <span className="font-semibold text-lg tracking-tight text-white">
-            Binzeo <span className="text-indigo-400">ID</span>
-          </span>
+          <Image
+            src="/logo.svg"
+            alt="BINZEO"
+            width={122}
+            height={29}
+            priority
+            className="h-8 w-auto invert transition-opacity group-hover:opacity-80"
+          />
         </Link>
 
         <nav className="hidden md:flex items-center gap-8">
