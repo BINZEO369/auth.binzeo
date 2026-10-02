@@ -45,11 +45,11 @@ export async function POST(req: NextRequest) {
       .eq("id", data.user.id)
       .maybeSingle();
 
-    // Block suspended/deactivated accounts
-    if (profile?.account_status && !["active", "pending"].includes(profile.account_status)) {
+    // Only active, OTP-verified accounts may establish a login session.
+    if (profile?.account_status !== "active") {
       await supabase.auth.signOut();
       return fail(
-        `Account ${profile.account_status}`,
+        `Account ${profile?.account_status ?? "pending"}`,
         403,
         "ACCOUNT_BLOCKED"
       );

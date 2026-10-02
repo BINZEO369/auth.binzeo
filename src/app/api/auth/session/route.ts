@@ -43,6 +43,11 @@ export async function GET() {
       .eq("id", user.id)
       .maybeSingle();
 
+    if (profile?.account_status !== "active") {
+      await supabase.auth.signOut();
+      return fail("Account is not active", 403, "ACCOUNT_BLOCKED");
+    }
+
     return ok({
       user: {
         id: user.id,

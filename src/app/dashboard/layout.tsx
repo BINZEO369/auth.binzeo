@@ -15,25 +15,31 @@ export default async function DashboardLayout({
 
   if (!user) redirect("/login?next=/dashboard");
 
+  const requestPath = (await headers()).get("x-pathname") ?? "";
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("binzeo_user_id, first_name, last_name, display_name, account_status")
+    .eq("id", user.id)
+    .maybeSingle();
+
   const { data: verification } = await supabase
     .from("user_verification_records")
     .select("verification_status")
     .eq("user_id", user.id)
     .eq("verification_type", "email")
     .maybeSingle();
-  const requestPath = (await headers()).get("x-pathname") ?? "";
+  const isPendingVerification =
+    profile?.account_status === "pending" &&
+    verification?.verification_status !== "verified";
+  if (profile?.account_status !== "active" && !isPendingVerification) {
+    redirect("/login?blocked=1");
+  }
   if (
-    verification?.verification_status !== "verified" &&
+    isPendingVerification &&
     requestPath !== "/dashboard/verify-email"
   ) {
     redirect("/dashboard/verify-email");
   }
-
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("binzeo_user_id, first_name, last_name, display_name, account_status")
-    .eq("id", user.id)
-    .maybeSingle();
 
   return (
     <DashboardShell
