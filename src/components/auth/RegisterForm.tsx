@@ -1,8 +1,25 @@
 "use client";
 
+import Image from "next/image";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+
+const fieldClass =
+  "w-full rounded-2xl border border-[#4a4d51] bg-transparent px-4 py-3.5 text-sm text-white placeholder-[#8f949b] outline-none transition-colors focus:border-white focus:ring-1 focus:ring-white/30";
+
+function BrandLogo() {
+  return (
+    <Image
+      src="/logo.svg"
+      alt="BINZEO"
+      width={132}
+      height={31}
+      priority
+      className="mx-auto h-8 w-auto invert"
+    />
+  );
+}
 
 export default function RegisterForm() {
   const router = useRouter();
@@ -70,33 +87,18 @@ export default function RegisterForm() {
 
   if (success) {
     return (
-      <div className="rounded-2xl border border-[#d5dfdd] bg-white/90 backdrop-blur p-8 text-center">
-        <div className="w-14 h-14 mx-auto mb-4 rounded-full bg-[#dff2e9] border border-[#a8d9c4] flex items-center justify-center">
-          <svg
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className="w-7 h-7 text-[#2e8064]"
-          >
-            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
-            <path d="m9 11 3 3L22 4" />
+      <div className="mx-auto w-full max-w-[420px] rounded-[34px] bg-[#050607] px-6 py-10 text-center text-white shadow-[0_24px_70px_rgba(16,24,32,0.24)] ring-8 ring-white/70 sm:px-9">
+        <BrandLogo />
+        <div className="mx-auto mt-12 flex h-14 w-14 items-center justify-center rounded-full bg-[#dff2e9] text-[#2e8064]">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" className="h-7 w-7">
+            <path d="M5 12.5 9.5 17 19 7.5" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
         </div>
-        <h2 className="text-xl font-bold text-[#101820] mb-2">
-          Check your email
-        </h2>
-        <p className="text-sm text-[#5c6b70] mb-6">
-          We&apos;ve sent a confirmation link to{" "}
-          <span className="text-[#101820] font-medium">{email}</span>. Click it to
-          activate your Binzeo ID.
+        <h1 className="mt-6 text-2xl font-semibold">Check your email</h1>
+        <p className="mt-3 text-sm leading-6 text-[#a6abb2]">
+          We&apos;ve sent a confirmation link to <span className="text-white">{email}</span>.
         </p>
-        <Link
-          href="/login"
-          className="inline-block px-5 py-2.5 rounded-lg bg-[#101820] hover:bg-[#263746] text-white text-sm font-medium transition-colors"
-        >
+        <Link href="/login" className="mt-8 inline-flex w-full items-center justify-center rounded-full bg-white py-3 text-sm font-semibold text-[#050607] transition hover:bg-[#e3e6e8]">
           Go to login
         </Link>
       </div>
@@ -104,145 +106,126 @@ export default function RegisterForm() {
   }
 
   return (
-    <div className="rounded-2xl border border-[#d5dfdd] bg-white/90 backdrop-blur p-6 sm:p-8">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-[#101820] mb-2">
-          Create your Binzeo ID
-        </h1>
-        <p className="text-sm text-[#5c6b70]">
-          Get your unique BZ-U ID in seconds
-        </p>
+    <div className="mx-auto w-full max-w-[420px] rounded-[34px] bg-[#050607] px-5 py-8 text-white shadow-[0_24px_70px_rgba(16,24,32,0.24)] ring-8 ring-white/70 sm:px-8 sm:py-9">
+      <BrandLogo />
+
+      <div className="mt-9 text-center">
+        <h1 className="text-[28px] font-semibold tracking-tight">Create your account</h1>
+        <p className="mt-2 text-sm text-[#a6abb2]">Let&apos;s get you started with BINZEO</p>
       </div>
 
       {error && (
-        <div className="mb-4 p-3 rounded-lg border border-[#efb8b0] bg-[#fbe5e2] text-[#b84f4b] text-sm">
+        <div className="mt-6 rounded-2xl border border-[#9d514f] bg-[#2a1516] px-4 py-3 text-sm text-[#ffb8b4]">
           {error}
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="mt-7 space-y-3">
         <div className="grid grid-cols-2 gap-3">
-          <div>
-            <label className="block text-sm font-medium text-[#35454c] mb-1.5">
-              First name
-            </label>
-            <input
-              type="text"
-              value={firstName}
-              onChange={(e) => setFirstName(e.target.value)}
-              required
-              autoComplete="given-name"
-              placeholder="John"
-              className="w-full px-3.5 py-2.5 rounded-lg border border-[#d5dfdd] bg-[#eef2f1] text-[#101820] placeholder-gray-600 focus:outline-none focus:border-[#79b9d5] focus:ring-2 focus:ring-[#79b9d5]/30 transition-colors"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-[#35454c] mb-1.5">
-              Last name
-            </label>
-            <input
-              type="text"
-              value={lastName}
-              onChange={(e) => setLastName(e.target.value)}
-              required
-              autoComplete="family-name"
-              placeholder="Doe"
-              className="w-full px-3.5 py-2.5 rounded-lg border border-[#d5dfdd] bg-[#eef2f1] text-[#101820] placeholder-gray-600 focus:outline-none focus:border-[#79b9d5] focus:ring-2 focus:ring-[#79b9d5]/30 transition-colors"
-            />
-          </div>
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-[#35454c] mb-1.5">
-            Email
-          </label>
           <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            type="text"
+            value={firstName}
+            onChange={(e) => setFirstName(e.target.value)}
             required
-            autoComplete="email"
-            placeholder="you@example.com"
-            className="w-full px-3.5 py-2.5 rounded-lg border border-[#d5dfdd] bg-[#eef2f1] text-[#101820] placeholder-gray-600 focus:outline-none focus:border-[#79b9d5] focus:ring-2 focus:ring-[#79b9d5]/30 transition-colors"
+            autoComplete="given-name"
+            placeholder="First name"
+            aria-label="First name"
+            className={fieldClass}
+          />
+          <input
+            type="text"
+            value={lastName}
+            onChange={(e) => setLastName(e.target.value)}
+            required
+            autoComplete="family-name"
+            placeholder="Last name"
+            aria-label="Last name"
+            className={fieldClass}
           />
         </div>
 
-        <div>
-          <label className="block text-sm font-medium text-[#35454c] mb-1.5">
-            Password
-          </label>
-          <div className="relative">
-            <input
-              type={showPassword ? "text" : "password"}
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              minLength={8}
-              autoComplete="new-password"
-              placeholder="At least 8 characters"
-              className="w-full px-3.5 py-2.5 pr-14 rounded-lg border border-[#d5dfdd] bg-[#eef2f1] text-[#101820] placeholder-gray-600 focus:outline-none focus:border-[#79b9d5] focus:ring-2 focus:ring-[#79b9d5]/30 transition-colors"
-            />
-            <button
-              type="button"
-              onClick={() => setShowPassword((s) => !s)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-[#6d7c80] hover:text-[#35454c] text-xs"
-            >
-              {showPassword ? "Hide" : "Show"}
-            </button>
-          </div>
-        </div>
+        <input
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+          autoComplete="email"
+          placeholder="Your Email"
+          aria-label="Email"
+          className={fieldClass}
+        />
 
-        <div>
-          <label className="block text-sm font-medium text-[#35454c] mb-1.5">
-            Confirm password
-          </label>
+        <div className="relative">
           <input
             type={showPassword ? "text" : "password"}
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
             required
+            minLength={8}
             autoComplete="new-password"
-            placeholder="Repeat your password"
-            className="w-full px-3.5 py-2.5 rounded-lg border border-[#d5dfdd] bg-[#eef2f1] text-[#101820] placeholder-gray-600 focus:outline-none focus:border-[#79b9d5] focus:ring-2 focus:ring-[#79b9d5]/30 transition-colors"
+            placeholder="Your Password"
+            aria-label="Password"
+            className={`${fieldClass} pr-16`}
           />
+          <button
+            type="button"
+            onClick={() => setShowPassword((s) => !s)}
+            className="absolute right-4 top-1/2 -translate-y-1/2 text-xs text-[#a6abb2] hover:text-white"
+          >
+            {showPassword ? "Hide" : "Show"}
+          </button>
         </div>
 
-        <label className="flex items-start gap-2.5 text-sm text-[#5c6b70] cursor-pointer">
+        <input
+          type={showPassword ? "text" : "password"}
+          value={confirmPassword}
+          onChange={(e) => setConfirmPassword(e.target.value)}
+          required
+          autoComplete="new-password"
+          placeholder="Confirm Password"
+          aria-label="Confirm password"
+          className={fieldClass}
+        />
+
+        <label className="flex items-start gap-2 px-1 pt-1 text-xs leading-5 text-[#a6abb2]">
           <input
             type="checkbox"
             checked={acceptTerms}
             onChange={(e) => setAcceptTerms(e.target.checked)}
-            className="mt-0.5 w-4 h-4 rounded border-[#d5dfdd] bg-[#eef2f1] accent-[#101820]"
+            className="mt-1 h-3.5 w-3.5 accent-white"
           />
           <span>
-            I agree to the{" "}
-            <Link href="/terms" className="text-[#216f9e] hover:text-[#3f86b2]">
-              Terms
-            </Link>{" "}
-            and{" "}
-            <Link href="/privacy" className="text-[#216f9e] hover:text-[#3f86b2]">
-              Privacy Policy
-            </Link>
+            I agree to the <Link href="/terms" className="text-white underline underline-offset-2">Terms</Link> and <Link href="/privacy" className="text-white underline underline-offset-2">Privacy Policy</Link>
           </span>
         </label>
 
         <button
           type="submit"
           disabled={loading}
-          className="w-full py-2.5 rounded-lg bg-[#101820] hover:bg-[#263746] disabled:opacity-60 disabled:cursor-not-allowed text-white font-medium transition-colors shadow-lg shadow-[#9bd8c7]/25"
+          className="mt-2 w-full rounded-full bg-white py-3.5 text-sm font-semibold text-[#050607] transition hover:bg-[#e3e6e8] disabled:cursor-not-allowed disabled:opacity-60"
         >
           {loading ? "Creating your ID..." : "Create account"}
         </button>
       </form>
 
-      <p className="mt-6 text-center text-sm text-[#5c6b70]">
+      <div className="my-6 flex items-center gap-3 text-xs text-[#8f949b]">
+        <span className="h-px flex-1 bg-[#3d4145]" />
+        <span>or</span>
+        <span className="h-px flex-1 bg-[#3d4145]" />
+      </div>
+
+      <div className="space-y-3">
+        <button type="button" onClick={() => setError("Apple sign-up is not available yet.")} className="flex w-full items-center justify-center gap-2 rounded-full bg-[#15171a] py-3 text-sm font-medium text-white transition hover:bg-[#202327]">
+          <span className="text-base">●</span> Continue with Apple
+        </button>
+        <button type="button" onClick={() => setError("Phone sign-up is not available yet.")} className="flex w-full items-center justify-center gap-2 rounded-full bg-[#15171a] py-3 text-sm font-medium text-white transition hover:bg-[#202327]">
+          <span aria-hidden="true">⌕</span> Continue with phone
+        </button>
+      </div>
+
+      <p className="mt-7 text-center text-sm text-[#a6abb2]">
         Already have an account?{" "}
-        <Link
-          href="/login"
-          className="text-[#216f9e] hover:text-[#3f86b2] font-medium"
-        >
-          Sign in
-        </Link>
+        <Link href="/login" className="font-medium text-white hover:text-[#c9e8f1]">Sign in</Link>
       </p>
     </div>
   );

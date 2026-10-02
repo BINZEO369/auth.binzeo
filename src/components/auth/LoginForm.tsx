@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
@@ -45,6 +46,14 @@ export default function LoginForm() {
 
   return (
     <div className="rounded-2xl border border-[#d5dfdd] bg-white/90 backdrop-blur p-6 sm:p-8">
+      <Image
+        src="/logo.svg"
+        alt="BINZEO"
+        width={122}
+        height={29}
+        priority
+        className="mx-auto mb-8 h-8 w-auto"
+      />
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-[#101820] mb-2">Welcome back</h1>
         <p className="text-sm text-[#5c6b70]">
