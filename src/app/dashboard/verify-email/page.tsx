@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { apiFetch } from "@/lib/api/client";
 
@@ -9,6 +9,7 @@ type Step = "idle" | "sent" | "verified";
 
 export default function VerifyEmailPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [step, setStep] = useState<Step>("idle");
   const [challengeId, setChallengeId] = useState<string | null>(null);
   const [digits, setDigits] = useState<string[]>(["", "", "", "", "", ""]);
@@ -20,6 +21,15 @@ export default function VerifyEmailPage() {
   } | null>(null);
 
   const inputsRef = useRef<Array<HTMLInputElement | null>>([]);
+
+  useEffect(() => {
+    const signupChallengeId = searchParams.get("challenge_id");
+    if (!signupChallengeId) return;
+    setChallengeId(signupChallengeId);
+    setStep("sent");
+    setResendIn(30);
+    setTimeout(() => focusIndex(0), 100);
+  }, [searchParams]);
 
   // Resend countdown
   useEffect(() => {

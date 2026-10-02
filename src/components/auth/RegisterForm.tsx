@@ -77,9 +77,9 @@ export default function RegisterForm() {
         setLoading(false);
         return;
       }
-      if (data.data?.requires_email_confirmation) {
-        setSuccess(true);
-        setLoading(false);
+      if (data.data?.requires_custom_email_verification && data.data.challenge_id) {
+        router.push(`/dashboard/verify-email?challenge_id=${encodeURIComponent(data.data.challenge_id)}`);
+        router.refresh();
         return;
       }
       router.push("/dashboard");
@@ -100,7 +100,7 @@ export default function RegisterForm() {
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" className="h-7 w-7"><path d="M5 12.5 9.5 17 19 7.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
         </div>
         <h1 className="mt-6 text-center text-2xl font-semibold">Check your email</h1>
-        <p className="mt-3 text-center text-sm leading-6 text-[#a6abb2]">We&apos;ve sent a confirmation link to <span className="text-white">{email}</span>.</p>
+        <p className="mt-3 text-center text-sm leading-6 text-[#a6abb2]">We&apos;ve sent a 6-digit verification code to <span className="text-white">{email}</span>.</p>
         <Link href="/login" className="mt-8 inline-flex w-full items-center justify-center rounded-full bg-white py-3 text-sm font-semibold text-[#050607] transition hover:bg-[#e3e6e8]">Go to login</Link>
       </div>
     );
