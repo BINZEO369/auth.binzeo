@@ -11,6 +11,7 @@ const NAV = [
   { href: "/dashboard/contacts", label: "Contacts", icon: "phone" },
   { href: "/dashboard/sectors", label: "Sectors", icon: "grid" },
   { href: "/dashboard/devices", label: "Devices", icon: "device" },
+  { href: "/dashboard/verify-email", label: "Verify Email", icon: "check" },
   { href: "/dashboard/security", label: "Security", icon: "shield" },
 ];
 
@@ -39,6 +40,8 @@ function NavIcon({ name }: { name: string }) {
       return <svg {...c}><rect x="5" y="2" width="14" height="20" rx="2" /><path d="M12 18h.01" /></svg>;
     case "shield":
       return <svg {...c}><path d="M12 2 4 6v6c0 5 3.5 9.5 8 10 4.5-.5 8-5 8-10V6l-8-4Z" /></svg>;
+    case "check":
+      return <svg {...c}><path d="M20 6 9 17l-5-5" /></svg>;
     default:
       return null;
   }
