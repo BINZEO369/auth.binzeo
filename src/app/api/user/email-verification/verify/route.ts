@@ -61,6 +61,9 @@ export async function POST(req: NextRequest) {
     const result = Array.isArray(data) ? data[0] : data;
 
     const verified = result?.verified === true;
+    if (verified && result?.user_id !== user.id) {
+      return fail("Verification challenge does not belong to this user", 403, "FORBIDDEN");
+    }
     const reason: string = result?.reason ?? (verified ? "verified" : "verification_failed");
 
     return ok({

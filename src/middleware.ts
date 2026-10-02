@@ -5,7 +5,9 @@ const PROTECTED = ['/dashboard']
 const AUTH_ONLY = ['/login', '/register']
 
 export async function middleware(req: NextRequest) {
-  let res = NextResponse.next({ request: req })
+  const requestHeaders = new Headers(req.headers)
+  requestHeaders.set('x-pathname', req.nextUrl.pathname)
+  let res = NextResponse.next({ request: { headers: requestHeaders } })
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -15,7 +17,7 @@ export async function middleware(req: NextRequest) {
         getAll: () => req.cookies.getAll(),
         setAll: (list) => {
           list.forEach(({ name, value }) => req.cookies.set(name, value))
-          res = NextResponse.next({ request: req })
+          res = NextResponse.next({ request: { headers: requestHeaders } })
           list.forEach(({ name, value, options }) =>
             res.cookies.set(name, value, options)
           )

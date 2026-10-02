@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { headers } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
 import DashboardShell from "@/components/dashboard/DashboardShell";
 
@@ -13,6 +14,20 @@ export default async function DashboardLayout({
   } = await supabase.auth.getUser();
 
   if (!user) redirect("/login?next=/dashboard");
+
+  const { data: verification } = await supabase
+    .from("user_verification_records")
+    .select("verification_status")
+    .eq("user_id", user.id)
+    .eq("verification_type", "email")
+    .maybeSingle();
+  const requestPath = (await headers()).get("x-pathname") ?? "";
+  if (
+    verification?.verification_status !== "verified" &&
+    requestPath !== "/dashboard/verify-email"
+  ) {
+    redirect("/dashboard/verify-email");
+  }
 
   const { data: profile } = await supabase
     .from("profiles")

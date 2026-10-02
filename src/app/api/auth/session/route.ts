@@ -13,6 +13,16 @@ export async function GET() {
       return fail("Unauthorized", 401, "UNAUTHORIZED");
     }
 
+    const { data: verification } = await supabase
+      .from("user_verification_records")
+      .select("verification_status")
+      .eq("user_id", user.id)
+      .eq("verification_type", "email")
+      .maybeSingle();
+    if (verification?.verification_status !== "verified") {
+      return fail("Email verification required", 403, "EMAIL_VERIFICATION_REQUIRED");
+    }
+
     const { data: profile } = await supabase
       .from("profiles")
       .select(

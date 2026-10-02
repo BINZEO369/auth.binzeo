@@ -23,6 +23,21 @@ export async function POST(req: NextRequest) {
       return fail("Invalid email or password", 401, "INVALID_CREDENTIALS");
     }
 
+    const { data: verification } = await supabase
+      .from("user_verification_records")
+      .select("verification_status")
+      .eq("user_id", data.user.id)
+      .eq("verification_type", "email")
+      .maybeSingle();
+    if (verification?.verification_status !== "verified") {
+      await supabase.auth.signOut();
+      return fail(
+        "Please verify your email with the OTP before signing in",
+        403,
+        "EMAIL_VERIFICATION_REQUIRED"
+      );
+    }
+
     // Fetch profile for user details
     const { data: profile } = await supabase
       .from("profiles")
