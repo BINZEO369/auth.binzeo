@@ -20,7 +20,7 @@ type Device = {
 };
 
 const inputCls =
-  "w-full px-3 py-2 rounded-lg border border-[#1f1f2e] bg-[#0a0a0f] text-white text-sm placeholder-gray-600 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-colors";
+  "w-full px-3 py-2 rounded-lg border border-[#d5dfdd] bg-[#eef2f1] text-[#101820] text-sm placeholder-gray-600 focus:outline-none focus:border-[#79b9d5] focus:ring-2 focus:ring-[#79b9d5]/30 transition-colors";
 
 function timeAgo(iso: string | null) {
   if (!iso) return "Never";
@@ -116,7 +116,7 @@ export default function DevicesPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <div className="w-6 h-6 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin" />
+        <div className="w-6 h-6 border-2 border-[#79b9d5] border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
@@ -124,8 +124,8 @@ export default function DevicesPage() {
   return (
     <div className="max-w-3xl mx-auto space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-white mb-1">Devices</h1>
-        <p className="text-sm text-gray-400">
+        <h1 className="text-2xl font-bold text-[#101820] mb-1">Devices</h1>
+        <p className="text-sm text-[#5c6b70]">
           Devices that have accessed your Binzeo ID account
         </p>
       </div>
@@ -134,8 +134,8 @@ export default function DevicesPage() {
         <div
           className={`p-3 rounded-lg border text-sm ${
             message.type === "success"
-              ? "bg-green-500/10 border-green-500/30 text-green-400"
-              : "bg-red-500/10 border-red-500/30 text-red-400"
+              ? "bg-[#dff2e9] border-[#a8d9c4] text-[#2e8064]"
+              : "bg-[#fbe5e2] border-[#efb8b0] text-[#b84f4b]"
           }`}
         >
           {message.text}
@@ -143,7 +143,7 @@ export default function DevicesPage() {
       )}
 
       {devices.length === 0 ? (
-        <div className="p-12 rounded-2xl border border-dashed border-[#1f1f2e] text-center">
+        <div className="p-12 rounded-2xl border border-dashed border-[#d5dfdd] text-center">
           <Image
             src="/icons/device.svg"
             alt=""
@@ -151,7 +151,7 @@ export default function DevicesPage() {
             height={40}
             className="invert mx-auto mb-3"
           />
-          <p className="text-gray-400 text-sm">
+          <p className="text-[#5c6b70] text-sm">
             No devices recorded yet.
           </p>
         </div>
@@ -160,11 +160,11 @@ export default function DevicesPage() {
           {devices.map((d) => (
             <div
               key={d.id}
-              className="p-5 rounded-2xl border border-[#1f1f2e] bg-[#0d0d13] hover:border-indigo-500/30 transition-colors"
+              className="p-5 rounded-2xl border border-[#d5dfdd] bg-white hover:border-[#9bd7c7] transition-colors"
             >
               <div className="flex items-start justify-between gap-3 mb-3">
                 <div className="flex items-start gap-3 min-w-0 flex-1">
-                  <div className="w-10 h-10 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center shrink-0 text-lg">
+                  <div className="w-10 h-10 rounded-xl bg-[#dff2eb] border border-[#b4ded3] flex items-center justify-center shrink-0 text-lg">
                     <Image
                       src={
                         d.device_type === "mobile"
@@ -191,24 +191,24 @@ export default function DevicesPage() {
                         <button
                           onClick={() => handleRename(d.id)}
                           disabled={busyId === d.id}
-                          className="text-xs text-indigo-400 hover:text-indigo-300 shrink-0"
+                          className="text-xs text-[#216f9e] hover:text-[#3f86b2] shrink-0"
                         >
                           Save
                         </button>
                         <button
                           onClick={() => setEditingId(null)}
-                          className="text-xs text-gray-500 hover:text-gray-300 shrink-0"
+                          className="text-xs text-[#6d7c80] hover:text-[#35454c] shrink-0"
                         >
                           Cancel
                         </button>
                       </div>
                     ) : (
                       <div className="flex items-center gap-2 flex-wrap">
-                        <span className="font-medium text-white text-sm truncate">
+                        <span className="font-medium text-[#101820] text-sm truncate">
                           {d.device_name ?? "Unnamed device"}
                         </span>
                         {d.is_trusted && (
-                          <span className="text-[10px] px-2 py-0.5 rounded-full bg-green-500/10 text-green-400 border border-green-500/20">
+                          <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#dff2e9] text-[#2e8064] border border-[#b6e1cf]">
                             <Image
                               src="/icons/check.svg"
                               alt=""
@@ -222,7 +222,7 @@ export default function DevicesPage() {
                       </div>
                     )}
 
-                    <div className="text-xs text-gray-500 mt-1 truncate">
+                    <div className="text-xs text-[#6d7c80] mt-1 truncate">
                       {[
                         d.operating_system,
                         d.browser,
@@ -231,24 +231,24 @@ export default function DevicesPage() {
                         .filter(Boolean)
                         .join(" · ")}
                     </div>
-                    <div className="text-xs text-gray-600 mt-0.5">
+                    <div className="text-xs text-[#849295] mt-0.5">
                       Last seen: {timeAgo(d.last_seen_at)}
                     </div>
                   </div>
                 </div>
               </div>
 
-              <div className="flex items-center gap-3 pt-3 border-t border-[#1f1f2e]">
+              <div className="flex items-center gap-3 pt-3 border-t border-[#d5dfdd]">
                 <button
                   onClick={() => startEdit(d)}
-                  className="text-xs text-gray-400 hover:text-indigo-400 transition-colors"
+                  className="text-xs text-[#5c6b70] hover:text-[#216f9e] transition-colors"
                 >
                   Rename
                 </button>
                 <button
                   onClick={() => toggleTrust(d)}
                   disabled={busyId === d.id}
-                  className="text-xs text-gray-400 hover:text-indigo-400 transition-colors disabled:opacity-50"
+                  className="text-xs text-[#5c6b70] hover:text-[#216f9e] transition-colors disabled:opacity-50"
                 >
                   {d.is_trusted ? "Untrust" : "Trust"}
                 </button>
@@ -256,7 +256,7 @@ export default function DevicesPage() {
                 <button
                   onClick={() => handleRemove(d.id)}
                   disabled={busyId === d.id}
-                  className="text-xs text-red-400 hover:text-red-300 disabled:opacity-50"
+                  className="text-xs text-[#b84f4b] hover:text-red-300 disabled:opacity-50"
                 >
                   Remove
                 </button>

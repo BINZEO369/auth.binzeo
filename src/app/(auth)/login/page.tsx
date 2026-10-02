@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 
 export default function LoginPage() {
   return (
-    <Suspense fallback={<div className="text-center text-gray-500">Loading...</div>}>
+    <Suspense fallback={<div className="text-center text-[#6d7c80]">Loading...</div>}>
       <LoginForm />
     </Suspense>
   );

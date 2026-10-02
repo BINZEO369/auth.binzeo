@@ -97,7 +97,7 @@ export default function SectorsPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <div className="w-6 h-6 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin" />
+        <div className="w-6 h-6 border-2 border-[#79b9d5] border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
@@ -105,8 +105,8 @@ export default function SectorsPage() {
   return (
     <div className="max-w-3xl mx-auto space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-white mb-1">Sectors</h1>
-        <p className="text-sm text-gray-400">
+        <h1 className="text-2xl font-bold text-[#101820] mb-1">Sectors</h1>
+        <p className="text-sm text-[#5c6b70]">
           Join industry sectors to unlock related features
         </p>
       </div>
@@ -115,8 +115,8 @@ export default function SectorsPage() {
         <div
           className={`p-3 rounded-lg border text-sm ${
             message.type === "success"
-              ? "bg-green-500/10 border-green-500/30 text-green-400"
-              : "bg-red-500/10 border-red-500/30 text-red-400"
+              ? "bg-[#dff2e9] border-[#a8d9c4] text-[#2e8064]"
+              : "bg-[#fbe5e2] border-[#efb8b0] text-[#b84f4b]"
           }`}
         >
           {message.text}
@@ -126,33 +126,33 @@ export default function SectorsPage() {
       {/* My Sectors */}
       {mySectors.length > 0 && (
         <section className="space-y-3">
-          <h2 className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
+          <h2 className="text-xs font-semibold text-[#5c6b70] uppercase tracking-wider">
             My Sectors ({mySectors.length})
           </h2>
           <div className="space-y-2">
             {mySectors.map((s) => (
               <div
                 key={s.sector_id}
-                className="p-4 rounded-2xl border border-indigo-500/20 bg-indigo-500/5 flex items-center justify-between gap-3"
+                className="p-4 rounded-2xl border border-[#b4ded3] bg-[#263746]/5 flex items-center justify-between gap-3"
               >
                 <div className="min-w-0">
                   <div className="flex items-center gap-2 mb-1">
-                    <span className="font-mono text-[10px] text-indigo-400 px-1.5 py-0.5 rounded bg-indigo-500/10">
+                    <span className="font-mono text-[10px] text-[#216f9e] px-1.5 py-0.5 rounded bg-[#dff2eb]">
                       {s.sectors?.sector_code}
                     </span>
-                    <span className="font-medium text-white text-sm truncate">
+                    <span className="font-medium text-[#101820] text-sm truncate">
                       {s.sectors?.sector_name}
                     </span>
                   </div>
-                  <div className="text-xs text-gray-500">
+                  <div className="text-xs text-[#6d7c80]">
                     Status:{" "}
                     <span
                       className={
                         s.status === "active"
-                          ? "text-green-400"
+                          ? "text-[#2e8064]"
                           : s.status === "paused"
-                          ? "text-yellow-400"
-                          : "text-gray-400"
+                          ? "text-[#a47618]"
+                          : "text-[#5c6b70]"
                       }
                     >
                       {s.status}
@@ -166,7 +166,7 @@ export default function SectorsPage() {
                     onChange={(e) =>
                       handleStatusChange(s.sector_id, e.target.value)
                     }
-                    className="text-xs px-2 py-1 rounded border border-[#1f1f2e] bg-[#0a0a0f] text-white"
+                    className="text-xs px-2 py-1 rounded border border-[#d5dfdd] bg-[#eef2f1] text-[#101820]"
                   >
                     <option value="active">Active</option>
                     <option value="paused">Paused</option>
@@ -175,7 +175,7 @@ export default function SectorsPage() {
                   <button
                     onClick={() => handleLeave(s.sector_id)}
                     disabled={busyId === s.sector_id}
-                    className="text-xs text-red-400 hover:text-red-300 disabled:opacity-50"
+                    className="text-xs text-[#b84f4b] hover:text-red-300 disabled:opacity-50"
                   >
                     Leave
                   </button>
@@ -188,12 +188,12 @@ export default function SectorsPage() {
 
       {/* Available Sectors */}
       <section className="space-y-3">
-        <h2 className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
+        <h2 className="text-xs font-semibold text-[#5c6b70] uppercase tracking-wider">
           Available Sectors
         </h2>
 
         {allSectors.length === 0 ? (
-          <div className="p-12 rounded-2xl border border-dashed border-[#1f1f2e] text-center">
+          <div className="p-12 rounded-2xl border border-dashed border-[#d5dfdd] text-center">
             <Image
               src="/icons/building.svg"
               alt=""
@@ -201,7 +201,7 @@ export default function SectorsPage() {
               height={40}
               className="invert mx-auto mb-3"
             />
-            <p className="text-gray-400 text-sm">
+            <p className="text-[#5c6b70] text-sm">
               No sectors available right now.
             </p>
           </div>
@@ -212,14 +212,14 @@ export default function SectorsPage() {
               return (
                 <div
                   key={s.id}
-                  className="p-5 rounded-2xl border border-[#1f1f2e] bg-[#0d0d13] hover:border-indigo-500/30 transition-colors flex flex-col"
+                  className="p-5 rounded-2xl border border-[#d5dfdd] bg-white hover:border-[#9bd7c7] transition-colors flex flex-col"
                 >
                   <div className="flex items-start justify-between gap-2 mb-2">
-                    <div className="font-mono text-[10px] text-indigo-400 px-1.5 py-0.5 rounded bg-indigo-500/10">
+                    <div className="font-mono text-[10px] text-[#216f9e] px-1.5 py-0.5 rounded bg-[#dff2eb]">
                       {s.sector_code}
                     </div>
                     {joined && (
-                      <span className="text-xs px-2 py-0.5 rounded-full bg-green-500/10 text-green-400 border border-green-500/20">
+                      <span className="text-xs px-2 py-0.5 rounded-full bg-[#dff2e9] text-[#2e8064] border border-[#b6e1cf]">
                         <Image
                           src="/icons/check.svg"
                           alt=""
@@ -232,11 +232,11 @@ export default function SectorsPage() {
                     )}
                   </div>
 
-                  <div className="font-medium text-white text-sm mb-1">
+                  <div className="font-medium text-[#101820] text-sm mb-1">
                     {s.sector_name}
                   </div>
                   {s.description && (
-                    <p className="text-xs text-gray-500 mb-4 flex-1">
+                    <p className="text-xs text-[#6d7c80] mb-4 flex-1">
                       {s.description}
                     </p>
                   )}
@@ -248,8 +248,8 @@ export default function SectorsPage() {
                     disabled={busyId === s.id}
                     className={`mt-auto w-full py-2 rounded-lg text-sm font-medium transition-colors disabled:opacity-60 ${
                       joined
-                        ? "border border-[#1f1f2e] text-gray-300 hover:border-red-500/30 hover:text-red-400"
-                        : "bg-indigo-600 hover:bg-indigo-500 text-white"
+                        ? "border border-[#d5dfdd] text-[#35454c] hover:border-[#efb8b0] hover:text-[#b84f4b]"
+                        : "bg-[#101820] hover:bg-[#263746] text-[#101820]"
                     }`}
                   >
                     {busyId === s.id

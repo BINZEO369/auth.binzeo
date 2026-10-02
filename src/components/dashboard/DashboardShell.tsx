@@ -80,32 +80,32 @@ export default function DashboardShell({ children, user }: Props) {
 
   const SidebarContent = () => (
     <>
-      <div className="p-5 border-b border-[#1f1f2e]">
+      <div className="p-5 border-b border-[#d5dfdd]">
         <Link href="/" className="flex items-center gap-2 mb-5">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-indigo-700 flex items-center justify-center font-bold text-white text-xs">
+          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#78c3e4] to-[#3f86b2] flex items-center justify-center font-bold text-[#101820] text-xs">
             B
           </div>
-          <span className="font-semibold text-white">
-            Binzeo <span className="text-indigo-400">ID</span>
+          <span className="font-semibold text-[#101820]">
+            Binzeo <span className="text-[#216f9e]">ID</span>
           </span>
         </Link>
 
-        <div className="p-3 rounded-xl border border-[#1f1f2e] bg-[#0a0a0f]">
+        <div className="p-3 rounded-xl border border-[#d5dfdd] bg-[#eef2f1]">
           <div className="flex items-center gap-2.5 mb-2">
-            <div className="w-8 h-8 rounded-full bg-indigo-600 flex items-center justify-center text-xs font-bold text-white">
+            <div className="w-8 h-8 rounded-full bg-[#101820] flex items-center justify-center text-xs font-bold text-[#101820]">
               {initials}
             </div>
             <div className="min-w-0 flex-1">
-              <div className="text-xs font-medium text-white truncate">
+              <div className="text-xs font-medium text-[#101820] truncate">
                 {displayName}
               </div>
-              <div className="text-[10px] text-gray-500 truncate">
+              <div className="text-[10px] text-[#6d7c80] truncate">
                 {user.email}
               </div>
             </div>
           </div>
           {user.binzeo_user_id && (
-            <div className="font-mono text-[10px] text-indigo-400 bg-indigo-500/10 rounded px-2 py-1 truncate">
+            <div className="font-mono text-[10px] text-[#216f9e] bg-[#dff2eb] rounded px-2 py-1 truncate">
               {user.binzeo_user_id}
             </div>
           )}
@@ -125,8 +125,8 @@ export default function DashboardShell({ children, user }: Props) {
               onClick={() => setOpen(false)}
               className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors ${
                 active
-                  ? "bg-indigo-600/10 text-indigo-400 border border-indigo-500/20"
-                  : "text-gray-400 hover:text-white hover:bg-[#181824] border border-transparent"
+                  ? "bg-[#e3f0f3] text-[#216f9e] border border-[#b4ded3]"
+                  : "text-[#5c6b70] hover:text-[#101820] hover:bg-[#e5eceb] border border-transparent"
               }`}
             >
               <NavIcon name={item.icon} />
@@ -136,11 +136,11 @@ export default function DashboardShell({ children, user }: Props) {
         })}
       </nav>
 
-      <div className="p-3 border-t border-[#1f1f2e]">
+      <div className="p-3 border-t border-[#d5dfdd]">
         <button
           onClick={handleLogout}
           disabled={loggingOut}
-          className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-sm text-red-400 hover:bg-red-500/10 border border-transparent hover:border-red-500/20 transition-colors disabled:opacity-50"
+          className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-sm text-[#b84f4b] hover:bg-[#fbe5e2] border border-transparent hover:border-[#efc7c0] transition-colors disabled:opacity-50"
         >
           <svg
             viewBox="0 0 24 24"
@@ -162,9 +162,9 @@ export default function DashboardShell({ children, user }: Props) {
   );
 
   return (
-    <div className="min-h-screen flex bg-[#0a0a0f]">
+    <div className="min-h-screen flex bg-[#eef2f1]">
       {/* Desktop Sidebar */}
-      <aside className="hidden lg:flex flex-col w-64 border-r border-[#1f1f2e] bg-[#0d0d13] sticky top-0 h-screen">
+      <aside className="hidden lg:flex flex-col w-64 border-r border-[#d5dfdd] bg-white sticky top-0 h-screen">
         <SidebarContent />
       </aside>
 
@@ -175,7 +175,7 @@ export default function DashboardShell({ children, user }: Props) {
             className="fixed inset-0 bg-black/70 z-40 lg:hidden"
             onClick={() => setOpen(false)}
           />
-          <aside className="fixed inset-y-0 left-0 w-72 bg-[#0d0d13] border-r border-[#1f1f2e] z-50 lg:hidden flex flex-col">
+          <aside className="fixed inset-y-0 left-0 w-72 bg-white border-r border-[#d5dfdd] z-50 lg:hidden flex flex-col">
             <SidebarContent />
           </aside>
         </>
@@ -183,10 +183,10 @@ export default function DashboardShell({ children, user }: Props) {
 
       {/* Main */}
       <div className="flex-1 flex flex-col min-w-0">
-        <header className="sticky top-0 z-30 h-14 border-b border-[#1f1f2e] bg-[#0a0a0f]/80 backdrop-blur flex items-center gap-3 px-4">
+        <header className="sticky top-0 z-30 h-14 border-b border-[#d5dfdd] bg-[#eef2f1]/80 backdrop-blur flex items-center gap-3 px-4">
           <button
             onClick={() => setOpen(true)}
-            className="lg:hidden p-2 -ml-2 text-gray-400 hover:text-white"
+            className="lg:hidden p-2 -ml-2 text-[#5c6b70] hover:text-[#101820]"
             aria-label="Open menu"
           >
             <svg
@@ -209,10 +209,10 @@ export default function DashboardShell({ children, user }: Props) {
             <span
               className={`text-[10px] px-2 py-1 rounded-full border font-medium ${
                 user.account_status === "active"
-                  ? "bg-green-500/10 text-green-400 border-green-500/20"
+                  ? "bg-[#dff2e9] text-[#2e8064] border-[#b6e1cf]"
                   : user.account_status === "pending"
-                  ? "bg-yellow-500/10 text-yellow-400 border-yellow-500/20"
-                  : "bg-red-500/10 text-red-400 border-red-500/20"
+                  ? "bg-[#fff3d8] text-[#a47618] border-[#ead39a]"
+                  : "bg-[#fbe5e2] text-[#b84f4b] border-[#efc7c0]"
               }`}
             >
               {user.account_status.toUpperCase()}

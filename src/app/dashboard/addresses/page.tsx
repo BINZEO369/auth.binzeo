@@ -20,7 +20,7 @@ type Address = {
 };
 
 const inputCls =
-  "w-full px-3 py-2 rounded-lg border border-[#1f1f2e] bg-[#0a0a0f] text-white text-sm placeholder-gray-600 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-colors";
+  "w-full px-3 py-2 rounded-lg border border-[#d5dfdd] bg-[#eef2f1] text-[#101820] text-sm placeholder-gray-600 focus:outline-none focus:border-[#79b9d5] focus:ring-2 focus:ring-[#79b9d5]/30 transition-colors";
 
 const emptyForm: Partial<Address> = {
   address_type: "home",
@@ -39,7 +39,7 @@ function Field({
 }) {
   return (
     <div className={span ? "col-span-2" : ""}>
-      <label className="block text-xs font-medium text-gray-400 mb-1.5">
+      <label className="block text-xs font-medium text-[#5c6b70] mb-1.5">
         {label}
       </label>
       {children}
@@ -137,7 +137,7 @@ export default function AddressesPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <div className="w-6 h-6 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin" />
+        <div className="w-6 h-6 border-2 border-[#79b9d5] border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
@@ -146,15 +146,15 @@ export default function AddressesPage() {
     <div className="max-w-3xl mx-auto space-y-6">
       <div className="flex items-start justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold text-white mb-1">Addresses</h1>
-          <p className="text-sm text-gray-400">
+          <h1 className="text-2xl font-bold text-[#101820] mb-1">Addresses</h1>
+          <p className="text-sm text-[#5c6b70]">
             Manage your saved addresses
           </p>
         </div>
         {!showForm && (
           <button
             onClick={openNew}
-            className="px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-medium transition-colors"
+            className="px-4 py-2 rounded-lg bg-[#101820] hover:bg-[#263746] text-[#101820] text-sm font-medium transition-colors"
           >
             + Add address
           </button>
@@ -165,8 +165,8 @@ export default function AddressesPage() {
         <div
           className={`p-3 rounded-lg border text-sm ${
             message.type === "success"
-              ? "bg-green-500/10 border-green-500/30 text-green-400"
-              : "bg-red-500/10 border-red-500/30 text-red-400"
+              ? "bg-[#dff2e9] border-[#a8d9c4] text-[#2e8064]"
+              : "bg-[#fbe5e2] border-[#efb8b0] text-[#b84f4b]"
           }`}
         >
           {message.text}
@@ -176,9 +176,9 @@ export default function AddressesPage() {
       {showForm && (
         <form
           onSubmit={handleSubmit}
-          className="p-5 rounded-2xl border border-indigo-500/20 bg-[#0d0d13] space-y-4"
+          className="p-5 rounded-2xl border border-[#b4ded3] bg-white space-y-4"
         >
-          <h2 className="text-sm font-semibold text-white">
+          <h2 className="text-sm font-semibold text-[#101820]">
             {editingId ? "Edit address" : "New address"}
           </h2>
 
@@ -269,12 +269,12 @@ export default function AddressesPage() {
             </Field>
           </div>
 
-          <label className="flex items-center gap-2 text-sm text-gray-300 cursor-pointer">
+          <label className="flex items-center gap-2 text-sm text-[#35454c] cursor-pointer">
             <input
               type="checkbox"
               checked={!!form.is_primary}
               onChange={(e) => update("is_primary", e.target.checked)}
-              className="w-4 h-4 rounded border-[#1f1f2e] bg-[#0a0a0f] accent-indigo-600"
+              className="w-4 h-4 rounded border-[#d5dfdd] bg-[#eef2f1] accent-[#101820]"
             />
             Set as primary address
           </label>
@@ -283,14 +283,14 @@ export default function AddressesPage() {
             <button
               type="button"
               onClick={cancel}
-              className="px-4 py-2 rounded-lg border border-[#1f1f2e] text-gray-300 hover:text-white hover:border-[#2d2d40] text-sm transition-colors"
+              className="px-4 py-2 rounded-lg border border-[#d5dfdd] text-[#35454c] hover:text-[#101820] hover:border-[#bdccca] text-sm transition-colors"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={saving}
-              className="px-5 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 disabled:opacity-60 text-white text-sm font-medium transition-colors"
+              className="px-5 py-2 rounded-lg bg-[#101820] hover:bg-[#263746] disabled:opacity-60 text-[#101820] text-sm font-medium transition-colors"
             >
               {saving ? "Saving..." : editingId ? "Update" : "Add"}
             </button>
@@ -299,7 +299,7 @@ export default function AddressesPage() {
       )}
 
       {addresses.length === 0 && !showForm ? (
-        <div className="p-12 rounded-2xl border border-dashed border-[#1f1f2e] text-center">
+        <div className="p-12 rounded-2xl border border-dashed border-[#d5dfdd] text-center">
           <Image
             src="/icons/location.svg"
             alt=""
@@ -307,12 +307,12 @@ export default function AddressesPage() {
             height={40}
             className="invert mx-auto mb-3"
           />
-          <p className="text-gray-400 text-sm mb-4">
+          <p className="text-[#5c6b70] text-sm mb-4">
             No addresses yet. Add your first one.
           </p>
           <button
             onClick={openNew}
-            className="px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-medium transition-colors"
+            className="px-4 py-2 rounded-lg bg-[#101820] hover:bg-[#263746] text-[#101820] text-sm font-medium transition-colors"
           >
             Add address
           </button>
@@ -322,15 +322,15 @@ export default function AddressesPage() {
           {addresses.map((a) => (
             <div
               key={a.id}
-              className="p-5 rounded-2xl border border-[#1f1f2e] bg-[#0d0d13] hover:border-indigo-500/30 transition-colors"
+              className="p-5 rounded-2xl border border-[#d5dfdd] bg-white hover:border-[#9bd7c7] transition-colors"
             >
               <div className="flex items-start justify-between gap-3 mb-2">
                 <div className="flex items-center gap-2">
-                  <span className="text-xs px-2 py-0.5 rounded-full bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 capitalize">
+                  <span className="text-xs px-2 py-0.5 rounded-full bg-[#dff2eb] text-[#216f9e] border border-[#b4ded3] capitalize">
                     {a.address_type}
                   </span>
                   {a.is_primary && (
-                    <span className="text-xs px-2 py-0.5 rounded-full bg-green-500/10 text-green-400 border border-green-500/20">
+                    <span className="text-xs px-2 py-0.5 rounded-full bg-[#dff2e9] text-[#2e8064] border border-[#b6e1cf]">
                       Primary
                     </span>
                   )}
@@ -338,23 +338,23 @@ export default function AddressesPage() {
                 <div className="flex gap-2 shrink-0">
                   <button
                     onClick={() => openEdit(a)}
-                    className="text-xs text-gray-400 hover:text-indigo-400 transition-colors"
+                    className="text-xs text-[#5c6b70] hover:text-[#216f9e] transition-colors"
                   >
                     Edit
                   </button>
                   <button
                     onClick={() => handleDelete(a.id)}
-                    className="text-xs text-gray-400 hover:text-red-400 transition-colors"
+                    className="text-xs text-[#5c6b70] hover:text-[#b84f4b] transition-colors"
                   >
                     Delete
                   </button>
                 </div>
               </div>
-              <div className="text-sm text-gray-300">
+              <div className="text-sm text-[#35454c]">
                 {a.address_line_1}
                 {a.address_line_2 && `, ${a.address_line_2}`}
               </div>
-              <div className="text-xs text-gray-500 mt-1">
+              <div className="text-xs text-[#6d7c80] mt-1">
                 {[a.city, a.state_province, a.postal_code, a.country_code]
                   .filter(Boolean)
                   .join(", ")}

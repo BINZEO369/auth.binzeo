@@ -44,23 +44,23 @@ export default function LoginForm() {
   };
 
   return (
-    <div className="rounded-2xl border border-[#1f1f2e] bg-[#12121a]/80 backdrop-blur p-6 sm:p-8">
+    <div className="rounded-2xl border border-[#d5dfdd] bg-white/90 backdrop-blur p-6 sm:p-8">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-white mb-2">Welcome back</h1>
-        <p className="text-sm text-gray-400">
+        <h1 className="text-2xl font-bold text-[#101820] mb-2">Welcome back</h1>
+        <p className="text-sm text-[#5c6b70]">
           Sign in to continue to your Binzeo ID
         </p>
       </div>
 
       {error && (
-        <div className="mb-4 p-3 rounded-lg border border-red-500/30 bg-red-500/10 text-red-400 text-sm">
+        <div className="mb-4 p-3 rounded-lg border border-[#efb8b0] bg-[#fbe5e2] text-[#b84f4b] text-sm">
           {error}
         </div>
       )}
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label className="block text-sm font-medium text-gray-300 mb-1.5">
+          <label className="block text-sm font-medium text-[#35454c] mb-1.5">
             Email
           </label>
           <input
@@ -70,18 +70,18 @@ export default function LoginForm() {
             required
             autoComplete="email"
             placeholder="you@example.com"
-            className="w-full px-3.5 py-2.5 rounded-lg border border-[#1f1f2e] bg-[#0a0a0f] text-white placeholder-gray-600 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-colors"
+            className="w-full px-3.5 py-2.5 rounded-lg border border-[#d5dfdd] bg-[#eef2f1] text-[#101820] placeholder-gray-600 focus:outline-none focus:border-[#79b9d5] focus:ring-2 focus:ring-[#79b9d5]/30 transition-colors"
           />
         </div>
 
         <div>
           <div className="flex items-center justify-between mb-1.5">
-            <label className="block text-sm font-medium text-gray-300">
+            <label className="block text-sm font-medium text-[#35454c]">
               Password
             </label>
             <Link
               href="/forgot-password"
-              className="text-xs text-indigo-400 hover:text-indigo-300"
+              className="text-xs text-[#216f9e] hover:text-[#3f86b2]"
             >
               Forgot?
             </Link>
@@ -94,12 +94,12 @@ export default function LoginForm() {
               required
               autoComplete="current-password"
               placeholder="••••••••"
-              className="w-full px-3.5 py-2.5 pr-10 rounded-lg border border-[#1f1f2e] bg-[#0a0a0f] text-white placeholder-gray-600 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-colors"
+              className="w-full px-3.5 py-2.5 pr-10 rounded-lg border border-[#d5dfdd] bg-[#eef2f1] text-[#101820] placeholder-gray-600 focus:outline-none focus:border-[#79b9d5] focus:ring-2 focus:ring-[#79b9d5]/30 transition-colors"
             />
             <button
               type="button"
               onClick={() => setShowPassword((s) => !s)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300 text-xs"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-[#6d7c80] hover:text-[#35454c] text-xs"
             >
               {showPassword ? "Hide" : "Show"}
             </button>
@@ -109,17 +109,17 @@ export default function LoginForm() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full py-2.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 disabled:opacity-60 disabled:cursor-not-allowed text-white font-medium transition-colors shadow-lg shadow-indigo-600/20"
+          className="w-full py-2.5 rounded-lg bg-[#101820] hover:bg-[#263746] disabled:opacity-60 disabled:cursor-not-allowed text-[#101820] font-medium transition-colors shadow-lg shadow-[#9bd8c7]/25"
         >
           {loading ? "Signing in..." : "Sign in"}
         </button>
       </form>
 
-      <p className="mt-6 text-center text-sm text-gray-400">
+      <p className="mt-6 text-center text-sm text-[#5c6b70]">
         Don&apos;t have an account?{" "}
         <Link
           href="/register"
-          className="text-indigo-400 hover:text-indigo-300 font-medium"
+          className="text-[#216f9e] hover:text-[#3f86b2] font-medium"
         >
           Create one
         </Link>

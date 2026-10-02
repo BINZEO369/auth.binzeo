@@ -98,7 +98,7 @@ export default function SecurityPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <div className="w-6 h-6 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin" />
+        <div className="w-6 h-6 border-2 border-[#79b9d5] border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
@@ -106,22 +106,22 @@ export default function SecurityPage() {
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-white mb-1">Security</h1>
-        <p className="text-sm text-gray-400">
+        <h1 className="text-2xl font-bold text-[#101820] mb-1">Security</h1>
+        <p className="text-sm text-[#5c6b70]">
           Monitor your account activity and security settings
         </p>
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-2 border-b border-[#1f1f2e] overflow-x-auto">
+      <div className="flex gap-2 border-b border-[#d5dfdd] overflow-x-auto">
         {TABS.map((t) => (
           <button
             key={t.id}
             onClick={() => setTab(t.id)}
             className={`px-4 py-2.5 text-sm font-medium whitespace-nowrap border-b-2 transition-colors ${
               tab === t.id
-                ? "text-indigo-400 border-indigo-500"
-                : "text-gray-400 border-transparent hover:text-white"
+                ? "text-[#216f9e] border-[#79b9d5]"
+                : "text-[#5c6b70] border-transparent hover:text-[#101820]"
             }`}
           >
             {t.label}
@@ -138,39 +138,39 @@ export default function SecurityPage() {
             logins.map((l) => (
               <div
                 key={l.id}
-                className="p-4 rounded-xl border border-[#1f1f2e] bg-[#0d0d13] flex items-start justify-between gap-3"
+                className="p-4 rounded-xl border border-[#d5dfdd] bg-white flex items-start justify-between gap-3"
               >
                 <div className="min-w-0">
                   <div className="flex items-center gap-2 mb-1 flex-wrap">
                     <span
                       className={`text-xs px-2 py-0.5 rounded-full border ${
                         l.login_status === "success"
-                          ? "bg-green-500/10 text-green-400 border-green-500/20"
+                          ? "bg-[#dff2e9] text-[#2e8064] border-[#b6e1cf]"
                           : l.login_status === "failed"
-                          ? "bg-red-500/10 text-red-400 border-red-500/20"
+                          ? "bg-[#fbe5e2] text-[#b84f4b] border-[#efc7c0]"
                           : l.login_status === "blocked"
-                          ? "bg-yellow-500/10 text-yellow-400 border-yellow-500/20"
-                          : "bg-gray-500/10 text-gray-400 border-gray-500/20"
+                          ? "bg-[#fff3d8] text-[#a47618] border-[#ead39a]"
+                          : "bg-[#eef2f1] text-[#5c6b70] border-[#d5dfdd]"
                       }`}
                     >
                       {l.login_status}
                     </span>
-                    <span className="text-xs text-gray-400 capitalize">
+                    <span className="text-xs text-[#5c6b70] capitalize">
                       {l.login_method ?? "password"}
                     </span>
                   </div>
-                  <div className="text-xs text-gray-500 truncate">
+                  <div className="text-xs text-[#6d7c80] truncate">
                     {l.ip_address ?? "No IP"} ·{" "}
                     {[l.city, l.country].filter(Boolean).join(", ") ||
                       "Unknown location"}
                   </div>
                   {l.user_agent && (
-                    <div className="text-xs text-gray-600 mt-0.5 truncate">
+                    <div className="text-xs text-[#849295] mt-0.5 truncate">
                       {l.user_agent}
                     </div>
                   )}
                 </div>
-                <div className="text-xs text-gray-500 shrink-0">
+                <div className="text-xs text-[#6d7c80] shrink-0">
                   {timeAgo(l.login_at)}
                 </div>
               </div>
@@ -188,25 +188,25 @@ export default function SecurityPage() {
             activities.map((a) => (
               <div
                 key={a.id}
-                className="p-4 rounded-xl border border-[#1f1f2e] bg-[#0d0d13]"
+                className="p-4 rounded-xl border border-[#d5dfdd] bg-white"
               >
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
-                    <div className="text-sm text-white font-medium capitalize mb-0.5">
+                    <div className="text-sm text-[#101820] font-medium capitalize mb-0.5">
                       {a.activity_type.replace(/_/g, " ")}
                     </div>
                     {a.activity_description && (
-                      <div className="text-xs text-gray-400">
+                      <div className="text-xs text-[#5c6b70]">
                         {a.activity_description}
                       </div>
                     )}
                     {a.ip_address && (
-                      <div className="text-xs text-gray-600 mt-1">
+                      <div className="text-xs text-[#849295] mt-1">
                         IP: {a.ip_address}
                       </div>
                     )}
                   </div>
-                  <div className="text-xs text-gray-500 shrink-0">
+                  <div className="text-xs text-[#6d7c80] shrink-0">
                     {timeAgo(a.created_at)}
                   </div>
                 </div>
@@ -225,31 +225,31 @@ export default function SecurityPage() {
             methods.map((m) => (
               <div
                 key={m.id}
-                className="p-4 rounded-xl border border-[#1f1f2e] bg-[#0d0d13]"
+                className="p-4 rounded-xl border border-[#d5dfdd] bg-white"
               >
                 <div className="flex items-start justify-between gap-3">
                   <div>
                     <div className="flex items-center gap-2 mb-1">
-                      <span className="text-sm font-medium text-white capitalize">
+                      <span className="text-sm font-medium text-[#101820] capitalize">
                         {m.auth_method.replace(/_/g, " ")}
                       </span>
-                      <span className="text-xs text-gray-500">
+                      <span className="text-xs text-[#6d7c80]">
                         via {m.provider}
                       </span>
                     </div>
                     {m.provider_email && (
-                      <div className="text-xs text-gray-400">
+                      <div className="text-xs text-[#5c6b70]">
                         {m.provider_email}
                       </div>
                     )}
-                    <div className="text-xs text-gray-500 mt-1">
+                    <div className="text-xs text-[#6d7c80] mt-1">
                       Signed in {m.login_count} time
                       {m.login_count !== 1 ? "s" : ""}
                       {m.last_sign_in_at &&
                         ` · Last: ${timeAgo(m.last_sign_in_at)}`}
                     </div>
                   </div>
-                  <span className="text-xs px-2 py-0.5 rounded-full bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 capitalize shrink-0">
+                  <span className="text-xs px-2 py-0.5 rounded-full bg-[#dff2eb] text-[#216f9e] border border-[#b4ded3] capitalize shrink-0">
                     {m.last_event ?? "linked"}
                   </span>
                 </div>
@@ -268,34 +268,34 @@ export default function SecurityPage() {
             verifications.map((v) => (
               <div
                 key={v.id}
-                className="p-4 rounded-xl border border-[#1f1f2e] bg-[#0d0d13]"
+                className="p-4 rounded-xl border border-[#d5dfdd] bg-white"
               >
                 <div className="flex items-start justify-between gap-3">
                   <div>
                     <div className="flex items-center gap-2 mb-1">
-                      <span className="text-sm font-medium text-white capitalize">
+                      <span className="text-sm font-medium text-[#101820] capitalize">
                         {v.verification_type}
                       </span>
                       <span
                         className={`text-xs px-2 py-0.5 rounded-full border ${
                           v.verification_status === "verified"
-                            ? "bg-green-500/10 text-green-400 border-green-500/20"
+                            ? "bg-[#dff2e9] text-[#2e8064] border-[#b6e1cf]"
                             : v.verification_status === "pending"
-                            ? "bg-yellow-500/10 text-yellow-400 border-yellow-500/20"
-                            : "bg-red-500/10 text-red-400 border-red-500/20"
+                            ? "bg-[#fff3d8] text-[#a47618] border-[#ead39a]"
+                            : "bg-[#fbe5e2] text-[#b84f4b] border-[#efc7c0]"
                         }`}
                       >
                         {v.verification_status}
                       </span>
                     </div>
-                    <div className="text-xs text-gray-500">
+                    <div className="text-xs text-[#6d7c80]">
                       {v.verified_at
                         ? `Verified ${timeAgo(v.verified_at)}`
                         : v.last_requested_at
                         ? `Requested ${timeAgo(v.last_requested_at)}`
                         : "No activity"}
                     </div>
-                    <div className="text-xs text-gray-600 mt-0.5">
+                    <div className="text-xs text-[#849295] mt-0.5">
                       Attempts: {v.attempt_count}
                     </div>
                   </div>
@@ -311,7 +311,7 @@ export default function SecurityPage() {
 
 function EmptyState({ icon, text }: { icon: string; text: string }) {
   return (
-    <div className="p-12 rounded-2xl border border-dashed border-[#1f1f2e] text-center">
+    <div className="p-12 rounded-2xl border border-dashed border-[#d5dfdd] text-center">
       <Image
         src={icon}
         alt=""
@@ -319,7 +319,7 @@ function EmptyState({ icon, text }: { icon: string; text: string }) {
         height={40}
         className="invert mx-auto mb-3"
       />
-      <p className="text-gray-400 text-sm">{text}</p>
+      <p className="text-[#5c6b70] text-sm">{text}</p>
     </div>
   );
 }

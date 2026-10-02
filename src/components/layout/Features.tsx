@@ -93,16 +93,16 @@ function Icon({ name }: { name: string }) {
 
 export default function Features() {
   return (
-    <section id="features" className="py-20 sm:py-28 border-t border-[#1f1f2e]">
+    <section id="features" className="py-20 sm:py-28 border-t border-[#d5dfdd]">
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
         <div className="text-center mb-14">
-          <div className="inline-block text-xs font-medium text-indigo-400 tracking-wider uppercase mb-3">
+          <div className="inline-block text-xs font-medium text-[#216f9e] tracking-wider uppercase mb-3">
             Features
           </div>
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight mb-4">
             Everything you need
           </h2>
-          <p className="text-gray-400 max-w-xl mx-auto">
+          <p className="text-[#5c6b70] max-w-xl mx-auto">
             A complete identity platform with all the tools for managing your
             digital presence.
           </p>
@@ -112,15 +112,15 @@ export default function Features() {
           {features.map((f) => (
             <div
               key={f.title}
-              className="group p-6 rounded-2xl border border-[#1f1f2e] bg-[#12121a]/50 hover:border-indigo-500/40 hover:bg-[#12121a] transition-all hover:-translate-y-1"
+              className="group p-6 rounded-2xl border border-[#d5dfdd] bg-white/80 hover:border-[#8bc9df] hover:bg-white transition-all hover:-translate-y-1"
             >
-              <div className="w-11 h-11 rounded-xl bg-indigo-500/10 text-indigo-400 flex items-center justify-center mb-4 group-hover:bg-indigo-500/20 group-hover:scale-110 transition-all">
+              <div className="w-11 h-11 rounded-xl bg-[#dff2eb] text-[#216f9e] flex items-center justify-center mb-4 group-hover:bg-[#263746]/20 group-hover:scale-110 transition-all">
                 <Icon name={f.icon} />
               </div>
-              <h3 className="text-base font-semibold text-white mb-2">
+              <h3 className="text-base font-semibold text-[#101820] mb-2">
                 {f.title}
               </h3>
-              <p className="text-sm text-gray-400 leading-relaxed">{f.desc}</p>
+              <p className="text-sm text-[#5c6b70] leading-relaxed">{f.desc}</p>
             </div>
           ))}
         </div>

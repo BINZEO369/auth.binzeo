@@ -32,7 +32,7 @@ type Data = {
 };
 
 const inputCls =
-  "w-full px-3 py-2 rounded-lg border border-[#1f1f2e] bg-[#0a0a0f] text-white text-sm placeholder-gray-600 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-colors";
+  "w-full px-3 py-2 rounded-lg border border-[#d5dfdd] bg-[#eef2f1] text-[#101820] text-sm placeholder-gray-600 focus:outline-none focus:border-[#79b9d5] focus:ring-2 focus:ring-[#79b9d5]/30 transition-colors";
 
 function Field({
   label,
@@ -43,7 +43,7 @@ function Field({
 }) {
   return (
     <div>
-      <label className="block text-xs font-medium text-gray-400 mb-1.5">
+      <label className="block text-xs font-medium text-[#5c6b70] mb-1.5">
         {label}
       </label>
       {children}
@@ -98,7 +98,7 @@ export default function ProfilePage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <div className="w-6 h-6 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin" />
+        <div className="w-6 h-6 border-2 border-[#79b9d5] border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
@@ -106,8 +106,8 @@ export default function ProfilePage() {
   return (
     <form onSubmit={handleSubmit} className="max-w-3xl mx-auto space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-white mb-1">Profile</h1>
-        <p className="text-sm text-gray-400">
+        <h1 className="text-2xl font-bold text-[#101820] mb-1">Profile</h1>
+        <p className="text-sm text-[#5c6b70]">
           Manage your personal information and preferences
         </p>
       </div>
@@ -116,8 +116,8 @@ export default function ProfilePage() {
         <div
           className={`p-3 rounded-lg border text-sm ${
             message.type === "success"
-              ? "bg-green-500/10 border-green-500/30 text-green-400"
-              : "bg-red-500/10 border-red-500/30 text-red-400"
+              ? "bg-[#dff2e9] border-[#a8d9c4] text-[#2e8064]"
+              : "bg-[#fbe5e2] border-[#efb8b0] text-[#b84f4b]"
           }`}
         >
           {message.text}
@@ -125,12 +125,12 @@ export default function ProfilePage() {
       )}
 
       {data?.profile?.binzeo_user_id && (
-        <div className="p-4 rounded-xl border border-indigo-500/20 bg-indigo-500/5 flex items-center justify-between">
+        <div className="p-4 rounded-xl border border-[#b4ded3] bg-[#263746]/5 flex items-center justify-between">
           <div>
-            <div className="text-xs text-gray-400 mb-0.5">
+            <div className="text-xs text-[#5c6b70] mb-0.5">
               Your Binzeo ID (permanent)
             </div>
-            <div className="font-mono text-indigo-400 font-medium">
+            <div className="font-mono text-[#216f9e] font-medium">
               {data.profile.binzeo_user_id}
             </div>
           </div>
@@ -144,8 +144,8 @@ export default function ProfilePage() {
         </div>
       )}
 
-      <section className="p-5 rounded-2xl border border-[#1f1f2e] bg-[#0d0d13] space-y-4">
-        <h2 className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
+      <section className="p-5 rounded-2xl border border-[#d5dfdd] bg-white space-y-4">
+        <h2 className="text-xs font-semibold text-[#5c6b70] uppercase tracking-wider">
           Personal Information
         </h2>
 
@@ -223,8 +223,8 @@ export default function ProfilePage() {
         </div>
       </section>
 
-      <section className="p-5 rounded-2xl border border-[#1f1f2e] bg-[#0d0d13] space-y-4">
-        <h2 className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
+      <section className="p-5 rounded-2xl border border-[#d5dfdd] bg-white space-y-4">
+        <h2 className="text-xs font-semibold text-[#5c6b70] uppercase tracking-wider">
           Regional Preferences
         </h2>
 
@@ -294,8 +294,8 @@ export default function ProfilePage() {
         </div>
       </section>
 
-      <section className="p-5 rounded-2xl border border-[#1f1f2e] bg-[#0d0d13] space-y-1">
-        <h2 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">
+      <section className="p-5 rounded-2xl border border-[#d5dfdd] bg-white space-y-1">
+        <h2 className="text-xs font-semibold text-[#5c6b70] uppercase tracking-wider mb-3">
           Notifications
         </h2>
 
@@ -312,19 +312,19 @@ export default function ProfilePage() {
             key={key}
             className="flex items-center justify-between py-2 cursor-pointer"
           >
-            <span className="text-sm text-gray-300">{label}</span>
+            <span className="text-sm text-[#35454c]">{label}</span>
             <input
               type="checkbox"
               checked={!!form[key]}
               onChange={(e) => update(key, e.target.checked as never)}
-              className="w-4 h-4 rounded border-[#1f1f2e] bg-[#0a0a0f] accent-indigo-600"
+              className="w-4 h-4 rounded border-[#d5dfdd] bg-[#eef2f1] accent-[#101820]"
             />
           </label>
         ))}
       </section>
 
-      <section className="p-5 rounded-2xl border border-[#1f1f2e] bg-[#0d0d13] space-y-4">
-        <h2 className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
+      <section className="p-5 rounded-2xl border border-[#d5dfdd] bg-white space-y-4">
+        <h2 className="text-xs font-semibold text-[#5c6b70] uppercase tracking-wider">
           Account Recovery
         </h2>
         <Field label="Recovery email">
@@ -342,7 +342,7 @@ export default function ProfilePage() {
         <button
           type="submit"
           disabled={saving}
-          className="px-6 py-2.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 disabled:opacity-60 disabled:cursor-not-allowed text-white text-sm font-medium transition-colors shadow-lg shadow-indigo-600/20"
+          className="px-6 py-2.5 rounded-lg bg-[#101820] hover:bg-[#263746] disabled:opacity-60 disabled:cursor-not-allowed text-[#101820] text-sm font-medium transition-colors shadow-lg shadow-[#9bd8c7]/25"
         >
           {saving ? "Saving..." : "Save changes"}
         </button>
