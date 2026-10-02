@@ -12,6 +12,10 @@ type LoginEntry = {
   user_agent: string | null;
   country: string | null;
   city: string | null;
+  latitude: number | null;
+  longitude: number | null;
+  location_accuracy_meters: number | null;
+  location_source: string | null;
   login_at: string;
   logout_at: string | null;
   user_devices: {
@@ -172,6 +176,13 @@ export default function SecurityPage() {
                     {[l.city, l.country].filter(Boolean).join(", ") ||
                       "Unknown location"}
                   </div>
+                  {l.latitude !== null && l.longitude !== null && (
+                    <div className="text-[11px] text-[#6d7c80] mt-0.5">
+                      Coordinates: {Number(l.latitude).toFixed(6)}, {Number(l.longitude).toFixed(6)}
+                      {l.location_accuracy_meters !== null && ` · ±${Math.round(l.location_accuracy_meters)}m`}
+                      {l.location_source && ` · ${l.location_source.replace(/_/g, " ")}`}
+                    </div>
+                  )}
                   {l.user_devices && (
                     <div className="text-xs text-[#5c6b70] mt-1">
                       {l.user_devices.device_name ?? l.user_devices.device_type ?? "Unknown device"}

@@ -28,6 +28,11 @@ const signupSchema = z.object({
   terms_accepted: z.literal(true, { message: "Terms acceptance is required" }),
   privacy_accepted: z.literal(true, { message: "Privacy Policy acceptance is required" }),
   location_consent: z.literal(true, { message: "Location permission is required" }),
+  location: z.object({
+    latitude: z.number().min(-90).max(90),
+    longitude: z.number().min(-180).max(180),
+    accuracy_meters: z.number().min(0).max(100000),
+  }).optional(),
 });
 
 export async function POST(req: NextRequest) {
@@ -39,9 +44,16 @@ export async function POST(req: NextRequest) {
       const firstError = parsed.error.issues[0]?.message ?? "Invalid input";
       return fail(firstError, 422, "VALIDATION_ERROR");
     }
+    if (!parsed.data.location) {
+      return fail("Precise device location permission is required to create your account", 422, "PRECISE_LOCATION_REQUIRED");
+    }
 
     const { email, password, first_name, last_name, country_code } = parsed.data;
-    const location = await resolveRequestLocation(req.headers, true);
+    const location = await resolveRequestLocation(req.headers, true, {
+      latitude: parsed.data.location.latitude,
+      longitude: parsed.data.location.longitude,
+      accuracyMeters: parsed.data.location.accuracy_meters,
+    });
     const consentDate = new Date().toISOString();
 
     // Supabase must not send its built-in confirmation link. The application
@@ -58,6 +70,7 @@ export async function POST(req: NextRequest) {
           terms_accepted: true,
           privacy_accepted: true,
           location_consent: true,
+          location_source: location.source,
           consent_date: consentDate,
         },
       });
@@ -106,6 +119,10 @@ export async function POST(req: NextRequest) {
       user_agent: req.headers.get("user-agent"),
       country: location.country,
       city: location.city,
+      latitude: location.latitude,
+      longitude: location.longitude,
+      location_accuracy_meters: location.accuracyMeters,
+      location_source: location.source,
     });
     if (signupHistoryError) console.error("[SIGNUP_HISTORY_ERROR]", signupHistoryError);
 
@@ -120,6 +137,8 @@ export async function POST(req: NextRequest) {
         city: location.city,
         latitude: location.latitude,
         longitude: location.longitude,
+        location_accuracy_meters: location.accuracyMeters,
+        location_source: location.source,
         is_primary: true,
       });
       if (addressError) console.error("[SIGNUP_ADDRESS_ERROR]", addressError);

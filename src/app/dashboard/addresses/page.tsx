@@ -16,6 +16,10 @@ type Address = {
   city: string | null;
   area: string | null;
   postal_code: string | null;
+  latitude: number | null;
+  longitude: number | null;
+  location_accuracy_meters: number | null;
+  location_source: string | null;
   is_primary: boolean;
 };
 
@@ -349,6 +353,12 @@ export default function AddressesPage() {
                   .filter(Boolean)
                   .join(", ")}
               </div>
+              {a.latitude !== null && a.longitude !== null && (
+                <div className="text-[11px] text-[#849295] mt-1">
+                  Precise location: {Number(a.latitude).toFixed(6)}, {Number(a.longitude).toFixed(6)}
+                  {a.location_accuracy_meters !== null && ` · ±${Math.round(a.location_accuracy_meters)}m`}
+                </div>
+              )}
             </div>
           ))}
         </div>

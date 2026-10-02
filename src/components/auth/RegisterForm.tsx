@@ -4,7 +4,7 @@ import Image from "next/image";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { getClientDeviceId } from "@/lib/client-device";
+import { getClientDeviceId, requestPreciseLocation } from "@/lib/client-device";
 
 const fieldClass =
   "w-full rounded-2xl border border-[#4a4d51] bg-transparent px-4 py-3.5 text-sm text-white placeholder-[#8f949b] outline-none transition-colors focus:border-white focus:ring-1 focus:ring-white/30";
@@ -61,8 +61,13 @@ export default function RegisterForm() {
       setError("You must accept the Terms and Privacy Policy");
       return;
     }
+    if (!allowLocation) {
+      setError("You must allow precise location access to create your BINZEO account");
+      return;
+    }
     setLoading(true);
     try {
+      const preciseLocation = await requestPreciseLocation();
       const res = await fetch("/api/auth/signup", {
         method: "POST",
         headers: {
@@ -77,6 +82,7 @@ export default function RegisterForm() {
           terms_accepted: acceptTerms,
           privacy_accepted: acceptTerms,
           location_consent: allowLocation,
+          location: preciseLocation,
         }),
       });
       const data = await res.json();
@@ -92,8 +98,8 @@ export default function RegisterForm() {
       }
       router.push("/dashboard");
       router.refresh();
-    } catch {
-      setError("Something went wrong. Please try again.");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Precise location permission is required");
       setLoading(false);
     }
   };
@@ -141,7 +147,7 @@ export default function RegisterForm() {
         </label>
         <label className="flex items-start gap-2 px-1 pt-1 text-xs leading-5 text-[#a6abb2]">
           <input type="checkbox" checked={allowLocation} onChange={(e) => setAllowLocation(e.target.checked)} className="mt-1 h-3.5 w-3.5 accent-white" />
-          <span>I allow BINZEO to use my IP address and approximate city/country to create my default address. I can edit it later.</span>
+          <span>I allow BINZEO to use my precise device location (with browser permission) to create my default address and protect my account. I can edit it later.</span>
         </label>
         <button type="submit" disabled={loading} className="mt-2 w-full rounded-full bg-white py-3.5 text-sm font-semibold text-[#050607] transition hover:bg-[#e3e6e8] disabled:cursor-not-allowed disabled:opacity-60">{loading ? "Creating your ID..." : "Create account"}</button>
       </form>

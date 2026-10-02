@@ -40,7 +40,17 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const location = await resolveRequestLocation(req.headers, true);
+    const location = await resolveRequestLocation(
+      req.headers,
+      true,
+      parsed.data.location
+        ? {
+            latitude: parsed.data.location.latitude,
+            longitude: parsed.data.location.longitude,
+            accuracyMeters: parsed.data.location.accuracy_meters,
+          }
+        : undefined,
+    );
     const device = await upsertUserDevice(supabase, data.user.id, req.headers, location.ip);
 
     // Fetch profile for user details
@@ -61,6 +71,10 @@ export async function POST(req: NextRequest) {
         user_agent: req.headers.get("user-agent"),
         country: location.country,
         city: location.city,
+        latitude: location.latitude,
+        longitude: location.longitude,
+        location_accuracy_meters: location.accuracyMeters,
+        location_source: location.source,
       });
       if (blockedHistoryError) console.error("[LOGIN_BLOCKED_HISTORY_ERROR]", blockedHistoryError);
       await supabase.auth.signOut();
@@ -80,6 +94,10 @@ export async function POST(req: NextRequest) {
       user_agent: req.headers.get("user-agent"),
       country: location.country,
       city: location.city,
+      latitude: location.latitude,
+      longitude: location.longitude,
+      location_accuracy_meters: location.accuracyMeters,
+      location_source: location.source,
     });
     if (loginHistoryError) console.error("[LOGIN_HISTORY_ERROR]", loginHistoryError);
 

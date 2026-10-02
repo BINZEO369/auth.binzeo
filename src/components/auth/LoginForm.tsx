@@ -4,7 +4,7 @@ import Image from "next/image";
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { getClientDeviceId } from "@/lib/client-device";
+import { getClientDeviceId, requestPreciseLocation } from "@/lib/client-device";
 
 const fieldClass =
   "w-full rounded-2xl border border-[#4a4d51] bg-transparent px-4 py-3.5 text-sm text-white placeholder-[#8f949b] outline-none transition-colors focus:border-white focus:ring-1 focus:ring-white/30";
@@ -39,13 +39,14 @@ export default function LoginForm() {
     setLoading(true);
     setError("");
     try {
+      const preciseLocation = await requestPreciseLocation();
       const res = await fetch("/api/auth/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           "x-binzeo-device-id": getClientDeviceId(),
         },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email, password, location: preciseLocation }),
       });
       const data = await res.json();
       if (!data.success) {
@@ -55,8 +56,8 @@ export default function LoginForm() {
       }
       router.push(next);
       router.refresh();
-    } catch {
-      setError("Something went wrong. Please try again.");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Precise location permission is required");
       setLoading(false);
     }
   };
@@ -67,6 +68,7 @@ export default function LoginForm() {
       <div className="mt-9 text-center">
         <h1 className="text-[28px] font-semibold tracking-tight">Welcome back</h1>
         <p className="mt-2 text-sm text-[#a6abb2]">Let&apos;s get you into your BINZEO ID</p>
+        <p className="mt-2 text-xs text-[#7f8790]">For account security, your browser will ask permission to share your precise location during sign-in.</p>
       </div>
 
       {error && <div className="mt-6 rounded-2xl border border-[#9d514f] bg-[#2a1516] px-4 py-3 text-sm text-[#ffb8b4]">{error}</div>}
