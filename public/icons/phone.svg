@@ -1,3 +1,11 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="phone icon">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" role="img" aria-labelledby="title desc">
+  <title id="title">Binzeo phone icon</title>
+  <desc id="desc">A custom Binzeo phone icon with the Binzeo signature orbit.</desc>
   <path d="M21 16.5v2.8a2 2 0 0 1-2.2 2 18.8 18.8 0 0 1-8.2-2.9 18.2 18.2 0 0 1-5.7-5.7A18.8 18.8 0 0 1 2 4.5 2 2 0 0 1 4 2.3h2.8a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.4 2.1L8 10a15.5 15.5 0 0 0 6 6l1.2-1.2a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 1.4Z"/>
+  <g id="binzeo-signature" aria-label="Binzeo signature">
+    <path d="M17.2 7.1c.9-1.8 2.5-1.8 3.4 0s2.5 1.8 3.4 0" stroke-width="1.45"/>
+    <circle cx="19.4" cy="4.4" r="0.7" fill="#000000" stroke="none"/>
+    <circle cx="22.4" cy="5.2" r="0.55" fill="#000000" stroke="none"/>
+    <circle cx="23.1" cy="8.2" r="0.45" fill="#000000" stroke="none"/>
+  </g>
 </svg>
