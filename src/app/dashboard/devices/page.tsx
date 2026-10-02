@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useState } from "react";
 import { apiFetch } from "@/lib/api/client";
 
@@ -143,7 +144,13 @@ export default function DevicesPage() {
 
       {devices.length === 0 ? (
         <div className="p-12 rounded-2xl border border-dashed border-[#1f1f2e] text-center">
-          <div className="text-4xl mb-3">💻</div>
+          <Image
+            src="/icons/device.svg"
+            alt=""
+            width={40}
+            height={40}
+            className="invert mx-auto mb-3"
+          />
           <p className="text-gray-400 text-sm">
             No devices recorded yet.
           </p>
@@ -158,11 +165,17 @@ export default function DevicesPage() {
               <div className="flex items-start justify-between gap-3 mb-3">
                 <div className="flex items-start gap-3 min-w-0 flex-1">
                   <div className="w-10 h-10 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center shrink-0 text-lg">
-                    {d.device_type === "mobile"
-                      ? "📱"
-                      : d.device_type === "tablet"
-                      ? "📲"
-                      : "💻"}
+                    <Image
+                      src={
+                        d.device_type === "mobile"
+                          ? "/icons/mobile.svg"
+                          : "/icons/device.svg"
+                      }
+                      alt={d.device_type ?? "device"}
+                      width={24}
+                      height={24}
+                      className="invert"
+                    />
                   </div>
 
                   <div className="min-w-0 flex-1">
@@ -196,7 +209,14 @@ export default function DevicesPage() {
                         </span>
                         {d.is_trusted && (
                           <span className="text-[10px] px-2 py-0.5 rounded-full bg-green-500/10 text-green-400 border border-green-500/20">
-                            ✓ Trusted
+                            <Image
+                              src="/icons/check.svg"
+                              alt=""
+                              width={12}
+                              height={12}
+                              className="invert inline-block mr-1 align-[-2px]"
+                            />
+                            Trusted
                           </span>
                         )}
                       </div>

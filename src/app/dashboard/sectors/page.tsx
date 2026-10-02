@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useState } from "react";
 import { apiFetch } from "@/lib/api/client";
 
@@ -193,7 +194,13 @@ export default function SectorsPage() {
 
         {allSectors.length === 0 ? (
           <div className="p-12 rounded-2xl border border-dashed border-[#1f1f2e] text-center">
-            <div className="text-4xl mb-3">🏢</div>
+            <Image
+              src="/icons/building.svg"
+              alt=""
+              width={40}
+              height={40}
+              className="invert mx-auto mb-3"
+            />
             <p className="text-gray-400 text-sm">
               No sectors available right now.
             </p>
@@ -213,7 +220,14 @@ export default function SectorsPage() {
                     </div>
                     {joined && (
                       <span className="text-xs px-2 py-0.5 rounded-full bg-green-500/10 text-green-400 border border-green-500/20">
-                        ✓ Joined
+                        <Image
+                          src="/icons/check.svg"
+                          alt=""
+                          width={12}
+                          height={12}
+                          className="invert inline-block mr-1 align-[-2px]"
+                        />
+                        Joined
                       </span>
                     )}
                   </div>

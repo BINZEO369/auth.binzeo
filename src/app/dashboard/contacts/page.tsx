@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useState } from "react";
 import { apiFetch } from "@/lib/api/client";
 
@@ -22,10 +23,10 @@ const emptyForm: Partial<Contact> = {
 };
 
 const TYPE_ICON: Record<string, string> = {
-  website: "🌐",
-  social: "💬",
-  messenger: "📱",
-  other: "🔗",
+  website: "/icons/link.svg",
+  social: "/icons/message.svg",
+  messenger: "/icons/mobile.svg",
+  other: "/icons/link.svg",
 };
 
 function Field({
@@ -246,7 +247,13 @@ export default function ContactsPage() {
 
       {contacts.length === 0 && !showForm ? (
         <div className="p-12 rounded-2xl border border-dashed border-[#1f1f2e] text-center">
-          <div className="text-4xl mb-3">📇</div>
+          <Image
+            src="/icons/id-card.svg"
+            alt=""
+            width={40}
+            height={40}
+            className="invert mx-auto mb-3"
+          />
           <p className="text-gray-400 text-sm mb-4">
             No contacts yet. Add your first one.
           </p>
@@ -267,7 +274,13 @@ export default function ContactsPage() {
               <div className="flex items-start justify-between gap-2 mb-3">
                 <div className="flex items-center gap-2">
                   <span className="text-lg">
-                    {TYPE_ICON[c.contact_type] ?? "🔗"}
+                    <Image
+                      src={TYPE_ICON[c.contact_type] ?? "/icons/link.svg"}
+                      alt=""
+                      width={20}
+                      height={20}
+                      className="invert"
+                    />
                   </span>
                   <span className="text-xs text-gray-400 capitalize">
                     {c.contact_type}
@@ -304,7 +317,14 @@ export default function ContactsPage() {
                 )}
                 {c.is_verified && (
                   <span className="text-xs px-2 py-0.5 rounded-full bg-green-500/10 text-green-400 border border-green-500/20">
-                    ✓ Verified
+                    <Image
+                      src="/icons/check.svg"
+                      alt=""
+                      width={12}
+                      height={12}
+                      className="invert inline-block mr-1 align-[-2px]"
+                    />
+                    Verified
                   </span>
                 )}
               </div>

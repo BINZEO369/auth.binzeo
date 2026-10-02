@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useState } from "react";
 import { apiFetch } from "@/lib/api/client";
 
@@ -133,7 +134,13 @@ export default function ProfilePage() {
               {data.profile.binzeo_user_id}
             </div>
           </div>
-          <div className="text-2xl">🆔</div>
+          <Image
+            src="/icons/id-card.svg"
+            alt=""
+            width={28}
+            height={28}
+            className="invert"
+          />
         </div>
       )}
 

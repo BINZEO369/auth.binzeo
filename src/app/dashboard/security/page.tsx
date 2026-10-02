@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useState } from "react";
 import { apiFetch } from "@/lib/api/client";
 
@@ -132,7 +133,7 @@ export default function SecurityPage() {
       {tab === "logins" && (
         <div className="space-y-2">
           {logins.length === 0 ? (
-            <EmptyState icon="🔐" text="No login history yet." />
+            <EmptyState icon="/icons/lock.svg" text="No login history yet." />
           ) : (
             logins.map((l) => (
               <div
@@ -182,7 +183,7 @@ export default function SecurityPage() {
       {tab === "activity" && (
         <div className="space-y-2">
           {activities.length === 0 ? (
-            <EmptyState icon="📋" text="No activity recorded yet." />
+            <EmptyState icon="/icons/history.svg" text="No activity recorded yet." />
           ) : (
             activities.map((a) => (
               <div
@@ -219,7 +220,7 @@ export default function SecurityPage() {
       {tab === "methods" && (
         <div className="space-y-2">
           {methods.length === 0 ? (
-            <EmptyState icon="🔑" text="No auth methods linked yet." />
+            <EmptyState icon="/icons/lock.svg" text="No auth methods linked yet." />
           ) : (
             methods.map((m) => (
               <div
@@ -262,7 +263,7 @@ export default function SecurityPage() {
       {tab === "verifications" && (
         <div className="space-y-2">
           {verifications.length === 0 ? (
-            <EmptyState icon="✓" text="No verification records yet." />
+            <EmptyState icon="/icons/check.svg" text="No verification records yet." />
           ) : (
             verifications.map((v) => (
               <div
@@ -311,7 +312,13 @@ export default function SecurityPage() {
 function EmptyState({ icon, text }: { icon: string; text: string }) {
   return (
     <div className="p-12 rounded-2xl border border-dashed border-[#1f1f2e] text-center">
-      <div className="text-4xl mb-3">{icon}</div>
+      <Image
+        src={icon}
+        alt=""
+        width={40}
+        height={40}
+        className="invert mx-auto mb-3"
+      />
       <p className="text-gray-400 text-sm">{text}</p>
     </div>
   );
