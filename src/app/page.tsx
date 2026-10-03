@@ -131,7 +131,7 @@ export default async function HomePage() {
       `}</style>
 
       {/* ============================================================ */}
-      {/*  SECTION 1 · HERO — video + identity card                     */}
+      {/*  SECTION 1 · HERO — image only (no video)                     */}
       {/* ============================================================ */}
       <section className="relative min-h-[100dvh] w-full flex items-center overflow-hidden pt-24 pb-16">
         <div className="absolute inset-0 z-0 overflow-hidden">
@@ -140,19 +140,9 @@ export default async function HomePage() {
             style={{
               backgroundImage: "url('/images/img1.jpg')",
               backgroundColor: "#000",
+              animation: "bz-kenburns 26s ease-in-out infinite",
             }}
           />
-          <video
-            autoPlay
-            muted
-            loop
-            playsInline
-            preload="auto"
-            poster="/images/img1.jpg"
-            className="absolute inset-0 h-full w-full object-cover"
-          >
-            <source src="/videos/vid1.mp4" type="video/mp4" />
-          </video>
         </div>
 
         <div
