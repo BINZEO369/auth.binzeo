@@ -72,6 +72,7 @@ const videoSections = [
     text: "From opening a bank account to meeting someone new — your BINZEO ID is the calm, trusted layer beneath everything.",
     video: "/videos/vid2.mp4",
     poster: "/images/img12.jpg",
+    align: "left" as const,
   },
   {
     tag: "Security",
@@ -79,6 +80,7 @@ const videoSections = [
     text: "Every session is verified. Every connection encrypted. Every action logged — but only for you.",
     video: "/videos/vid3.mp4",
     poster: "/images/img13.jpg",
+    align: "right" as const,
   },
   {
     tag: "Global",
@@ -86,6 +88,7 @@ const videoSections = [
     text: "Verified access that travels with you. Share what matters. Keep what doesn't.",
     video: "/videos/vid4.mp4",
     poster: "/images/img14.jpg",
+    align: "left" as const,
   },
 ];
 
@@ -138,43 +141,73 @@ export default async function HomePage() {
           0%, 100% { transform: scale(1) translate(0, 0); }
           50%      { transform: scale(1.08) translate(-1%, -1%); }
         }
+        @keyframes hp-video-ambient {
+          0%, 100% { opacity: 0.15; }
+          50%      { opacity: 0.35; }
+        }
       `}</style>
 
       {/* ============================================================ */}
       {/*  SECTION 1 · HERO — full-screen video                          */}
       {/* ============================================================ */}
       <section className="relative min-h-[100dvh] w-full flex items-center overflow-hidden pt-24 pb-16">
-        <video
-          autoPlay
-          muted
-          loop
-          playsInline
-          preload="auto"
-          poster="/images/img7.jpg"
-          className="absolute inset-0 -z-10 h-full w-full object-cover"
-          aria-hidden="true"
-        >
-          <source src="/videos/vid1.mp4" type="video/mp4" />
-        </video>
-
+        {/* ---------- Video background layer ---------- */}
         <div
           aria-hidden="true"
-          className="absolute inset-0 -z-10 pointer-events-none"
+          className="absolute inset-0 z-0 overflow-hidden"
+        >
+          {/* Poster (shows while video loads) */}
+          <div
+            className="absolute inset-0 bg-center bg-cover bg-no-repeat"
+            style={{
+              backgroundImage: "url('/images/img7.jpg')",
+              backgroundColor: "#000",
+            }}
+          />
+          {/* Video on top of poster */}
+          <video
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="auto"
+            poster="/images/img7.jpg"
+            className="absolute inset-0 h-full w-full object-cover"
+          >
+            <source src="/videos/vid1.mp4" type="video/mp4" />
+          </video>
+        </div>
+
+        {/* ---------- Overlay layers ---------- */}
+        <div
+          aria-hidden="true"
+          className="absolute inset-0 z-[1] pointer-events-none"
           style={{
             background:
-              "linear-gradient(180deg, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.45) 40%, rgba(0,0,0,0.88) 100%)",
+              "linear-gradient(180deg, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.42) 40%, rgba(0,0,0,0.88) 100%)",
           }}
         />
         <div
           aria-hidden="true"
-          className="absolute inset-0 -z-10 pointer-events-none"
+          className="absolute inset-0 z-[1] pointer-events-none"
           style={{
             background:
               "radial-gradient(ellipse 90% 70% at 50% 45%, transparent 0%, rgba(0,0,0,0.55) 100%)",
           }}
         />
+        {/* Ambient breathing glow */}
+        <div
+          aria-hidden="true"
+          className="absolute inset-0 z-[1] pointer-events-none"
+          style={{
+            background:
+              "radial-gradient(ellipse 60% 50% at 50% 50%, rgba(255,255,255,0.06) 0%, transparent 70%)",
+            animation: "hp-video-ambient 6s ease-in-out infinite",
+          }}
+        />
 
-        <div className="relative mx-auto w-full max-w-7xl px-5 sm:px-8 lg:px-10">
+        {/* ---------- Content (top layer) ---------- */}
+        <div className="relative z-10 mx-auto w-full max-w-7xl px-5 sm:px-8 lg:px-10">
           <div className="grid items-center gap-14 lg:grid-cols-[1.05fr_0.95fr] lg:gap-20">
             <div className="max-w-3xl">
               <div
@@ -293,7 +326,7 @@ export default async function HomePage() {
               </div>
             </div>
 
-            {/* RIGHT — Identity Card (glass overlay on video) */}
+            {/* RIGHT — Identity Card */}
             <div
               className="relative mx-auto w-full max-w-md lg:ml-auto"
               style={{
@@ -468,17 +501,17 @@ export default async function HomePage() {
       </section>
 
       {/* ============================================================ */}
-      {/*  FULL-SCREEN IMAGE SECTIONS (content on top of image)         */}
+      {/*  FULL-SCREEN IMAGE SECTIONS                                    */}
       {/* ============================================================ */}
       {imageSections.map((item, idx) => (
         <section
           key={item.tag}
           className="relative w-full min-h-[100dvh] flex items-center overflow-hidden"
         >
-          {/* Background image with subtle Ken Burns */}
+          {/* Image layer */}
           <div
             aria-hidden="true"
-            className="absolute inset-0 bg-center bg-cover bg-no-repeat"
+            className="absolute inset-0 z-0 bg-center bg-cover bg-no-repeat"
             style={{
               backgroundImage: `url('${item.image}')`,
               backgroundColor: "#000",
@@ -486,10 +519,10 @@ export default async function HomePage() {
             }}
           />
 
-          {/* Directional dark overlays for legibility */}
+          {/* Overlays */}
           <div
             aria-hidden="true"
-            className="absolute inset-0 pointer-events-none"
+            className="absolute inset-0 z-[1] pointer-events-none"
             style={{
               background:
                 item.align === "left"
@@ -499,7 +532,7 @@ export default async function HomePage() {
           />
           <div
             aria-hidden="true"
-            className="absolute inset-0 pointer-events-none"
+            className="absolute inset-0 z-[1] pointer-events-none"
             style={{
               background:
                 "linear-gradient(180deg, rgba(0,0,0,0.55) 0%, transparent 25%, transparent 70%, rgba(0,0,0,0.70) 100%)",
@@ -507,7 +540,7 @@ export default async function HomePage() {
           />
 
           {/* Content */}
-          <div className="relative w-full max-w-7xl mx-auto px-5 sm:px-8 lg:px-10 py-24">
+          <div className="relative z-10 w-full max-w-7xl mx-auto px-5 sm:px-8 lg:px-10 py-24">
             <div
               className={`flex ${
                 item.align === "left" ? "justify-start" : "justify-end"
@@ -533,7 +566,6 @@ export default async function HomePage() {
                   {item.text}
                 </p>
 
-                {/* Small accent line */}
                 <div className="mt-8 h-[2px] w-14 rounded-full bg-gradient-to-r from-white to-transparent" />
               </div>
             </div>
@@ -542,31 +574,46 @@ export default async function HomePage() {
       ))}
 
       {/* ============================================================ */}
-      {/*  FULL-SCREEN VIDEO SECTIONS (content on top of video)         */}
+      {/*  FULL-SCREEN VIDEO SECTIONS                                    */}
+      {/*  Structure: image poster (z-0) → video (z-0) → overlays (z-[1]) → content (z-10) */}
       {/* ============================================================ */}
       {videoSections.map((v, idx) => (
         <section
           key={v.tag}
           className="relative w-full min-h-[100dvh] flex items-center overflow-hidden"
         >
-          {/* Video background */}
-          <video
-            autoPlay
-            muted
-            loop
-            playsInline
-            preload="metadata"
-            poster={v.poster}
-            className="absolute inset-0 h-full w-full object-cover"
-            aria-hidden="true"
-          >
-            <source src={v.video} type="video/mp4" />
-          </video>
-
-          {/* Directional overlay */}
+          {/* ---------- Background layer: poster + video stacked ---------- */}
           <div
             aria-hidden="true"
-            className="absolute inset-0 pointer-events-none"
+            className="absolute inset-0 z-0 overflow-hidden"
+          >
+            {/* Poster image (visible while video loads / if video fails) */}
+            <div
+              className="absolute inset-0 bg-center bg-cover bg-no-repeat"
+              style={{
+                backgroundImage: `url('${v.poster}')`,
+                backgroundColor: "#000",
+              }}
+            />
+
+            {/* Video on top of poster */}
+            <video
+              autoPlay
+              muted
+              loop
+              playsInline
+              preload="auto"
+              poster={v.poster}
+              className="absolute inset-0 h-full w-full object-cover"
+            >
+              <source src={v.video} type="video/mp4" />
+            </video>
+          </div>
+
+          {/* ---------- Overlay layers ---------- */}
+          <div
+            aria-hidden="true"
+            className="absolute inset-0 z-[1] pointer-events-none"
             style={{
               background:
                 idx % 2 === 0
@@ -576,15 +623,25 @@ export default async function HomePage() {
           />
           <div
             aria-hidden="true"
-            className="absolute inset-0 pointer-events-none"
+            className="absolute inset-0 z-[1] pointer-events-none"
             style={{
               background:
                 "linear-gradient(180deg, rgba(0,0,0,0.55) 0%, transparent 25%, transparent 70%, rgba(0,0,0,0.75) 100%)",
             }}
           />
+          {/* Ambient breathing glow */}
+          <div
+            aria-hidden="true"
+            className="absolute inset-0 z-[1] pointer-events-none"
+            style={{
+              background:
+                "radial-gradient(ellipse 60% 50% at 50% 50%, rgba(255,255,255,0.05) 0%, transparent 70%)",
+              animation: "hp-video-ambient 7s ease-in-out infinite",
+            }}
+          />
 
-          {/* Content */}
-          <div className="relative w-full max-w-7xl mx-auto px-5 sm:px-8 lg:px-10 py-24">
+          {/* ---------- Content ---------- */}
+          <div className="relative z-10 w-full max-w-7xl mx-auto px-5 sm:px-8 lg:px-10 py-24">
             <div
               className={`flex ${
                 idx % 2 === 0 ? "justify-start" : "justify-end"
@@ -611,12 +668,12 @@ export default async function HomePage() {
       ))}
 
       {/* ============================================================ */}
-      {/*  WHY BINZEO — full-screen bg (img15)                          */}
+      {/*  WHY BINZEO — full-screen bg                                  */}
       {/* ============================================================ */}
       <section className="relative w-full min-h-[100dvh] flex items-center overflow-hidden">
         <div
           aria-hidden="true"
-          className="absolute inset-0 bg-center bg-cover bg-no-repeat"
+          className="absolute inset-0 z-0 bg-center bg-cover bg-no-repeat"
           style={{
             backgroundImage: "url('/images/img15.jpg')",
             backgroundColor: "#000",
@@ -624,7 +681,7 @@ export default async function HomePage() {
         />
         <div
           aria-hidden="true"
-          className="absolute inset-0 pointer-events-none"
+          className="absolute inset-0 z-[1] pointer-events-none"
           style={{
             background:
               "linear-gradient(180deg, rgba(0,0,0,0.78) 0%, rgba(0,0,0,0.55) 30%, rgba(0,0,0,0.55) 70%, rgba(0,0,0,0.85) 100%)",
@@ -633,7 +690,7 @@ export default async function HomePage() {
 
         <div
           id="why-binzeo"
-          className="relative w-full max-w-7xl mx-auto px-5 sm:px-8 lg:px-10 py-24"
+          className="relative z-10 w-full max-w-7xl mx-auto px-5 sm:px-8 lg:px-10 py-24"
         >
           <div className="max-w-2xl mb-14">
             <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-white/15 bg-white/[0.06] backdrop-blur-xl text-white/70 text-[10.5px] font-medium uppercase tracking-[0.16em] mb-5">
@@ -690,12 +747,12 @@ export default async function HomePage() {
       </section>
 
       {/* ============================================================ */}
-      {/*  HOW IT WORKS — full-screen bg (img16)                        */}
+      {/*  HOW IT WORKS — full-screen bg                                */}
       {/* ============================================================ */}
       <section className="relative w-full min-h-[100dvh] flex items-center overflow-hidden">
         <div
           aria-hidden="true"
-          className="absolute inset-0 bg-center bg-cover bg-no-repeat"
+          className="absolute inset-0 z-0 bg-center bg-cover bg-no-repeat"
           style={{
             backgroundImage: "url('/images/img16.jpg')",
             backgroundColor: "#000",
@@ -703,7 +760,7 @@ export default async function HomePage() {
         />
         <div
           aria-hidden="true"
-          className="absolute inset-0 pointer-events-none"
+          className="absolute inset-0 z-[1] pointer-events-none"
           style={{
             background:
               "linear-gradient(180deg, rgba(0,0,0,0.80) 0%, rgba(0,0,0,0.55) 40%, rgba(0,0,0,0.85) 100%)",
@@ -712,7 +769,7 @@ export default async function HomePage() {
 
         <div
           id="how-it-works"
-          className="relative w-full max-w-7xl mx-auto px-5 sm:px-8 lg:px-10 py-24"
+          className="relative z-10 w-full max-w-7xl mx-auto px-5 sm:px-8 lg:px-10 py-24"
         >
           <div className="grid gap-14 lg:grid-cols-[0.85fr_1.15fr] lg:items-end">
             <div>
@@ -758,12 +815,12 @@ export default async function HomePage() {
       </section>
 
       {/* ============================================================ */}
-      {/*  FINAL CTA — full-screen bg (img17)                            */}
+      {/*  FINAL CTA — full-screen bg                                   */}
       {/* ============================================================ */}
       <section className="relative w-full min-h-[90dvh] flex items-center overflow-hidden">
         <div
           aria-hidden="true"
-          className="absolute inset-0 bg-center bg-cover bg-no-repeat"
+          className="absolute inset-0 z-0 bg-center bg-cover bg-no-repeat"
           style={{
             backgroundImage: "url('/images/img17.jpg')",
             backgroundColor: "#000",
@@ -771,7 +828,7 @@ export default async function HomePage() {
         />
         <div
           aria-hidden="true"
-          className="absolute inset-0 pointer-events-none"
+          className="absolute inset-0 z-[1] pointer-events-none"
           style={{
             background:
               "linear-gradient(180deg, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.60) 50%, rgba(0,0,0,0.88) 100%)",
@@ -779,7 +836,7 @@ export default async function HomePage() {
         />
         <div
           aria-hidden="true"
-          className="absolute inset-0 pointer-events-none"
+          className="absolute inset-0 z-[1] pointer-events-none"
           style={{
             background:
               "radial-gradient(ellipse 80% 60% at 50% 50%, transparent 0%, rgba(0,0,0,0.4) 100%)",
@@ -788,7 +845,7 @@ export default async function HomePage() {
 
         <div
           id="security"
-          className="relative w-full max-w-4xl mx-auto px-5 sm:px-8 lg:px-10 py-24 text-center"
+          className="relative z-10 w-full max-w-4xl mx-auto px-5 sm:px-8 lg:px-10 py-24 text-center"
         >
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-white/20 bg-white/[0.08] backdrop-blur-xl text-white/85 text-[10.5px] font-medium uppercase tracking-[0.16em] mb-7">
             Built for your next chapter
