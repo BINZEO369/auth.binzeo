@@ -199,23 +199,40 @@ export default function LoginForm() {
 
   return (
     <div
-      className="relative min-h-screen w-full bg-cover bg-center bg-no-repeat bg-fixed"
-      style={{ backgroundImage: "url('/images/img3.jpg')" }}
+      className="relative w-screen min-h-screen overflow-x-hidden"
+      style={{
+        minHeight: "100dvh",
+        backgroundImage: "url('/images/img3.jpg')",
+        backgroundSize: "cover",
+        backgroundPosition: "center center",
+        backgroundRepeat: "no-repeat",
+        backgroundColor: "#000",
+      }}
     >
       {/* Dark overlay for legibility */}
-      <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/50 to-black/80" />
       <div
-        className="absolute inset-0"
+        className="absolute inset-0 pointer-events-none"
         style={{
           background:
-            "radial-gradient(ellipse 80% 60% at 50% 40%, transparent 0%, rgba(0,0,0,0.35) 100%)",
+            "linear-gradient(180deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.35) 40%, rgba(0,0,0,0.65) 100%)",
+        }}
+      />
+      {/* Radial vignette for focus */}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          background:
+            "radial-gradient(ellipse 90% 70% at 50% 45%, transparent 0%, rgba(0,0,0,0.30) 100%)",
         }}
       />
 
       {/* Content */}
-      <div className="relative z-10 flex min-h-screen items-center justify-center px-4 py-10">
+      <div
+        className="relative z-10 flex w-full items-center justify-center px-4 py-10"
+        style={{ minHeight: "100dvh" }}
+      >
         <div
-          className="w-full max-w-[440px] rounded-[32px] border border-white/12 bg-white/[0.06] backdrop-blur-2xl shadow-[0_32px_80px_-24px_rgba(0,0,0,0.65),inset_0_1px_0_0_rgba(255,255,255,0.14)] px-6 py-8 sm:px-9 sm:py-10 text-white"
+          className="w-full max-w-[520px] rounded-[32px] border border-white/12 bg-white/[0.06] backdrop-blur-2xl shadow-[0_32px_80px_-24px_rgba(0,0,0,0.75),inset_0_1px_0_0_rgba(255,255,255,0.14)] px-7 py-9 sm:px-10 sm:py-11 text-white"
           style={{
             animation: "auth-fade-up 0.9s cubic-bezier(0.22, 1, 0.36, 1) both",
           }}
@@ -235,14 +252,14 @@ export default function LoginForm() {
 
           <BrandLogo />
 
-          <div className="mt-8 text-center">
-            <h1 className="text-[30px] font-semibold tracking-[-0.03em] leading-tight text-white">
+          <div className="mt-9 text-center">
+            <h1 className="text-[32px] font-semibold tracking-[-0.035em] leading-tight text-white">
               Welcome back
             </h1>
-            <p className="mt-2 text-[14px] text-white/70">
+            <p className="mt-2.5 text-[15px] text-white/70">
               Let&apos;s get you into your BINZEO ID
             </p>
-            <p className="mt-3 text-[11px] text-white/45 leading-relaxed">
+            <p className="mt-3 text-[11.5px] text-white/45 leading-relaxed max-w-[360px] mx-auto">
               For account security, your browser will ask permission to share
               your precise location during sign-in.
             </p>
@@ -254,7 +271,7 @@ export default function LoginForm() {
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="mt-7 space-y-3">
+          <form onSubmit={handleSubmit} className="mt-8 space-y-3.5">
             <input
               type="email"
               value={email}
@@ -297,7 +314,7 @@ export default function LoginForm() {
             <button
               type="submit"
               disabled={loading}
-              className="mt-3 w-full rounded-full bg-white py-3.5 text-sm font-semibold text-black transition-all duration-300 hover:bg-white/90 hover:shadow-[0_12px_32px_-8px_rgba(255,255,255,0.35)] hover:-translate-y-px active:translate-y-0 disabled:cursor-not-allowed disabled:opacity-60"
+              className="mt-3 w-full rounded-full bg-white py-4 text-sm font-semibold text-black transition-all duration-300 hover:bg-white/90 hover:shadow-[0_16px_40px_-10px_rgba(255,255,255,0.4)] hover:-translate-y-px active:translate-y-0 disabled:cursor-not-allowed disabled:opacity-60"
             >
               {loading ? "Signing in..." : "Sign in"}
             </button>
