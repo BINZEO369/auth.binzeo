@@ -28,6 +28,30 @@ const steps = [
   { label: "Connect", detail: "Manage and share your identity with confidence." },
 ];
 
+const showcase = [
+  {
+    tag: "Mobile",
+    title: "Your identity, always in pocket.",
+    text: "Access your BINZEO ID from any device with a single tap — passkey, biometric, or password.",
+    image: "/images/img9.jpg",
+    align: "right" as const,
+  },
+  {
+    tag: "Security",
+    title: "Built with serious protection.",
+    text: "Enterprise-grade encryption, verified sessions, and precise-location checks keep your account safe.",
+    image: "/images/img8.jpg",
+    align: "left" as const,
+  },
+  {
+    tag: "Global",
+    title: "One ID. Everywhere you go.",
+    text: "Share your profile with anyone, anywhere. Your identity travels with you, secure and portable.",
+    image: "/images/img10.jpg",
+    align: "right" as const,
+  },
+];
+
 /* ================================================================== */
 /*  Page                                                               */
 /* ================================================================== */
@@ -41,9 +65,7 @@ export default async function HomePage() {
   return (
     <>
       {/* ============================================================ */}
-      {/*  FIXED BACKGROUND — img6                                      */}
-      {/*  Rendered OUTSIDE main so main's transparent bg doesn't       */}
-      {/*  cover it. z-index: -20 keeps it behind everything.          */}
+      {/*  BASE FIXED BACKGROUND                                        */}
       {/* ============================================================ */}
       <div
         aria-hidden="true"
@@ -54,8 +76,6 @@ export default async function HomePage() {
           zIndex: -20,
         }}
       />
-
-      {/* Overlay 1 — vertical gradient */}
       <div
         aria-hidden="true"
         className="fixed inset-0 pointer-events-none"
@@ -65,8 +85,6 @@ export default async function HomePage() {
           zIndex: -15,
         }}
       />
-
-      {/* Overlay 2 — radial vignette */}
       <div
         aria-hidden="true"
         className="fixed inset-0 pointer-events-none"
@@ -78,7 +96,7 @@ export default async function HomePage() {
       />
 
       {/* ============================================================ */}
-      {/*  MAIN — no bg-black, transparent                              */}
+      {/*  MAIN                                                         */}
       {/* ============================================================ */}
       <main className="relative w-full min-h-screen overflow-x-hidden text-white">
         {/* ============================================================ */}
@@ -105,17 +123,58 @@ export default async function HomePage() {
             0%, 100% { opacity: 0.4; transform: scale(1); }
             50%      { opacity: 0.7; transform: scale(1.05); }
           }
+          @keyframes hp-scroll {
+            0%   { transform: translateY(0); opacity: 0; }
+            50%  { opacity: 1; }
+            100% { transform: translateY(12px); opacity: 0; }
+          }
+          @keyframes hp-marquee {
+            from { transform: translateX(0); }
+            to   { transform: translateX(-50%); }
+          }
         `}</style>
 
         {/* ============================================================ */}
-        {/*  HERO                                                         */}
+        {/*  SECTION 1 · HERO with VIDEO BACKGROUND                       */}
         {/* ============================================================ */}
-        <section className="relative min-h-[100dvh] w-full flex items-center pt-24 pb-16">
-          <div className="mx-auto w-full max-w-7xl px-5 sm:px-8 lg:px-10">
+        <section className="relative min-h-[100dvh] w-full flex items-center overflow-hidden pt-24 pb-16">
+          {/* Video background */}
+          <video
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="auto"
+            poster="/images/img7.jpg"
+            className="absolute inset-0 -z-10 h-full w-full object-cover"
+            aria-hidden="true"
+          >
+            <source src="/videos/vid1.mp4" type="video/mp4" />
+          </video>
+
+          {/* Video overlays */}
+          <div
+            aria-hidden="true"
+            className="absolute inset-0 -z-10 pointer-events-none"
+            style={{
+              background:
+                "linear-gradient(180deg, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.45) 40%, rgba(0,0,0,0.85) 100%)",
+            }}
+          />
+          <div
+            aria-hidden="true"
+            className="absolute inset-0 -z-10 pointer-events-none"
+            style={{
+              background:
+                "radial-gradient(ellipse 90% 70% at 50% 45%, transparent 0%, rgba(0,0,0,0.5) 100%)",
+            }}
+          />
+
+          {/* Content */}
+          <div className="relative mx-auto w-full max-w-7xl px-5 sm:px-8 lg:px-10">
             <div className="grid items-center gap-14 lg:grid-cols-[1.05fr_0.95fr] lg:gap-20">
-              {/* ---------- LEFT — Copy ---------- */}
+              {/* LEFT */}
               <div className="max-w-3xl">
-                {/* Kicker badge */}
                 <div
                   className="inline-flex items-center gap-2.5 px-4 py-2 rounded-full border border-white/15 bg-white/[0.06] backdrop-blur-xl text-white/85 text-[11px] sm:text-[12px] font-medium uppercase tracking-[0.14em] mb-7"
                   style={{
@@ -127,10 +186,9 @@ export default async function HomePage() {
                     className="w-1.5 h-1.5 rounded-full bg-white"
                     style={{ animation: "hp-pulse 2.2s ease-in-out infinite" }}
                   />
-                  Your identity, beautifully connected
+                  Now available for everyone
                 </div>
 
-                {/* Headline */}
                 <h1 className="text-[42px] leading-[1.02] sm:text-[64px] sm:leading-[1.0] lg:text-[80px] lg:leading-[0.98] font-semibold tracking-[-0.05em] mb-6">
                   {["A", "calmer", "way", "to", "own"].map((word, i) => (
                     <span
@@ -157,7 +215,6 @@ export default async function HomePage() {
                   </span>
                 </h1>
 
-                {/* Underline accent */}
                 <div
                   className="h-[2px] w-16 rounded-full bg-gradient-to-r from-transparent via-white to-transparent origin-left mb-7"
                   style={{
@@ -166,7 +223,6 @@ export default async function HomePage() {
                   }}
                 />
 
-                {/* Paragraph */}
                 <p
                   className="max-w-xl text-[15px] sm:text-[17px] leading-relaxed text-white/70 mb-9"
                   style={{
@@ -179,7 +235,6 @@ export default async function HomePage() {
                   less friction.
                 </p>
 
-                {/* CTA buttons */}
                 <div
                   className="flex flex-col sm:flex-row gap-3 mb-12"
                   style={{
@@ -218,7 +273,6 @@ export default async function HomePage() {
                   )}
                 </div>
 
-                {/* Feature ticks */}
                 <div
                   className="flex flex-wrap gap-x-7 gap-y-3 text-[12.5px] text-white/50"
                   style={{
@@ -237,7 +291,7 @@ export default async function HomePage() {
                 </div>
               </div>
 
-              {/* ---------- RIGHT — Identity Card ---------- */}
+              {/* RIGHT — Identity Card */}
               <div
                 className="relative mx-auto w-full max-w-md lg:ml-auto"
                 style={{
@@ -245,7 +299,6 @@ export default async function HomePage() {
                     "hp-fade-up 1.1s cubic-bezier(0.22, 1, 0.36, 1) 0.5s both",
                 }}
               >
-                {/* Ambient glow behind card */}
                 <div
                   aria-hidden="true"
                   className="absolute -inset-8 -z-10 rounded-full blur-3xl"
@@ -256,7 +309,6 @@ export default async function HomePage() {
                   }}
                 />
 
-                {/* Main card */}
                 <div
                   className="relative overflow-hidden rounded-[32px] border border-white/15 p-6 sm:p-7"
                   style={{
@@ -268,7 +320,6 @@ export default async function HomePage() {
                       "inset 0 1px 0 0 rgba(255,255,255,0.18), 0 40px 100px -32px rgba(0,0,0,0.85), 0 8px 24px -12px rgba(0,0,0,0.5)",
                   }}
                 >
-                  {/* Top sheen */}
                   <div
                     aria-hidden="true"
                     className="absolute inset-x-0 top-0 h-px"
@@ -278,7 +329,6 @@ export default async function HomePage() {
                     }}
                   />
 
-                  {/* Header */}
                   <div className="relative flex items-center justify-between border-b border-white/12 pb-5">
                     <div>
                       <p className="text-[10.5px] tracking-[0.16em] text-white/45 uppercase">
@@ -303,7 +353,6 @@ export default async function HomePage() {
                     </span>
                   </div>
 
-                  {/* Inner identity mini-card */}
                   <div
                     className="relative mt-6 rounded-2xl border border-white/12 p-5"
                     style={{
@@ -349,7 +398,6 @@ export default async function HomePage() {
                     </div>
                   </div>
 
-                  {/* Footer */}
                   <div className="relative mt-5 flex items-center justify-between text-[11.5px] text-white/45">
                     <span>Simple on the surface</span>
                     <span className="flex items-center gap-1.5 text-white/70">
@@ -364,7 +412,6 @@ export default async function HomePage() {
                   </div>
                 </div>
 
-                {/* Floating badge */}
                 <div
                   className="absolute -bottom-6 -left-5 hidden sm:block rounded-2xl border border-white/15 px-4 py-3"
                   style={{
@@ -388,24 +435,128 @@ export default async function HomePage() {
             </div>
 
             {/* Scroll indicator */}
-            <div
-              className="mt-16 flex items-center justify-between text-[11.5px] text-white/40"
-              style={{
-                animation:
-                  "hp-fade-up 0.9s cubic-bezier(0.22, 1, 0.36, 1) 1.5s both",
-              }}
-            >
-              <span>Scroll to explore</span>
-              <span className="hidden items-center gap-2.5 sm:flex">
+            <div className="mt-16 flex flex-col items-center gap-3 text-[11.5px] text-white/40">
+              <span className="flex items-center gap-2.5">
                 <span className="h-px w-12 bg-white/25" />
-                Digital identity, reimagined
+                Scroll to explore
+                <span className="h-px w-12 bg-white/25" />
+              </span>
+              <span
+                className="flex h-8 w-5 items-start justify-center rounded-full border border-white/25 p-1"
+                aria-hidden="true"
+              >
+                <span
+                  className="h-1.5 w-1 rounded-full bg-white/70"
+                  style={{ animation: "hp-scroll 2s ease-in-out infinite" }}
+                />
               </span>
             </div>
           </div>
         </section>
 
         {/* ============================================================ */}
-        {/*  SECTION · WHY BINZEO                                        */}
+        {/*  SECTION 2 · MARQUEE — Trust indicators                       */}
+        {/* ============================================================ */}
+        <section className="relative w-full overflow-hidden border-y border-white/8 py-6">
+          <div
+            className="flex gap-16 whitespace-nowrap"
+            style={{ animation: "hp-marquee 30s linear infinite" }}
+          >
+            {[...Array(2)].map((_, dup) => (
+              <div key={dup} className="flex gap-16">
+                {[
+                  "✦ Personal profile",
+                  "✦ Secure access",
+                  "✦ One memorable ID",
+                  "✦ Precise location verification",
+                  "✦ Passkey support",
+                  "✦ Enterprise-grade encryption",
+                  "✦ Built for everyone",
+                  "✦ Free forever",
+                ].map((item, i) => (
+                  <span
+                    key={`${dup}-${i}`}
+                    className="text-[14px] font-medium tracking-[-0.01em] text-white/45"
+                  >
+                    {item}
+                  </span>
+                ))}
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* ============================================================ */}
+        {/*  SECTION 3 · PRODUCT SHOWCASE (Apple-style alternates)        */}
+        {/* ============================================================ */}
+        {showcase.map((item, i) => (
+          <section
+            key={item.tag}
+            className="relative w-full px-5 py-20 sm:px-8 sm:py-32 lg:px-10"
+          >
+            <div className="mx-auto max-w-7xl">
+              <div
+                className={`grid items-center gap-12 lg:grid-cols-2 lg:gap-20 ${
+                  item.align === "left" ? "lg:[&>*:first-child]:order-2" : ""
+                }`}
+              >
+                {/* Text */}
+                <div className="max-w-xl">
+                  <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-white/15 bg-white/[0.06] backdrop-blur-xl text-white/70 text-[10.5px] font-medium uppercase tracking-[0.16em] mb-5">
+                    {item.tag}
+                  </div>
+                  <h2 className="text-[36px] sm:text-[52px] leading-[1.05] font-semibold tracking-[-0.045em] text-white mb-5">
+                    {item.title}
+                  </h2>
+                  <p className="text-[15px] sm:text-[16.5px] leading-relaxed text-white/60">
+                    {item.text}
+                  </p>
+                </div>
+
+                {/* Image */}
+                <div className="relative">
+                  <div
+                    aria-hidden="true"
+                    className="absolute -inset-6 -z-10 rounded-[36px] blur-3xl"
+                    style={{
+                      background:
+                        "radial-gradient(circle, rgba(255,255,255,0.10) 0%, transparent 70%)",
+                    }}
+                  />
+                  <div
+                    className="relative overflow-hidden rounded-[32px] border border-white/15"
+                    style={{
+                      background:
+                        "linear-gradient(180deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%)",
+                      backdropFilter: "blur(28px) saturate(180%)",
+                      WebkitBackdropFilter: "blur(28px) saturate(180%)",
+                      boxShadow:
+                        "inset 0 1px 0 0 rgba(255,255,255,0.14), 0 40px 100px -32px rgba(0,0,0,0.85)",
+                    }}
+                  >
+                    <div
+                      aria-hidden="true"
+                      className="absolute inset-x-0 top-0 h-px z-10"
+                      style={{
+                        background:
+                          "linear-gradient(90deg, transparent, rgba(255,255,255,0.5), transparent)",
+                      }}
+                    />
+                    <img
+                      src={item.image}
+                      alt={item.title}
+                      className="aspect-[4/3] w-full object-cover"
+                      loading="lazy"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+        ))}
+
+        {/* ============================================================ */}
+        {/*  SECTION 4 · WHY BINZEO                                       */}
         {/* ============================================================ */}
         <section
           id="why-binzeo"
@@ -471,7 +622,7 @@ export default async function HomePage() {
         </section>
 
         {/* ============================================================ */}
-        {/*  SECTION · HOW IT WORKS                                       */}
+        {/*  SECTION 5 · HOW IT WORKS                                     */}
         {/* ============================================================ */}
         <section
           id="how-it-works"
@@ -520,7 +671,7 @@ export default async function HomePage() {
         </section>
 
         {/* ============================================================ */}
-        {/*  SECTION · CTA / SECURITY                                    */}
+        {/*  SECTION 6 · CTA                                              */}
         {/* ============================================================ */}
         <section
           id="security"
