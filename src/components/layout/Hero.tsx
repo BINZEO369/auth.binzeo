@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 
 export default function Hero({ isLoggedIn = false }: { isLoggedIn?: boolean }) {
@@ -47,26 +49,26 @@ export default function Hero({ isLoggedIn = false }: { isLoggedIn?: boolean }) {
       />
 
       {/* ============================================================ */}
-      {/*  KEYFRAMES                                                    */}
+      {/*  KEYFRAMES (as global style)                                  */}
       {/* ============================================================ */}
-      <style jsx>{`
+      <style jsx global>{`
         @keyframes bn-hero-breathe {
           0%, 100% { opacity: 0.5; transform: scale(1); }
           50%      { opacity: 0.85; transform: scale(1.08); }
         }
-        @keyframes bn-fade-up {
+        @keyframes bn-hero-fade-up {
           from { opacity: 0; transform: translateY(24px); filter: blur(6px); }
           to   { opacity: 1; transform: translateY(0); filter: blur(0); }
         }
-        @keyframes bn-word-in {
+        @keyframes bn-hero-word-in {
           from { opacity: 0; transform: translateY(28px); filter: blur(8px); }
           to   { opacity: 1; transform: translateY(0); filter: blur(0); }
         }
-        @keyframes bn-underline {
+        @keyframes bn-hero-underline {
           from { transform: scaleX(0); }
           to   { transform: scaleX(1); }
         }
-        @keyframes bn-pulse-soft {
+        @keyframes bn-hero-pulse {
           0%, 100% { opacity: 0.7; transform: scale(1); }
           50%      { opacity: 1; transform: scale(1.15); }
         }
@@ -79,19 +81,21 @@ export default function Hero({ isLoggedIn = false }: { isLoggedIn?: boolean }) {
         <div
           className="mx-auto max-w-4xl rounded-[36px] border border-white/12 bg-white/[0.05] backdrop-blur-2xl shadow-[0_40px_100px_-32px_rgba(0,0,0,0.85),inset_0_1px_0_0_rgba(255,255,255,0.15)] px-6 py-14 sm:px-12 sm:py-20 text-center text-white"
           style={{
-            animation: "bn-fade-up 0.9s cubic-bezier(0.22, 1, 0.36, 1) both",
+            animation:
+              "bn-hero-fade-up 0.9s cubic-bezier(0.22, 1, 0.36, 1) both",
           }}
         >
           {/* Status badge */}
           <div
             className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-white/15 bg-white/[0.06] backdrop-blur-xl text-white/80 text-[11px] sm:text-[12px] uppercase tracking-[0.12em] mb-8"
             style={{
-              animation: "bn-fade-up 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.1s both",
+              animation:
+                "bn-hero-fade-up 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.1s both",
             }}
           >
             <span
               className="w-1.5 h-1.5 rounded-full bg-white"
-              style={{ animation: "bn-pulse-soft 2s ease-in-out infinite" }}
+              style={{ animation: "bn-hero-pulse 2s ease-in-out infinite" }}
             />
             Now available for everyone
           </div>
@@ -103,7 +107,7 @@ export default function Hero({ isLoggedIn = false }: { isLoggedIn?: boolean }) {
                 key={word}
                 className="inline-block"
                 style={{
-                  animation: `bn-word-in 0.9s cubic-bezier(0.22, 1, 0.36, 1) ${
+                  animation: `bn-hero-word-in 0.9s cubic-bezier(0.22, 1, 0.36, 1) ${
                     0.15 + i * 0.12
                   }s both`,
                 }}
@@ -117,7 +121,7 @@ export default function Hero({ isLoggedIn = false }: { isLoggedIn?: boolean }) {
               className="inline-block bg-gradient-to-r from-white via-white/90 to-white/70 bg-clip-text text-transparent"
               style={{
                 animation:
-                  "bn-word-in 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.51s both",
+                  "bn-hero-word-in 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.51s both",
               }}
             >
               Reimagined
@@ -129,7 +133,7 @@ export default function Hero({ isLoggedIn = false }: { isLoggedIn?: boolean }) {
             className="mx-auto h-[2px] w-16 bg-white/60 rounded-full origin-center mb-8"
             style={{
               animation:
-                "bn-underline 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.7s both",
+                "bn-hero-underline 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.7s both",
             }}
           />
 
@@ -138,7 +142,7 @@ export default function Hero({ isLoggedIn = false }: { isLoggedIn?: boolean }) {
             className="max-w-2xl mx-auto text-[15px] sm:text-[17px] text-white/70 leading-relaxed mb-10"
             style={{
               animation:
-                "bn-fade-up 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.85s both",
+                "bn-hero-fade-up 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.85s both",
             }}
           >
             Create, manage, and share your secure digital identity with Binzeo
@@ -154,7 +158,7 @@ export default function Hero({ isLoggedIn = false }: { isLoggedIn?: boolean }) {
             className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-12"
             style={{
               animation:
-                "bn-fade-up 0.9s cubic-bezier(0.22, 1, 0.36, 1) 1.05s both",
+                "bn-hero-fade-up 0.9s cubic-bezier(0.22, 1, 0.36, 1) 1.05s both",
             }}
           >
             {isLoggedIn ? (
@@ -193,7 +197,7 @@ export default function Hero({ isLoggedIn = false }: { isLoggedIn?: boolean }) {
             className="grid grid-cols-3 gap-3 max-w-2xl mx-auto"
             style={{
               animation:
-                "bn-fade-up 0.9s cubic-bezier(0.22, 1, 0.36, 1) 1.25s both",
+                "bn-hero-fade-up 0.9s cubic-bezier(0.22, 1, 0.36, 1) 1.25s both",
             }}
           >
             <div className="rounded-2xl border border-white/12 bg-white/[0.04] backdrop-blur-xl px-3 py-4">
