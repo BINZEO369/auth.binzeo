@@ -35,7 +35,7 @@ export default async function HomePage() {
   const isLoggedIn = Boolean(user);
 
   return (
-    <main className="liquid-page min-h-screen overflow-hidden bg-[#07111a] text-white">
+    <main className="liquid-page min-h-screen overflow-hidden bg-[#07111a] pt-[72px] text-white">
       <Navbar isLoggedIn={isLoggedIn} />
       <section className="relative isolate min-h-screen overflow-hidden">
         <div className="liquid-background" aria-hidden="true" />

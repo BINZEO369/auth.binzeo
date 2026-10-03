@@ -164,11 +164,11 @@ export default function DashboardShell({ children, user }: Props) {
   );
 
   return (
-    <div className="flex min-h-screen flex-col bg-[#f3f3f3]">
+    <div className="flex min-h-screen flex-col bg-[#f3f3f3] pt-[72px]">
       <Navbar isLoggedIn onMenu={() => setOpen(true)} />
       <div className="flex flex-1">
       {/* Desktop Sidebar */}
-        <aside className="sticky top-0 hidden h-screen w-64 flex-col border-r border-white/10 bg-[#07111a]/90 text-white backdrop-blur-2xl lg:flex">
+        <aside className="sticky top-[72px] hidden h-[calc(100vh-72px)] w-64 flex-col border-r border-white/10 bg-[#07111a]/90 text-white backdrop-blur-2xl lg:flex">
         {sidebarContent}
       </aside>
 
@@ -179,7 +179,7 @@ export default function DashboardShell({ children, user }: Props) {
             className="fixed inset-0 bg-[#000000]/70 z-40 lg:hidden"
             onClick={() => setOpen(false)}
           />
-          <aside className="fixed inset-y-0 left-0 z-50 flex w-72 flex-col border-r border-white/10 bg-[#07111a] text-white backdrop-blur-2xl lg:hidden">
+          <aside className="fixed bottom-0 left-0 top-[72px] z-50 flex w-72 flex-col border-r border-white/10 bg-[#07111a] text-white backdrop-blur-2xl lg:hidden">
             {sidebarContent}
           </aside>
         </>
