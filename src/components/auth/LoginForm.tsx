@@ -7,9 +7,6 @@ import Link from "next/link";
 import { getClientDeviceId, requestPreciseLocation } from "@/lib/client-device";
 import { startAuthentication } from "@simplewebauthn/browser";
 
-/* ------------------------------------------------------------------ */
-/*  Glass field style                                                  */
-/* ------------------------------------------------------------------ */
 const fieldClass =
   "w-full rounded-2xl border border-white/15 bg-white/5 px-4 py-3.5 text-sm text-white placeholder-white/40 outline-none transition-all duration-300 focus:border-white/40 focus:bg-white/10 focus:ring-2 focus:ring-white/10";
 
@@ -201,35 +198,21 @@ export default function LoginForm() {
   };
 
   return (
-    <div className="relative min-h-screen w-full overflow-hidden">
-      {/* ============================================================ */}
-      {/*  FULL SCREEN BACKGROUND IMAGE                                 */}
-      {/* ============================================================ */}
-      <div className="fixed inset-0 -z-10">
-        <Image
-          src="/images/img3.jpg"
-          alt=""
-          fill
-          priority
-          quality={95}
-          sizes="100vw"
-          className="object-cover"
-        />
-        {/* Dark gradient overlay for legibility */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/50 to-black/80" />
-        {/* Subtle vignette */}
-        <div
-          className="absolute inset-0"
-          style={{
-            background:
-              "radial-gradient(ellipse 80% 60% at 50% 40%, transparent 0%, rgba(0,0,0,0.35) 100%)",
-          }}
-        />
-      </div>
+    <div
+      className="relative min-h-screen w-full bg-cover bg-center bg-no-repeat bg-fixed"
+      style={{ backgroundImage: "url('/images/img3.jpg')" }}
+    >
+      {/* Dark overlay for legibility */}
+      <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/50 to-black/80" />
+      <div
+        className="absolute inset-0"
+        style={{
+          background:
+            "radial-gradient(ellipse 80% 60% at 50% 40%, transparent 0%, rgba(0,0,0,0.35) 100%)",
+        }}
+      />
 
-      {/* ============================================================ */}
-      {/*  CONTENT                                                     */}
-      {/* ============================================================ */}
+      {/* Content */}
       <div className="relative z-10 flex min-h-screen items-center justify-center px-4 py-10">
         <div
           className="w-full max-w-[440px] rounded-[32px] border border-white/12 bg-white/[0.06] backdrop-blur-2xl shadow-[0_32px_80px_-24px_rgba(0,0,0,0.65),inset_0_1px_0_0_rgba(255,255,255,0.14)] px-6 py-8 sm:px-9 sm:py-10 text-white"
@@ -237,7 +220,6 @@ export default function LoginForm() {
             animation: "auth-fade-up 0.9s cubic-bezier(0.22, 1, 0.36, 1) both",
           }}
         >
-          {/* ---------- Keyframes ---------- */}
           <style jsx>{`
             @keyframes auth-fade-up {
               from {
@@ -251,10 +233,8 @@ export default function LoginForm() {
             }
           `}</style>
 
-          {/* ---------- Brand ---------- */}
           <BrandLogo />
 
-          {/* ---------- Heading ---------- */}
           <div className="mt-8 text-center">
             <h1 className="text-[30px] font-semibold tracking-[-0.03em] leading-tight text-white">
               Welcome back
@@ -268,14 +248,12 @@ export default function LoginForm() {
             </p>
           </div>
 
-          {/* ---------- Error ---------- */}
           {error && (
             <div className="mt-6 rounded-2xl border border-red-400/25 bg-red-500/10 backdrop-blur-xl px-4 py-3 text-sm text-red-200">
               {error}
             </div>
           )}
 
-          {/* ---------- Main Form ---------- */}
           <form onSubmit={handleSubmit} className="mt-7 space-y-3">
             <input
               type="email"
@@ -325,14 +303,12 @@ export default function LoginForm() {
             </button>
           </form>
 
-          {/* ---------- Divider ---------- */}
           <div className="my-6 flex items-center gap-3 text-xs text-white/50">
             <span className="h-px flex-1 bg-white/15" />
             <span>or</span>
             <span className="h-px flex-1 bg-white/15" />
           </div>
 
-          {/* ---------- Temporary Token Login ---------- */}
           <form
             onSubmit={handleTemporaryLogin}
             className="space-y-3 rounded-2xl border border-white/12 bg-white/[0.04] backdrop-blur-xl p-4"
@@ -389,7 +365,6 @@ export default function LoginForm() {
             )}
           </form>
 
-          {/* ---------- Passkey ---------- */}
           <button
             type="button"
             onClick={handlePasskeyLogin}
@@ -399,12 +374,10 @@ export default function LoginForm() {
             {passkeyLoading ? "Checking passkey..." : "Sign in with passkey"}
           </button>
 
-          {/* ---------- Social Actions ---------- */}
           <div className="mt-3">
             <SocialActions onMessage={setError} />
           </div>
 
-          {/* ---------- Footer ---------- */}
           <p className="mt-7 text-center text-sm text-white/70">
             Don&apos;t have an account?{" "}
             <Link
