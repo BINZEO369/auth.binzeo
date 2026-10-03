@@ -1,8 +1,11 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
+import Navbar from "@/components/layout/Navbar";
+import Footer from "@/components/layout/Footer";
 
 const NAV = [
   { href: "/dashboard", label: "Overview", icon: "home" },
@@ -82,16 +85,11 @@ export default function DashboardShell({ children, user }: Props) {
     router.refresh();
   };
 
-  const SidebarContent = () => (
+  const sidebarContent = (
     <>
       <div className="p-5 border-b border-[#d5dfdd]">
-        <Link href="/" className="flex items-center gap-2 mb-5">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#78c3e4] to-[#3f86b2] flex items-center justify-center font-bold text-[#101820] text-xs">
-            B
-          </div>
-          <span className="font-semibold text-[#101820]">
-            Binzeo <span className="text-[#216f9e]">ID</span>
-          </span>
+        <Link href="/" className="mb-5 inline-flex items-center gap-2">
+          <Image src="/logo.svg" alt="BINZEO" width={122} height={29} className="h-8 w-auto" />
         </Link>
 
         <div className="p-3 rounded-xl border border-[#d5dfdd] bg-[#eef2f1]">
@@ -166,10 +164,12 @@ export default function DashboardShell({ children, user }: Props) {
   );
 
   return (
-    <div className="min-h-screen flex bg-[#eef2f1]">
+    <div className="flex min-h-screen flex-col bg-[#eef2f1]">
+      <Navbar isLoggedIn onMenu={() => setOpen(true)} />
+      <div className="flex flex-1">
       {/* Desktop Sidebar */}
       <aside className="hidden lg:flex flex-col w-64 border-r border-[#d5dfdd] bg-white sticky top-0 h-screen">
-        <SidebarContent />
+        {sidebarContent}
       </aside>
 
       {/* Mobile Drawer */}
@@ -180,52 +180,17 @@ export default function DashboardShell({ children, user }: Props) {
             onClick={() => setOpen(false)}
           />
           <aside className="fixed inset-y-0 left-0 w-72 bg-white border-r border-[#d5dfdd] z-50 lg:hidden flex flex-col">
-            <SidebarContent />
+            {sidebarContent}
           </aside>
         </>
       )}
 
       {/* Main */}
-      <div className="flex-1 flex flex-col min-w-0">
-        <header className="sticky top-0 z-30 h-14 border-b border-[#d5dfdd] bg-[#eef2f1]/80 backdrop-blur flex items-center gap-3 px-4">
-          <button
-            onClick={() => setOpen(true)}
-            className="lg:hidden p-2 -ml-2 text-[#5c6b70] hover:text-[#101820]"
-            aria-label="Open menu"
-          >
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              className="w-5 h-5"
-            >
-              <line x1="3" y1="6" x2="21" y2="6" />
-              <line x1="3" y1="12" x2="21" y2="12" />
-              <line x1="3" y1="18" x2="21" y2="18" />
-            </svg>
-          </button>
-
-          <div className="flex-1" />
-
-          {user.account_status && (
-            <span
-              className={`text-[10px] px-2 py-1 rounded-full border font-medium ${
-                user.account_status === "active"
-                  ? "bg-[#dff2e9] text-[#2e8064] border-[#b6e1cf]"
-                  : user.account_status === "pending"
-                  ? "bg-[#fff3d8] text-[#a47618] border-[#ead39a]"
-                  : "bg-[#fbe5e2] text-[#b84f4b] border-[#efc7c0]"
-              }`}
-            >
-              {user.account_status.toUpperCase()}
-            </span>
-          )}
-        </header>
-
+      <div className="flex min-w-0 flex-1 flex-col">
         <main className="flex-1 p-4 sm:p-6">{children}</main>
       </div>
+      </div>
+      <Footer isLoggedIn />
     </div>
   );
 }
