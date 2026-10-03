@@ -44,42 +44,6 @@ const features = [
   },
 ];
 
-const cinematicVideos = [
-  {
-    tag: "Real Life",
-    title: "Designed for the moments that matter.",
-    text: "From opening a bank account to meeting someone new — BINZEO is the calm, trusted layer beneath everything.",
-    video: "/videos/vid2.mp4",
-    poster: "/images/img6.jpg",
-    align: "left" as const,
-  },
-  {
-    tag: "Security",
-    title: "Your data, wrapped in care.",
-    text: "Every session verified. Every connection encrypted. Every action logged — but only for you.",
-    video: "/videos/vid3.mp4",
-    poster: "/images/img7.jpg",
-    align: "right" as const,
-  },
-  {
-    tag: "Global",
-    title: "One ID. Every corner of the world.",
-    text: "Verified access that travels with you. Share what matters. Keep what doesn't.",
-    video: "/videos/vid4.mp4",
-    poster: "/images/img8.jpg",
-    align: "left" as const,
-  },
-];
-
-const gallery = [
-  { src: "/images/img9.jpg", label: "Your card" },
-  { src: "/images/img10.jpg", label: "Verified" },
-  { src: "/images/img11.jpg", label: "In motion" },
-  { src: "/images/img12.jpg", label: "Connected" },
-  { src: "/images/img13.jpg", label: "Protected" },
-  { src: "/images/img14.jpg", label: "Timeless" },
-];
-
 const benefits = [
   {
     number: "01",
@@ -124,7 +88,7 @@ export default async function HomePage() {
   return (
     <main className="relative w-full overflow-x-hidden bg-black text-white antialiased">
       {/* ============================================================ */}
-      {/*  GLOBAL KEYFRAMES + FONT                                     */}
+      {/*  KEYFRAMES                                                    */}
       {/* ============================================================ */}
       <style>{`
         @keyframes bz-fade-up {
@@ -134,14 +98,6 @@ export default async function HomePage() {
         @keyframes bz-word-in {
           from { opacity: 0; transform: translateY(40px); filter: blur(14px); }
           to   { opacity: 1; transform: translateY(0); filter: blur(0); }
-        }
-        @keyframes bz-fade-in {
-          from { opacity: 0; }
-          to   { opacity: 1; }
-        }
-        @keyframes bz-scale-in {
-          from { opacity: 0; transform: scale(1.15); filter: blur(20px); }
-          to   { opacity: 1; transform: scale(1); filter: blur(0); }
         }
         @keyframes bz-underline {
           from { transform: scaleX(0); opacity: 0; }
@@ -172,11 +128,10 @@ export default async function HomePage() {
           0%, 100% { opacity: 0.12; }
           50%      { opacity: 0.30; }
         }
-        .bz-ease { transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1); }
       `}</style>
 
       {/* ============================================================ */}
-      {/*  HERO — Full-screen video + Identity card                    */}
+      {/*  SECTION 1 · HERO — video + identity card                     */}
       {/* ============================================================ */}
       <section className="relative min-h-[100dvh] w-full flex items-center overflow-hidden pt-24 pb-16">
         <div className="absolute inset-0 z-0 overflow-hidden">
@@ -488,7 +443,7 @@ export default async function HomePage() {
       </section>
 
       {/* ============================================================ */}
-      {/*  TRUST MARQUEE                                                */}
+      {/*  SECTION 2 · TRUST MARQUEE                                    */}
       {/* ============================================================ */}
       <section className="relative w-full overflow-hidden border-y border-white/8 bg-black py-7">
         <div
@@ -512,7 +467,7 @@ export default async function HomePage() {
       </section>
 
       {/* ============================================================ */}
-      {/*  FEATURE SECTIONS — image + glass content                     */}
+      {/*  SECTION 3-6 · FEATURES — one image each                      */}
       {/* ============================================================ */}
       {features.map((f, idx) => (
         <section
@@ -587,166 +542,14 @@ export default async function HomePage() {
       ))}
 
       {/* ============================================================ */}
-      {/*  CINEMATIC VIDEO SECTIONS                                     */}
-      {/* ============================================================ */}
-      {cinematicVideos.map((v, idx) => (
-        <section
-          key={v.tag}
-          className="relative w-full min-h-[100dvh] flex items-center overflow-hidden"
-        >
-          <div
-            aria-hidden="true"
-            className="absolute inset-0 z-0 overflow-hidden"
-          >
-            <div
-              className="absolute inset-0 bg-center bg-cover bg-no-repeat"
-              style={{
-                backgroundImage: `url('${v.poster}')`,
-                backgroundColor: "#000",
-              }}
-            />
-            <video
-              autoPlay
-              muted
-              loop
-              playsInline
-              preload="auto"
-              poster={v.poster}
-              className="absolute inset-0 h-full w-full object-cover"
-            >
-              <source src={v.video} type="video/mp4" />
-            </video>
-          </div>
-
-          <div
-            aria-hidden="true"
-            className="absolute inset-0 z-[1] pointer-events-none"
-            style={{
-              background:
-                idx % 2 === 0
-                  ? "linear-gradient(90deg, rgba(0,0,0,0.90) 0%, rgba(0,0,0,0.60) 45%, rgba(0,0,0,0.15) 80%, rgba(0,0,0,0.05) 100%)"
-                  : "linear-gradient(270deg, rgba(0,0,0,0.90) 0%, rgba(0,0,0,0.60) 45%, rgba(0,0,0,0.15) 80%, rgba(0,0,0,0.05) 100%)",
-            }}
-          />
-          <div
-            aria-hidden="true"
-            className="absolute inset-0 z-[1] pointer-events-none"
-            style={{
-              background:
-                "linear-gradient(180deg, rgba(0,0,0,0.50) 0%, transparent 25%, transparent 70%, rgba(0,0,0,0.75) 100%)",
-            }}
-          />
-          <div
-            aria-hidden="true"
-            className="absolute inset-0 z-[1] pointer-events-none"
-            style={{
-              background:
-                "radial-gradient(ellipse 60% 50% at 50% 50%, rgba(255,255,255,0.05) 0%, transparent 70%)",
-              animation: "bz-ambient 8s ease-in-out infinite",
-            }}
-          />
-
-          <div className="relative z-10 w-full max-w-7xl mx-auto px-5 sm:px-8 lg:px-10 py-24">
-            <div
-              className={`flex ${
-                idx % 2 === 0 ? "justify-start" : "justify-end"
-              }`}
-            >
-              <div className="max-w-xl">
-                <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-white/20 bg-white/[0.08] backdrop-blur-xl text-white/85 text-[10.5px] font-medium uppercase tracking-[0.18em] mb-6">
-                  {v.tag}
-                </div>
-
-                <h2 className="text-[38px] sm:text-[58px] lg:text-[70px] leading-[1.02] font-semibold tracking-[-0.05em] text-white mb-6">
-                  {v.title}
-                </h2>
-
-                <p className="text-[15px] sm:text-[17px] leading-relaxed text-white/75 max-w-lg">
-                  {v.text}
-                </p>
-
-                <div className="mt-9 h-[2px] w-16 rounded-full bg-gradient-to-r from-white to-transparent" />
-              </div>
-            </div>
-          </div>
-        </section>
-      ))}
-
-      {/* ============================================================ */}
-      {/*  GALLERY — 3-column image grid                                */}
-      {/* ============================================================ */}
-      <section className="relative w-full px-5 py-24 sm:px-8 sm:py-32 lg:px-10">
-        <div className="mx-auto max-w-7xl">
-          <div className="max-w-2xl mb-14">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-white/15 bg-white/[0.06] backdrop-blur-xl text-white/70 text-[10.5px] font-medium uppercase tracking-[0.18em] mb-5">
-              A closer look
-            </div>
-            <h2 className="text-[38px] sm:text-[58px] leading-[1.04] font-semibold tracking-[-0.05em] text-white">
-              Every detail, considered.
-            </h2>
-          </div>
-
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {gallery.map((g, i) => (
-              <div
-                key={g.label}
-                className="group relative aspect-square overflow-hidden rounded-[28px] border border-white/12"
-                style={{
-                  animation: `bz-fade-up 0.9s cubic-bezier(0.22, 1, 0.36, 1) ${
-                    i * 0.08
-                  }s both`,
-                  boxShadow:
-                    "inset 0 1px 0 0 rgba(255,255,255,0.10), 0 30px 70px -30px rgba(0,0,0,0.75)",
-                }}
-              >
-                <img
-                  src={g.src}
-                  alt={g.label}
-                  className="h-full w-full object-cover transition-transform duration-[1200ms] ease-out group-hover:scale-110"
-                  loading="lazy"
-                />
-                <div
-                  aria-hidden="true"
-                  className="absolute inset-0 transition-opacity duration-700 group-hover:opacity-60"
-                  style={{
-                    background:
-                      "linear-gradient(180deg, transparent 40%, rgba(0,0,0,0.75) 100%)",
-                  }}
-                />
-                <div className="absolute inset-x-0 bottom-0 p-5 flex items-center justify-between">
-                  <span className="text-[12px] font-medium uppercase tracking-[0.16em] text-white/85">
-                    {g.label}
-                  </span>
-                  <span className="flex h-7 w-7 items-center justify-center rounded-full border border-white/25 bg-white/10 backdrop-blur-xl text-white opacity-0 transition-opacity duration-500 group-hover:opacity-100">
-                    <svg
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      className="h-3.5 w-3.5"
-                    >
-                      <path d="M7 17 17 7" />
-                      <path d="M7 7h10v10" />
-                    </svg>
-                  </span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ============================================================ */}
-      {/*  WHY BINZEO — glass cards on img15                            */}
+      {/*  SECTION 7 · WHY BINZEO — img6                                */}
       {/* ============================================================ */}
       <section className="relative w-full min-h-[100dvh] flex items-center overflow-hidden">
         <div
           aria-hidden="true"
           className="absolute inset-0 z-0 bg-center bg-cover bg-no-repeat"
           style={{
-            backgroundImage: "url('/images/img15.jpg')",
+            backgroundImage: "url('/images/img6.jpg')",
             backgroundColor: "#000",
             animation: "bz-kenburns 26s ease-in-out infinite",
           }}
@@ -819,14 +622,14 @@ export default async function HomePage() {
       </section>
 
       {/* ============================================================ */}
-      {/*  HOW IT WORKS — glass tiles on img16                          */}
+      {/*  SECTION 8 · HOW IT WORKS — img7                              */}
       {/* ============================================================ */}
       <section className="relative w-full min-h-[100dvh] flex items-center overflow-hidden">
         <div
           aria-hidden="true"
           className="absolute inset-0 z-0 bg-center bg-cover bg-no-repeat"
           style={{
-            backgroundImage: "url('/images/img16.jpg')",
+            backgroundImage: "url('/images/img7.jpg')",
             backgroundColor: "#000",
           }}
         />
@@ -889,14 +692,14 @@ export default async function HomePage() {
       </section>
 
       {/* ============================================================ */}
-      {/*  STATS — glass strip on img17                                 */}
+      {/*  SECTION 9 · STATS — img8                                     */}
       {/* ============================================================ */}
       <section className="relative w-full overflow-hidden">
         <div
           aria-hidden="true"
           className="absolute inset-0 z-0 bg-center bg-cover bg-no-repeat"
           style={{
-            backgroundImage: "url('/images/img17.jpg')",
+            backgroundImage: "url('/images/img8.jpg')",
             backgroundColor: "#000",
           }}
         />
@@ -940,30 +743,18 @@ export default async function HomePage() {
       </section>
 
       {/* ============================================================ */}
-      {/*  CLOSING VIDEO — vid5                                          */}
+      {/*  SECTION 10 · SHOWCASE — img9                                 */}
       {/* ============================================================ */}
-      <section className="relative w-full min-h-[100dvh] flex items-center overflow-hidden">
-        <div className="absolute inset-0 z-0 overflow-hidden">
-          <div
-            className="absolute inset-0 bg-center bg-cover bg-no-repeat"
-            style={{
-              backgroundImage: "url('/images/img18.jpg')",
-              backgroundColor: "#000",
-            }}
-          />
-          <video
-            autoPlay
-            muted
-            loop
-            playsInline
-            preload="auto"
-            poster="/images/img18.jpg"
-            className="absolute inset-0 h-full w-full object-cover"
-          >
-            <source src="/videos/vid5.mp4" type="video/mp4" />
-          </video>
-        </div>
-
+      <section className="relative w-full min-h-[90dvh] flex items-center overflow-hidden">
+        <div
+          aria-hidden="true"
+          className="absolute inset-0 z-0 bg-center bg-cover bg-no-repeat"
+          style={{
+            backgroundImage: "url('/images/img9.jpg')",
+            backgroundColor: "#000",
+            animation: "bz-kenburns 28s ease-in-out infinite",
+          }}
+        />
         <div
           aria-hidden="true"
           className="absolute inset-0 z-[1] pointer-events-none"
@@ -1001,14 +792,14 @@ export default async function HomePage() {
       </section>
 
       {/* ============================================================ */}
-      {/*  FINAL CTA — img19                                            */}
+      {/*  SECTION 11 · FINAL CTA — img10                               */}
       {/* ============================================================ */}
       <section className="relative w-full min-h-[90dvh] flex items-center overflow-hidden">
         <div
           aria-hidden="true"
           className="absolute inset-0 z-0 bg-center bg-cover bg-no-repeat"
           style={{
-            backgroundImage: "url('/images/img19.jpg')",
+            backgroundImage: "url('/images/img10.jpg')",
             backgroundColor: "#000",
           }}
         />
