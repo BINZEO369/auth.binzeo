@@ -36,7 +36,7 @@ export default async function HomePage() {
 
   return (
     <main className="liquid-page min-h-screen overflow-hidden bg-[#07111a] text-white">
-      <Navbar isLoggedIn={isLoggedIn} variant="liquid" />
+      <Navbar isLoggedIn={isLoggedIn} />
       <section className="relative isolate min-h-screen overflow-hidden">
         <div className="liquid-background" aria-hidden="true" />
         <div className="liquid-grid" aria-hidden="true" />
@@ -182,7 +182,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <Footer isLoggedIn={isLoggedIn} variant="liquid" />
+      <Footer isLoggedIn={isLoggedIn} />
     </main>
   );
 }

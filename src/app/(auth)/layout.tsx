@@ -8,9 +8,9 @@ export default function AuthLayout({
 }) {
   return (
     <div className="liquid-page min-h-screen overflow-hidden bg-[#07111a] text-white">
-      <Navbar variant="liquid" />
+      <Navbar />
       <main>{children}</main>
-      <Footer variant="liquid" />
+      <Footer />
     </div>
   );
 }
