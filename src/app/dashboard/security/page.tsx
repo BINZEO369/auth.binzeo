@@ -112,7 +112,7 @@ export default function SecurityPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <div className="w-6 h-6 border-2 border-[#79b9d5] border-t-transparent rounded-full animate-spin" />
+        <div className="w-6 h-6 border-2 border-[#777777] border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
@@ -120,8 +120,8 @@ export default function SecurityPage() {
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-[#101820] mb-1">Security</h1>
-        <p className="text-sm text-[#5c6b70]">
+        <h1 className="text-2xl font-bold text-[#111111] mb-1">Security</h1>
+        <p className="text-sm text-[#6666666]">
           Monitor your account activity and security settings
         </p>
       </div>
@@ -129,15 +129,15 @@ export default function SecurityPage() {
       <PasskeyManager />
 
       {/* Tabs */}
-      <div className="flex gap-2 border-b border-[#d5dfdd] overflow-x-auto">
+      <div className="flex gap-2 border-b border-[#dddddd] overflow-x-auto">
         {TABS.map((t) => (
           <button
             key={t.id}
             onClick={() => setTab(t.id)}
             className={`px-4 py-2.5 text-sm font-medium whitespace-nowrap border-b-2 transition-colors ${
               tab === t.id
-                ? "text-[#216f9e] border-[#79b9d5]"
-                : "text-[#5c6b70] border-transparent hover:text-[#101820]"
+                ? "text-[#333333] border-[#777777]"
+                : "text-[#6666666] border-transparent hover:text-[#111111]"
             }`}
           >
             {t.label}
@@ -154,41 +154,41 @@ export default function SecurityPage() {
             logins.map((l) => (
               <div
                 key={l.id}
-                className="p-4 rounded-xl border border-[#d5dfdd] bg-white flex items-start justify-between gap-3"
+                className="p-4 rounded-xl border border-[#dddddd] bg-white flex items-start justify-between gap-3"
               >
                 <div className="min-w-0">
                   <div className="flex items-center gap-2 mb-1 flex-wrap">
                     <span
                       className={`text-xs px-2 py-0.5 rounded-full border ${
                         l.login_status === "success"
-                          ? "bg-[#dff2e9] text-[#2e8064] border-[#b6e1cf]"
+                          ? "bg-[#eeeeee] text-[#444444] border-[#cccccc]"
                           : l.login_status === "failed"
-                          ? "bg-[#fbe5e2] text-[#b84f4b] border-[#efc7c0]"
+                          ? "bg-[#f2f2f2] text-[#333333] border-[#d0d0d0]"
                           : l.login_status === "blocked"
-                          ? "bg-[#fff3d8] text-[#a47618] border-[#ead39a]"
-                          : "bg-[#eef2f1] text-[#5c6b70] border-[#d5dfdd]"
+                          ? "bg-[#f5f5f5] text-[#444444] border-[#cccccc]"
+                          : "bg-[#f3f3f3] text-[#6666666] border-[#dddddd]"
                       }`}
                     >
                       {l.login_status}
                     </span>
-                    <span className="text-xs text-[#5c6b70] capitalize">
+                    <span className="text-xs text-[#6666666] capitalize">
                       {l.login_method ?? "password"}
                     </span>
                   </div>
-                  <div className="text-xs text-[#6d7c80] truncate">
+                  <div className="text-xs text-[#666666] truncate">
                     {l.ip_address ?? "No IP"} ·{" "}
                     {[l.city, l.country].filter(Boolean).join(", ") ||
                       "Unknown location"}
                   </div>
                   {l.latitude !== null && l.longitude !== null && (
-                    <div className="text-[11px] text-[#6d7c80] mt-0.5">
+                    <div className="text-[11px] text-[#666666] mt-0.5">
                       Coordinates: {Number(l.latitude).toFixed(6)}, {Number(l.longitude).toFixed(6)}
                       {l.location_accuracy_meters !== null && ` · ±${Math.round(l.location_accuracy_meters)}m`}
                       {l.location_source && ` · ${l.location_source.replace(/_/g, " ")}`}
                     </div>
                   )}
                   {l.user_devices && (
-                    <div className="text-xs text-[#5c6b70] mt-1">
+                    <div className="text-xs text-[#6666666] mt-1">
                       {l.user_devices.device_name ?? l.user_devices.device_type ?? "Unknown device"}
                       {l.user_devices.operating_system &&
                         ` · ${l.user_devices.operating_system}${l.user_devices.os_version ? ` ${l.user_devices.os_version}` : ""}`}
@@ -197,12 +197,12 @@ export default function SecurityPage() {
                     </div>
                   )}
                   {l.user_agent && (
-                    <div className="text-[11px] text-[#849295] mt-0.5 truncate" title={l.user_agent}>
+                    <div className="text-[11px] text-[#888888] mt-0.5 truncate" title={l.user_agent}>
                       {l.user_agent}
                     </div>
                   )}
                 </div>
-                <div className="text-xs text-[#6d7c80] shrink-0">
+                <div className="text-xs text-[#666666] shrink-0">
                   {timeAgo(l.login_at)}
                 </div>
               </div>
@@ -220,25 +220,25 @@ export default function SecurityPage() {
             activities.map((a) => (
               <div
                 key={a.id}
-                className="p-4 rounded-xl border border-[#d5dfdd] bg-white"
+                className="p-4 rounded-xl border border-[#dddddd] bg-white"
               >
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
-                    <div className="text-sm text-[#101820] font-medium capitalize mb-0.5">
+                    <div className="text-sm text-[#111111] font-medium capitalize mb-0.5">
                       {a.activity_type.replace(/_/g, " ")}
                     </div>
                     {a.activity_description && (
-                      <div className="text-xs text-[#5c6b70]">
+                      <div className="text-xs text-[#6666666]">
                         {a.activity_description}
                       </div>
                     )}
                     {a.ip_address && (
-                      <div className="text-xs text-[#849295] mt-1">
+                      <div className="text-xs text-[#888888] mt-1">
                         IP: {a.ip_address}
                       </div>
                     )}
                   </div>
-                  <div className="text-xs text-[#6d7c80] shrink-0">
+                  <div className="text-xs text-[#666666] shrink-0">
                     {timeAgo(a.created_at)}
                   </div>
                 </div>
@@ -257,31 +257,31 @@ export default function SecurityPage() {
             methods.map((m) => (
               <div
                 key={m.id}
-                className="p-4 rounded-xl border border-[#d5dfdd] bg-white"
+                className="p-4 rounded-xl border border-[#dddddd] bg-white"
               >
                 <div className="flex items-start justify-between gap-3">
                   <div>
                     <div className="flex items-center gap-2 mb-1">
-                      <span className="text-sm font-medium text-[#101820] capitalize">
+                      <span className="text-sm font-medium text-[#111111] capitalize">
                         {m.auth_method.replace(/_/g, " ")}
                       </span>
-                      <span className="text-xs text-[#6d7c80]">
+                      <span className="text-xs text-[#666666]">
                         via {m.provider}
                       </span>
                     </div>
                     {m.provider_email && (
-                      <div className="text-xs text-[#5c6b70]">
+                      <div className="text-xs text-[#6666666]">
                         {m.provider_email}
                       </div>
                     )}
-                    <div className="text-xs text-[#6d7c80] mt-1">
+                    <div className="text-xs text-[#666666] mt-1">
                       Signed in {m.login_count} time
                       {m.login_count !== 1 ? "s" : ""}
                       {m.last_sign_in_at &&
                         ` · Last: ${timeAgo(m.last_sign_in_at)}`}
                     </div>
                   </div>
-                  <span className="text-xs px-2 py-0.5 rounded-full bg-[#dff2eb] text-[#216f9e] border border-[#b4ded3] capitalize shrink-0">
+                  <span className="text-xs px-2 py-0.5 rounded-full bg-[#eeeeee] text-[#333333] border border-[#c9c9c9] capitalize shrink-0">
                     {m.last_event ?? "linked"}
                   </span>
                 </div>
@@ -300,34 +300,34 @@ export default function SecurityPage() {
             verifications.map((v) => (
               <div
                 key={v.id}
-                className="p-4 rounded-xl border border-[#d5dfdd] bg-white"
+                className="p-4 rounded-xl border border-[#dddddd] bg-white"
               >
                 <div className="flex items-start justify-between gap-3">
                   <div>
                     <div className="flex items-center gap-2 mb-1">
-                      <span className="text-sm font-medium text-[#101820] capitalize">
+                      <span className="text-sm font-medium text-[#111111] capitalize">
                         {v.verification_type}
                       </span>
                       <span
                         className={`text-xs px-2 py-0.5 rounded-full border ${
                           v.verification_status === "verified"
-                            ? "bg-[#dff2e9] text-[#2e8064] border-[#b6e1cf]"
+                            ? "bg-[#eeeeee] text-[#444444] border-[#cccccc]"
                             : v.verification_status === "pending"
-                            ? "bg-[#fff3d8] text-[#a47618] border-[#ead39a]"
-                            : "bg-[#fbe5e2] text-[#b84f4b] border-[#efc7c0]"
+                            ? "bg-[#f5f5f5] text-[#444444] border-[#cccccc]"
+                            : "bg-[#f2f2f2] text-[#333333] border-[#d0d0d0]"
                         }`}
                       >
                         {v.verification_status}
                       </span>
                     </div>
-                    <div className="text-xs text-[#6d7c80]">
+                    <div className="text-xs text-[#666666]">
                       {v.verified_at
                         ? `Verified ${timeAgo(v.verified_at)}`
                         : v.last_requested_at
                         ? `Requested ${timeAgo(v.last_requested_at)}`
                         : "No activity"}
                     </div>
-                    <div className="text-xs text-[#849295] mt-0.5">
+                    <div className="text-xs text-[#888888] mt-0.5">
                       Attempts: {v.attempt_count}
                     </div>
                   </div>
@@ -343,7 +343,7 @@ export default function SecurityPage() {
 
 function EmptyState({ icon, text }: { icon: string; text: string }) {
   return (
-    <div className="p-12 rounded-2xl border border-dashed border-[#d5dfdd] text-center">
+    <div className="p-12 rounded-2xl border border-dashed border-[#dddddd] text-center">
       <Image
         src={icon}
         alt=""
@@ -351,7 +351,7 @@ function EmptyState({ icon, text }: { icon: string; text: string }) {
         height={40}
         className="invert mx-auto mb-3"
       />
-      <p className="text-[#5c6b70] text-sm">{text}</p>
+      <p className="text-[#6666666] text-sm">{text}</p>
     </div>
   );
 }

@@ -12,7 +12,7 @@ export default async function HomePage() {
   const isLoggedIn = Boolean(user);
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#f6faf9]">
+    <div className="min-h-screen flex flex-col bg-[#fafafa]">
       <Navbar isLoggedIn={isLoggedIn} />
       <main className="flex-1">
         <Hero isLoggedIn={isLoggedIn} />

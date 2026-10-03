@@ -36,7 +36,7 @@ export function buildOtpEmail(code: string, expiresInSeconds = 30, siteUrl: stri
         <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="max-width:560px; margin:0 auto;">
           <tr>
             <td style="padding:0;">
-              <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="background:#000000; border:1px solid #27272a; border-radius:18px; overflow:hidden;">
+              <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="background:#000000; border:1px solid #272727; border-radius:18px; overflow:hidden;">
                 <tr><td style="height:3px; background:#ffffff; font-size:0; line-height:0;">&nbsp;</td></tr>
                 <tr>
                   <td style="padding:34px 30px 18px; text-align:center;">
@@ -46,25 +46,25 @@ export function buildOtpEmail(code: string, expiresInSeconds = 30, siteUrl: stri
                 <tr>
                   <td style="padding:14px 30px 0; text-align:center;">
                     <h1 style="margin:0 0 12px; color:#ffffff; font-size:25px; line-height:1.3; font-weight:700;">Verify your email address</h1>
-                    <p style="margin:0 auto; max-width:390px; color:#c7c7cc; font-size:14px; line-height:1.65;">Use the verification code below to continue setting up your BINZEO account.</p>
+                    <p style="margin:0 auto; max-width:390px; color:#c7c7c7; font-size:14px; line-height:1.65;">Use the verification code below to continue setting up your BINZEO account.</p>
                   </td>
                 </tr>
                 <tr>
                   <td style="padding:26px 30px 14px;">
                     <div style="padding:20px 14px; border:1px solid #ffffff; border-radius:13px; background:#090909; text-align:center;">
-                      <div style="margin-bottom:9px; color:#a1a1aa; font-size:10px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase;">BINZEO verification code</div>
+                      <div style="margin-bottom:9px; color:#a1a1a1; font-size:10px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase;">BINZEO verification code</div>
                       <div style="color:#ffffff; font-family:'SFMono-Regular',Consolas,'Liberation Mono',monospace; font-size:35px; line-height:1.2; font-weight:800; letter-spacing:9px;">${code}</div>
                     </div>
                   </td>
                 </tr>
                 <tr>
                   <td style="padding:10px 30px 30px; text-align:center;">
-                    <p style="margin:0 0 9px; color:#d4d4d8; font-size:12px; line-height:1.6;">This code expires in <strong style="color:#ffffff;">${expiresInSeconds} seconds</strong>.</p>
-                    <p style="margin:0 auto; max-width:400px; color:#8f8f98; font-size:11px; line-height:1.6;">Never share this code. BINZEO will never ask for it by phone or email.</p>
+                    <p style="margin:0 0 9px; color:#d4d4d4; font-size:12px; line-height:1.6;">This code expires in <strong style="color:#ffffff;">${expiresInSeconds} seconds</strong>.</p>
+                    <p style="margin:0 auto; max-width:400px; color:#8f8f8f; font-size:11px; line-height:1.6;">Never share this code. BINZEO will never ask for it by phone or email.</p>
                   </td>
                 </tr>
               </table>
-              <p style="margin:16px 0 0; color:#66666e; font-size:10px; line-height:1.5; text-align:center;">If you didn't request this code, you can safely ignore this email.<br />© ${new Date().getFullYear()} BINZEO inc. All rights reserved.</p>
+              <p style="margin:16px 0 0; color:#6666666; font-size:10px; line-height:1.5; text-align:center;">If you didn't request this code, you can safely ignore this email.<br />© ${new Date().getFullYear()} BINZEO inc. All rights reserved.</p>
             </td>
           </tr>
         </table>

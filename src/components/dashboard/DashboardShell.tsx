@@ -87,27 +87,27 @@ export default function DashboardShell({ children, user }: Props) {
 
   const sidebarContent = (
     <>
-      <div className="p-5 border-b border-[#d5dfdd]">
+      <div className="p-5 border-b border-[#dddddd]">
         <Link href="/" className="mb-5 inline-flex items-center gap-2">
           <Image src="/logo.svg" alt="BINZEO" width={122} height={29} className="h-8 w-auto" />
         </Link>
 
-        <div className="p-3 rounded-xl border border-[#d5dfdd] bg-[#eef2f1]">
+        <div className="p-3 rounded-xl border border-[#dddddd] bg-[#f3f3f3]">
           <div className="flex items-center gap-2.5 mb-2">
-            <div className="w-8 h-8 rounded-full bg-[#101820] flex items-center justify-center text-xs font-bold text-white">
+            <div className="w-8 h-8 rounded-full bg-[#111111] flex items-center justify-center text-xs font-bold text-white">
               {initials}
             </div>
             <div className="min-w-0 flex-1">
-              <div className="text-xs font-medium text-[#101820] truncate">
+              <div className="text-xs font-medium text-[#111111] truncate">
                 {displayName}
               </div>
-              <div className="text-[10px] text-[#6d7c80] truncate">
+              <div className="text-[10px] text-[#666666] truncate">
                 {user.email}
               </div>
             </div>
           </div>
           {user.binzeo_user_id && (
-            <div className="font-mono text-[10px] text-[#216f9e] bg-[#dff2eb] rounded px-2 py-1 truncate">
+            <div className="font-mono text-[10px] text-[#333333] bg-[#eeeeee] rounded px-2 py-1 truncate">
               {user.binzeo_user_id}
             </div>
           )}
@@ -127,8 +127,8 @@ export default function DashboardShell({ children, user }: Props) {
               onClick={() => setOpen(false)}
               className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors ${
                 active
-                  ? "bg-[#e3f0f3] text-[#216f9e] border border-[#b4ded3]"
-                  : "text-[#5c6b70] hover:text-[#101820] hover:bg-[#e5eceb] border border-transparent"
+                  ? "bg-[#e9e9e9] text-[#333333] border border-[#c9c9c9]"
+                  : "text-[#6666666] hover:text-[#111111] hover:bg-[#e7e7e7] border border-transparent"
               }`}
             >
               <NavIcon name={item.icon} />
@@ -138,11 +138,11 @@ export default function DashboardShell({ children, user }: Props) {
         })}
       </nav>
 
-      <div className="p-3 border-t border-[#d5dfdd]">
+      <div className="p-3 border-t border-[#dddddd]">
         <button
           onClick={handleLogout}
           disabled={loggingOut}
-          className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-sm text-[#b84f4b] hover:bg-[#fbe5e2] border border-transparent hover:border-[#efc7c0] transition-colors disabled:opacity-50"
+          className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-sm text-[#333333] hover:bg-[#f2f2f2] border border-transparent hover:border-[#d0d0d0] transition-colors disabled:opacity-50"
         >
           <svg
             viewBox="0 0 24 24"
@@ -164,11 +164,11 @@ export default function DashboardShell({ children, user }: Props) {
   );
 
   return (
-    <div className="flex min-h-screen flex-col bg-[#eef2f1]">
+    <div className="flex min-h-screen flex-col bg-[#f3f3f3]">
       <Navbar isLoggedIn onMenu={() => setOpen(true)} />
       <div className="flex flex-1">
       {/* Desktop Sidebar */}
-      <aside className="hidden lg:flex flex-col w-64 border-r border-[#d5dfdd] bg-white sticky top-0 h-screen">
+      <aside className="hidden lg:flex flex-col w-64 border-r border-[#dddddd] bg-white sticky top-0 h-screen">
         {sidebarContent}
       </aside>
 
@@ -176,10 +176,10 @@ export default function DashboardShell({ children, user }: Props) {
       {open && (
         <>
           <div
-            className="fixed inset-0 bg-black/70 z-40 lg:hidden"
+            className="fixed inset-0 bg-[#000000]/70 z-40 lg:hidden"
             onClick={() => setOpen(false)}
           />
-          <aside className="fixed inset-y-0 left-0 w-72 bg-white border-r border-[#d5dfdd] z-50 lg:hidden flex flex-col">
+          <aside className="fixed inset-y-0 left-0 w-72 bg-white border-r border-[#dddddd] z-50 lg:hidden flex flex-col">
             {sidebarContent}
           </aside>
         </>

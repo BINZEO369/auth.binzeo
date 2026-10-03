@@ -147,14 +147,14 @@ export default function VerifyEmailPage() {
     <div className="max-w-md mx-auto">
       {/* Header */}
       <div className="mb-6">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[#1f1f2e] bg-[#0d0d13] text-xs text-gray-400 mb-4">
-          <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-pulse" />
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[#333333] bg-[#0d0d0d] text-xs text-[#888888] mb-4">
+          <span className="w-1.5 h-1.5 rounded-full bg-[#6666666] animate-pulse" />
           Email Verification
         </div>
         <h1 className="text-2xl font-bold text-white mb-1">
           {step === "verified" ? "Verified!" : "Verify your email"}
         </h1>
-        <p className="text-sm text-gray-400">
+        <p className="text-sm text-[#888888]">
           {step === "idle" &&
             "We'll send a 6-digit code to your registered email."}
           {step === "sent" &&
@@ -169,8 +169,8 @@ export default function VerifyEmailPage() {
         <div
           className={`p-3 rounded-lg border text-sm mb-4 ${
             message.type === "success"
-              ? "bg-green-500/10 border-green-500/30 text-green-400"
-              : "bg-red-500/10 border-red-500/30 text-red-400"
+              ? "bg-[#555555]/10 border-[#555555]/30 text-[#444444]"
+              : "bg-[#555555]/10 border-[#555555]/30 text-[#444444]"
           }`}
         >
           {message.text}
@@ -182,7 +182,7 @@ export default function VerifyEmailPage() {
         <button
           onClick={sendOtp}
           disabled={loading}
-          className="w-full py-3 rounded-lg bg-indigo-600 hover:bg-indigo-500 disabled:opacity-60 disabled:cursor-not-allowed text-white font-medium transition-colors shadow-lg shadow-indigo-600/20"
+          className="w-full py-3 rounded-lg bg-[#222222] hover:bg-[#333333] disabled:opacity-60 disabled:cursor-not-allowed text-white font-medium transition-colors shadow-lg shadow-indigo-600/20"
         >
           {loading ? "Sending..." : "Send verification code"}
         </button>
@@ -192,7 +192,7 @@ export default function VerifyEmailPage() {
       {step === "sent" && (
         <form
           onSubmit={verifyOtp}
-          className="p-5 rounded-2xl border border-[#1f1f2e] bg-[#0d0d13] space-y-4"
+          className="p-5 rounded-2xl border border-[#333333] bg-[#0d0d0d] space-y-4"
         >
           <div className="flex justify-center gap-2">
             {digits.map((d, i) => (
@@ -207,7 +207,7 @@ export default function VerifyEmailPage() {
                 value={d}
                 onChange={(e) => handleDigit(i, e.target.value)}
                 onKeyDown={(e) => handleKeyDown(i, e)}
-                className="w-11 h-13 sm:w-12 sm:h-14 text-center text-xl font-bold rounded-lg border border-[#1f1f2e] bg-[#0a0a0f] text-white focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-colors"
+                className="w-11 h-13 sm:w-12 sm:h-14 text-center text-xl font-bold rounded-lg border border-[#333333] bg-[#0d0d0d] text-white focus:outline-none focus:border-[#444444] focus:ring-2 focus:ring-indigo-500/20 transition-colors"
                 style={{ height: "3.25rem" }}
               />
             ))}
@@ -216,17 +216,17 @@ export default function VerifyEmailPage() {
           <button
             type="submit"
             disabled={loading || digits.some((d) => !d)}
-            className="w-full py-3 rounded-lg bg-indigo-600 hover:bg-indigo-500 disabled:opacity-60 disabled:cursor-not-allowed text-white font-medium transition-colors"
+            className="w-full py-3 rounded-lg bg-[#222222] hover:bg-[#333333] disabled:opacity-60 disabled:cursor-not-allowed text-white font-medium transition-colors"
           >
             {loading ? "Verifying..." : "Verify code"}
           </button>
 
-          <div className="flex items-center justify-between text-xs text-gray-500 pt-2">
+          <div className="flex items-center justify-between text-xs text-[#777777] pt-2">
             <button
               type="button"
               onClick={sendOtp}
               disabled={resendIn > 0 || loading}
-              className="text-indigo-400 hover:text-indigo-300 disabled:text-gray-600 disabled:cursor-not-allowed"
+              className="text-[#555555] hover:text-[#6666666] disabled:text-[#6666666] disabled:cursor-not-allowed"
             >
               {resendIn > 0 ? `Resend in ${resendIn}s` : "Resend code"}
             </button>
@@ -237,7 +237,7 @@ export default function VerifyEmailPage() {
                 setDigits(["", "", "", "", "", ""]);
                 setMessage(null);
               }}
-              className="hover:text-gray-300"
+              className="hover:text-[#6666666]"
             >
               Cancel
             </button>
@@ -247,8 +247,8 @@ export default function VerifyEmailPage() {
 
       {/* Verified Step */}
       {step === "verified" && (
-        <div className="p-8 rounded-2xl border border-green-500/20 bg-green-500/5 text-center">
-          <div className="w-14 h-14 mx-auto mb-4 rounded-full bg-green-500/10 border border-green-500/30 flex items-center justify-center">
+        <div className="p-8 rounded-2xl border border-[#555555]/20 bg-[#555555]/5 text-center">
+          <div className="w-14 h-14 mx-auto mb-4 rounded-full bg-[#555555]/10 border border-[#555555]/30 flex items-center justify-center">
             <svg
               viewBox="0 0 24 24"
               fill="none"
@@ -256,17 +256,17 @@ export default function VerifyEmailPage() {
               strokeWidth="2.5"
               strokeLinecap="round"
               strokeLinejoin="round"
-              className="w-7 h-7 text-green-400"
+              className="w-7 h-7 text-[#444444]"
             >
               <path d="M20 6 9 17l-5-5" />
             </svg>
           </div>
-          <p className="text-sm text-gray-300 mb-4">
+          <p className="text-sm text-[#6666666] mb-4">
             Redirecting to dashboard...
           </p>
           <Link
             href="/dashboard"
-            className="inline-block px-5 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-medium transition-colors"
+            className="inline-block px-5 py-2 rounded-lg bg-[#222222] hover:bg-[#333333] text-white text-sm font-medium transition-colors"
           >
             Go now
           </Link>

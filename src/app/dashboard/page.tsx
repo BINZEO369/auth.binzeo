@@ -32,10 +32,10 @@ function Card({
   href?: string;
 }) {
   const inner = (
-    <div className="p-5 rounded-2xl border border-[#d5dfdd] bg-white hover:border-[#8bc9df] transition-colors h-full">
-      <div className="text-xs text-[#6d7c80] mb-1">{title}</div>
-      <div className="text-lg font-semibold text-[#101820] truncate">{value}</div>
-      {hint && <div className="text-xs text-[#849295] mt-1">{hint}</div>}
+    <div className="p-5 rounded-2xl border border-[#dddddd] bg-white hover:border-[#aaaaaa] transition-colors h-full">
+      <div className="text-xs text-[#666666] mb-1">{title}</div>
+      <div className="text-lg font-semibold text-[#111111] truncate">{value}</div>
+      {hint && <div className="text-xs text-[#888888] mt-1">{hint}</div>}
     </div>
   );
   return href ? <Link href={href}>{inner}</Link> : inner;
@@ -56,7 +56,7 @@ export default function DashboardOverviewPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <div className="w-6 h-6 border-2 border-[#79b9d5] border-t-transparent rounded-full animate-spin" />
+        <div className="w-6 h-6 border-2 border-[#777777] border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
@@ -67,15 +67,15 @@ export default function DashboardOverviewPage() {
   return (
     <div className="max-w-5xl mx-auto space-y-6">
       {/* Welcome */}
-      <div className="p-6 rounded-2xl border border-[#b4ded3] bg-gradient-to-br from-[#d8eef5] via-white to-white">
-        <div className="text-sm text-[#5c6b70] mb-1">Welcome back,</div>
-        <h1 className="text-2xl sm:text-3xl font-bold text-[#101820] mb-3">
+      <div className="p-6 rounded-2xl border border-[#c9c9c9] bg-gradient-to-br from-[#eeeeee] via-white to-white">
+        <div className="text-sm text-[#6666666] mb-1">Welcome back,</div>
+        <h1 className="text-2xl sm:text-3xl font-bold text-[#111111] mb-3">
           {name}
         </h1>
         {profile?.binzeo_user_id && (
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#dff2eb] border border-[#b4ded3]">
-            <span className="text-xs text-[#5c6b70]">Your ID</span>
-            <span className="font-mono text-sm text-[#216f9e] font-medium">
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#eeeeee] border border-[#c9c9c9]">
+            <span className="text-xs text-[#6666666]">Your ID</span>
+            <span className="font-mono text-sm text-[#333333] font-medium">
               {profile.binzeo_user_id}
             </span>
           </div>
@@ -115,7 +115,7 @@ export default function DashboardOverviewPage() {
 
       {/* Sections */}
       <div>
-        <h2 className="text-sm font-semibold text-[#5c6b70] uppercase tracking-wider mb-3">
+        <h2 className="text-sm font-semibold text-[#6666666] uppercase tracking-wider mb-3">
           Manage
         </h2>
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
@@ -130,10 +130,10 @@ export default function DashboardOverviewPage() {
             <Link
               key={item.href}
               href={item.href}
-              className="group p-5 rounded-2xl border border-[#d5dfdd] bg-white hover:border-[#8bc9df] hover:-translate-y-0.5 transition-all"
+              className="group p-5 rounded-2xl border border-[#dddddd] bg-white hover:border-[#aaaaaa] hover:-translate-y-0.5 transition-all"
             >
               <div className="flex items-center justify-between mb-2">
-                <div className="text-[#101820] font-medium group-hover:text-[#216f9e] transition-colors">
+                <div className="text-[#111111] font-medium group-hover:text-[#333333] transition-colors">
                   {item.title}
                 </div>
                 <svg
@@ -143,12 +143,12 @@ export default function DashboardOverviewPage() {
                   strokeWidth="2"
                   strokeLinecap="round"
                   strokeLinejoin="round"
-                  className="w-4 h-4 text-[#849295] group-hover:text-[#216f9e] group-hover:translate-x-0.5 transition-all"
+                  className="w-4 h-4 text-[#888888] group-hover:text-[#333333] group-hover:translate-x-0.5 transition-all"
                 >
                   <path d="m9 18 6-6-6-6" />
                 </svg>
               </div>
-              <div className="text-xs text-[#6d7c80]">{item.desc}</div>
+              <div className="text-xs text-[#666666]">{item.desc}</div>
             </Link>
           ))}
         </div>
