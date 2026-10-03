@@ -1,7 +1,16 @@
+import Navbar from "@/components/layout/Navbar";
+import Footer from "@/components/layout/Footer";
+
 export default function AuthLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  return <>{children}</>;
+  return (
+    <div className="liquid-page min-h-screen overflow-hidden bg-[#07111a] text-white">
+      <Navbar variant="liquid" />
+      <main>{children}</main>
+      <Footer variant="liquid" />
+    </div>
+  );
 }

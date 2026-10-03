@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
+import Navbar from "@/components/layout/Navbar";
+import Footer from "@/components/layout/Footer";
 
 const benefits = [
   {
@@ -34,44 +36,13 @@ export default async function HomePage() {
 
   return (
     <main className="liquid-page min-h-screen overflow-hidden bg-[#07111a] text-white">
+      <Navbar isLoggedIn={isLoggedIn} variant="liquid" />
       <section className="relative isolate min-h-screen overflow-hidden">
         <div className="liquid-background" aria-hidden="true" />
         <div className="liquid-grid" aria-hidden="true" />
         <div className="liquid-orb liquid-orb-one" aria-hidden="true" />
         <div className="liquid-orb liquid-orb-two" aria-hidden="true" />
         <div className="liquid-orb liquid-orb-three" aria-hidden="true" />
-
-        <header className="relative z-10 mx-auto flex w-full max-w-7xl items-center justify-between px-5 py-6 sm:px-8 lg:px-10">
-          <Link href="/" className="group flex items-center gap-3" aria-label="BINZEO home">
-            <span className="flex h-10 w-10 items-center justify-center rounded-2xl border border-white/25 bg-white/15 p-2 shadow-lg shadow-cyan-950/20 backdrop-blur-xl transition group-hover:bg-white/25">
-              <img src="/logo.svg" alt="" className="h-full w-full object-contain brightness-0 invert" />
-            </span>
-            <span className="text-sm font-semibold tracking-[0.22em] text-white/90">BINZEO</span>
-          </Link>
-
-          <nav className="hidden items-center gap-8 text-sm text-white/65 md:flex" aria-label="Main navigation">
-            <a href="#why-binzeo" className="transition hover:text-white">Why BINZEO</a>
-            <a href="#how-it-works" className="transition hover:text-white">How it works</a>
-            <a href="#security" className="transition hover:text-white">Security</a>
-          </nav>
-
-          <div className="flex items-center gap-2 sm:gap-3">
-            {isLoggedIn ? (
-              <Link href="/dashboard" className="liquid-button liquid-button-light px-4 py-2.5 text-sm sm:px-5">
-                Dashboard <span aria-hidden="true">↗</span>
-              </Link>
-            ) : (
-              <>
-                <Link href="/signin" className="hidden rounded-full px-4 py-2.5 text-sm text-white/75 transition hover:bg-white/10 hover:text-white sm:inline-flex">
-                  Sign in
-                </Link>
-                <Link href="/signup" className="liquid-button liquid-button-light px-4 py-2.5 text-sm sm:px-5">
-                  Get started <span aria-hidden="true">↗</span>
-                </Link>
-              </>
-            )}
-          </div>
-        </header>
 
         <div className="relative z-10 mx-auto flex min-h-[calc(100vh-88px)] w-full max-w-7xl items-center px-5 pb-14 pt-10 sm:px-8 sm:pb-20 lg:px-10">
           <div className="grid w-full items-center gap-14 lg:grid-cols-[1.05fr_0.95fr] lg:gap-20">
@@ -211,10 +182,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <footer className="mx-auto flex w-full max-w-7xl flex-col gap-4 px-5 py-8 text-xs text-white/40 sm:flex-row sm:items-center sm:justify-between sm:px-8 lg:px-10">
-        <span>© {new Date().getFullYear()} BINZEO Labs</span>
-        <span>Secure identity, made simple.</span>
-      </footer>
+      <Footer isLoggedIn={isLoggedIn} variant="liquid" />
     </main>
   );
 }

@@ -2,76 +2,60 @@
 
 import Link from "next/link";
 
-export default function Footer({ isLoggedIn = false }: { isLoggedIn?: boolean }) {
+type FooterProps = {
+  isLoggedIn?: boolean;
+  variant?: "light" | "liquid";
+};
+
+export default function Footer({
+  isLoggedIn = false,
+  variant = "light",
+}: FooterProps) {
   const year = new Date().getFullYear();
+  const isLiquid = variant === "liquid";
+  const muted = isLiquid ? "text-white/50" : "text-[#525252]";
+  const subtle = isLiquid ? "text-white/35" : "text-[#737373]";
+  const border = isLiquid ? "border-white/10" : "border-[#dddddd]";
+  const heading = isLiquid ? "text-white/85" : "text-[#111111]";
 
   return (
-    <footer className="border-t border-[#dddddd] mt-auto">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-12">
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-8 mb-10">
+    <footer className={`mt-auto border-t ${border} ${isLiquid ? "bg-[#07111a]/80 text-white" : "bg-white"}`}>
+      <div className="mx-auto max-w-7xl px-5 py-12 sm:px-8 lg:px-10">
+        <div className="grid grid-cols-2 gap-8 sm:grid-cols-4">
           <div className="col-span-2">
-            <Link href="/" className="flex items-center gap-2 mb-4">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#b8b8b8] to-[#5e5e5e] flex items-center justify-center font-bold text-[#111111] text-sm">
-                B
-              </div>
-              <span className="font-semibold text-[#111111]">
-                Binzeo <span className="text-[#333333]">ID</span>
+            <Link href="/" className="mb-4 inline-flex items-center gap-3">
+              <span className={isLiquid ? "flex h-9 w-9 items-center justify-center rounded-xl border border-white/20 bg-white/10 p-2" : "flex h-9 w-9 items-center justify-center rounded-xl bg-[#111111] p-2"}>
+                <img src="/logo.svg" alt="BINZEO" className={isLiquid ? "h-full w-full object-contain brightness-0 invert" : "h-full w-full object-contain invert"} />
               </span>
+              <span className={`font-semibold tracking-[0.14em] ${heading}`}>BINZEO</span>
             </Link>
-            <p className="text-sm text-[#666666] max-w-xs">
-              Your secure digital identity — create, manage and share with one
-              click.
+            <p className={`max-w-xs text-sm leading-6 ${muted}`}>
+              Your secure digital identity — create, manage and share with confidence.
             </p>
           </div>
 
           <div>
-            <h4 className="text-sm font-semibold text-[#111111] mb-3">Product</h4>
-            <ul className="space-y-2 text-sm text-[#666666]">
-              {isLoggedIn ? (
-                <li><Link href="/dashboard" className="hover:text-[#111111] transition-colors">Dashboard</Link></li>
-              ) : (
-                <>
-                  <li><Link href="/signup" className="hover:text-[#111111] transition-colors">Get Started</Link></li>
-                  <li><Link href="/signin" className="hover:text-[#111111] transition-colors">Sign in</Link></li>
-                </>
-              )}
-              <li>
-                <Link href="#eeeeeetures" className="hover:text-[#111111] transition-colors">
-                  Features
-                </Link>
-              </li>
+            <h4 className={`mb-3 text-sm font-semibold ${heading}`}>Product</h4>
+            <ul className={`space-y-2 text-sm ${muted}`}>
+              <li><Link href={isLoggedIn ? "/dashboard" : "/signup"} className="transition hover:text-white">{isLoggedIn ? "Dashboard" : "Get started"}</Link></li>
+              {!isLoggedIn && <li><Link href="/signin" className="transition hover:text-white">Sign in</Link></li>}
+              <li><Link href="/#why-binzeo" className="transition hover:text-white">Why BINZEO</Link></li>
             </ul>
           </div>
 
           <div>
-            <h4 className="text-sm font-semibold text-[#111111] mb-3">Company</h4>
-            <ul className="space-y-2 text-sm text-[#666666]">
-              <li>
-                <Link href="#" className="hover:text-[#111111] transition-colors">
-                  About
-                </Link>
-              </li>
-              <li>
-                <Link href="#" className="hover:text-[#111111] transition-colors">
-                  Privacy
-                </Link>
-              </li>
-              <li>
-                <Link href="#" className="hover:text-[#111111] transition-colors">
-                  Terms
-                </Link>
-              </li>
+            <h4 className={`mb-3 text-sm font-semibold ${heading}`}>Explore</h4>
+            <ul className={`space-y-2 text-sm ${muted}`}>
+              <li><Link href="/#how-it-works" className="transition hover:text-white">How it works</Link></li>
+              <li><Link href="/#security" className="transition hover:text-white">Security</Link></li>
+              <li><Link href="/" className="transition hover:text-white">Home</Link></li>
             </ul>
           </div>
         </div>
 
-        <div className="border-t border-[#dddddd] pt-6 flex flex-col sm:flex-row items-center justify-between gap-3">
-          <p className="text-xs text-[#666666]">
-            © {year} Binzeo Labs. All rights reserved.
-          </p>
-          <p className="text-xs text-[#888888]">
-            Built with Next.js · Supabase
-          </p>
+        <div className={`mt-10 flex flex-col items-center justify-between gap-3 border-t pt-6 text-xs sm:flex-row ${border}`}>
+          <p className={muted}>© {year} BINZEO Labs. All rights reserved.</p>
+          <p className={subtle}>Built with Next.js · Supabase</p>
         </div>
       </div>
     </footer>
