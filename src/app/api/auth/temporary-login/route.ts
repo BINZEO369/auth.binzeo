@@ -31,7 +31,7 @@ export async function POST(req: NextRequest) {
     const { data: linkData, error: linkError } = await admin.auth.admin.generateLink({
       type: "magiclink",
       email: consumed.email,
-      options: origin ? { redirectTo: `${origin}/login` } : undefined,
+      options: origin ? { redirectTo: `${origin}/signin` } : undefined,
     });
     const hashedToken = linkData?.properties?.hashed_token;
     if (linkError || !hashedToken) {

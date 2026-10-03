@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-export default function CTA() {
+export default function CTA({ isLoggedIn = false }: { isLoggedIn?: boolean }) {
   return (
     <section className="py-20 sm:py-28 border-t border-[#d5dfdd]">
       <div className="max-w-5xl mx-auto px-4 sm:px-6">
@@ -24,19 +24,15 @@ export default function CTA() {
               Join thousands of users already using Binzeo ID to own their
               digital identity.
             </p>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-              <Link
-                href="/register"
-                className="w-full sm:w-auto px-6 py-3 rounded-lg bg-[#101820] hover:bg-[#263746] text-white font-medium transition-all hover:scale-105 shadow-lg shadow-[#9bd8c7]/35"
-              >
-                Get started — it&apos;s free
-              </Link>
-              <Link
-                href="/login"
-                className="w-full sm:w-auto px-6 py-3 rounded-lg border border-[#d5dfdd] hover:border-[#8bc9df] text-[#35454c] hover:text-[#101820] font-medium transition-all"
-              >
-                I already have an ID
-              </Link>
+            <div className="flex flex-col items-center justify-center gap-3 sm:flex-row">
+              {isLoggedIn ? (
+                <Link href="/dashboard" className="w-full rounded-xl bg-[#101820] px-6 py-3 text-center font-semibold text-white shadow-lg shadow-[#9bd8c7]/35 transition hover:-translate-y-0.5 hover:bg-[#263746] sm:w-auto">Go to Dashboard →</Link>
+              ) : (
+                <>
+                  <Link href="/signup" className="w-full rounded-xl bg-[#101820] px-6 py-3 text-center font-medium text-white shadow-lg shadow-[#9bd8c7]/35 transition-all hover:scale-105 hover:bg-[#263746] sm:w-auto">Get started — it&apos;s free</Link>
+                  <Link href="/signin" className="w-full rounded-xl border border-[#d5dfdd] px-6 py-3 text-center font-medium text-[#35454c] transition-all hover:border-[#8bc9df] hover:text-[#101820] sm:w-auto">I already have an ID</Link>
+                </>
+              )}
             </div>
           </div>
         </div>

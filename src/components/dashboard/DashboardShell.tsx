@@ -78,7 +78,7 @@ export default function DashboardShell({ children, user }: Props) {
   const handleLogout = async () => {
     setLoggingOut(true);
     await fetch("/api/auth/logout", { method: "POST" });
-    router.push("/login");
+    router.push("/signin");
     router.refresh();
   };
 

@@ -115,7 +115,7 @@ export default function RegisterForm() {
         </div>
         <h1 className="mt-6 text-center text-2xl font-semibold">Check your email</h1>
         <p className="mt-3 text-center text-sm leading-6 text-[#a6abb2]">We&apos;ve sent a 6-digit verification code to <span className="text-white">{email}</span>.</p>
-        <Link href="/login" className="mt-8 inline-flex w-full items-center justify-center rounded-full bg-white py-3 text-sm font-semibold text-[#050607] transition hover:bg-[#e3e6e8]">Go to login</Link>
+        <Link href="/signin" className="mt-8 inline-flex w-full items-center justify-center rounded-full bg-white py-3 text-sm font-semibold text-[#050607] transition hover:bg-[#e3e6e8]">Go to login</Link>
       </div>
     );
   }
@@ -154,7 +154,7 @@ export default function RegisterForm() {
 
       <div className="my-6 flex items-center gap-3 text-xs text-[#8f949b]"><span className="h-px flex-1 bg-[#3d4145]" /><span>or</span><span className="h-px flex-1 bg-[#3d4145]" /></div>
       <SocialActions onMessage={setError} />
-      <p className="mt-7 text-center text-sm text-[#a6abb2]">Already have an account? <Link href="/login" className="font-medium text-white hover:text-[#c9e8f1]">Sign in</Link></p>
+      <p className="mt-7 text-center text-sm text-[#a6abb2]">Already have an account? <Link href="/signin" className="font-medium text-white hover:text-[#c9e8f1]">Sign in</Link></p>
     </div>
   );
 }

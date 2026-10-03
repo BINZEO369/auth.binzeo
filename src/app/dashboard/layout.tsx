@@ -13,7 +13,7 @@ export default async function DashboardLayout({
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (!user) redirect("/login?next=/dashboard");
+  if (!user) redirect("/signin?next=/dashboard");
 
   const requestPath = (await headers()).get("x-pathname") ?? "";
   const { data: profile } = await supabase
@@ -36,7 +36,7 @@ export default async function DashboardLayout({
     redirect("/dashboard");
   }
   if (profile?.account_status !== "active" && !isPendingVerification) {
-    redirect("/login?blocked=1");
+    redirect("/signin?blocked=1");
   }
   if (
     isPendingVerification &&

@@ -63,7 +63,7 @@ export default function TemporaryLoginTokens() {
     );
     if (response.success) {
       setNewToken(response.data.token);
-      const directLoginUrl = `${window.location.origin}/login#temporary_token=${encodeURIComponent(response.data.token)}`;
+      const directLoginUrl = `${window.location.origin}/signin#temporary_token=${encodeURIComponent(response.data.token)}`;
       setQrImage(await QRCode.toDataURL(directLoginUrl, { width: 240, margin: 2, color: { dark: "#101820", light: "#ffffff" } }));
       setMessage("Token created. Copy it now; it will not be shown again.");
       await load();

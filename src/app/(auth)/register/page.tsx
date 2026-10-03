@@ -1,11 +1,5 @@
-import { Metadata } from "next";
-import RegisterForm from "@/components/auth/RegisterForm";
+import { redirect } from "next/navigation";
 
-export const metadata: Metadata = {
-  title: "Create Account",
-  description: "Create your Binzeo ID account",
-};
-
-export default function RegisterPage() {
-  return <RegisterForm />;
+export default function LegacyRegisterPage() {
+  redirect("/signup");
 }

@@ -2,7 +2,7 @@ import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
 const PROTECTED = ['/dashboard']
-const AUTH_ONLY = ['/login', '/register']
+const AUTH_ONLY = ['/signin', '/signup', '/signin', '/signup']
 
 export async function middleware(req: NextRequest) {
   const requestHeaders = new Headers(req.headers)
@@ -31,7 +31,7 @@ export async function middleware(req: NextRequest) {
 
   if (!user && PROTECTED.some((p) => pathname.startsWith(p))) {
     const url = req.nextUrl.clone()
-    url.pathname = '/login'
+    url.pathname = '/signin'
     url.searchParams.set('next', pathname)
     return NextResponse.redirect(url)
   }

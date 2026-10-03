@@ -1,50 +1,27 @@
 import Image from "next/image";
 import Link from "next/link";
 
-export default function Navbar() {
+export default function Navbar({ isLoggedIn = false }: { isLoggedIn?: boolean }) {
   return (
-    <header className="sticky top-0 z-50 border-b border-[#d5dfdd] bg-[#eef2f1]/80 backdrop-blur-xl">
-      <nav className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-2 group">
-          <Image
-            src="/logo.svg"
-            alt="BINZEO"
-            width={122}
-            height={29}
-            priority
-            className="h-8 w-auto transition-opacity group-hover:opacity-70"
-          />
+    <header className="sticky top-0 z-50 border-b border-[#d5dfdd]/80 bg-white/85 backdrop-blur-xl">
+      <nav className="mx-auto flex h-[72px] max-w-6xl items-center justify-between px-4 sm:px-6">
+        <Link href="/" className="flex items-center gap-3 group">
+          <Image src="/logo.svg" alt="BINZEO" width={122} height={29} priority className="h-8 w-auto transition-opacity group-hover:opacity-70" />
         </Link>
-
-        <nav className="hidden md:flex items-center gap-8">
-          <Link
-            href="#features"
-            className="text-sm text-[#5c6b70] hover:text-[#101820] transition-colors"
-          >
-            Features
-          </Link>
-          <Link
-            href="#how"
-            className="text-sm text-[#5c6b70] hover:text-[#101820] transition-colors"
-          >
-            How it works
-          </Link>
-        </nav>
-
-        <div className="flex items-center gap-2">
-          <Link
-            href="/login"
-            className="text-sm text-[#35454c] hover:text-[#101820] px-3 py-2 transition-colors"
-          >
-            Login
-          </Link>
-          <Link
-            href="/register"
-            className="text-sm font-medium bg-[#101820] hover:bg-[#263746] text-white px-4 py-2 rounded-lg transition-colors shadow-lg shadow-[#9bd8c7]/25"
-          >
-            Get Started
-          </Link>
+        <div className="hidden items-center gap-8 md:flex">
+          <Link href="#features" className="text-sm font-medium text-[#5c6b70] transition-colors hover:text-[#101820]">Features</Link>
+          <Link href="#how" className="text-sm font-medium text-[#5c6b70] transition-colors hover:text-[#101820]">How it works</Link>
         </div>
+        {isLoggedIn ? (
+          <Link href="/dashboard" aria-label="Open dashboard" title="Dashboard" className="inline-flex h-11 w-11 items-center justify-center rounded-xl border border-[#b4ded3] bg-[#e3f4ee] text-[#216f9e] shadow-sm transition hover:-translate-y-0.5 hover:bg-[#d7eee8]">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5"><rect x="3" y="3" width="7" height="7" rx="1" /><rect x="14" y="3" width="7" height="7" rx="1" /><rect x="3" y="14" width="7" height="7" rx="1" /><rect x="14" y="14" width="7" height="7" rx="1" /></svg>
+          </Link>
+        ) : (
+          <div className="flex items-center gap-2">
+            <Link href="/signin" className="rounded-lg px-3 py-2 text-sm font-medium text-[#35454c] transition-colors hover:bg-[#eef2f1] hover:text-[#101820]">Sign in</Link>
+            <Link href="/signup" className="rounded-xl bg-[#101820] px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-[#9bd8c7]/25 transition hover:-translate-y-0.5 hover:bg-[#263746]">Get started</Link>
+          </div>
+        )}
       </nav>
     </header>
   );

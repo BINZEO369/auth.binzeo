@@ -94,7 +94,7 @@ export default function LoginForm() {
   useEffect(() => {
     const hashToken = new URLSearchParams(window.location.hash.replace(/^#/, "")).get("temporary_token");
     if (!hashToken) return;
-    window.history.replaceState(null, document.title, "/login");
+    window.history.replaceState(null, document.title, "/signin");
     // eslint-disable-next-line react-hooks/set-state-in-effect
     void exchangeTemporaryToken(hashToken);
   }, [exchangeTemporaryToken]);
@@ -204,7 +204,7 @@ export default function LoginForm() {
       </form>
       <button type="button" onClick={handlePasskeyLogin} disabled={passkeyLoading} className="mt-3 w-full rounded-full border border-[#5c6269] py-3 text-sm font-semibold text-white transition hover:bg-[#15171a] disabled:opacity-60">{passkeyLoading ? "Checking passkey..." : "Sign in with passkey"}</button>
       <SocialActions onMessage={setError} />
-      <p className="mt-7 text-center text-sm text-[#a6abb2]">Don&apos;t have an account? <Link href="/register" className="font-medium text-white hover:text-[#c9e8f1]">Create one</Link></p>
+      <p className="mt-7 text-center text-sm text-[#a6abb2]">Don&apos;t have an account? <Link href="/signup" className="font-medium text-white hover:text-[#c9e8f1]">Create one</Link></p>
     </div>
   );
 }

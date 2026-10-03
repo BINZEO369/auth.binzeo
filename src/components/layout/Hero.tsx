@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-export default function Hero() {
+export default function Hero({ isLoggedIn = false }: { isLoggedIn?: boolean }) {
   return (
     <section className="relative overflow-hidden bg-[#e7f0f2]">
       <div
@@ -52,19 +52,18 @@ export default function Hero() {
           ID.
         </p>
 
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 animate-fade-up delay-300">
-          <Link
-            href="/register"
-            className="w-full sm:w-auto px-6 py-3 rounded-lg bg-[#101820] hover:bg-[#263746] text-white font-medium transition-all hover:scale-105 shadow-lg shadow-[#9bd8c7]/35"
-          >
-            Create your ID
-          </Link>
-          <Link
-            href="/login"
-            className="w-full sm:w-auto px-6 py-3 rounded-lg border border-[#d5dfdd] hover:border-[#8bc9df] text-[#35454c] hover:text-[#101820] font-medium transition-all"
-          >
-            Sign in
-          </Link>
+        <div className="flex flex-col items-center justify-center gap-3 animate-fade-up delay-300 sm:flex-row">
+          {isLoggedIn ? (
+            <Link href="/dashboard" className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#101820] px-6 py-3 font-semibold text-white shadow-lg shadow-[#9bd8c7]/35 transition-all hover:-translate-y-0.5 hover:bg-[#263746] sm:w-auto">
+              Open Dashboard
+              <span aria-hidden="true">→</span>
+            </Link>
+          ) : (
+            <>
+              <Link href="/signup" className="w-full rounded-xl bg-[#101820] px-6 py-3 text-center font-medium text-white shadow-lg shadow-[#9bd8c7]/35 transition-all hover:scale-105 hover:bg-[#263746] sm:w-auto">Create your ID</Link>
+              <Link href="/signin" className="w-full rounded-xl border border-[#d5dfdd] px-6 py-3 text-center font-medium text-[#35454c] transition-all hover:border-[#8bc9df] hover:text-[#101820] sm:w-auto">Sign in</Link>
+            </>
+          )}
         </div>
 
         {/* Stats */}

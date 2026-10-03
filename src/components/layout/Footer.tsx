@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-export default function Footer() {
+export default function Footer({ isLoggedIn = false }: { isLoggedIn?: boolean }) {
   const year = new Date().getFullYear();
 
   return (
@@ -25,16 +25,14 @@ export default function Footer() {
           <div>
             <h4 className="text-sm font-semibold text-[#101820] mb-3">Product</h4>
             <ul className="space-y-2 text-sm text-[#6d7c80]">
-              <li>
-                <Link href="/register" className="hover:text-[#101820] transition-colors">
-                  Get Started
-                </Link>
-              </li>
-              <li>
-                <Link href="/login" className="hover:text-[#101820] transition-colors">
-                  Login
-                </Link>
-              </li>
+              {isLoggedIn ? (
+                <li><Link href="/dashboard" className="hover:text-[#101820] transition-colors">Dashboard</Link></li>
+              ) : (
+                <>
+                  <li><Link href="/signup" className="hover:text-[#101820] transition-colors">Get Started</Link></li>
+                  <li><Link href="/signin" className="hover:text-[#101820] transition-colors">Sign in</Link></li>
+                </>
+              )}
               <li>
                 <Link href="#features" className="hover:text-[#101820] transition-colors">
                   Features

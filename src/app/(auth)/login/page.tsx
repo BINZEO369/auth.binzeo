@@ -1,16 +1,5 @@
-import { Suspense } from "react";
-import { Metadata } from "next";
-import LoginForm from "@/components/auth/LoginForm";
+import { redirect } from "next/navigation";
 
-export const metadata: Metadata = {
-  title: "Login",
-  description: "Sign in to your Binzeo ID account",
-};
-
-export default function LoginPage() {
-  return (
-    <Suspense fallback={<div className="text-center text-[#6d7c80]">Loading...</div>}>
-      <LoginForm />
-    </Suspense>
-  );
+export default function LegacyLoginPage() {
+  redirect("/signin");
 }

@@ -7,7 +7,7 @@ export async function GET(req: NextRequest) {
   const next = searchParams.get('next') ?? '/dashboard'
 
   if (!code) {
-    return NextResponse.redirect(`${origin}/login?error=missing_code`)
+    return NextResponse.redirect(`${origin}/signin?error=missing_code`)
   }
 
   try {
@@ -16,13 +16,13 @@ export async function GET(req: NextRequest) {
 
     if (error) {
       return NextResponse.redirect(
-        `${origin}/login?error=${encodeURIComponent(error.message)}`
+        `${origin}/signin?error=${encodeURIComponent(error.message)}`
       )
     }
 
     return NextResponse.redirect(`${origin}${next}`)
   } catch (err) {
     console.error('[CALLBACK_ERROR]', err)
-    return NextResponse.redirect(`${origin}/login?error=callback_failed`)
+    return NextResponse.redirect(`${origin}/signin?error=callback_failed`)
   }
 }
