@@ -7,98 +7,158 @@ import Link from "next/link";
 import { getClientDeviceId, requestPreciseLocation } from "@/lib/client-device";
 import { startAuthentication } from "@simplewebauthn/browser";
 
-type Step = "splash" | "welcome" | "choose" | "email" | "token" | "passkey" | "success";
-type Method = "email" | "token" | "passkey" | "apple";
+/* ================================================================== */
+/*  Types                                                              */
+/* ================================================================== */
+type Stage = "logo" | "welcome" | "methods" | "email" | "token" | "passkey" | "qr" | "success";
 
+/* ================================================================== */
+/*  Field class                                                        */
+/* ================================================================== */
 const fieldClass =
   "w-full rounded-2xl border border-white/15 bg-white/5 px-4 py-3.5 text-sm text-white placeholder-white/40 outline-none transition-all duration-300 focus:border-white/40 focus:bg-white/10 focus:ring-2 focus:ring-white/10";
 
-/* ------------------------------------------------------------------ */
-/*  SVG icons (inline, monochrome)                                     */
-/* ------------------------------------------------------------------ */
-function IconEmail() {
+/* ================================================================== */
+/*  Small icon components                                              */
+/* ================================================================== */
+function IconMail() {
   return (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
-      <rect x="3" y="5" width="18" height="14" rx="2.5" />
-      <path d="m3 7 9 6 9-6" />
+      <rect x="2" y="4" width="20" height="16" rx="3" />
+      <path d="m22 7-8.97 5.7a2 2 0 0 1-2.06 0L2 7" />
     </svg>
   );
 }
+
 function IconKey() {
   return (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
       <circle cx="8" cy="15" r="4" />
-      <path d="m10.85 12.15 8.4-8.4M18 5l2 2M15 8l2 2" />
+      <path d="m10.85 12.15 8-8" />
+      <path d="M18 5 21 8" />
+      <path d="M15 8 18 11" />
     </svg>
   );
 }
-function IconPasskey() {
+
+function IconFingerprint() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
+      <path d="M12 10a2 2 0 0 0-2 2c0 1.02-.1 2.51-.26 4" />
+      <path d="M14 13.12c0 2.38 0 6.38-1 8.88" />
+      <path d="M17.29 21.02c.12-.6.43-2.3.5-3.02" />
+      <path d="M2 12a10 10 0 0 1 18-6" />
+      <path d="M2 16h.01" />
+      <path d="M21.8 16c.2-2 .131-5.354 0-6" />
+      <path d="M5 19.5C5.5 18 6 15 6 12a6 6 0 0 1 .34-2" />
+      <path d="M8.65 22c.21-.66.45-1.32.57-2" />
+      <path d="M9 6.8a6 6 0 0 1 9 5.2v2" />
+    </svg>
+  );
+}
+
+function IconQR() {
   return (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
-      <path d="M12 2 4 6v6c0 5 3.5 9.5 8 10 4.5-.5 8-5 8-10V6l-8-4Z" />
-      <path d="M9 12h.01M12 12h.01M15 12h.01" />
+      <rect x="3" y="3" width="7" height="7" rx="1.5" />
+      <rect x="14" y="3" width="7" height="7" rx="1.5" />
+      <rect x="3" y="14" width="7" height="7" rx="1.5" />
+      <path d="M14 14h3v3h-3z" />
+      <path d="M21 14v3" />
+      <path d="M14 21h3" />
+      <path d="M21 21h-3" />
     </svg>
   );
 }
-function IconApple() {
-  return (
-    <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
-      <path d="M16.365 1.43c0 1.14-.493 2.27-1.177 3.08-.744.9-1.99 1.57-2.987 1.57-.12 0-.23-.02-.32-.06-.02-.1-.04-.26-.04-.44 0-1.11.5-2.22 1.19-3.02C13.79.74 15.05.09 16.16.03c.05.14.08.28.08.44a.36.36 0 0 1-.01.06c.06.32.13.62.13.9zM12.6 8.35c1.13 0 2.66-.98 3.63-.98 1.51 0 2.32.7 3.07 1.6-.06.06-1.86 1.08-1.86 3.34 0 2.62 2.3 3.54 2.34 3.55-.02.06-.36 1.24-1.19 2.44-.72 1.04-1.47 2.09-2.63 2.09-1.13 0-1.45-.65-2.72-.65-1.25 0-1.68.67-2.75.67-1.11 0-1.87-1-2.72-2.15-1.02-1.42-1.85-3.65-1.85-5.75 0-3.4 2.2-5.16 4.38-5.16 1.15 0 2.11.75 2.83.75.68 0 1.77-.76 3.07-.76z" />
-    </svg>
-  );
-}
+
 function IconArrowLeft() {
   return (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
-      <path d="M19 12H5M12 19l-7-7 7-7" />
+      <path d="m15 18-6-6 6-6" />
     </svg>
   );
 }
+
 function IconCheck() {
   return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="w-8 h-8">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" className="w-8 h-8">
       <path d="M20 6 9 17l-5-5" />
     </svg>
   );
 }
 
+/* ================================================================== */
+/*  Brand logo — bigger on splash                                      */
+/* ================================================================== */
+function BrandLogo({ big = false }: { big?: boolean }) {
+  return (
+    <Image
+      src="/logo.svg"
+      alt="BINZEO"
+      width={big ? 180 : 132}
+      height={big ? 42 : 31}
+      priority
+      className={`mx-auto w-auto invert transition-all duration-700 ${
+        big ? "h-11 sm:h-12" : "h-8"
+      }`}
+    />
+  );
+}
+
+/* ================================================================== */
+/*  Main component                                                     */
+/* ================================================================== */
 export default function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const next = searchParams.get("next") ?? "/dashboard";
 
-  const [step, setStep] = useState<Step>("splash");
-  const [lastMethod, setLastMethod] = useState<Method | null>(null);
-  const [error, setError] = useState("");
+  const [stage, setStage] = useState<Stage>("logo");
 
-  // Form fields
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [temporaryToken, setTemporaryToken] = useState("");
-
-  // Loading states
   const [loading, setLoading] = useState(false);
+
+  const [temporaryToken, setTemporaryToken] = useState("");
   const [tokenLoading, setTokenLoading] = useState(false);
+
   const [passkeyLoading, setPasskeyLoading] = useState(false);
+
   const [scanningQr, setScanningQr] = useState(false);
   const qrScannerRef = useRef<{ stop: () => Promise<void>; clear: () => void } | null>(null);
 
-  /* ---------- Splash timing ---------- */
-  useEffect(() => {
-    if (step !== "splash") return;
-    const t = setTimeout(() => setStep("welcome"), 2400);
-    return () => clearTimeout(t);
-  }, [step]);
+  const [error, setError] = useState("");
 
+  /* ------------------------------------------------------------------ */
+  /*  Cinematic auto-transitions                                        */
+  /* ------------------------------------------------------------------ */
   useEffect(() => {
-    if (step !== "welcome") return;
-    const t = setTimeout(() => setStep("choose"), 2600);
-    return () => clearTimeout(t);
-  }, [step]);
+    if (stage === "logo") {
+      const t = setTimeout(() => setStage("welcome"), 1800);
+      return () => clearTimeout(t);
+    }
+    if (stage === "welcome") {
+      const t = setTimeout(() => setStage("methods"), 1700);
+      return () => clearTimeout(t);
+    }
+  }, [stage]);
 
-  /* ---------- Email login ---------- */
-  const handleEmailSubmit = async (e: React.FormEvent) => {
+  /* ------------------------------------------------------------------ */
+  /*  Success handler — shows animation then redirects                  */
+  /* ------------------------------------------------------------------ */
+  const handleSuccess = useCallback(() => {
+    setStage("success");
+    setTimeout(() => {
+      router.push(next);
+      router.refresh();
+    }, 1600);
+  }, [next, router]);
+
+  /* ------------------------------------------------------------------ */
+  /*  Email/password login                                              */
+  /* ------------------------------------------------------------------ */
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError("");
@@ -118,18 +178,16 @@ export default function LoginForm() {
         setLoading(false);
         return;
       }
-      setStep("success");
-      setTimeout(() => {
-        router.push(next);
-        router.refresh();
-      }, 1600);
+      handleSuccess();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Precise location permission is required");
       setLoading(false);
     }
   };
 
-  /* ---------- Temporary token ---------- */
+  /* ------------------------------------------------------------------ */
+  /*  Temporary token login                                             */
+  /* ------------------------------------------------------------------ */
   const exchangeTemporaryToken = useCallback(
     async (token: string) => {
       setTokenLoading(true);
@@ -146,20 +204,17 @@ export default function LoginForm() {
         const data = await res.json();
         if (!data.success) {
           setError(data.error?.message ?? "Temporary login failed");
+          setTokenLoading(false);
           return;
         }
-        setStep("success");
-        setTimeout(() => {
-          router.push(next);
-          router.refresh();
-        }, 1600);
+        handleSuccess();
       } catch {
         setError("Temporary login failed. Please try again.");
       } finally {
         setTokenLoading(false);
       }
     },
-    [next, router]
+    [handleSuccess]
   );
 
   useEffect(() => {
@@ -170,12 +225,14 @@ export default function LoginForm() {
     void exchangeTemporaryToken(hashToken);
   }, [exchangeTemporaryToken]);
 
-  const handleTokenSubmit = async (e: React.FormEvent) => {
+  const handleTemporaryLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     await exchangeTemporaryToken(temporaryToken);
   };
 
-  /* ---------- QR ---------- */
+  /* ------------------------------------------------------------------ */
+  /*  QR scanner                                                        */
+  /* ------------------------------------------------------------------ */
   const scanQrToken = async () => {
     setError("");
     setScanningQr(true);
@@ -212,7 +269,9 @@ export default function LoginForm() {
     setScanningQr(false);
   };
 
-  /* ---------- Passkey ---------- */
+  /* ------------------------------------------------------------------ */
+  /*  Passkey login                                                     */
+  /* ------------------------------------------------------------------ */
   const handlePasskeyLogin = async () => {
     setPasskeyLoading(true);
     setError("");
@@ -235,36 +294,25 @@ export default function LoginForm() {
       });
       const verifyData = await verifyRes.json();
       if (!verifyData.success) throw new Error(verifyData.error?.message ?? "Passkey login failed");
-      setStep("success");
-      setTimeout(() => {
-        router.push(next);
-        router.refresh();
-      }, 1600);
+      handleSuccess();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Passkey login was cancelled");
+    } finally {
       setPasskeyLoading(false);
     }
   };
 
-  /* ---------- Method selection ---------- */
-  const chooseMethod = (method: Method) => {
+  /* ------------------------------------------------------------------ */
+  /*  Method selection helper                                           */
+  /* ------------------------------------------------------------------ */
+  const selectMethod = (m: Stage) => {
     setError("");
-    setLastMethod(method);
-    if (method === "passkey") {
-      void handlePasskeyLogin();
-      return;
-    }
-    if (method === "apple") {
-      setError("Apple sign-in is not available yet.");
-      return;
-    }
-    setStep(method);
+    setStage(m);
   };
 
   const goBack = () => {
     setError("");
-    void stopQrScan();
-    setStep("choose");
+    setStage("methods");
   };
 
   /* ================================================================== */
@@ -272,7 +320,57 @@ export default function LoginForm() {
   /* ================================================================== */
   return (
     <div className="relative w-full min-h-[100dvh] overflow-x-hidden">
-      {/* ---------- Fixed background ---------- */}
+      {/* ------------ Keyframes ------------ */}
+      <style jsx global>{`
+        @keyframes bn-splash-in {
+          0%   { opacity: 0; transform: scale(0.86); filter: blur(8px); }
+          60%  { opacity: 1; transform: scale(1.02); filter: blur(0); }
+          100% { opacity: 1; transform: scale(1); filter: blur(0); }
+        }
+        @keyframes bn-splash-glow {
+          0%, 100% { opacity: 0.35; transform: scale(1); }
+          50%      { opacity: 0.75; transform: scale(1.15); }
+        }
+        @keyframes bn-splash-exit {
+          0%   { opacity: 1; transform: scale(1); filter: blur(0); }
+          100% { opacity: 0; transform: scale(1.08); filter: blur(6px); }
+        }
+        @keyframes bn-fade-up {
+          from { opacity: 0; transform: translateY(22px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes bn-fade-in {
+          from { opacity: 0; }
+          to   { opacity: 1; }
+        }
+        @keyframes bn-slide-in {
+          from { opacity: 0; transform: translateX(28px); }
+          to   { opacity: 1; transform: translateX(0); }
+        }
+        @keyframes bn-slide-out {
+          from { opacity: 1; transform: translateX(0); }
+          to   { opacity: 0; transform: translateX(-28px); }
+        }
+        @keyframes bn-pop {
+          0%   { opacity: 0; transform: scale(0.6); }
+          60%  { opacity: 1; transform: scale(1.06); }
+          100% { opacity: 1; transform: scale(1); }
+        }
+        @keyframes bn-ring {
+          0%   { transform: scale(0.9); opacity: 0.65; }
+          100% { transform: scale(1.8); opacity: 0; }
+        }
+        @keyframes bn-float {
+          0%, 100% { transform: translateY(0); }
+          50%      { transform: translateY(-6px); }
+        }
+        @keyframes bn-spin {
+          to { transform: rotate(360deg); }
+        }
+        .bn-ease { animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1); }
+      `}</style>
+
+      {/* ------------ Fixed background ------------ */}
       <div
         aria-hidden="true"
         className="fixed inset-0 -z-10 bg-center bg-cover bg-no-repeat"
@@ -283,7 +381,7 @@ export default function LoginForm() {
         className="fixed inset-0 -z-10 pointer-events-none"
         style={{
           background:
-            "linear-gradient(180deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.35) 40%, rgba(0,0,0,0.68) 100%)",
+            "linear-gradient(180deg, rgba(0,0,0,0.60) 0%, rgba(0,0,0,0.40) 40%, rgba(0,0,0,0.72) 100%)",
         }}
       />
       <div
@@ -291,501 +389,570 @@ export default function LoginForm() {
         className="fixed inset-0 -z-10 pointer-events-none"
         style={{
           background:
-            "radial-gradient(ellipse 90% 70% at 50% 45%, transparent 0%, rgba(0,0,0,0.32) 100%)",
+            "radial-gradient(ellipse 90% 70% at 50% 45%, transparent 0%, rgba(0,0,0,0.35) 100%)",
         }}
       />
 
-      {/* ---------- Global keyframes ---------- */}
-      <style jsx global>{`
-        @keyframes cine-fade-up {
-          from { opacity: 0; transform: translateY(24px) scale(0.98); }
-          to   { opacity: 1; transform: translateY(0) scale(1); }
-        }
-        @keyframes cine-scale-in {
-          from { opacity: 0; transform: scale(0.9); }
-          to   { opacity: 1; transform: scale(1); }
-        }
-        @keyframes cine-logo {
-          0%   { opacity: 0; transform: scale(0.6) rotate(-8deg); filter: blur(12px); }
-          40%  { opacity: 1; transform: scale(1.05) rotate(0deg); filter: blur(0); }
-          60%  { transform: scale(1); }
-          85%  { opacity: 1; transform: scale(1); }
-          100% { opacity: 0; transform: scale(1.15); filter: blur(6px); }
-        }
-        @keyframes cine-ring {
-          0%   { transform: scale(0.4); opacity: 0.9; }
-          100% { transform: scale(2.4); opacity: 0; }
-        }
-        @keyframes cine-text-in {
-          from { opacity: 0; transform: translateY(12px); }
-          to   { opacity: 1; transform: translateY(0); }
-        }
-        @keyframes cine-card-out {
-          from { opacity: 1; transform: translateY(0) scale(1); }
-          to   { opacity: 0; transform: translateY(-12px) scale(0.98); }
-        }
-        @keyframes cine-check {
-          0%   { transform: scale(0); opacity: 0; }
-          60%  { transform: scale(1.15); opacity: 1; }
-          100% { transform: scale(1); opacity: 1; }
-        }
-        @keyframes cine-ring-expand {
-          0%   { transform: scale(0.8); opacity: 0.8; }
-          100% { transform: scale(2.2); opacity: 0; }
-        }
-        .cine-fade-up   { animation: cine-fade-up 0.7s cubic-bezier(0.22,1,0.36,1) both; }
-        .cine-scale-in  { animation: cine-scale-in 0.6s cubic-bezier(0.22,1,0.36,1) both; }
-        .cine-delay-1   { animation-delay: 0.08s; }
-        .cine-delay-2   { animation-delay: 0.16s; }
-        .cine-delay-3   { animation-delay: 0.24s; }
-        .cine-delay-4   { animation-delay: 0.32s; }
-      `}</style>
-
-      {/* ================================================================ */}
-      {/*  MAIN CONTAINER                                                    */}
-      {/* ================================================================ */}
-      <div className="relative z-10 flex w-full min-h-[100dvh] items-center justify-center px-4 py-8 sm:py-12">
-        <div className="w-full max-w-[520px]">
-
-          {/* ============================================================== */}
-          {/*  STEP 1 — SPLASH                                                */}
-          {/* ============================================================== */}
-          {step === "splash" && (
-            <div className="flex flex-col items-center justify-center py-20">
-              <div className="relative">
-                <div className="absolute inset-0 rounded-full border border-white/30"
-                  style={{ animation: "cine-ring 2s ease-out infinite" }} />
-                <div className="absolute inset-0 rounded-full border border-white/20"
-                  style={{ animation: "cine-ring 2s ease-out 0.5s infinite" }} />
-                <div style={{ animation: "cine-logo 2.4s cubic-bezier(0.22,1,0.36,1) both" }}>
-                  <Image
-                    src="/logo.svg"
-                    alt="BINZEO"
-                    width={160}
-                    height={38}
-                    priority
-                    className="h-10 w-auto invert"
-                  />
-                </div>
-              </div>
-              <div
-                className="mt-10 text-white/50 text-xs tracking-[0.35em] uppercase"
-                style={{ animation: "cine-text-in 1.4s 0.4s cubic-bezier(0.22,1,0.36,1) both" }}
-              >
-                Secure Identity
-              </div>
-            </div>
-          )}
-
-          {/* ============================================================== */}
-          {/*  STEP 2 — WELCOME                                              */}
-          {/* ============================================================== */}
-          {step === "welcome" && (
-            <div className="text-center py-16">
-              <div style={{ animation: "cine-fade-up 0.9s cubic-bezier(0.22,1,0.36,1) both" }}>
-                <Image
-                  src="/logo.svg"
-                  alt="BINZEO"
-                  width={132}
-                  height={31}
-                  priority
-                  className="mx-auto h-8 w-auto invert"
-                />
-              </div>
-              <h1
-                className="mt-10 text-[44px] sm:text-[56px] font-semibold tracking-[-0.04em] leading-[1.02] text-white"
-                style={{ animation: "cine-text-in 1s 0.3s cubic-bezier(0.22,1,0.36,1) both" }}
-              >
-                Welcome back
-              </h1>
-              <p
-                className="mt-4 text-[16px] text-white/65 max-w-md mx-auto leading-relaxed"
-                style={{ animation: "cine-text-in 1s 0.7s cubic-bezier(0.22,1,0.36,1) both" }}
-              >
-                Let&apos;s get you into your BINZEO account.
-              </p>
-              <p
-                className="mt-3 text-[12px] text-white/40 max-w-sm mx-auto leading-relaxed"
-                style={{ animation: "cine-text-in 1s 1.1s cubic-bezier(0.22,1,0.36,1) both" }}
-              >
-                For account security, your browser will ask permission to share your precise location during sign-in.
-              </p>
-            </div>
-          )}
-
-          {/* ============================================================== */}
-          {/*  STEP 3 — CHOOSE METHOD                                        */}
-          {/* ============================================================== */}
-          {step === "choose" && (
+      {/* ============================================================ */}
+      {/*  STAGE: LOGO — full-screen cinematic                          */}
+      {/* ============================================================ */}
+      {stage === "logo" && (
+        <div className="relative z-10 flex min-h-[100dvh] items-center justify-center">
+          <div className="relative flex items-center justify-center">
+            {/* Glow ring */}
             <div
-              className="rounded-[32px] border border-white/12 bg-white/[0.06] backdrop-blur-2xl shadow-[0_32px_80px_-24px_rgba(0,0,0,0.75),inset_0_1px_0_0_rgba(255,255,255,0.14)] px-7 py-9 sm:px-10 sm:py-11 text-white"
-              style={{ animation: "cine-fade-up 0.8s cubic-bezier(0.22,1,0.36,1) both" }}
-            >
-              <div className="text-center">
-                <Image
-                  src="/logo.svg"
-                  alt="BINZEO"
-                  width={132}
-                  height={31}
-                  className="mx-auto h-7 w-auto invert"
-                />
-                <h1 className="mt-7 text-[28px] font-semibold tracking-[-0.03em] leading-tight text-white">
-                  Sign in to your account
-                </h1>
-                <p className="mt-2 text-[14px] text-white/60">
-                  Choose how you&apos;d like to continue
-                </p>
-              </div>
-
-              {error && (
-                <div
-                  className="mt-6 rounded-2xl border border-red-400/25 bg-red-500/10 backdrop-blur-xl px-4 py-3 text-sm text-red-200"
-                  style={{ animation: "cine-fade-up 0.5s cubic-bezier(0.22,1,0.36,1) both" }}
-                >
-                  {error}
-                </div>
-              )}
-
-              <div className="mt-7 space-y-3">
-                {/* Email option */}
-                <button
-                  type="button"
-                  onClick={() => chooseMethod("email")}
-                  className="group w-full flex items-center gap-4 rounded-2xl border border-white/12 bg-white/[0.04] backdrop-blur-xl px-5 py-4 text-left transition-all duration-300 hover:bg-white/[0.09] hover:border-white/25 hover:translate-x-0.5"
-                  style={{ animation: "cine-fade-up 0.6s 0.1s cubic-bezier(0.22,1,0.36,1) both" }}
-                >
-                  <span className="w-11 h-11 rounded-full bg-white/10 flex items-center justify-center text-white/85 group-hover:bg-white/15 transition-colors">
-                    <IconEmail />
-                  </span>
-                  <span className="flex-1 min-w-0">
-                    <span className="block text-[15px] font-medium text-white">Continue with Email</span>
-                    <span className="block text-[12px] text-white/50 mt-0.5">Email and password</span>
-                  </span>
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4 text-white/40 group-hover:text-white/80 group-hover:translate-x-0.5 transition-all">
-                    <path d="m9 18 6-6-6-6" />
-                  </svg>
-                </button>
-
-                {/* Token option */}
-                <button
-                  type="button"
-                  onClick={() => chooseMethod("token")}
-                  className="group w-full flex items-center gap-4 rounded-2xl border border-white/12 bg-white/[0.04] backdrop-blur-xl px-5 py-4 text-left transition-all duration-300 hover:bg-white/[0.09] hover:border-white/25 hover:translate-x-0.5"
-                  style={{ animation: "cine-fade-up 0.6s 0.2s cubic-bezier(0.22,1,0.36,1) both" }}
-                >
-                  <span className="w-11 h-11 rounded-full bg-white/10 flex items-center justify-center text-white/85 group-hover:bg-white/15 transition-colors">
-                    <IconKey />
-                  </span>
-                  <span className="flex-1 min-w-0">
-                    <span className="block text-[15px] font-medium text-white">Temporary token</span>
-                    <span className="block text-[12px] text-white/50 mt-0.5">One-time access code or QR</span>
-                  </span>
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4 text-white/40 group-hover:text-white/80 group-hover:translate-x-0.5 transition-all">
-                    <path d="m9 18 6-6-6-6" />
-                  </svg>
-                </button>
-
-                {/* Passkey option */}
-                <button
-                  type="button"
-                  onClick={() => chooseMethod("passkey")}
-                  disabled={passkeyLoading}
-                  className="group w-full flex items-center gap-4 rounded-2xl border border-white/12 bg-white/[0.04] backdrop-blur-xl px-5 py-4 text-left transition-all duration-300 hover:bg-white/[0.09] hover:border-white/25 hover:translate-x-0.5 disabled:opacity-60"
-                  style={{ animation: "cine-fade-up 0.6s 0.3s cubic-bezier(0.22,1,0.36,1) both" }}
-                >
-                  <span className="w-11 h-11 rounded-full bg-white/10 flex items-center justify-center text-white/85 group-hover:bg-white/15 transition-colors">
-                    <IconPasskey />
-                  </span>
-                  <span className="flex-1 min-w-0">
-                    <span className="block text-[15px] font-medium text-white">
-                      {passkeyLoading ? "Checking passkey..." : "Continue with Passkey"}
-                    </span>
-                    <span className="block text-[12px] text-white/50 mt-0.5">Biometric or security key</span>
-                  </span>
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4 text-white/40 group-hover:text-white/80 group-hover:translate-x-0.5 transition-all">
-                    <path d="m9 18 6-6-6-6" />
-                  </svg>
-                </button>
-
-                {/* Apple option */}
-                <button
-                  type="button"
-                  onClick={() => chooseMethod("apple")}
-                  className="group w-full flex items-center gap-4 rounded-2xl border border-white/12 bg-white/[0.04] backdrop-blur-xl px-5 py-4 text-left transition-all duration-300 hover:bg-white/[0.09] hover:border-white/25 hover:translate-x-0.5"
-                  style={{ animation: "cine-fade-up 0.6s 0.4s cubic-bezier(0.22,1,0.36,1) both" }}
-                >
-                  <span className="w-11 h-11 rounded-full bg-white/10 flex items-center justify-center text-white/85 group-hover:bg-white/15 transition-colors">
-                    <IconApple />
-                  </span>
-                  <span className="flex-1 min-w-0">
-                    <span className="block text-[15px] font-medium text-white">Continue with Apple</span>
-                    <span className="block text-[12px] text-white/50 mt-0.5">Coming soon</span>
-                  </span>
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4 text-white/40 group-hover:text-white/80 group-hover:translate-x-0.5 transition-all">
-                    <path d="m9 18 6-6-6-6" />
-                  </svg>
-                </button>
-              </div>
-
-              <p className="mt-7 text-center text-sm text-white/60">
-                Don&apos;t have an account?{" "}
-                <Link href="/signup" className="font-medium text-white hover:text-white/80 transition-colors">
-                  Create one
-                </Link>
-              </p>
-            </div>
-          )}
-
-          {/* ============================================================== */}
-          {/*  STEP 4a — EMAIL                                               */}
-          {/* ============================================================== */}
-          {step === "email" && (
+              className="absolute w-72 h-72 rounded-full pointer-events-none"
+              style={{
+                background:
+                  "radial-gradient(circle, rgba(255,255,255,0.28) 0%, transparent 65%)",
+                animation: "bn-splash-glow 2.2s ease-in-out infinite",
+              }}
+            />
             <div
-              className="rounded-[32px] border border-white/12 bg-white/[0.06] backdrop-blur-2xl shadow-[0_32px_80px_-24px_rgba(0,0,0,0.75),inset_0_1px_0_0_rgba(255,255,255,0.14)] px-7 py-8 sm:px-10 sm:py-10 text-white"
-              style={{ animation: "cine-fade-up 0.55s cubic-bezier(0.22,1,0.36,1) both" }}
+              className="relative"
+              style={{
+                animation:
+                  "bn-splash-in 1.4s cubic-bezier(0.22, 1, 0.36, 1) both",
+              }}
             >
-              <button
-                type="button"
-                onClick={goBack}
-                className="flex items-center gap-2 text-xs text-white/55 hover:text-white transition-colors"
-              >
-                <IconArrowLeft />
-                Back
-              </button>
-
-              <div className="mt-6">
-                <div className="w-12 h-12 rounded-2xl bg-white/10 border border-white/15 flex items-center justify-center text-white/90 mb-5">
-                  <IconEmail />
-                </div>
-                <h2 className="text-[26px] font-semibold tracking-[-0.025em] leading-tight text-white">
-                  Sign in with email
-                </h2>
-                <p className="mt-2 text-[14px] text-white/60">
-                  Enter your credentials to continue
-                </p>
-              </div>
-
-              {error && (
-                <div className="mt-6 rounded-2xl border border-red-400/25 bg-red-500/10 backdrop-blur-xl px-4 py-3 text-sm text-red-200">
-                  {error}
-                </div>
-              )}
-
-              <form onSubmit={handleEmailSubmit} className="mt-7 space-y-3.5">
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                  autoComplete="email"
-                  placeholder="Your Email"
-                  aria-label="Email"
-                  className={fieldClass}
-                />
-                <div className="relative">
-                  <input
-                    type={showPassword ? "text" : "password"}
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                    autoComplete="current-password"
-                    placeholder="Your Password"
-                    aria-label="Password"
-                    className={`${fieldClass} pr-16`}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword((s) => !s)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-xs text-white/60 hover:text-white transition-colors"
-                  >
-                    {showPassword ? "Hide" : "Show"}
-                  </button>
-                </div>
-
-                <div className="pt-1 text-right">
-                  <Link
-                    href="/forgot-password"
-                    className="text-sm text-white/60 hover:text-white transition-colors"
-                  >
-                    Forgot password?
-                  </Link>
-                </div>
-
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="mt-2 w-full rounded-full bg-white py-4 text-sm font-semibold text-black transition-all duration-300 hover:bg-white/90 hover:shadow-[0_16px_40px_-10px_rgba(255,255,255,0.4)] hover:-translate-y-px active:translate-y-0 disabled:cursor-not-allowed disabled:opacity-60"
-                >
-                  {loading ? "Signing in..." : "Sign in"}
-                </button>
-              </form>
+              <BrandLogo big />
             </div>
-          )}
+          </div>
+        </div>
+      )}
 
-          {/* ============================================================== */}
-          {/*  STEP 4b — TOKEN                                               */}
-          {/* ============================================================== */}
-          {step === "token" && (
+      {/* ============================================================ */}
+      {/*  STAGE: WELCOME — hero text                                   */}
+      {/* ============================================================ */}
+      {stage === "welcome" && (
+        <div className="relative z-10 flex min-h-[100dvh] items-center justify-center px-6">
+          <div className="text-center max-w-lg">
             <div
-              className="rounded-[32px] border border-white/12 bg-white/[0.06] backdrop-blur-2xl shadow-[0_32px_80px_-24px_rgba(0,0,0,0.75),inset_0_1px_0_0_rgba(255,255,255,0.14)] px-7 py-8 sm:px-10 sm:py-10 text-white"
-              style={{ animation: "cine-fade-up 0.55s cubic-bezier(0.22,1,0.36,1) both" }}
+              className="text-white"
+              style={{
+                animation:
+                  "bn-fade-up 1s cubic-bezier(0.22, 1, 0.36, 1) both",
+              }}
             >
-              <button
-                type="button"
-                onClick={goBack}
-                className="flex items-center gap-2 text-xs text-white/55 hover:text-white transition-colors"
-              >
-                <IconArrowLeft />
-                Back
-              </button>
+              <BrandLogo />
+            </div>
+            <h1
+              className="mt-10 text-[40px] sm:text-[48px] font-semibold tracking-[-0.04em] leading-[1.05] text-white"
+              style={{
+                animation:
+                  "bn-fade-up 1s cubic-bezier(0.22, 1, 0.36, 1) 0.15s both",
+              }}
+            >
+              Welcome back
+            </h1>
+            <p
+              className="mt-4 text-[16px] text-white/75"
+              style={{
+                animation:
+                  "bn-fade-up 1s cubic-bezier(0.22, 1, 0.36, 1) 0.30s both",
+              }}
+            >
+              Let&apos;s get you into your BINZEO account.
+            </p>
+            <p
+              className="mt-6 text-[12px] text-white/45 leading-relaxed max-w-sm mx-auto"
+              style={{
+                animation:
+                  "bn-fade-up 1s cubic-bezier(0.22, 1, 0.36, 1) 0.45s both",
+              }}
+            >
+              For account security, your browser will ask permission to share
+              your precise location during sign-in.
+            </p>
+          </div>
+        </div>
+      )}
 
-              <div className="mt-6">
-                <div className="w-12 h-12 rounded-2xl bg-white/10 border border-white/15 flex items-center justify-center text-white/90 mb-5">
-                  <IconKey />
+      {/* ============================================================ */}
+      {/*  STAGE: METHODS / EMAIL / TOKEN / PASSKEY / QR                */}
+      {/* ============================================================ */}
+      {(stage === "methods" ||
+        stage === "email" ||
+        stage === "token" ||
+        stage === "passkey" ||
+        stage === "qr") && (
+        <div className="relative z-10 flex min-h-[100dvh] items-center justify-center px-4 py-8 sm:py-12">
+          <div
+            className="w-full max-w-[520px] rounded-[32px] border border-white/12 bg-white/[0.06] backdrop-blur-2xl shadow-[0_32px_80px_-24px_rgba(0,0,0,0.75),inset_0_1px_0_0_rgba(255,255,255,0.14)] px-7 py-9 sm:px-10 sm:py-11 text-white"
+            style={{
+              animation:
+                "bn-fade-up 0.9s cubic-bezier(0.22, 1, 0.36, 1) both",
+            }}
+          >
+            {/* ---------- Header ---------- */}
+            <div className="flex items-center justify-between mb-8">
+              {stage === "methods" ? (
+                <div className="w-full text-center">
+                  <BrandLogo />
                 </div>
-                <h2 className="text-[26px] font-semibold tracking-[-0.025em] leading-tight text-white">
-                  Temporary token
-                </h2>
-                <p className="mt-2 text-[14px] text-white/60">
-                  Paste a one-time token or scan the QR code
-                </p>
-              </div>
-
-              {error && (
-                <div className="mt-6 rounded-2xl border border-red-400/25 bg-red-500/10 backdrop-blur-xl px-4 py-3 text-sm text-red-200">
-                  {error}
-                </div>
-              )}
-
-              <form onSubmit={handleTokenSubmit} className="mt-7 space-y-3.5">
-                <input
-                  type="password"
-                  value={temporaryToken}
-                  onChange={(e) => setTemporaryToken(e.target.value)}
-                  required
-                  autoComplete="one-time-code"
-                  placeholder="Paste temporary token"
-                  aria-label="Temporary login token"
-                  className={fieldClass}
-                />
-
-                <button
-                  type="submit"
-                  disabled={tokenLoading}
-                  className="w-full rounded-full bg-white py-4 text-sm font-semibold text-black transition-all duration-300 hover:bg-white/90 hover:shadow-[0_16px_40px_-10px_rgba(255,255,255,0.4)] hover:-translate-y-px active:translate-y-0 disabled:cursor-not-allowed disabled:opacity-60"
-                >
-                  {tokenLoading ? "Signing in..." : "Sign in with token"}
-                </button>
-              </form>
-
-              <div className="my-5 flex items-center gap-3 text-xs text-white/40">
-                <span className="h-px flex-1 bg-white/15" />
-                <span>or</span>
-                <span className="h-px flex-1 bg-white/15" />
-              </div>
-
-              {!scanningQr ? (
-                <button
-                  type="button"
-                  onClick={scanQrToken}
-                  disabled={tokenLoading}
-                  className="w-full rounded-full border border-white/25 bg-white/5 backdrop-blur-xl py-3 text-sm font-semibold text-white transition-all duration-300 hover:bg-white/10 hover:border-white/35 disabled:opacity-60"
-                >
-                  Scan QR code with camera
-                </button>
               ) : (
                 <>
-                  <div
-                    id="binzeo-qr-reader"
-                    className="overflow-hidden rounded-xl border border-white/15"
-                  />
                   <button
                     type="button"
-                    onClick={stopQrScan}
-                    className="mt-3 w-full rounded-full border border-white/15 bg-transparent py-2.5 text-xs text-white/60 hover:text-white transition-colors"
+                    onClick={goBack}
+                    aria-label="Back"
+                    className="flex items-center gap-1.5 px-3 py-2 -ml-3 rounded-full text-white/70 hover:text-white hover:bg-white/5 transition-all duration-300"
                   >
-                    Stop camera
+                    <IconArrowLeft />
+                    <span className="text-sm">Back</span>
                   </button>
+                  <div className="text-[13px] text-white/50">
+                    {stage === "email" && "Email sign in"}
+                    {stage === "token" && "Temporary token"}
+                    {stage === "passkey" && "Passkey"}
+                    {stage === "qr" && "QR token"}
+                  </div>
                 </>
               )}
             </div>
-          )}
 
-          {/* ============================================================== */}
-          {/*  STEP 4c — PASSKEY (loading)                                   */}
-          {/* ============================================================== */}
-          {step === "passkey" && (
-            <div
-              className="rounded-[32px] border border-white/12 bg-white/[0.06] backdrop-blur-2xl shadow-[0_32px_80px_-24px_rgba(0,0,0,0.75),inset_0_1px_0_0_rgba(255,255,255,0.14)] px-7 py-12 sm:px-10 text-white text-center"
-              style={{ animation: "cine-fade-up 0.55s cubic-bezier(0.22,1,0.36,1) both" }}
-            >
-              <div className="w-16 h-16 mx-auto rounded-2xl bg-white/10 border border-white/15 flex items-center justify-center text-white/90">
-                <IconPasskey />
-              </div>
-              <h2 className="mt-6 text-[24px] font-semibold tracking-[-0.025em] text-white">
-                Checking your passkey
-              </h2>
-              <p className="mt-2 text-[14px] text-white/60">
-                Follow your device&apos;s prompt to continue
-              </p>
-              <div className="mt-6 inline-flex items-center gap-2 text-xs text-white/50">
-                <span className="w-3 h-3 rounded-full border-2 border-white/50 border-t-transparent animate-spin" />
-                Waiting for authentication...
-              </div>
-            </div>
-          )}
+            {/* ============================================================ */}
+            {/*  METHODS VIEW                                               */}
+            {/* ============================================================ */}
+            {stage === "methods" && (
+              <div
+                style={{
+                  animation:
+                    "bn-fade-up 0.9s cubic-bezier(0.22, 1, 0.36, 1) both",
+                }}
+              >
+                <div className="text-center">
+                  <h1 className="text-[30px] sm:text-[32px] font-semibold tracking-[-0.035em] leading-tight">
+                    Welcome back
+                  </h1>
+                  <p className="mt-2.5 text-[14.5px] text-white/70">
+                    Let&apos;s get you into your BINZEO account.
+                  </p>
+                  <p className="mt-3 text-[11px] text-white/40 leading-relaxed max-w-[340px] mx-auto">
+                    Choose how you&apos;d like to sign in.
+                  </p>
+                </div>
 
-          {/* ============================================================== */}
-          {/*  STEP 5 — SUCCESS                                              */}
-          {/* ============================================================== */}
-          {step === "success" && (
-            <div
-              className="rounded-[32px] border border-white/12 bg-white/[0.06] backdrop-blur-2xl shadow-[0_32px_80px_-24px_rgba(0,0,0,0.75),inset_0_1px_0_0_rgba(255,255,255,0.14)] px-7 py-14 sm:px-10 text-white text-center"
-              style={{ animation: "cine-scale-in 0.7s cubic-bezier(0.22,1,0.36,1) both" }}
-            >
-              <div className="relative w-20 h-20 mx-auto">
-                <span
-                  className="absolute inset-0 rounded-full bg-green-400/25"
-                  style={{ animation: "cine-ring-expand 1.4s ease-out infinite" }}
-                />
-                <span
-                  className="absolute inset-0 rounded-full bg-green-400/25"
-                  style={{ animation: "cine-ring-expand 1.4s 0.4s ease-out infinite" }}
-                />
-                <span
-                  className="relative w-20 h-20 rounded-full bg-gradient-to-br from-green-400/30 to-emerald-500/20 border border-green-400/40 flex items-center justify-center text-green-200"
-                  style={{ animation: "cine-check 0.7s cubic-bezier(0.22,1,0.36,1) both" }}
-                >
-                  <IconCheck />
-                </span>
+                <div className="mt-8 grid gap-3">
+                  {[
+                    {
+                      key: "email" as Stage,
+                      icon: <IconMail />,
+                      label: "Sign in with Email",
+                      sub: "Use your email and password",
+                    },
+                    {
+                      key: "token" as Stage,
+                      icon: <IconKey />,
+                      label: "Temporary token",
+                      sub: "One-time full-account access",
+                    },
+                    {
+                      key: "passkey" as Stage,
+                      icon: <IconFingerprint />,
+                      label: "Sign in with Passkey",
+                      sub: "Biometric or security key",
+                    },
+                    {
+                      key: "qr" as Stage,
+                      icon: <IconQR />,
+                      label: "Scan QR token",
+                      sub: "Use your camera to scan",
+                    },
+                  ].map((m, i) => (
+                    <button
+                      key={m.key}
+                      type="button"
+                      onClick={() => selectMethod(m.key)}
+                      className="group flex items-center gap-4 w-full rounded-2xl border border-white/12 bg-white/[0.04] backdrop-blur-xl px-4 py-4 text-left transition-all duration-300 hover:bg-white/[0.10] hover:border-white/25 hover:-translate-y-0.5"
+                      style={{
+                        animation: `bn-fade-up 0.7s cubic-bezier(0.22, 1, 0.36, 1) ${
+                          0.15 + i * 0.08
+                        }s both`,
+                      }}
+                    >
+                      <div className="w-11 h-11 shrink-0 rounded-xl bg-white/10 border border-white/15 flex items-center justify-center text-white/90 group-hover:bg-white/15 transition-all duration-300">
+                        {m.icon}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="text-[14.5px] font-medium text-white">
+                          {m.label}
+                        </div>
+                        <div className="text-[12px] text-white/50 mt-0.5">
+                          {m.sub}
+                        </div>
+                      </div>
+                      <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        className="w-4 h-4 text-white/40 group-hover:text-white/70 group-hover:translate-x-0.5 transition-all duration-300"
+                      >
+                        <path d="m9 18 6-6-6-6" />
+                      </svg>
+                    </button>
+                  ))}
+                </div>
+
+                {/* Social separator */}
+                <div className="my-7 flex items-center gap-3 text-[11px] text-white/40">
+                  <span className="h-px flex-1 bg-white/12" />
+                  <span>or continue with</span>
+                  <span className="h-px flex-1 bg-white/12" />
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setError("Apple sign-in is not available yet.")
+                    }
+                    className="flex items-center justify-center gap-2 rounded-full border border-white/15 bg-white/5 backdrop-blur-xl py-3 text-sm font-medium text-white transition-all duration-300 hover:bg-white/10 hover:border-white/25"
+                  >
+                    <span className="font-semibold">A</span>
+                    Apple
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setError("Phone sign-in is not available yet.")
+                    }
+                    className="flex items-center justify-center gap-2 rounded-full border border-white/15 bg-white/5 backdrop-blur-xl py-3 text-sm font-medium text-white transition-all duration-300 hover:bg-white/10 hover:border-white/25"
+                  >
+                    <Image
+                      src="/icons/phone.svg"
+                      alt=""
+                      width={16}
+                      height={16}
+                      className="invert"
+                    />
+                    Phone
+                  </button>
+                </div>
+
+                {/* Error */}
+                {error && (
+                  <div className="mt-6 rounded-2xl border border-red-400/25 bg-red-500/10 backdrop-blur-xl px-4 py-3 text-sm text-red-200">
+                    {error}
+                  </div>
+                )}
+
+                <p className="mt-8 text-center text-sm text-white/60">
+                  Don&apos;t have an account?{" "}
+                  <Link
+                    href="/signup"
+                    className="font-medium text-white hover:text-white/80 transition-colors"
+                  >
+                    Create one
+                  </Link>
+                </p>
               </div>
-              <h2 className="mt-8 text-[28px] font-semibold tracking-[-0.025em] text-white">
-                Welcome to Binzeo
-              </h2>
-              <p className="mt-2 text-[14px] text-white/60">
-                Signed in successfully. Taking you to your account...
-              </p>
-              <div className="mt-8 flex justify-center">
-                <div className="h-1 w-32 rounded-full bg-white/10 overflow-hidden">
-                  <div
-                    className="h-full bg-white/70 rounded-full"
-                    style={{
-                      animation: "cine-progress 1.5s cubic-bezier(0.4, 0, 0.2, 1) both",
-                    }}
+            )}
+
+            {/* ============================================================ */}
+            {/*  EMAIL VIEW                                                 */}
+            {/* ============================================================ */}
+            {stage === "email" && (
+              <div
+                style={{
+                  animation:
+                    "bn-slide-in 0.55s cubic-bezier(0.22, 1, 0.36, 1) both",
+                }}
+              >
+                <div>
+                  <h2 className="text-[26px] font-semibold tracking-[-0.03em]">
+                    Sign in with email
+                  </h2>
+                  <p className="mt-2 text-[13.5px] text-white/60">
+                    Enter your credentials to continue.
+                  </p>
+                </div>
+
+                {error && (
+                  <div className="mt-5 rounded-2xl border border-red-400/25 bg-red-500/10 backdrop-blur-xl px-4 py-3 text-sm text-red-200">
+                    {error}
+                  </div>
+                )}
+
+                <form onSubmit={handleSubmit} className="mt-7 space-y-3.5">
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                    autoComplete="email"
+                    placeholder="Your Email"
+                    aria-label="Email"
+                    className={fieldClass}
                   />
+                  <div className="relative">
+                    <input
+                      type={showPassword ? "text" : "password"}
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      required
+                      autoComplete="current-password"
+                      placeholder="Your Password"
+                      aria-label="Password"
+                      className={`${fieldClass} pr-16`}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword((s) => !s)}
+                      className="absolute right-4 top-1/2 -translate-y-1/2 text-xs text-white/60 hover:text-white transition-colors"
+                    >
+                      {showPassword ? "Hide" : "Show"}
+                    </button>
+                  </div>
+
+                  <div className="pt-2 text-center">
+                    <Link
+                      href="/forgot-password"
+                      className="text-sm text-white/70 hover:text-white transition-colors"
+                    >
+                      Forgot password?
+                    </Link>
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="mt-3 w-full rounded-full bg-white py-4 text-sm font-semibold text-black transition-all duration-300 hover:bg-white/90 hover:shadow-[0_16px_40px_-10px_rgba(255,255,255,0.4)] hover:-translate-y-px active:translate-y-0 disabled:cursor-not-allowed disabled:opacity-60"
+                  >
+                    {loading ? "Signing in..." : "Sign in"}
+                  </button>
+                </form>
+              </div>
+            )}
+
+            {/* ============================================================ */}
+            {/*  TOKEN VIEW                                                 */}
+            {/* ============================================================ */}
+            {stage === "token" && (
+              <div
+                style={{
+                  animation:
+                    "bn-slide-in 0.55s cubic-bezier(0.22, 1, 0.36, 1) both",
+                }}
+              >
+                <div>
+                  <h2 className="text-[26px] font-semibold tracking-[-0.03em]">
+                    Temporary token
+                  </h2>
+                  <p className="mt-2 text-[13.5px] text-white/60">
+                    Use a one-time token created from Account → Security.
+                  </p>
+                </div>
+
+                {error && (
+                  <div className="mt-5 rounded-2xl border border-red-400/25 bg-red-500/10 backdrop-blur-xl px-4 py-3 text-sm text-red-200">
+                    {error}
+                  </div>
+                )}
+
+                <form onSubmit={handleTemporaryLogin} className="mt-7 space-y-3.5">
+                  <input
+                    type="password"
+                    value={temporaryToken}
+                    onChange={(e) => setTemporaryToken(e.target.value)}
+                    required
+                    autoComplete="one-time-code"
+                    placeholder="Paste temporary token"
+                    aria-label="Temporary login token"
+                    className={fieldClass}
+                  />
+
+                  <button
+                    type="submit"
+                    disabled={tokenLoading}
+                    className="w-full rounded-full bg-white py-4 text-sm font-semibold text-black transition-all duration-300 hover:bg-white/90 hover:shadow-[0_16px_40px_-10px_rgba(255,255,255,0.4)] hover:-translate-y-px disabled:cursor-not-allowed disabled:opacity-60"
+                  >
+                    {tokenLoading ? "Signing in..." : "Sign in with token"}
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setError("");
+                      setStage("qr");
+                    }}
+                    className="w-full rounded-full border border-white/15 bg-transparent py-3 text-xs text-white/80 transition-all duration-300 hover:bg-white/5 hover:border-white/25"
+                  >
+                    Or scan QR code instead
+                  </button>
+                </form>
+              </div>
+            )}
+
+            {/* ============================================================ */}
+            {/*  PASSKEY VIEW                                               */}
+            {/* ============================================================ */}
+            {stage === "passkey" && (
+              <div
+                className="text-center"
+                style={{
+                  animation:
+                    "bn-slide-in 0.55s cubic-bezier(0.22, 1, 0.36, 1) both",
+                }}
+              >
+                <div
+                  className="mx-auto w-20 h-20 rounded-3xl bg-white/10 border border-white/15 flex items-center justify-center text-white/90"
+                  style={{ animation: "bn-float 3.5s ease-in-out infinite" }}
+                >
+                  <IconFingerprint />
+                </div>
+
+                <h2 className="mt-6 text-[26px] font-semibold tracking-[-0.03em]">
+                  Sign in with Passkey
+                </h2>
+                <p className="mt-2.5 text-[13.5px] text-white/60 max-w-sm mx-auto">
+                  Use your fingerprint, face, or security key to sign in
+                  securely without a password.
+                </p>
+
+                {error && (
+                  <div className="mt-6 rounded-2xl border border-red-400/25 bg-red-500/10 backdrop-blur-xl px-4 py-3 text-sm text-red-200 text-left">
+                    {error}
+                  </div>
+                )}
+
+                <button
+                  type="button"
+                  onClick={handlePasskeyLogin}
+                  disabled={passkeyLoading}
+                  className="mt-8 w-full rounded-full bg-white py-4 text-sm font-semibold text-black transition-all duration-300 hover:bg-white/90 hover:shadow-[0_16px_40px_-10px_rgba(255,255,255,0.4)] hover:-translate-y-px disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  {passkeyLoading ? "Checking passkey..." : "Continue"}
+                </button>
+              </div>
+            )}
+
+            {/* ============================================================ */}
+            {/*  QR VIEW                                                    */}
+            {/* ============================================================ */}
+            {stage === "qr" && (
+              <div
+                style={{
+                  animation:
+                    "bn-slide-in 0.55s cubic-bezier(0.22, 1, 0.36, 1) both",
+                }}
+              >
+                <div>
+                  <h2 className="text-[26px] font-semibold tracking-[-0.03em]">
+                    Scan QR token
+                  </h2>
+                  <p className="mt-2 text-[13.5px] text-white/60">
+                    Point your camera at the QR code on your other device.
+                  </p>
+                </div>
+
+                {error && (
+                  <div className="mt-5 rounded-2xl border border-red-400/25 bg-red-500/10 backdrop-blur-xl px-4 py-3 text-sm text-red-200">
+                    {error}
+                  </div>
+                )}
+
+                <div className="mt-7">
+                  {!scanningQr ? (
+                    <button
+                      type="button"
+                      onClick={scanQrToken}
+                      disabled={tokenLoading}
+                      className="w-full rounded-full bg-white py-4 text-sm font-semibold text-black transition-all duration-300 hover:bg-white/90 hover:shadow-[0_16px_40px_-10px_rgba(255,255,255,0.4)] hover:-translate-y-px disabled:cursor-not-allowed disabled:opacity-60"
+                    >
+                      Open camera
+                    </button>
+                  ) : (
+                    <div className="space-y-3">
+                      <div
+                        id="binzeo-qr-reader"
+                        className="overflow-hidden rounded-2xl border border-white/15"
+                      />
+                      <button
+                        type="button"
+                        onClick={stopQrScan}
+                        className="w-full rounded-full border border-white/15 bg-transparent py-2.5 text-xs text-white/60 hover:text-white transition-colors"
+                      >
+                        Stop camera
+                      </button>
+                    </div>
+                  )}
                 </div>
               </div>
-              <style jsx>{`
-                @keyframes cine-progress {
-                  from { width: 0%; }
-                  to   { width: 100%; }
-                }
-              `}</style>
-            </div>
-          )}
-
+            )}
+          </div>
         </div>
-      </div>
+      )}
+
+      {/* ============================================================ */}
+      {/*  STAGE: SUCCESS                                              */}
+      {/* ============================================================ */}
+      {stage === "success" && (
+        <div className="relative z-10 flex min-h-[100dvh] items-center justify-center px-6">
+          <div className="text-center max-w-md">
+            {/* Success ring */}
+            <div className="relative mx-auto w-24 h-24 flex items-center justify-center">
+              <div
+                className="absolute inset-0 rounded-full border-2 border-white/40"
+                style={{
+                  animation:
+                    "bn-ring 1.6s cubic-bezier(0.22, 1, 0.36, 1) infinite",
+                }}
+              />
+              <div
+                className="w-20 h-20 rounded-full bg-white/10 border border-white/25 backdrop-blur-xl flex items-center justify-center text-white"
+                style={{
+                  animation:
+                    "bn-pop 0.7s cubic-bezier(0.22, 1, 0.36, 1) both",
+                }}
+              >
+                <IconCheck />
+              </div>
+            </div>
+
+            <h1
+              className="mt-8 text-[32px] sm:text-[38px] font-semibold tracking-[-0.035em] text-white"
+              style={{
+                animation:
+                  "bn-fade-up 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.15s both",
+              }}
+            >
+              Welcome to BINZEO
+            </h1>
+            <p
+              className="mt-3 text-[15px] text-white/70"
+              style={{
+                animation:
+                  "bn-fade-up 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.30s both",
+              }}
+            >
+              You&apos;re signed in. Taking you in…
+            </p>
+
+            {/* Loading dots */}
+            <div
+              className="mt-8 flex items-center justify-center gap-1.5"
+              style={{
+                animation:
+                  "bn-fade-in 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.5s both",
+              }}
+            >
+              {[0, 1, 2].map((i) => (
+                <span
+                  key={i}
+                  className="w-2 h-2 rounded-full bg-white/70"
+                  style={{
+                    animation: `bn-float 1.2s ease-in-out ${i * 0.15}s infinite`,
+                  }}
+                />
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
