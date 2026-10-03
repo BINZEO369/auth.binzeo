@@ -110,12 +110,12 @@ Theme প্রয়োগ করা হয়েছে:
 
 Reference cloud/sky aesthetic ধরে দুটি image তৈরি করে `public/images/`-এ রাখা হয়েছে এবং website-এ ব্যবহার করা হয়েছে:
 
-- `public/images/binzeo-cloud-hero.jpg`
+- `public/images/img5.jpg`
   - Hero section background
   - Sky-blue, white cloud ও subtle mint atmosphere
   - Text-safe overlay যুক্ত
 
-- `public/images/binzeo-cloud-card.jpg`
+- `public/images/img4.jpg`
   - CTA section background
   - Soft cloud ও mint-white visual
   - Readability overlay যুক্ত

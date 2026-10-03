@@ -7,7 +7,7 @@ export default function CTA({ isLoggedIn = false }: { isLoggedIn?: boolean }) {
         <div className="relative rounded-3xl border border-[#c9c9c9] bg-[#ececec] p-8 sm:p-16 text-center overflow-hidden">
           <div
             className="absolute inset-0 bg-cover bg-center opacity-70 grayscale"
-            style={{ backgroundImage: "url('/images/binzeo-cloud-card.jpg')" }}
+            style={{ backgroundImage: "url('/images/img4.jpg')" }}
             aria-hidden="true"
           />
           <div

@@ -5,7 +5,7 @@ export default function Hero({ isLoggedIn = false }: { isLoggedIn?: boolean }) {
     <section className="relative overflow-hidden bg-[#f1f1f1]">
       <div
         className="absolute inset-0 bg-cover bg-center opacity-65 grayscale"
-        style={{ backgroundImage: "url('/images/binzeo-cloud-hero.jpg')" }}
+        style={{ backgroundImage: "url('/images/img5.jpg')" }}
         aria-hidden="true"
       />
       <div
