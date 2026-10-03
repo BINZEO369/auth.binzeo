@@ -3,33 +3,47 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 type HeaderProps = {
   isLoggedIn?: boolean;
   onMenu?: () => void;
 };
 
-const dashboardNavigation = [
-  ["/dashboard", "Overview"],
-  ["/dashboard/profile", "Profile"],
-  ["/dashboard/addresses", "Addresses"],
-  ["/dashboard/contacts", "Contacts"],
-  ["/dashboard/sectors", "Sectors"],
-  ["/dashboard/devices", "Devices"],
-  ["/dashboard/verify-email", "Verify Email"],
-  ["/dashboard/security", "Security"],
+/* ================================================================== */
+/*  Navigation data                                                    */
+/* ================================================================== */
+const siteNavigation = [
+  { href: "/", label: "Home", sub: "Back to homepage" },
+  { href: "/#why-binzeo", label: "Why BINZEO", sub: "What makes us different" },
+  { href: "/#how-it-works", label: "How it works", sub: "Three simple steps" },
+  { href: "/#security", label: "Security", sub: "Your data, protected" },
 ] as const;
 
+const dashboardNavigation = [
+  { href: "/dashboard", label: "Overview", sub: "Your dashboard" },
+  { href: "/dashboard/profile", label: "Profile", sub: "Personal information" },
+  { href: "/dashboard/addresses", label: "Addresses", sub: "Saved locations" },
+  { href: "/dashboard/contacts", label: "Contacts", sub: "Ways to reach you" },
+  { href: "/dashboard/sectors", label: "Sectors", sub: "Industry access" },
+  { href: "/dashboard/devices", label: "Devices", sub: "Logged-in devices" },
+  { href: "/dashboard/verify-email", label: "Verify Email", sub: "Confirm your address" },
+  { href: "/dashboard/security", label: "Security", sub: "Activity & sessions" },
+] as const;
+
+/* ================================================================== */
+/*  Icons                                                              */
+/* ================================================================== */
 function MenuIcon({ open = false }: { open?: boolean }) {
   return (
     <svg
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
-      strokeWidth="2"
+      strokeWidth="1.9"
       strokeLinecap="round"
-      className="h-[18px] w-[18px]"
+      strokeLinejoin="round"
+      className="h-[19px] w-[19px]"
       aria-hidden="true"
     >
       {open ? (
@@ -39,20 +53,95 @@ function MenuIcon({ open = false }: { open?: boolean }) {
         </>
       ) : (
         <>
-          <line x1="3" y1="6" x2="21" y2="6" />
-          <line x1="3" y1="12" x2="21" y2="12" />
-          <line x1="3" y1="18" x2="21" y2="18" />
+          <line x1="3.5" y1="6.5" x2="20.5" y2="6.5" />
+          <line x1="3.5" y1="12" x2="20.5" y2="12" />
+          <line x1="3.5" y1="17.5" x2="20.5" y2="17.5" />
         </>
       )}
     </svg>
   );
 }
 
+function ArrowIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="h-3.5 w-3.5"
+      aria-hidden="true"
+    >
+      <path d="m9 18 6-6-6-6" />
+    </svg>
+  );
+}
+
+/* ================================================================== */
+/*  Main Header                                                        */
+/* ================================================================== */
 export default function Header({ isLoggedIn = false, onMenu }: HeaderProps) {
   const pathname = usePathname();
   const router = useRouter();
+
   const [open, setOpen] = useState(false);
   const [loggingOut, setLoggingOut] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const wrapperRef = useRef<HTMLDivElement | null>(null);
+
+  /* ------------------------------------------------------------- */
+  /*  Scroll detection — glass intensifies                          */
+  /* ------------------------------------------------------------- */
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 16);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  /* ------------------------------------------------------------- */
+  /*  Outside click + ESC to close                                  */
+  /* ------------------------------------------------------------- */
+  useEffect(() => {
+    if (!open) return;
+    const onClick = (e: MouseEvent) => {
+      if (wrapperRef.current && !wrapperRef.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setOpen(false);
+    };
+    document.addEventListener("mousedown", onClick);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("mousedown", onClick);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [open]);
+
+  /* ------------------------------------------------------------- */
+  /*  Lock body scroll when menu open                               */
+  /* ------------------------------------------------------------- */
+  useEffect(() => {
+    document.body.style.overflow = open ? "hidden" : "";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [open]);
+
+  /* ------------------------------------------------------------- */
+  /*  Handlers                                                      */
+  /* ------------------------------------------------------------- */
+  const handleMenuClick = () => {
+    if (onMenu) {
+      onMenu();
+      return;
+    }
+    setOpen((v) => !v);
+  };
 
   const closeMenu = () => setOpen(false);
 
@@ -64,128 +153,368 @@ export default function Header({ isLoggedIn = false, onMenu }: HeaderProps) {
     router.refresh();
   };
 
-  const handleMenuClick = () => {
-    if (onMenu) {
-      onMenu();
-      return;
-    }
-    setOpen((value) => !value);
-  };
-
+  /* ================================================================== */
+  /*  RENDER                                                            */
+  /* ================================================================== */
   return (
-    <header className="fixed inset-x-0 top-0 z-50">
-      <div
-        aria-hidden="true"
-        className="absolute inset-0 border-b border-white/10 backdrop-blur-2xl"
-        style={{
-          background:
-            "linear-gradient(180deg, rgba(10,10,10,0.72) 0%, rgba(10,10,10,0.55) 100%)",
-          boxShadow:
-            "inset 0 1px 0 0 rgba(255,255,255,0.08), 0 8px 32px -12px rgba(0,0,0,0.55)",
-        }}
-      />
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-x-0 top-0 h-px"
-        style={{
-          background:
-            "linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent)",
-        }}
-      />
+    <div ref={wrapperRef}>
+      <header className="fixed inset-x-0 top-0 z-50">
+        {/* ============================================================ */}
+        {/*  LIQUID GLASS BACKGROUND — WHITE                              */}
+        {/* ============================================================ */}
+        <div
+          aria-hidden="true"
+          className="absolute inset-0 border-b transition-all duration-500"
+          style={{
+            background: scrolled
+              ? "rgba(255,255,255,0.72)"
+              : "rgba(255,255,255,0.55)",
+            backdropFilter: "blur(28px) saturate(180%)",
+            WebkitBackdropFilter: "blur(28px) saturate(180%)",
+            borderBottomColor: scrolled
+              ? "rgba(0,0,0,0.08)"
+              : "rgba(0,0,0,0.04)",
+            boxShadow: scrolled
+              ? "inset 0 -1px 0 0 rgba(255,255,255,0.9), 0 1px 2px rgba(0,0,0,0.04), 0 12px 40px -16px rgba(0,0,0,0.12)"
+              : "inset 0 -1px 0 0 rgba(255,255,255,0.6)",
+          }}
+        />
 
-      <nav className="relative mx-auto flex h-[68px] max-w-7xl items-center justify-between px-5 sm:px-8 lg:px-10">
-        <Link
-          href="/"
-          className="group flex items-center transition-opacity duration-300 hover:opacity-80"
-          aria-label="BINZEO home"
-          onClick={closeMenu}
+        {/* Subtle top sheen (white glow) */}
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-x-0 top-0 h-px"
+          style={{
+            background:
+              "linear-gradient(90deg, transparent, rgba(255,255,255,1), transparent)",
+          }}
+        />
+
+        {/* ============================================================ */}
+        {/*  NAV                                                          */}
+        {/* ============================================================ */}
+        <nav
+          className="relative mx-auto flex max-w-7xl items-center justify-between px-5 sm:px-8 lg:px-10 transition-all duration-500"
+          style={{ height: scrolled ? "60px" : "68px" }}
         >
-          <Image
-            src="/logo.svg"
-            alt="BINZEO"
-            width={140}
-            height={34}
-            priority
-            className="h-8 w-auto brightness-0 invert sm:h-9"
-          />
-        </Link>
+          {/* ---------- LEFT: Logo ---------- */}
+          <Link
+            href="/"
+            onClick={closeMenu}
+            className="group flex items-center transition-all duration-300 hover:opacity-70"
+            aria-label="BINZEO home"
+          >
+            <Image
+              src="/logo.svg"
+              alt="BINZEO"
+              width={140}
+              height={34}
+              priority
+              className="h-7 w-auto sm:h-8"
+              style={{
+                filter: "brightness(0) saturate(100%)", // pure black
+              }}
+            />
+          </Link>
 
-        <div className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-8 md:flex">
-          <Link href="/#why-binzeo" className="text-[13.5px] text-white/65 transition-colors duration-300 hover:text-white" onClick={closeMenu}>
-            Why BINZEO
-          </Link>
-          <Link href="/#how-it-works" className="text-[13.5px] text-white/65 transition-colors duration-300 hover:text-white" onClick={closeMenu}>
-            How it works
-          </Link>
-          <Link href="/#security" className="text-[13.5px] text-white/65 transition-colors duration-300 hover:text-white" onClick={closeMenu}>
-            Security
-          </Link>
-        </div>
+          {/* ---------- CENTER: Nav links (desktop) ---------- */}
+          <div className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-9 md:flex">
+            {siteNavigation.slice(1).map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                onClick={closeMenu}
+                className="group relative text-[13.5px] font-medium text-black/60 transition-colors duration-300 hover:text-black"
+              >
+                {item.label}
+                <span className="absolute -bottom-1 left-1/2 h-px w-0 -translate-x-1/2 bg-black transition-all duration-500 group-hover:w-full" />
+              </Link>
+            ))}
+          </div>
 
-        <div className="flex items-center gap-2">
+          {/* ---------- RIGHT: Menu button only ---------- */}
           <button
             type="button"
             onClick={handleMenuClick}
-            aria-label={open ? "Close navigation menu" : "Open navigation menu"}
+            aria-label={open ? "Close menu" : "Open menu"}
             aria-expanded={open}
             aria-controls="site-navigation-menu"
-            title={open ? "Close navigation menu" : "Open navigation menu"}
-            className="group relative flex h-10 w-10 items-center justify-center rounded-full border border-white/15 bg-white/[0.06] text-white/85 backdrop-blur-xl transition-all duration-500 hover:-translate-y-px hover:border-white/30 hover:bg-white/[0.14] hover:text-white hover:shadow-[0_10px_28px_-10px_rgba(255,255,255,0.35)]"
+            title={open ? "Close" : "Menu"}
+            className="group relative flex h-10 w-10 items-center justify-center overflow-hidden rounded-full transition-all duration-500 hover:-translate-y-px active:translate-y-0"
+            style={{
+              background: open
+                ? "rgba(0,0,0,0.92)"
+                : "rgba(255,255,255,0.55)",
+              backdropFilter: "blur(20px) saturate(180%)",
+              WebkitBackdropFilter: "blur(20px) saturate(180%)",
+              border: open
+                ? "1px solid rgba(0,0,0,0.92)"
+                : "1px solid rgba(0,0,0,0.10)",
+              color: open ? "#ffffff" : "#0a0a0a",
+              boxShadow: open
+                ? "inset 0 1px 0 0 rgba(255,255,255,0.18), 0 12px 32px -10px rgba(0,0,0,0.35)"
+                : "inset 0 1px 0 0 rgba(255,255,255,0.9), 0 2px 6px rgba(0,0,0,0.06)",
+            }}
           >
-            <MenuIcon open={open} />
+            {/* Hover sheen */}
+            <span
+              aria-hidden="true"
+              className="pointer-events-none absolute inset-0 rounded-full opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+              style={{
+                background: open
+                  ? "radial-gradient(circle at 30% 30%, rgba(255,255,255,0.25), transparent 60%)"
+                  : "radial-gradient(circle at 30% 30%, rgba(0,0,0,0.08), transparent 60%)",
+              }}
+            />
+            <span className="relative">
+              <MenuIcon open={open} />
+            </span>
           </button>
+        </nav>
 
-          <Link
-            href={isLoggedIn ? "/dashboard" : "/signup"}
-            onClick={closeMenu}
-            className="group inline-flex items-center gap-1.5 rounded-full bg-white px-5 py-2.5 text-[13.5px] font-semibold text-black transition-all duration-500 hover:-translate-y-px hover:bg-white/95 hover:shadow-[0_14px_36px_-10px_rgba(255,255,255,0.55)]"
-          >
-            {isLoggedIn ? "Dashboard" : "Get started"}
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" className="h-3.5 w-3.5 transition-transform duration-500 group-hover:translate-x-0.5" aria-hidden="true">
-              <path d="m9 18 6-6-6-6" />
-            </svg>
-          </Link>
-        </div>
-      </nav>
+        {/* ============================================================ */}
+        {/*  DROPDOWN MENU — WHITE LIQUID GLASS                           */}
+        {/* ============================================================ */}
+        {open && (
+          <>
+            {/* Backdrop (mobile) */}
+            <div
+              aria-hidden="true"
+              className="fixed inset-0 top-[68px] bg-black/20 backdrop-blur-sm md:hidden"
+              onClick={closeMenu}
+            />
 
-      {open && (
-        <div id="site-navigation-menu" className="border-t border-white/10 bg-[#07111a]/95 shadow-2xl shadow-black/20 backdrop-blur-2xl">
-          <div className="mx-auto max-w-7xl px-5 py-5 sm:px-8 lg:px-10">
-            <div className="grid gap-1 sm:grid-cols-2 lg:grid-cols-4">
-              <Link href="/" onClick={closeMenu} className="rounded-xl px-4 py-3 text-sm text-white/75 transition hover:bg-white/10 hover:text-white">Home</Link>
-              <Link href="/#why-binzeo" onClick={closeMenu} className="rounded-xl px-4 py-3 text-sm text-white/75 transition hover:bg-white/10 hover:text-white">Why BINZEO</Link>
-              <Link href="/#how-it-works" onClick={closeMenu} className="rounded-xl px-4 py-3 text-sm text-white/75 transition hover:bg-white/10 hover:text-white">How it works</Link>
-              <Link href="/#security" onClick={closeMenu} className="rounded-xl px-4 py-3 text-sm text-white/75 transition hover:bg-white/10 hover:text-white">Security</Link>
-            </div>
-
-            {isLoggedIn ? (
-              <>
-                <p className="mt-5 border-t border-white/10 px-4 pt-4 text-[10px] font-medium uppercase tracking-[0.18em] text-white/40">Dashboard</p>
-                <div className="mt-1 grid gap-1 sm:grid-cols-2 lg:grid-cols-4">
-                  {dashboardNavigation.map(([href, label]) => (
+            <div
+              id="site-navigation-menu"
+              className="relative border-b"
+              style={{
+                background:
+                  "linear-gradient(180deg, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0.92) 100%)",
+                backdropFilter: "blur(32px) saturate(180%)",
+                WebkitBackdropFilter: "blur(32px) saturate(180%)",
+                borderBottomColor: "rgba(0,0,0,0.06)",
+                boxShadow:
+                  "inset 0 1px 0 0 rgba(255,255,255,1), 0 32px 80px -24px rgba(0,0,0,0.18)",
+                animation:
+                  "hdr-drop-in 0.45s cubic-bezier(0.22, 1, 0.36, 1) both",
+                maxHeight: "calc(100vh - 68px)",
+                overflowY: "auto",
+              }}
+            >
+              <div className="mx-auto max-w-7xl px-5 py-6 sm:px-8 lg:px-10">
+                {/* ---------- SITE NAV ---------- */}
+                <p className="px-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-black/40 mb-3">
+                  Navigation
+                </p>
+                <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+                  {siteNavigation.map((item, i) => (
                     <Link
-                      key={href}
-                      href={href}
+                      key={item.href}
+                      href={item.href}
                       onClick={closeMenu}
-                      className={`rounded-xl px-4 py-3 text-sm transition ${pathname === href ? "bg-cyan-200/15 text-cyan-50" : "text-white/75 hover:bg-white/10 hover:text-white"}`}
+                      className="group flex flex-col gap-1 rounded-2xl border border-black/[0.06] bg-white/60 px-4 py-3.5 transition-all duration-400 hover:bg-white hover:border-black/[0.12] hover:-translate-y-0.5 hover:shadow-[0_12px_32px_-16px_rgba(0,0,0,0.18)]"
+                      style={{
+                        animation: `hdr-item-in 0.5s cubic-bezier(0.22, 1, 0.36, 1) ${
+                          0.05 + i * 0.04
+                        }s both`,
+                      }}
                     >
-                      {label}
+                      <div className="flex items-center justify-between">
+                        <span className="text-[14px] font-medium text-black">
+                          {item.label}
+                        </span>
+                        <span className="text-black/25 transition-all duration-400 group-hover:text-black/70 group-hover:translate-x-0.5">
+                          <ArrowIcon />
+                        </span>
+                      </div>
+                      <span className="text-[11.5px] text-black/45">
+                        {item.sub}
+                      </span>
                     </Link>
                   ))}
-                  <button type="button" onClick={handleLogout} disabled={loggingOut} className="rounded-xl px-4 py-3 text-left text-sm text-red-200/80 transition hover:bg-red-400/10 hover:text-red-100 disabled:opacity-50">
-                    {loggingOut ? "Logging out..." : "Logout"}
-                  </button>
                 </div>
-              </>
-            ) : (
-              <div className="mt-5 flex flex-wrap gap-2 border-t border-white/10 pt-4">
-                <Link href="/signin" onClick={closeMenu} className="rounded-xl px-4 py-3 text-sm text-white/75 transition hover:bg-white/10 hover:text-white">Sign in</Link>
-                <Link href="/signup" onClick={closeMenu} className="rounded-xl bg-white/10 px-4 py-3 text-sm font-medium text-white transition hover:bg-white/20">Get started</Link>
+
+                {/* ---------- DASHBOARD (if logged in) ---------- */}
+                {isLoggedIn && (
+                  <>
+                    <div className="mt-7 flex items-center gap-3">
+                      <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-black/40 whitespace-nowrap">
+                        Your Account
+                      </span>
+                      <div className="h-px flex-1 bg-black/[0.06]" />
+                    </div>
+
+                    <div className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+                      {dashboardNavigation.map((item, i) => {
+                        const isActive = pathname === item.href;
+                        return (
+                          <Link
+                            key={item.href}
+                            href={item.href}
+                            onClick={closeMenu}
+                            className={`group flex flex-col gap-1 rounded-2xl border px-4 py-3.5 transition-all duration-400 hover:-translate-y-0.5 ${
+                              isActive
+                                ? "bg-black text-white border-black hover:bg-black/90"
+                                : "bg-white/60 border-black/[0.06] text-black hover:bg-white hover:border-black/[0.12] hover:shadow-[0_12px_32px_-16px_rgba(0,0,0,0.18)]"
+                            }`}
+                            style={{
+                              animation: `hdr-item-in 0.5s cubic-bezier(0.22, 1, 0.36, 1) ${
+                                0.1 + i * 0.03
+                              }s both`,
+                            }}
+                          >
+                            <div className="flex items-center justify-between">
+                              <span
+                                className={`text-[14px] font-medium ${
+                                  isActive ? "text-white" : "text-black"
+                                }`}
+                              >
+                                {item.label}
+                              </span>
+                              <span
+                                className={`transition-all duration-400 group-hover:translate-x-0.5 ${
+                                  isActive
+                                    ? "text-white/70"
+                                    : "text-black/25 group-hover:text-black/70"
+                                }`}
+                              >
+                                <ArrowIcon />
+                              </span>
+                            </div>
+                            <span
+                              className={`text-[11.5px] ${
+                                isActive ? "text-white/70" : "text-black/45"
+                              }`}
+                            >
+                              {item.sub}
+                            </span>
+                          </Link>
+                        );
+                      })}
+
+                      {/* Logout */}
+                      <button
+                        type="button"
+                        onClick={handleLogout}
+                        disabled={loggingOut}
+                        className="group flex flex-col gap-1 rounded-2xl border border-red-200 bg-red-50/60 px-4 py-3.5 text-left transition-all duration-400 hover:bg-red-50 hover:border-red-300 hover:-translate-y-0.5 disabled:opacity-50"
+                      >
+                        <div className="flex items-center justify-between">
+                          <span className="text-[14px] font-medium text-red-600">
+                            {loggingOut ? "Logging out..." : "Logout"}
+                          </span>
+                          <svg
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            className="h-3.5 w-3.5 text-red-400 transition-transform duration-400 group-hover:translate-x-0.5"
+                          >
+                            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                            <polyline points="16 17 21 12 16 7" />
+                            <line x1="21" y1="12" x2="9" y2="12" />
+                          </svg>
+                        </div>
+                        <span className="text-[11.5px] text-red-400/80">
+                          End this session
+                        </span>
+                      </button>
+                    </div>
+                  </>
+                )}
+
+                {/* ---------- AUTH (if logged out) ---------- */}
+                {!isLoggedIn && (
+                  <>
+                    <div className="mt-7 flex items-center gap-3">
+                      <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-black/40 whitespace-nowrap">
+                        Get Started
+                      </span>
+                      <div className="h-px flex-1 bg-black/[0.06]" />
+                    </div>
+
+                    <div className="mt-3 grid gap-2 sm:grid-cols-2">
+                      <Link
+                        href="/signin"
+                        onClick={closeMenu}
+                        className="group flex flex-col gap-1 rounded-2xl border border-black/[0.06] bg-white/60 px-4 py-3.5 transition-all duration-400 hover:bg-white hover:border-black/[0.12] hover:-translate-y-0.5 hover:shadow-[0_12px_32px_-16px_rgba(0,0,0,0.18)]"
+                        style={{
+                          animation:
+                            "hdr-item-in 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.15s both",
+                        }}
+                      >
+                        <div className="flex items-center justify-between">
+                          <span className="text-[14px] font-medium text-black">
+                            Sign in
+                          </span>
+                          <span className="text-black/25 transition-all duration-400 group-hover:text-black/70 group-hover:translate-x-0.5">
+                            <ArrowIcon />
+                          </span>
+                        </div>
+                        <span className="text-[11.5px] text-black/45">
+                          Welcome back
+                        </span>
+                      </Link>
+
+                      <Link
+                        href="/signup"
+                        onClick={closeMenu}
+                        className="group flex flex-col gap-1 rounded-2xl bg-black px-4 py-3.5 transition-all duration-400 hover:bg-black/90 hover:-translate-y-0.5 hover:shadow-[0_16px_36px_-12px_rgba(0,0,0,0.45)]"
+                        style={{
+                          animation:
+                            "hdr-item-in 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.19s both",
+                        }}
+                      >
+                        <div className="flex items-center justify-between">
+                          <span className="text-[14px] font-medium text-white">
+                            Create your ID
+                          </span>
+                          <span className="text-white/60 transition-all duration-400 group-hover:text-white group-hover:translate-x-0.5">
+                            <ArrowIcon />
+                          </span>
+                        </div>
+                        <span className="text-[11.5px] text-white/55">
+                          It&apos;s free
+                        </span>
+                      </Link>
+                    </div>
+                  </>
+                )}
               </div>
-            )}
-          </div>
-        </div>
-      )}
-    </header>
+            </div>
+          </>
+        )}
+
+        {/* ============================================================ */}
+        {/*  KEYFRAMES                                                    */}
+        {/* ============================================================ */}
+        <style jsx global>{`
+          @keyframes hdr-drop-in {
+            from {
+              opacity: 0;
+              transform: translateY(-12px);
+              filter: blur(6px);
+            }
+            to {
+              opacity: 1;
+              transform: translateY(0);
+              filter: blur(0);
+            }
+          }
+          @keyframes hdr-item-in {
+            from {
+              opacity: 0;
+              transform: translateY(10px);
+            }
+            to {
+              opacity: 1;
+              transform: translateY(0);
+            }
+          }
+        `}</style>
+      </header>
+    </div>
   );
 }
