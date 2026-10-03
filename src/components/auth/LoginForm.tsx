@@ -198,39 +198,43 @@ export default function LoginForm() {
   };
 
   return (
-    <div
-      className="relative w-screen min-h-screen overflow-x-hidden"
-      style={{
-        minHeight: "100dvh",
-        backgroundImage: "url('/images/img3.jpg')",
-        backgroundSize: "cover",
-        backgroundPosition: "center center",
-        backgroundRepeat: "no-repeat",
-        backgroundColor: "#000",
-      }}
-    >
-      {/* Dark overlay for legibility */}
+    <div className="relative w-full min-h-[100dvh] overflow-x-hidden">
+      {/* ============================================================ */}
+      {/*  FIXED BACKGROUND IMAGE — never scrolls                       */}
+      {/* ============================================================ */}
       <div
-        className="absolute inset-0 pointer-events-none"
+        aria-hidden="true"
+        className="fixed inset-0 -z-10 bg-center bg-cover bg-no-repeat"
         style={{
-          background:
-            "linear-gradient(180deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.35) 40%, rgba(0,0,0,0.65) 100%)",
-        }}
-      />
-      {/* Radial vignette for focus */}
-      <div
-        className="absolute inset-0 pointer-events-none"
-        style={{
-          background:
-            "radial-gradient(ellipse 90% 70% at 50% 45%, transparent 0%, rgba(0,0,0,0.30) 100%)",
+          backgroundImage: "url('/images/img3.jpg')",
+          backgroundColor: "#000",
         }}
       />
 
-      {/* Content */}
+      {/* Fixed dark overlay — for text legibility */}
       <div
-        className="relative z-10 flex w-full items-center justify-center px-4 py-10"
-        style={{ minHeight: "100dvh" }}
-      >
+        aria-hidden="true"
+        className="fixed inset-0 -z-10 pointer-events-none"
+        style={{
+          background:
+            "linear-gradient(180deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.35) 40%, rgba(0,0,0,0.68) 100%)",
+        }}
+      />
+
+      {/* Fixed radial vignette — for focus */}
+      <div
+        aria-hidden="true"
+        className="fixed inset-0 -z-10 pointer-events-none"
+        style={{
+          background:
+            "radial-gradient(ellipse 90% 70% at 50% 45%, transparent 0%, rgba(0,0,0,0.32) 100%)",
+        }}
+      />
+
+      {/* ============================================================ */}
+      {/*  SCROLLABLE CONTENT — card moves with page scroll             */}
+      {/* ============================================================ */}
+      <div className="relative z-10 flex w-full min-h-[100dvh] items-center justify-center px-4 py-8 sm:py-12">
         <div
           className="w-full max-w-[520px] rounded-[32px] border border-white/12 bg-white/[0.06] backdrop-blur-2xl shadow-[0_32px_80px_-24px_rgba(0,0,0,0.75),inset_0_1px_0_0_rgba(255,255,255,0.14)] px-7 py-9 sm:px-10 sm:py-11 text-white"
           style={{
