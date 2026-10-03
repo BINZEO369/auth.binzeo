@@ -28,7 +28,10 @@ const steps = [
   { label: "Connect", detail: "Manage and share your identity with confidence." },
 ];
 
-const showcase = [
+/* ================================================================== */
+/*  Showcase data                                                      */
+/* ================================================================== */
+const imageShowcase = [
   {
     tag: "Mobile",
     title: "Your identity, always in pocket.",
@@ -49,6 +52,30 @@ const showcase = [
     text: "Share your profile with anyone, anywhere. Your identity travels with you, secure and portable.",
     image: "/images/img10.jpg",
     align: "right" as const,
+  },
+];
+
+const videoSections = [
+  {
+    tag: "Real Life",
+    title: "Designed for the moments that matter.",
+    text: "From opening a bank account to meeting someone new — your BINZEO ID is the calm, trusted layer beneath everything.",
+    video: "/videos/vid2.mp4",
+    poster: "/images/img12.jpg",
+  },
+  {
+    tag: "Security",
+    title: "Your data, wrapped in care.",
+    text: "Every session is verified. Every connection encrypted. Every action logged — but only for you.",
+    video: "/videos/vid3.mp4",
+    poster: "/images/img13.jpg",
+  },
+  {
+    tag: "Global",
+    title: "One ID. Every corner of the world.",
+    text: "Verified access that travels with you. Share what matters. Keep what doesn't.",
+    video: "/images/img14.jpg" /* placeholder */ as unknown as string,
+    poster: "/images/img14.jpg",
   },
 ];
 
@@ -135,10 +162,9 @@ export default async function HomePage() {
         `}</style>
 
         {/* ============================================================ */}
-        {/*  SECTION 1 · HERO with VIDEO BACKGROUND                       */}
+        {/*  SECTION 1 · HERO (VIDEO 1)                                   */}
         {/* ============================================================ */}
         <section className="relative min-h-[100dvh] w-full flex items-center overflow-hidden pt-24 pb-16">
-          {/* Video background */}
           <video
             autoPlay
             muted
@@ -152,7 +178,6 @@ export default async function HomePage() {
             <source src="/videos/vid1.mp4" type="video/mp4" />
           </video>
 
-          {/* Video overlays */}
           <div
             aria-hidden="true"
             className="absolute inset-0 -z-10 pointer-events-none"
@@ -170,7 +195,6 @@ export default async function HomePage() {
             }}
           />
 
-          {/* Content */}
           <div className="relative mx-auto w-full max-w-7xl px-5 sm:px-8 lg:px-10">
             <div className="grid items-center gap-14 lg:grid-cols-[1.05fr_0.95fr] lg:gap-20">
               {/* LEFT */}
@@ -434,7 +458,6 @@ export default async function HomePage() {
               </div>
             </div>
 
-            {/* Scroll indicator */}
             <div className="mt-16 flex flex-col items-center gap-3 text-[11.5px] text-white/40">
               <span className="flex items-center gap-2.5">
                 <span className="h-px w-12 bg-white/25" />
@@ -455,7 +478,7 @@ export default async function HomePage() {
         </section>
 
         {/* ============================================================ */}
-        {/*  SECTION 2 · MARQUEE — Trust indicators                       */}
+        {/*  SECTION 2 · MARQUEE                                          */}
         {/* ============================================================ */}
         <section className="relative w-full overflow-hidden border-y border-white/8 py-6">
           <div
@@ -487,9 +510,9 @@ export default async function HomePage() {
         </section>
 
         {/* ============================================================ */}
-        {/*  SECTION 3 · PRODUCT SHOWCASE (Apple-style alternates)        */}
+        {/*  SECTION 3 · IMAGE SHOWCASE (Apple-style)                     */}
         {/* ============================================================ */}
-        {showcase.map((item, i) => (
+        {imageShowcase.map((item) => (
           <section
             key={item.tag}
             className="relative w-full px-5 py-20 sm:px-8 sm:py-32 lg:px-10"
@@ -500,7 +523,6 @@ export default async function HomePage() {
                   item.align === "left" ? "lg:[&>*:first-child]:order-2" : ""
                 }`}
               >
-                {/* Text */}
                 <div className="max-w-xl">
                   <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-white/15 bg-white/[0.06] backdrop-blur-xl text-white/70 text-[10.5px] font-medium uppercase tracking-[0.16em] mb-5">
                     {item.tag}
@@ -513,7 +535,6 @@ export default async function HomePage() {
                   </p>
                 </div>
 
-                {/* Image */}
                 <div className="relative">
                   <div
                     aria-hidden="true"
@@ -556,26 +577,148 @@ export default async function HomePage() {
         ))}
 
         {/* ============================================================ */}
-        {/*  SECTION 4 · WHY BINZEO                                       */}
+        {/*  SECTION 4 · VIDEO SHOWCASE — Full-bleed cinematic            */}
         {/* ============================================================ */}
-        <section
-          id="why-binzeo"
-          className="relative w-full px-5 py-24 sm:px-8 sm:py-32 lg:px-10"
-        >
+        {videoSections.map((v, idx) => (
+          <section
+            key={v.tag}
+            className="relative w-full py-20 sm:py-32"
+          >
+            <div className="mx-auto max-w-7xl px-5 sm:px-8 lg:px-10">
+              <div className="relative overflow-hidden rounded-[40px] border border-white/15">
+                {/* Video background */}
+                {typeof v.video === "string" && v.video.endsWith(".mp4") ? (
+                  <video
+                    autoPlay
+                    muted
+                    loop
+                    playsInline
+                    preload="auto"
+                    poster={v.poster}
+                    className="absolute inset-0 h-full w-full object-cover"
+                    aria-hidden="true"
+                  >
+                    <source src={v.video} type="video/mp4" />
+                  </video>
+                ) : (
+                  <img
+                    src={v.poster}
+                    alt=""
+                    className="absolute inset-0 h-full w-full object-cover"
+                    aria-hidden="true"
+                  />
+                )}
+
+                {/* Dark overlay */}
+                <div
+                  aria-hidden="true"
+                  className="absolute inset-0"
+                  style={{
+                    background:
+                      idx % 2 === 0
+                        ? "linear-gradient(135deg, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.55) 60%, rgba(0,0,0,0.35) 100%)"
+                        : "linear-gradient(225deg, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.55) 60%, rgba(0,0,0,0.35) 100%)",
+                  }}
+                />
+
+                {/* Top sheen */}
+                <div
+                  aria-hidden="true"
+                  className="absolute inset-x-0 top-0 h-px z-10"
+                  style={{
+                    background:
+                      "linear-gradient(90deg, transparent, rgba(255,255,255,0.5), transparent)",
+                  }}
+                />
+
+                {/* Content */}
+                <div className="relative px-6 py-16 sm:px-12 sm:py-24 lg:px-16 lg:py-28 min-h-[500px] sm:min-h-[560px] flex items-center">
+                  <div className="max-w-2xl">
+                    <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-white/20 bg-white/[0.08] backdrop-blur-xl text-white/85 text-[10.5px] font-medium uppercase tracking-[0.16em] mb-6">
+                      {v.tag}
+                    </div>
+                    <h2 className="text-[34px] sm:text-[52px] lg:text-[60px] leading-[1.05] font-semibold tracking-[-0.045em] text-white mb-6">
+                      {v.title}
+                    </h2>
+                    <p className="text-[15px] sm:text-[17px] leading-relaxed text-white/70 max-w-xl">
+                      {v.text}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+        ))}
+
+        {/* ============================================================ */}
+        {/*  SECTION 5 · FEATURE GRID (2 images)                          */}
+        {/* ============================================================ */}
+        <section className="relative w-full px-5 py-20 sm:px-8 sm:py-28 lg:px-10">
           <div className="mx-auto max-w-7xl">
-            <div className="max-w-2xl">
+            <div className="max-w-2xl mb-14">
               <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-white/15 bg-white/[0.06] backdrop-blur-xl text-white/70 text-[10.5px] font-medium uppercase tracking-[0.16em] mb-5">
                 The BINZEO difference
               </div>
               <h2 className="text-[38px] sm:text-[56px] leading-[1.05] font-semibold tracking-[-0.045em] text-white">
                 Less noise. More control.
               </h2>
-              <p className="mt-5 max-w-xl text-[15px] sm:text-[16.5px] leading-relaxed text-white/60">
-                Everything you need to show up online with a clear, secure, and
-                unmistakably personal identity.
-              </p>
             </div>
 
+            <div className="grid gap-4 md:grid-cols-2">
+              {[
+                {
+                  img: "/images/img14.jpg",
+                  tag: "Everything connected",
+                  title: "One ID, every relationship.",
+                },
+                {
+                  img: "/images/img15.jpg",
+                  tag: "Built to last",
+                  title: "Designed for the decades ahead.",
+                },
+              ].map((f) => (
+                <article
+                  key={f.tag}
+                  className="group relative overflow-hidden rounded-[32px] border border-white/12"
+                  style={{
+                    background:
+                      "linear-gradient(180deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%)",
+                    backdropFilter: "blur(28px) saturate(180%)",
+                    WebkitBackdropFilter: "blur(28px) saturate(180%)",
+                    boxShadow:
+                      "inset 0 1px 0 0 rgba(255,255,255,0.12), 0 24px 60px -24px rgba(0,0,0,0.7)",
+                  }}
+                >
+                  <div className="aspect-[16/10] w-full overflow-hidden">
+                    <img
+                      src={f.img}
+                      alt={f.title}
+                      className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                      loading="lazy"
+                    />
+                  </div>
+                  <div className="p-6 sm:p-7">
+                    <div className="text-[10.5px] font-medium uppercase tracking-[0.16em] text-white/50 mb-3">
+                      {f.tag}
+                    </div>
+                    <h3 className="text-[22px] sm:text-[26px] font-medium tracking-[-0.025em] text-white">
+                      {f.title}
+                    </h3>
+                  </div>
+                </article>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ============================================================ */}
+        {/*  SECTION 6 · WHY BINZEO (3 cards)                             */}
+        {/* ============================================================ */}
+        <section
+          id="why-binzeo"
+          className="relative w-full px-5 py-24 sm:px-8 sm:py-32 lg:px-10"
+        >
+          <div className="mx-auto max-w-7xl">
             <div className="mt-14 grid gap-4 md:grid-cols-3">
               {benefits.map((b, i) => (
                 <article
@@ -622,7 +765,7 @@ export default async function HomePage() {
         </section>
 
         {/* ============================================================ */}
-        {/*  SECTION 5 · HOW IT WORKS                                     */}
+        {/*  SECTION 7 · HOW IT WORKS                                     */}
         {/* ============================================================ */}
         <section
           id="how-it-works"
@@ -671,7 +814,7 @@ export default async function HomePage() {
         </section>
 
         {/* ============================================================ */}
-        {/*  SECTION 6 · CTA                                              */}
+        {/*  SECTION 8 · FINAL CTA                                        */}
         {/* ============================================================ */}
         <section
           id="security"
@@ -720,7 +863,6 @@ export default async function HomePage() {
           </div>
         </section>
 
-        {/* Bottom spacer */}
         <div className="h-16" />
       </main>
     </>
