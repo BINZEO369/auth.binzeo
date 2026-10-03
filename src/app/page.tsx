@@ -33,7 +33,7 @@ export default async function HomePage() {
   const isLoggedIn = Boolean(user);
 
   return (
-    <main className="liquid-page min-h-full overflow-hidden bg-[#07111a] text-white">
+    <main className="liquid-page flex-none min-h-full overflow-x-clip bg-[#07111a] text-white">
       <section className="relative isolate min-h-[calc(100dvh-72px)] overflow-hidden">
         <div className="liquid-background" aria-hidden="true" />
         <div className="liquid-grid" aria-hidden="true" />
