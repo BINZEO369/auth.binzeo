@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-type NavbarProps = {
+type HeaderProps = {
   isLoggedIn?: boolean;
   onMenu?: () => void;
 };
@@ -19,7 +19,7 @@ function MenuIcon() {
   );
 }
 
-export default function Navbar({ isLoggedIn = false, onMenu }: NavbarProps) {
+export default function Header({ isLoggedIn = false, onMenu }: HeaderProps) {
   const pathname = usePathname();
   const isDashboard = pathname.startsWith("/dashboard");
   const menuControl = onMenu || isDashboard ? (

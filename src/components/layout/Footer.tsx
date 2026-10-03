@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 
 type FooterProps = {
@@ -16,7 +17,7 @@ export default function Footer({ isLoggedIn = false }: FooterProps) {
           <div className="col-span-2">
             <Link href="/" className="mb-4 inline-flex items-center gap-3">
               <span className="flex h-9 w-9 items-center justify-center rounded-xl border border-white/20 bg-white/10 p-2">
-                <img src="/logo.svg" alt="BINZEO" className="h-full w-full object-contain brightness-0 invert" />
+                <Image src="/logo.svg" alt="BINZEO" width={122} height={29} className="h-full w-full object-contain brightness-0 invert" />
               </span>
               <span className="font-semibold tracking-[0.14em] text-white/90">BINZEO</span>
             </Link>
