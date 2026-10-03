@@ -33,15 +33,15 @@ export default async function HomePage() {
   const isLoggedIn = Boolean(user);
 
   return (
-    <main className="liquid-page min-h-screen overflow-hidden bg-[#07111a] text-white">
-      <section className="relative isolate min-h-screen overflow-hidden">
+    <main className="liquid-page min-h-full overflow-hidden bg-[#07111a] text-white">
+      <section className="relative isolate min-h-[calc(100dvh-72px)] overflow-hidden">
         <div className="liquid-background" aria-hidden="true" />
         <div className="liquid-grid" aria-hidden="true" />
         <div className="liquid-orb liquid-orb-one" aria-hidden="true" />
         <div className="liquid-orb liquid-orb-two" aria-hidden="true" />
         <div className="liquid-orb liquid-orb-three" aria-hidden="true" />
 
-        <div className="relative z-10 mx-auto flex min-h-[calc(100vh-88px)] w-full max-w-7xl items-center px-5 pb-14 pt-10 sm:px-8 sm:pb-20 lg:px-10">
+        <div className="relative z-10 mx-auto flex min-h-[calc(100dvh-160px)] w-full max-w-7xl items-center px-5 pb-14 pt-10 sm:px-8 sm:pb-20 lg:px-10">
           <div className="grid w-full items-center gap-14 lg:grid-cols-[1.05fr_0.95fr] lg:gap-20">
             <div className="max-w-3xl">
               <div className="liquid-kicker mb-7 inline-flex items-center gap-2.5 rounded-full px-3.5 py-2 text-xs font-medium tracking-[0.12em] text-cyan-50/90 uppercase sm:text-sm">

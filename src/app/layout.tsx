@@ -37,9 +37,9 @@ export default async function RootLayout({
 
   return (
     <html lang="en" className={inter.variable}>
-      <body className="flex min-h-screen flex-col antialiased">
+      <body className="flex min-h-dvh flex-col antialiased">
         <Header isLoggedIn={Boolean(user)} />
-        <div className="flex min-h-0 flex-1 flex-col pt-[72px]">{children}</div>
+        <div className="flex min-h-[calc(100dvh-72px)] min-w-0 flex-1 flex-col pt-[72px]">{children}</div>
         <Footer isLoggedIn={Boolean(user)} />
       </body>
     </html>

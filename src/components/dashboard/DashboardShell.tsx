@@ -168,7 +168,7 @@ export default function DashboardShell({ children, user }: Props) {
   );
 
   return (
-    <div className="flex min-h-screen flex-col bg-[#f3f3f3]">
+    <div className="flex min-h-[calc(100dvh-72px)] flex-col bg-[#f3f3f3]">
       <div className="flex flex-1">
       {/* Desktop Sidebar */}
         <aside className="sticky top-0 hidden h-screen w-64 flex-col border-r border-white/10 bg-[#07111a]/90 text-white backdrop-blur-2xl lg:flex">

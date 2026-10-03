@@ -11,7 +11,7 @@ export default function Footer({ isLoggedIn = false }: FooterProps) {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="mt-auto border-t border-white/10 bg-[#07111a]/80 text-white backdrop-blur-2xl">
+    <footer className="relative z-10 mt-auto shrink-0 border-t border-white/10 bg-[#07111a]/80 text-white backdrop-blur-2xl">
       <div className="mx-auto max-w-7xl px-5 py-12 sm:px-8 lg:px-10">
         <div className="grid grid-cols-2 gap-8 sm:grid-cols-4">
           <div className="col-span-2">
