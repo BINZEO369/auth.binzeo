@@ -3,9 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
-import { useState } from "react";
-import Navbar from "@/components/layout/Navbar";
-import Footer from "@/components/layout/Footer";
+import { useEffect, useState } from "react";
 
 const NAV = [
   { href: "/dashboard", label: "Overview", icon: "home" },
@@ -67,6 +65,12 @@ export default function DashboardShell({ children, user }: Props) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [loggingOut, setLoggingOut] = useState(false);
+
+  useEffect(() => {
+    const openMenu = () => setOpen(true);
+    window.addEventListener("binzeo:open-dashboard-menu", openMenu);
+    return () => window.removeEventListener("binzeo:open-dashboard-menu", openMenu);
+  }, []);
 
   const displayName =
     user.display_name || user.first_name || user.email || "User";
@@ -164,11 +168,10 @@ export default function DashboardShell({ children, user }: Props) {
   );
 
   return (
-    <div className="flex min-h-screen flex-col bg-[#f3f3f3] pt-[72px]">
-      <Navbar isLoggedIn onMenu={() => setOpen(true)} />
+    <div className="flex min-h-screen flex-col bg-[#f3f3f3]">
       <div className="flex flex-1">
       {/* Desktop Sidebar */}
-        <aside className="sticky top-[72px] hidden h-[calc(100vh-72px)] w-64 flex-col border-r border-white/10 bg-[#07111a]/90 text-white backdrop-blur-2xl lg:flex">
+        <aside className="sticky top-0 hidden h-screen w-64 flex-col border-r border-white/10 bg-[#07111a]/90 text-white backdrop-blur-2xl lg:flex">
         {sidebarContent}
       </aside>
 
@@ -190,7 +193,6 @@ export default function DashboardShell({ children, user }: Props) {
         <main className="flex-1 p-4 sm:p-6">{children}</main>
       </div>
       </div>
-      <Footer isLoggedIn />
     </div>
   );
 }

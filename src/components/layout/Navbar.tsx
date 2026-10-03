@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 type NavbarProps = {
   isLoggedIn?: boolean;
@@ -19,10 +20,15 @@ function MenuIcon() {
 }
 
 export default function Navbar({ isLoggedIn = false, onMenu }: NavbarProps) {
-  const menuControl = onMenu ? (
+  const pathname = usePathname();
+  const isDashboard = pathname.startsWith("/dashboard");
+  const menuControl = onMenu || isDashboard ? (
     <button
       type="button"
-      onClick={onMenu}
+      onClick={() => {
+        if (onMenu) onMenu();
+        else window.dispatchEvent(new Event("binzeo:open-dashboard-menu"));
+      }}
       aria-label="Open dashboard menu"
       title="Dashboard menu"
       className="rounded-xl p-2 text-white/75 transition hover:bg-white/10 hover:text-white"

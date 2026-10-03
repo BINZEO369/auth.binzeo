@@ -1,7 +1,5 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
-import Navbar from "@/components/layout/Navbar";
-import Footer from "@/components/layout/Footer";
 
 const benefits = [
   {
@@ -35,8 +33,7 @@ export default async function HomePage() {
   const isLoggedIn = Boolean(user);
 
   return (
-    <main className="liquid-page min-h-screen overflow-hidden bg-[#07111a] pt-[72px] text-white">
-      <Navbar isLoggedIn={isLoggedIn} />
+    <main className="liquid-page min-h-screen overflow-hidden bg-[#07111a] text-white">
       <section className="relative isolate min-h-screen overflow-hidden">
         <div className="liquid-background" aria-hidden="true" />
         <div className="liquid-grid" aria-hidden="true" />
@@ -182,7 +179,6 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <Footer isLoggedIn={isLoggedIn} />
     </main>
   );
 }
