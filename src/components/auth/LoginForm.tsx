@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { getClientDeviceId, requestPreciseLocation } from "@/lib/client-device";
@@ -36,6 +36,8 @@ export default function LoginForm() {
   const [tokenLoading, setTokenLoading] = useState(false);
   const [passkeyLoading, setPasskeyLoading] = useState(false);
   const [temporaryToken, setTemporaryToken] = useState("");
+  const [scanningQr, setScanningQr] = useState(false);
+  const qrScannerRef = useRef<{ stop: () => Promise<void>; clear: () => void } | null>(null);
   const [error, setError] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -66,15 +68,14 @@ export default function LoginForm() {
     }
   };
 
-  const handleTemporaryLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const exchangeTemporaryToken = async (token: string) => {
     setTokenLoading(true);
     setError("");
     try {
       const res = await fetch("/api/auth/temporary-login", {
         method: "POST",
         headers: { "Content-Type": "application/json", "x-binzeo-device-id": getClientDeviceId() },
-        body: JSON.stringify({ token: temporaryToken.trim() }),
+        body: JSON.stringify({ token: token.trim() }),
       });
       const data = await res.json();
       if (!data.success) {
@@ -88,6 +89,47 @@ export default function LoginForm() {
     } finally {
       setTokenLoading(false);
     }
+  };
+
+  const handleTemporaryLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    await exchangeTemporaryToken(temporaryToken);
+  };
+
+  const scanQrToken = async () => {
+    setError("");
+    setScanningQr(true);
+    try {
+      const { Html5Qrcode } = await import("html5-qrcode");
+      const scanner = new Html5Qrcode("binzeo-qr-reader");
+      qrScannerRef.current = scanner;
+      await scanner.start(
+        { facingMode: "environment" },
+        { fps: 10, qrbox: { width: 220, height: 220 } },
+        async (decodedText) => {
+          const token = decodedText.startsWith("BINZEO_TEMP_TOKEN:")
+            ? decodedText.slice("BINZEO_TEMP_TOKEN:".length)
+            : decodedText;
+          await scanner.stop().catch(() => undefined);
+          scanner.clear();
+          qrScannerRef.current = null;
+          setScanningQr(false);
+          setTemporaryToken(token);
+          await exchangeTemporaryToken(token);
+        },
+        () => undefined,
+      );
+    } catch (err) {
+      setScanningQr(false);
+      setError(err instanceof Error ? err.message : "Camera access was unavailable");
+    }
+  };
+
+  const stopQrScan = async () => {
+    await qrScannerRef.current?.stop().catch(() => undefined);
+    qrScannerRef.current?.clear();
+    qrScannerRef.current = null;
+    setScanningQr(false);
   };
 
   const handlePasskeyLogin = async () => {
@@ -143,6 +185,14 @@ export default function LoginForm() {
         </div>
         <input type="password" value={temporaryToken} onChange={(e) => setTemporaryToken(e.target.value)} required autoComplete="one-time-code" placeholder="Paste temporary token" aria-label="Temporary login token" className={fieldClass} />
         <button type="submit" disabled={tokenLoading} className="w-full rounded-full border border-[#5c6269] py-3 text-sm font-semibold text-white transition hover:bg-[#15171a] disabled:opacity-60">{tokenLoading ? "Signing in..." : "Sign in with temporary token"}</button>
+        {!scanningQr ? (
+          <button type="button" onClick={scanQrToken} disabled={tokenLoading} className="w-full rounded-full border border-[#3d4145] py-2.5 text-xs text-[#c9e8f1] transition hover:bg-[#15171a] disabled:opacity-60">Scan QR token with camera</button>
+        ) : (
+          <>
+            <div id="binzeo-qr-reader" className="overflow-hidden rounded-xl border border-[#3d4145]" />
+            <button type="button" onClick={stopQrScan} className="w-full rounded-full border border-[#9d514f] py-2.5 text-xs text-[#ffb8b4]">Stop camera</button>
+          </>
+        )}
       </form>
       <button type="button" onClick={handlePasskeyLogin} disabled={passkeyLoading} className="mt-3 w-full rounded-full border border-[#5c6269] py-3 text-sm font-semibold text-white transition hover:bg-[#15171a] disabled:opacity-60">{passkeyLoading ? "Checking passkey..." : "Sign in with passkey"}</button>
       <SocialActions onMessage={setError} />

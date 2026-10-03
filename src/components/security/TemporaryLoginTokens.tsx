@@ -1,7 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import { apiFetch } from "@/lib/api/client";
+import QRCode from "qrcode";
 
 type TokenRecord = {
   id: string;
@@ -34,6 +36,7 @@ export default function TemporaryLoginTokens() {
   const [tokens, setTokens] = useState<TokenRecord[]>([]);
   const [duration, setDuration] = useState(5);
   const [newToken, setNewToken] = useState<string | null>(null);
+  const [qrImage, setQrImage] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [working, setWorking] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
@@ -53,12 +56,14 @@ export default function TemporaryLoginTokens() {
     setWorking(true);
     setMessage(null);
     setNewToken(null);
+    setQrImage(null);
     const response = await apiFetch<{ token: string; token_record: TokenRecord }>(
       "/api/user/temporary-login-tokens",
       { method: "POST", body: JSON.stringify({ duration_minutes: duration }) },
     );
     if (response.success) {
       setNewToken(response.data.token);
+      setQrImage(await QRCode.toDataURL(`BINZEO_TEMP_TOKEN:${response.data.token}`, { width: 240, margin: 2, color: { dark: "#101820", light: "#ffffff" } }));
       setMessage("Token created. Copy it now; it will not be shown again.");
       await load();
     } else {
@@ -101,7 +106,11 @@ export default function TemporaryLoginTokens() {
         <div className="rounded-xl border border-[#ead39a] bg-[#fff8e8] p-3 space-y-2">
           <div className="text-xs font-medium text-[#7a5b14]">Copy this token now</div>
           <code className="block break-all rounded-lg bg-white p-2 text-xs text-[#101820]">{newToken}</code>
-          <button onClick={copy} className="rounded-lg border border-[#d8bd6e] px-3 py-1.5 text-xs text-[#7a5b14]">Copy token</button>
+          <div className="flex flex-wrap items-center gap-3">
+            <button onClick={copy} className="rounded-lg border border-[#d8bd6e] px-3 py-1.5 text-xs text-[#7a5b14]">Copy token</button>
+            {qrImage && <Image src={qrImage} alt="QR code for temporary login token" width={160} height={160} unoptimized className="h-40 w-40 rounded-lg border border-[#ead39a] bg-white p-2" />}
+          </div>
+          <div className="text-[11px] text-[#7a5b14]">Scan this QR from the BINZEO login page. Anyone who scans it can enter the account, so keep it private.</div>
         </div>
       )}
       {message && <div className="text-xs text-[#5c6b70]">{message}</div>}
