@@ -1,232 +1,147 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect, useState } from "react";
 
-export default function Hero({ isLoggedIn = false }: { isLoggedIn?: boolean }) {
+export default function Navbar() {
+  const [scrolled, setScrolled] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 20);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
   return (
-    <section className="relative overflow-hidden w-full min-h-[100dvh] flex items-center justify-center">
-      {/* ============================================================ */}
-      {/*  FIXED BACKGROUND IMAGE — img7                                */}
-      {/* ============================================================ */}
-      <div
-        aria-hidden="true"
-        className="absolute inset-0 -z-10 bg-center bg-cover bg-no-repeat"
-        style={{
-          backgroundImage: "url('/images/img7.jpg')",
-          backgroundColor: "#000",
-        }}
-      />
+    <header
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
+        scrolled
+          ? "backdrop-blur-2xl bg-black/50 border-b border-white/10"
+          : "backdrop-blur-xl bg-black/20 border-b border-transparent"
+      }`}
+    >
+      <nav className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+        {/* Logo */}
+        <Link href="/" className="flex items-center gap-2.5 group">
+          <div className="w-9 h-9 rounded-xl bg-white/10 border border-white/20 backdrop-blur-xl flex items-center justify-center font-bold text-white text-sm shadow-[0_4px_12px_-4px_rgba(0,0,0,0.4)] group-hover:bg-white/20 transition-all duration-500">
+            B
+          </div>
+          <span className="font-semibold text-[15px] tracking-tight text-white">
+            Binzeo <span className="text-white/70">ID</span>
+          </span>
+        </Link>
 
-      {/* Dark overlay for legibility */}
-      <div
-        aria-hidden="true"
-        className="absolute inset-0 -z-10 pointer-events-none"
-        style={{
-          background:
-            "linear-gradient(180deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.35) 40%, rgba(0,0,0,0.70) 100%)",
-        }}
-      />
+        {/* Desktop nav */}
+        <div className="hidden md:flex items-center gap-8">
+          <Link
+            href="#features"
+            className="text-[13.5px] text-white/70 hover:text-white transition-colors duration-300"
+          >
+            Features
+          </Link>
+          <Link
+            href="#how"
+            className="text-[13.5px] text-white/70 hover:text-white transition-colors duration-300"
+          >
+            How it works
+          </Link>
+        </div>
 
-      {/* Radial vignette */}
-      <div
-        aria-hidden="true"
-        className="absolute inset-0 -z-10 pointer-events-none"
-        style={{
-          background:
-            "radial-gradient(ellipse 90% 70% at 50% 45%, transparent 0%, rgba(0,0,0,0.35) 100%)",
-        }}
-      />
+        {/* Right side */}
+        <div className="flex items-center gap-2">
+          <Link
+            href="/signin"
+            className="hidden sm:inline-flex text-[13.5px] text-white/80 hover:text-white px-3 py-2 transition-colors duration-300"
+          >
+            Login
+          </Link>
+          <Link
+            href="/signup"
+            className="inline-flex items-center gap-1.5 text-[13.5px] font-medium bg-white text-black px-4 py-2 rounded-full transition-all duration-500 hover:bg-white/90 hover:shadow-[0_8px_24px_-8px_rgba(255,255,255,0.5)] hover:-translate-y-px"
+          >
+            Get Started
+          </Link>
 
-      {/* Ambient glow accents */}
-      <div
-        aria-hidden="true"
-        className="absolute top-0 left-1/2 -translate-x-1/2 w-[720px] h-[720px] -z-10 pointer-events-none rounded-full"
-        style={{
-          background:
-            "radial-gradient(circle, rgba(255,255,255,0.14) 0%, transparent 65%)",
-          animation: "bn-hero-breathe 5s ease-in-out infinite",
-        }}
-      />
+          {/* Mobile menu button */}
+          <button
+            type="button"
+            onClick={() => setMobileOpen((v) => !v)}
+            aria-label="Menu"
+            className="md:hidden p-2 text-white/80 hover:text-white transition-colors"
+          >
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              className="w-5 h-5"
+            >
+              {mobileOpen ? (
+                <>
+                  <line x1="18" y1="6" x2="6" y2="18" />
+                  <line x1="6" y1="6" x2="18" y2="18" />
+                </>
+              ) : (
+                <>
+                  <line x1="3" y1="6" x2="21" y2="6" />
+                  <line x1="3" y1="12" x2="21" y2="12" />
+                  <line x1="3" y1="18" x2="21" y2="18" />
+                </>
+              )}
+            </svg>
+          </button>
+        </div>
+      </nav>
 
-      {/* ============================================================ */}
-      {/*  KEYFRAMES (as global style)                                  */}
-      {/* ============================================================ */}
-      <style jsx global>{`
-        @keyframes bn-hero-breathe {
-          0%, 100% { opacity: 0.5; transform: scale(1); }
-          50%      { opacity: 0.85; transform: scale(1.08); }
-        }
-        @keyframes bn-hero-fade-up {
-          from { opacity: 0; transform: translateY(24px); filter: blur(6px); }
-          to   { opacity: 1; transform: translateY(0); filter: blur(0); }
-        }
-        @keyframes bn-hero-word-in {
-          from { opacity: 0; transform: translateY(28px); filter: blur(8px); }
-          to   { opacity: 1; transform: translateY(0); filter: blur(0); }
-        }
-        @keyframes bn-hero-underline {
-          from { transform: scaleX(0); }
-          to   { transform: scaleX(1); }
-        }
-        @keyframes bn-hero-pulse {
-          0%, 100% { opacity: 0.7; transform: scale(1); }
-          50%      { opacity: 1; transform: scale(1.15); }
-        }
-      `}</style>
-
-      {/* ============================================================ */}
-      {/*  CONTENT                                                      */}
-      {/* ============================================================ */}
-      <div className="relative z-10 w-full max-w-6xl mx-auto px-4 sm:px-6 py-20 sm:py-24">
+      {/* Mobile dropdown */}
+      {mobileOpen && (
         <div
-          className="mx-auto max-w-4xl rounded-[36px] border border-white/12 bg-white/[0.05] backdrop-blur-2xl shadow-[0_40px_100px_-32px_rgba(0,0,0,0.85),inset_0_1px_0_0_rgba(255,255,255,0.15)] px-6 py-14 sm:px-12 sm:py-20 text-center text-white"
+          className="md:hidden border-t border-white/10 bg-black/70 backdrop-blur-2xl"
           style={{
-            animation:
-              "bn-hero-fade-up 0.9s cubic-bezier(0.22, 1, 0.36, 1) both",
+            animation: "nav-fade-in 0.3s cubic-bezier(0.22, 1, 0.36, 1) both",
           }}
         >
-          {/* Status badge */}
-          <div
-            className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-white/15 bg-white/[0.06] backdrop-blur-xl text-white/80 text-[11px] sm:text-[12px] uppercase tracking-[0.12em] mb-8"
-            style={{
-              animation:
-                "bn-hero-fade-up 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.1s both",
-            }}
-          >
-            <span
-              className="w-1.5 h-1.5 rounded-full bg-white"
-              style={{ animation: "bn-hero-pulse 2s ease-in-out infinite" }}
-            />
-            Now available for everyone
-          </div>
-
-          {/* Headline — word-by-word reveal */}
-          <h1 className="text-[42px] sm:text-[64px] lg:text-[76px] font-semibold tracking-[-0.045em] leading-[1.02] mb-7">
-            {["Your", "Digital", "Identity,"].map((word, i) => (
-              <span
-                key={word}
-                className="inline-block"
-                style={{
-                  animation: `bn-hero-word-in 0.9s cubic-bezier(0.22, 1, 0.36, 1) ${
-                    0.15 + i * 0.12
-                  }s both`,
-                }}
-              >
-                {word}
-                {i < 2 && "\u00A0"}
-              </span>
-            ))}
-            <br />
-            <span
-              className="inline-block bg-gradient-to-r from-white via-white/90 to-white/70 bg-clip-text text-transparent"
-              style={{
-                animation:
-                  "bn-hero-word-in 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.51s both",
-              }}
+          <div className="px-4 py-4 space-y-1">
+            <Link
+              href="#features"
+              onClick={() => setMobileOpen(false)}
+              className="block px-4 py-3 rounded-xl text-[14px] text-white/80 hover:text-white hover:bg-white/5 transition-colors"
             >
-              Reimagined
-            </span>
-          </h1>
-
-          {/* Underline accent */}
-          <div
-            className="mx-auto h-[2px] w-16 bg-white/60 rounded-full origin-center mb-8"
-            style={{
-              animation:
-                "bn-hero-underline 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.7s both",
-            }}
-          />
-
-          {/* Subtitle */}
-          <p
-            className="max-w-2xl mx-auto text-[15px] sm:text-[17px] text-white/70 leading-relaxed mb-10"
-            style={{
-              animation:
-                "bn-hero-fade-up 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.85s both",
-            }}
-          >
-            Create, manage, and share your secure digital identity with Binzeo
-            ID. One account — endless possibilities with a single{" "}
-            <span className="font-mono text-[13px] text-white/90 bg-white/10 px-2 py-0.5 rounded-md border border-white/10">
-              BZ-U-XXXXXX
-            </span>{" "}
-            ID.
-          </p>
-
-          {/* CTA Buttons */}
-          <div
-            className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-12"
-            style={{
-              animation:
-                "bn-hero-fade-up 0.9s cubic-bezier(0.22, 1, 0.36, 1) 1.05s both",
-            }}
-          >
-            {isLoggedIn ? (
-              <Link
-                href="/dashboard"
-                className="group inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-full bg-white px-7 py-3.5 font-semibold text-black transition-all duration-500 hover:bg-white/95 hover:shadow-[0_20px_50px_-12px_rgba(255,255,255,0.5)] hover:-translate-y-0.5"
-              >
-                Open Dashboard
-                <span
-                  aria-hidden="true"
-                  className="transition-transform duration-500 group-hover:translate-x-1"
-                >
-                  →
-                </span>
-              </Link>
-            ) : (
-              <>
-                <Link
-                  href="/signup"
-                  className="inline-flex w-full sm:w-auto items-center justify-center rounded-full bg-white px-7 py-3.5 font-semibold text-black transition-all duration-500 hover:bg-white/95 hover:shadow-[0_20px_50px_-12px_rgba(255,255,255,0.5)] hover:-translate-y-0.5"
-                >
-                  Create your ID
-                </Link>
-                <Link
-                  href="/signin"
-                  className="inline-flex w-full sm:w-auto items-center justify-center rounded-full border border-white/25 bg-white/5 backdrop-blur-xl px-7 py-3.5 font-medium text-white transition-all duration-500 hover:bg-white/12 hover:border-white/40 hover:-translate-y-0.5"
-                >
-                  Sign in
-                </Link>
-              </>
-            )}
-          </div>
-
-          {/* Stats */}
-          <div
-            className="grid grid-cols-3 gap-3 max-w-2xl mx-auto"
-            style={{
-              animation:
-                "bn-hero-fade-up 0.9s cubic-bezier(0.22, 1, 0.36, 1) 1.25s both",
-            }}
-          >
-            <div className="rounded-2xl border border-white/12 bg-white/[0.04] backdrop-blur-xl px-3 py-4">
-              <div className="text-[22px] sm:text-[26px] font-semibold tracking-tight text-white">
-                BZ-U
-              </div>
-              <div className="text-[10.5px] sm:text-[11px] text-white/55 mt-1 uppercase tracking-[0.12em]">
-                Unique ID
-              </div>
-            </div>
-            <div className="rounded-2xl border border-white/12 bg-white/[0.04] backdrop-blur-xl px-3 py-4">
-              <div className="text-[22px] sm:text-[26px] font-semibold tracking-tight text-white">
-                256-bit
-              </div>
-              <div className="text-[10.5px] sm:text-[11px] text-white/55 mt-1 uppercase tracking-[0.12em]">
-                Encryption
-              </div>
-            </div>
-            <div className="rounded-2xl border border-white/12 bg-white/[0.04] backdrop-blur-xl px-3 py-4">
-              <div className="text-[22px] sm:text-[26px] font-semibold tracking-tight text-white">
-                24/7
-              </div>
-              <div className="text-[10.5px] sm:text-[11px] text-white/55 mt-1 uppercase tracking-[0.12em]">
-                Availability
-              </div>
-            </div>
+              Features
+            </Link>
+            <Link
+              href="#how"
+              onClick={() => setMobileOpen(false)}
+              className="block px-4 py-3 rounded-xl text-[14px] text-white/80 hover:text-white hover:bg-white/5 transition-colors"
+            >
+              How it works
+            </Link>
+            <Link
+              href="/signin"
+              onClick={() => setMobileOpen(false)}
+              className="block px-4 py-3 rounded-xl text-[14px] text-white/80 hover:text-white hover:bg-white/5 transition-colors"
+            >
+              Login
+            </Link>
           </div>
         </div>
-      </div>
-    </section>
+      )}
+
+      <style jsx global>{`
+        @keyframes nav-fade-in {
+          from {
+            opacity: 0;
+            transform: translateY(-8px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+      `}</style>
+    </header>
   );
 }
