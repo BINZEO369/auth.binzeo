@@ -11,24 +11,24 @@ type HeaderProps = {
 };
 
 /* ================================================================== */
-/*  Navigation data                                                    */
+/*  Navigation data — with icons                                      */
 /* ================================================================== */
 const siteNavigation = [
-  { href: "/", label: "Home", sub: "Back to homepage" },
-  { href: "/#why-binzeo", label: "Why BINZEO", sub: "What makes us different" },
-  { href: "/#how-it-works", label: "How it works", sub: "Three simple steps" },
-  { href: "/#security", label: "Security", sub: "Your data, protected" },
+  { href: "/", label: "Home", sub: "Back to homepage", icon: "/icons/home.svg" },
+  { href: "/#why-binzeo", label: "Why BINZEO", sub: "What makes us different", icon: "/icons/check.svg" },
+  { href: "/#how-it-works", label: "How it works", sub: "Three simple steps", icon: "/icons/grid.svg" },
+  { href: "/#security", label: "Security", sub: "Your data, protected", icon: "/icons/shield.svg" },
 ] as const;
 
 const dashboardNavigation = [
-  { href: "/dashboard", label: "Overview", sub: "Your dashboard" },
-  { href: "/dashboard/profile", label: "Profile", sub: "Personal information" },
-  { href: "/dashboard/addresses", label: "Addresses", sub: "Saved locations" },
-  { href: "/dashboard/contacts", label: "Contacts", sub: "Ways to reach you" },
-  { href: "/dashboard/sectors", label: "Sectors", sub: "Industry access" },
-  { href: "/dashboard/devices", label: "Devices", sub: "Logged-in devices" },
-  { href: "/dashboard/verify-email", label: "Verify Email", sub: "Confirm your address" },
-  { href: "/dashboard/security", label: "Security", sub: "Activity & sessions" },
+  { href: "/dashboard", label: "Overview", sub: "Your dashboard", icon: "/icons/grid.svg" },
+  { href: "/dashboard/profile", label: "Profile", sub: "Personal information", icon: "/icons/user.svg" },
+  { href: "/dashboard/addresses", label: "Addresses", sub: "Saved locations", icon: "/icons/location.svg" },
+  { href: "/dashboard/contacts", label: "Contacts", sub: "Ways to reach you", icon: "/icons/message.svg" },
+  { href: "/dashboard/sectors", label: "Sectors", sub: "Industry access", icon: "/icons/building.svg" },
+  { href: "/dashboard/devices", label: "Devices", sub: "Logged-in devices", icon: "/icons/device.svg" },
+  { href: "/dashboard/verify-email", label: "Verify Email", sub: "Confirm your address", icon: "/icons/email.svg" },
+  { href: "/dashboard/security", label: "Security", sub: "Activity & sessions", icon: "/icons/shield.svg" },
 ] as const;
 
 /* ================================================================== */
@@ -80,6 +80,99 @@ function ArrowIcon() {
 }
 
 /* ================================================================== */
+/*  Menu tile — reusable                                              */
+/* ================================================================== */
+function MenuTile({
+  href,
+  label,
+  sub,
+  icon,
+  isActive,
+  delay = 0,
+  onClick,
+  variant = "light",
+}: {
+  href: string;
+  label: string;
+  sub: string;
+  icon: string;
+  isActive?: boolean;
+  delay?: number;
+  onClick?: () => void;
+  variant?: "light" | "dark";
+}) {
+  const isDark = variant === "dark" || isActive;
+
+  return (
+    <Link
+      href={href}
+      onClick={onClick}
+      className={`group relative flex items-center gap-3.5 overflow-hidden rounded-2xl border px-4 py-3.5 transition-all duration-500 hover:-translate-y-0.5 ${
+        isDark
+          ? "border-black bg-black text-white hover:bg-black/90 hover:shadow-[0_16px_40px_-14px_rgba(0,0,0,0.5)]"
+          : "border-black/[0.06] bg-white/70 text-black hover:border-black/[0.14] hover:bg-white hover:shadow-[0_16px_40px_-18px_rgba(0,0,0,0.18)]"
+      }`}
+      style={{
+        animation: `hdr-item-in 0.55s cubic-bezier(0.22, 1, 0.36, 1) ${delay}s both`,
+      }}
+    >
+      {/* Sheen */}
+      <span
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+        style={{
+          background: isDark
+            ? "radial-gradient(circle at 20% 20%, rgba(255,255,255,0.15), transparent 60%)"
+            : "radial-gradient(circle at 20% 20%, rgba(0,0,0,0.05), transparent 60%)",
+        }}
+      />
+
+      {/* Icon in glass circle */}
+      <span
+        className={`relative flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border transition-all duration-500 ${
+          isDark
+            ? "border-white/15 bg-white/10"
+            : "border-black/[0.06] bg-white group-hover:border-black/[0.10] group-hover:bg-white"
+        }`}
+      >
+        <Image
+          src={icon}
+          alt=""
+          width={18}
+          height={18}
+          className={`h-[18px] w-[18px] transition-all duration-500 group-hover:scale-110 ${
+            isDark ? "invert" : ""
+          }`}
+        />
+      </span>
+
+      {/* Text */}
+      <span className="relative flex min-w-0 flex-1 flex-col">
+        <span className="truncate text-[14px] font-medium leading-tight">
+          {label}
+        </span>
+        <span
+          className={`mt-0.5 truncate text-[11.5px] leading-tight ${
+            isDark ? "text-white/55" : "text-black/45"
+          }`}
+        >
+          {sub}
+        </span>
+      </span>
+
+      {/* Arrow */}
+      <span
+        className={`relative shrink-0 transition-all duration-500 group-hover:translate-x-0.5 ${
+          isDark ? "text-white/50 group-hover:text-white" : "text-black/25 group-hover:text-black/70"
+        }`}
+      >
+        <ArrowIcon />
+      </span>
+    </Link>
+  );
+}
+
+/* ================================================================== */
 /*  Main Header                                                        */
 /* ================================================================== */
 export default function Header({ isLoggedIn = false, onMenu }: HeaderProps) {
@@ -91,9 +184,7 @@ export default function Header({ isLoggedIn = false, onMenu }: HeaderProps) {
   const [scrolled, setScrolled] = useState(false);
   const wrapperRef = useRef<HTMLDivElement | null>(null);
 
-  /* ------------------------------------------------------------- */
-  /*  Scroll detection — glass intensifies                          */
-  /* ------------------------------------------------------------- */
+  /* -------- Scroll detection -------- */
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 16);
     onScroll();
@@ -101,9 +192,7 @@ export default function Header({ isLoggedIn = false, onMenu }: HeaderProps) {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  /* ------------------------------------------------------------- */
-  /*  Outside click + ESC to close                                  */
-  /* ------------------------------------------------------------- */
+  /* -------- Outside click + ESC -------- */
   useEffect(() => {
     if (!open) return;
     const onClick = (e: MouseEvent) => {
@@ -122,9 +211,7 @@ export default function Header({ isLoggedIn = false, onMenu }: HeaderProps) {
     };
   }, [open]);
 
-  /* ------------------------------------------------------------- */
-  /*  Lock body scroll when menu open                               */
-  /* ------------------------------------------------------------- */
+  /* -------- Lock body scroll -------- */
   useEffect(() => {
     document.body.style.overflow = open ? "hidden" : "";
     return () => {
@@ -132,9 +219,7 @@ export default function Header({ isLoggedIn = false, onMenu }: HeaderProps) {
     };
   }, [open]);
 
-  /* ------------------------------------------------------------- */
-  /*  Handlers                                                      */
-  /* ------------------------------------------------------------- */
+  /* -------- Handlers -------- */
   const handleMenuClick = () => {
     if (onMenu) {
       onMenu();
@@ -160,27 +245,27 @@ export default function Header({ isLoggedIn = false, onMenu }: HeaderProps) {
     <div ref={wrapperRef}>
       <header className="fixed inset-x-0 top-0 z-50">
         {/* ============================================================ */}
-        {/*  LIQUID GLASS BACKGROUND — WHITE                              */}
+        {/*  LIQUID GLASS HEADER BACKGROUND — WHITE                       */}
         {/* ============================================================ */}
         <div
           aria-hidden="true"
           className="absolute inset-0 border-b transition-all duration-500"
           style={{
             background: scrolled
-              ? "rgba(255,255,255,0.72)"
-              : "rgba(255,255,255,0.55)",
+              ? "rgba(255,255,255,0.78)"
+              : "rgba(255,255,255,0.58)",
             backdropFilter: "blur(28px) saturate(180%)",
             WebkitBackdropFilter: "blur(28px) saturate(180%)",
             borderBottomColor: scrolled
-              ? "rgba(0,0,0,0.08)"
-              : "rgba(0,0,0,0.04)",
+              ? "rgba(0,0,0,0.07)"
+              : "rgba(0,0,0,0.03)",
             boxShadow: scrolled
-              ? "inset 0 -1px 0 0 rgba(255,255,255,0.9), 0 1px 2px rgba(0,0,0,0.04), 0 12px 40px -16px rgba(0,0,0,0.12)"
+              ? "inset 0 -1px 0 0 rgba(255,255,255,0.9), 0 1px 2px rgba(0,0,0,0.03), 0 12px 40px -16px rgba(0,0,0,0.10)"
               : "inset 0 -1px 0 0 rgba(255,255,255,0.6)",
           }}
         />
 
-        {/* Subtle top sheen (white glow) */}
+        {/* Top sheen */}
         <div
           aria-hidden="true"
           className="pointer-events-none absolute inset-x-0 top-0 h-px"
@@ -194,7 +279,7 @@ export default function Header({ isLoggedIn = false, onMenu }: HeaderProps) {
         {/*  NAV                                                          */}
         {/* ============================================================ */}
         <nav
-          className="relative mx-auto flex max-w-7xl items-center justify-between px-5 sm:px-8 lg:px-10 transition-all duration-500"
+          className="relative mx-auto flex max-w-7xl items-center justify-between px-5 transition-all duration-500 sm:px-8 lg:px-10"
           style={{ height: scrolled ? "60px" : "68px" }}
         >
           {/* ---------- LEFT: Logo ---------- */}
@@ -211,9 +296,7 @@ export default function Header({ isLoggedIn = false, onMenu }: HeaderProps) {
               height={34}
               priority
               className="h-7 w-auto sm:h-8"
-              style={{
-                filter: "brightness(0) saturate(100%)", // pure black
-              }}
+              style={{ filter: "brightness(0) saturate(100%)" }}
             />
           </Link>
 
@@ -256,7 +339,6 @@ export default function Header({ isLoggedIn = false, onMenu }: HeaderProps) {
                 : "inset 0 1px 0 0 rgba(255,255,255,0.9), 0 2px 6px rgba(0,0,0,0.06)",
             }}
           >
-            {/* Hover sheen */}
             <span
               aria-hidden="true"
               className="pointer-events-none absolute inset-0 rounded-full opacity-0 transition-opacity duration-500 group-hover:opacity-100"
@@ -277,7 +359,7 @@ export default function Header({ isLoggedIn = false, onMenu }: HeaderProps) {
         {/* ============================================================ */}
         {open && (
           <>
-            {/* Backdrop (mobile) */}
+            {/* Mobile backdrop */}
             <div
               aria-hidden="true"
               className="fixed inset-0 top-[68px] bg-black/20 backdrop-blur-sm md:hidden"
@@ -289,7 +371,7 @@ export default function Header({ isLoggedIn = false, onMenu }: HeaderProps) {
               className="relative border-b"
               style={{
                 background:
-                  "linear-gradient(180deg, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0.92) 100%)",
+                  "linear-gradient(180deg, rgba(255,255,255,0.88) 0%, rgba(255,255,255,0.94) 100%)",
                 backdropFilter: "blur(32px) saturate(180%)",
                 WebkitBackdropFilter: "blur(32px) saturate(180%)",
                 borderBottomColor: "rgba(0,0,0,0.06)",
@@ -302,183 +384,118 @@ export default function Header({ isLoggedIn = false, onMenu }: HeaderProps) {
               }}
             >
               <div className="mx-auto max-w-7xl px-5 py-6 sm:px-8 lg:px-10">
-                {/* ---------- SITE NAV ---------- */}
-                <p className="px-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-black/40 mb-3">
-                  Navigation
-                </p>
+                {/* ---------- NAVIGATION ---------- */}
+                <div className="mb-3 flex items-center gap-3">
+                  <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-black/40 whitespace-nowrap">
+                    Navigation
+                  </span>
+                  <div className="h-px flex-1 bg-black/[0.06]" />
+                </div>
                 <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
                   {siteNavigation.map((item, i) => (
-                    <Link
+                    <MenuTile
                       key={item.href}
                       href={item.href}
+                      label={item.label}
+                      sub={item.sub}
+                      icon={item.icon}
+                      delay={0.05 + i * 0.04}
                       onClick={closeMenu}
-                      className="group flex flex-col gap-1 rounded-2xl border border-black/[0.06] bg-white/60 px-4 py-3.5 transition-all duration-400 hover:bg-white hover:border-black/[0.12] hover:-translate-y-0.5 hover:shadow-[0_12px_32px_-16px_rgba(0,0,0,0.18)]"
-                      style={{
-                        animation: `hdr-item-in 0.5s cubic-bezier(0.22, 1, 0.36, 1) ${
-                          0.05 + i * 0.04
-                        }s both`,
-                      }}
-                    >
-                      <div className="flex items-center justify-between">
-                        <span className="text-[14px] font-medium text-black">
-                          {item.label}
-                        </span>
-                        <span className="text-black/25 transition-all duration-400 group-hover:text-black/70 group-hover:translate-x-0.5">
-                          <ArrowIcon />
-                        </span>
-                      </div>
-                      <span className="text-[11.5px] text-black/45">
-                        {item.sub}
-                      </span>
-                    </Link>
+                    />
                   ))}
                 </div>
 
-                {/* ---------- DASHBOARD (if logged in) ---------- */}
+                {/* ---------- YOUR ACCOUNT (logged in) ---------- */}
                 {isLoggedIn && (
                   <>
-                    <div className="mt-7 flex items-center gap-3">
+                    <div className="mt-8 mb-3 flex items-center gap-3">
                       <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-black/40 whitespace-nowrap">
                         Your Account
                       </span>
                       <div className="h-px flex-1 bg-black/[0.06]" />
                     </div>
+                    <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+                      {dashboardNavigation.map((item, i) => (
+                        <MenuTile
+                          key={item.href}
+                          href={item.href}
+                          label={item.label}
+                          sub={item.sub}
+                          icon={item.icon}
+                          isActive={pathname === item.href}
+                          delay={0.12 + i * 0.03}
+                          onClick={closeMenu}
+                        />
+                      ))}
 
-                    <div className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
-                      {dashboardNavigation.map((item, i) => {
-                        const isActive = pathname === item.href;
-                        return (
-                          <Link
-                            key={item.href}
-                            href={item.href}
-                            onClick={closeMenu}
-                            className={`group flex flex-col gap-1 rounded-2xl border px-4 py-3.5 transition-all duration-400 hover:-translate-y-0.5 ${
-                              isActive
-                                ? "bg-black text-white border-black hover:bg-black/90"
-                                : "bg-white/60 border-black/[0.06] text-black hover:bg-white hover:border-black/[0.12] hover:shadow-[0_12px_32px_-16px_rgba(0,0,0,0.18)]"
-                            }`}
-                            style={{
-                              animation: `hdr-item-in 0.5s cubic-bezier(0.22, 1, 0.36, 1) ${
-                                0.1 + i * 0.03
-                              }s both`,
-                            }}
-                          >
-                            <div className="flex items-center justify-between">
-                              <span
-                                className={`text-[14px] font-medium ${
-                                  isActive ? "text-white" : "text-black"
-                                }`}
-                              >
-                                {item.label}
-                              </span>
-                              <span
-                                className={`transition-all duration-400 group-hover:translate-x-0.5 ${
-                                  isActive
-                                    ? "text-white/70"
-                                    : "text-black/25 group-hover:text-black/70"
-                                }`}
-                              >
-                                <ArrowIcon />
-                              </span>
-                            </div>
-                            <span
-                              className={`text-[11.5px] ${
-                                isActive ? "text-white/70" : "text-black/45"
-                              }`}
-                            >
-                              {item.sub}
-                            </span>
-                          </Link>
-                        );
-                      })}
-
-                      {/* Logout */}
+                      {/* Logout tile */}
                       <button
                         type="button"
                         onClick={handleLogout}
                         disabled={loggingOut}
-                        className="group flex flex-col gap-1 rounded-2xl border border-red-200 bg-red-50/60 px-4 py-3.5 text-left transition-all duration-400 hover:bg-red-50 hover:border-red-300 hover:-translate-y-0.5 disabled:opacity-50"
+                        className="group relative flex items-center gap-3.5 overflow-hidden rounded-2xl border border-red-200/70 bg-red-50/50 px-4 py-3.5 text-left transition-all duration-500 hover:-translate-y-0.5 hover:border-red-300 hover:bg-red-50 hover:shadow-[0_16px_40px_-18px_rgba(220,38,38,0.25)] disabled:opacity-50"
+                        style={{
+                          animation: `hdr-item-in 0.55s cubic-bezier(0.22, 1, 0.36, 1) ${
+                            0.12 + dashboardNavigation.length * 0.03
+                          }s both`,
+                        }}
                       >
-                        <div className="flex items-center justify-between">
-                          <span className="text-[14px] font-medium text-red-600">
+                        <span className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-red-200/70 bg-white transition-all duration-500 group-hover:scale-105">
+                          <Image
+                            src="/icons/logout.svg"
+                            alt=""
+                            width={18}
+                            height={18}
+                            className="h-[18px] w-[18px] transition-all duration-500"
+                            style={{
+                              filter:
+                                "invert(18%) sepia(94%) saturate(2033%) hue-rotate(340deg) brightness(95%) contrast(92%)",
+                            }}
+                          />
+                        </span>
+                        <span className="relative flex min-w-0 flex-1 flex-col">
+                          <span className="truncate text-[14px] font-medium leading-tight text-red-600">
                             {loggingOut ? "Logging out..." : "Logout"}
                           </span>
-                          <svg
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            className="h-3.5 w-3.5 text-red-400 transition-transform duration-400 group-hover:translate-x-0.5"
-                          >
-                            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-                            <polyline points="16 17 21 12 16 7" />
-                            <line x1="21" y1="12" x2="9" y2="12" />
-                          </svg>
-                        </div>
-                        <span className="text-[11.5px] text-red-400/80">
-                          End this session
+                          <span className="mt-0.5 truncate text-[11.5px] leading-tight text-red-400/80">
+                            End this session
+                          </span>
+                        </span>
+                        <span className="relative shrink-0 text-red-300 transition-all duration-500 group-hover:translate-x-0.5 group-hover:text-red-500">
+                          <ArrowIcon />
                         </span>
                       </button>
                     </div>
                   </>
                 )}
 
-                {/* ---------- AUTH (if logged out) ---------- */}
+                {/* ---------- GET STARTED (logged out) ---------- */}
                 {!isLoggedIn && (
                   <>
-                    <div className="mt-7 flex items-center gap-3">
+                    <div className="mt-8 mb-3 flex items-center gap-3">
                       <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-black/40 whitespace-nowrap">
                         Get Started
                       </span>
                       <div className="h-px flex-1 bg-black/[0.06]" />
                     </div>
-
-                    <div className="mt-3 grid gap-2 sm:grid-cols-2">
-                      <Link
+                    <div className="grid gap-2 sm:grid-cols-2">
+                      <MenuTile
                         href="/signin"
+                        label="Sign in"
+                        sub="Welcome back"
+                        icon="/icons/user.svg"
+                        delay={0.15}
                         onClick={closeMenu}
-                        className="group flex flex-col gap-1 rounded-2xl border border-black/[0.06] bg-white/60 px-4 py-3.5 transition-all duration-400 hover:bg-white hover:border-black/[0.12] hover:-translate-y-0.5 hover:shadow-[0_12px_32px_-16px_rgba(0,0,0,0.18)]"
-                        style={{
-                          animation:
-                            "hdr-item-in 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.15s both",
-                        }}
-                      >
-                        <div className="flex items-center justify-between">
-                          <span className="text-[14px] font-medium text-black">
-                            Sign in
-                          </span>
-                          <span className="text-black/25 transition-all duration-400 group-hover:text-black/70 group-hover:translate-x-0.5">
-                            <ArrowIcon />
-                          </span>
-                        </div>
-                        <span className="text-[11.5px] text-black/45">
-                          Welcome back
-                        </span>
-                      </Link>
-
-                      <Link
+                      />
+                      <MenuTile
                         href="/signup"
+                        label="Create your ID"
+                        sub="It's free"
+                        icon="/icons/id-card.svg"
+                        delay={0.19}
                         onClick={closeMenu}
-                        className="group flex flex-col gap-1 rounded-2xl bg-black px-4 py-3.5 transition-all duration-400 hover:bg-black/90 hover:-translate-y-0.5 hover:shadow-[0_16px_36px_-12px_rgba(0,0,0,0.45)]"
-                        style={{
-                          animation:
-                            "hdr-item-in 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.19s both",
-                        }}
-                      >
-                        <div className="flex items-center justify-between">
-                          <span className="text-[14px] font-medium text-white">
-                            Create your ID
-                          </span>
-                          <span className="text-white/60 transition-all duration-400 group-hover:text-white group-hover:translate-x-0.5">
-                            <ArrowIcon />
-                          </span>
-                        </div>
-                        <span className="text-[11.5px] text-white/55">
-                          It&apos;s free
-                        </span>
-                      </Link>
+                        variant="dark"
+                      />
                     </div>
                   </>
                 )}
