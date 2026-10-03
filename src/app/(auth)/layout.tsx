@@ -7,7 +7,7 @@ export default function AuthLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="liquid-page min-h-screen overflow-hidden bg-[#07111a] text-white">
+    <div className="min-h-screen overflow-hidden text-white">
       <Navbar />
       <main>{children}</main>
       <Footer />
