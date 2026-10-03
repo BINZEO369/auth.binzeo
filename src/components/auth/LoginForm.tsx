@@ -152,6 +152,8 @@ export default function LoginForm() {
   const next = searchParams.get("next") ?? "/dashboard";
 
   const [stage, setStage] = useState<Stage>("logo");
+  const [logoExiting, setLogoExiting] = useState(false);
+  const [welcomeExiting, setWelcomeExiting] = useState(false);
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -169,16 +171,35 @@ export default function LoginForm() {
   const [error, setError] = useState("");
 
   /* ------------------------------------------------------------- */
-  /*  Auto transitions                                             */
+  /*  Cinematic transitions with fade-out + fade-in overlap        */
   /* ------------------------------------------------------------- */
   useEffect(() => {
     if (stage === "logo") {
-      const t = setTimeout(() => setStage("welcome"), 2100);
-      return () => clearTimeout(t);
+      // Logo shows for 1.4s, then starts fading out at 1.4s
+      const fadeOutTimer = setTimeout(() => setLogoExiting(true), 1400);
+      // Logo fully gone by 2.0s, welcome starts
+      const nextTimer = setTimeout(() => {
+        setStage("welcome");
+        setLogoExiting(false);
+      }, 2000);
+      return () => {
+        clearTimeout(fadeOutTimer);
+        clearTimeout(nextTimer);
+      };
     }
+
     if (stage === "welcome") {
-      const t = setTimeout(() => setStage("methods"), 2000);
-      return () => clearTimeout(t);
+      // Welcome shows, then starts fading out at 1.8s
+      const fadeOutTimer = setTimeout(() => setWelcomeExiting(true), 1800);
+      // Welcome fully gone by 2.4s, methods appear
+      const nextTimer = setTimeout(() => {
+        setStage("methods");
+        setWelcomeExiting(false);
+      }, 2400);
+      return () => {
+        clearTimeout(fadeOutTimer);
+        clearTimeout(nextTimer);
+      };
     }
   }, [stage]);
 
@@ -376,60 +397,120 @@ export default function LoginForm() {
     <div className="relative w-full min-h-[100dvh] overflow-x-hidden">
       {/* ============ Keyframes ============ */}
       <style jsx global>{`
-        /* ---- Logo splash ---- */
-        @keyframes bn-logo-in {
+        /* ============================================ */
+        /*  LOGO CINEMATIC ANIMATIONS                    */
+        /* ============================================ */
+        @keyframes bn-logo-fade-in {
           0% {
             opacity: 0;
-            transform: scale(0.78) rotate(-3deg);
-            filter: blur(14px);
+            transform: scale(0.82) translateY(8px);
+            filter: blur(16px);
+          }
+          35% {
+            opacity: 0.5;
+            transform: scale(0.94) translateY(4px);
+            filter: blur(6px);
+          }
+          65% {
+            opacity: 0.95;
+            transform: scale(1.03) translateY(0);
+            filter: blur(1px);
+          }
+          85% {
+            opacity: 1;
+            transform: scale(0.995) translateY(0);
+            filter: blur(0);
+          }
+          100% {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+            filter: blur(0);
+          }
+        }
+        @keyframes bn-logo-fade-out {
+          0% {
+            opacity: 1;
+            transform: scale(1);
+            filter: blur(0);
           }
           40% {
             opacity: 0.6;
-            filter: blur(4px);
+            transform: scale(1.04);
+            filter: blur(3px);
           }
-          70% {
-            opacity: 1;
-            transform: scale(1.04) rotate(0.5deg);
-            filter: blur(0);
+          100% {
+            opacity: 0;
+            transform: scale(1.16);
+            filter: blur(14px);
+          }
+        }
+        @keyframes bn-logo-halo-in {
+          0% { opacity: 0; transform: scale(0.6); }
+          50% { opacity: 0.55; transform: scale(1.05); }
+          100% { opacity: 0.4; transform: scale(1); }
+        }
+        @keyframes bn-logo-halo-out {
+          0% { opacity: 0.4; transform: scale(1); }
+          100% { opacity: 0; transform: scale(1.5); }
+        }
+        @keyframes bn-conic-in {
+          0% {
+            opacity: 0;
+            transform: rotate(-90deg) scale(0.7);
+          }
+          100% {
+            opacity: 0.28;
+            transform: rotate(0deg) scale(1);
+          }
+        }
+        @keyframes bn-conic-out {
+          0% { opacity: 0.28; }
+          100% { opacity: 0; transform: rotate(60deg) scale(1.2); }
+        }
+        @keyframes bn-halo-breathe {
+          0%, 100% { opacity: 0.35; transform: scale(1); }
+          50%      { opacity: 0.75; transform: scale(1.15); }
+        }
+        @keyframes bn-halo-rotate {
+          from { transform: rotate(0deg); }
+          to   { transform: rotate(360deg); }
+        }
+        @keyframes bn-orbit {
+          0%, 100% { transform: translate(0, 0); opacity: 0.5; }
+          50%      { transform: translate(18px, -14px); opacity: 1; }
+        }
+        @keyframes bn-dot-pulse {
+          0%, 100% { transform: scale(1); opacity: 0.6; }
+          50%      { transform: scale(1.4); opacity: 1; }
+        }
+
+        /* ============================================ */
+        /*  WELCOME FADE ANIMATIONS                      */
+        /* ============================================ */
+        @keyframes bn-welcome-in {
+          0% {
+            opacity: 0;
+            transform: translateY(30px);
+            filter: blur(8px);
           }
           100% {
             opacity: 1;
-            transform: scale(1) rotate(0deg);
+            transform: translateY(0);
             filter: blur(0);
           }
         }
-        @keyframes bn-logo-out {
+        @keyframes bn-welcome-out {
           0% {
             opacity: 1;
-            transform: scale(1);
+            transform: translateY(0) scale(1);
             filter: blur(0);
           }
           100% {
             opacity: 0;
-            transform: scale(1.15);
+            transform: translateY(-24px) scale(0.98);
             filter: blur(10px);
           }
         }
-        @keyframes bn-halo-breathe {
-          0%, 100% {
-            opacity: 0.35;
-            transform: scale(1);
-          }
-          50% {
-            opacity: 0.75;
-            transform: scale(1.18);
-          }
-        }
-        @keyframes bn-halo-rotate {
-          from { transform: rotate(0deg); }
-          to { transform: rotate(360deg); }
-        }
-        @keyframes bn-orbit {
-          0%, 100% { transform: translate(0, 0); opacity: 0.6; }
-          50% { transform: translate(14px, -12px); opacity: 0.95; }
-        }
-
-        /* ---- Text reveals ---- */
         @keyframes bn-word-in {
           from {
             opacity: 0;
@@ -455,7 +536,9 @@ export default function LoginForm() {
           to   { transform: scaleX(1); }
         }
 
-        /* ---- Card / view transitions ---- */
+        /* ============================================ */
+        /*  CARD TRANSITIONS                             */
+        /* ============================================ */
         @keyframes bn-slide-in-right {
           from {
             opacity: 0;
@@ -480,8 +563,6 @@ export default function LoginForm() {
             filter: blur(0);
           }
         }
-
-        /* ---- Method buttons ---- */
         @keyframes bn-method-in {
           0% {
             opacity: 0;
@@ -493,7 +574,9 @@ export default function LoginForm() {
           }
         }
 
-        /* ---- Success ---- */
+        /* ============================================ */
+        /*  SUCCESS                                      */
+        /* ============================================ */
         @keyframes bn-pop {
           0% { opacity: 0; transform: scale(0.5); }
           60% { opacity: 1; transform: scale(1.08); }
@@ -544,49 +627,62 @@ export default function LoginForm() {
       />
 
       {/* ============================================================ */}
-      {/*  STAGE 1 · LOGO — cinematic splash                            */}
+      {/*  STAGE 1 · LOGO — cinematic fade in/out                       */}
       {/* ============================================================ */}
       {stage === "logo" && (
-        <div className="relative z-10 flex min-h-[100dvh] items-center justify-center overflow-hidden">
-          {/* Ambient orbiting glows */}
+        <div className="absolute inset-0 z-20 flex min-h-[100dvh] items-center justify-center overflow-hidden">
+          {/* Breathing radial halo */}
           <div
-            className="absolute w-[420px] h-[420px] rounded-full pointer-events-none"
+            className="absolute w-[440px] h-[440px] rounded-full pointer-events-none"
             style={{
               background:
-                "radial-gradient(circle, rgba(255,255,255,0.22) 0%, transparent 68%)",
-              animation: "bn-halo-breathe 3.4s ease-in-out infinite",
+                "radial-gradient(circle, rgba(255,255,255,0.28) 0%, transparent 68%)",
+              animation: logoExiting
+                ? "bn-logo-halo-out 0.6s cubic-bezier(0.55, 0, 1, 0.45) both"
+                : "bn-logo-halo-in 1.2s cubic-bezier(0.22, 1, 0.36, 1) both, bn-halo-breathe 3.4s ease-in-out 1.2s infinite",
             }}
           />
+
+          {/* Rotating conic glow */}
           <div
-            className="absolute w-[680px] h-[680px] rounded-full pointer-events-none opacity-25"
+            className="absolute w-[720px] h-[720px] rounded-full pointer-events-none"
             style={{
               background:
-                "conic-gradient(from 0deg, transparent 0%, rgba(255,255,255,0.35) 30%, transparent 60%)",
-              animation:
-                "bn-halo-rotate 9s linear infinite, bn-halo-breathe 5s ease-in-out infinite",
-              filter: "blur(40px)",
+                "conic-gradient(from 0deg, transparent 0%, rgba(255,255,255,0.4) 25%, transparent 55%)",
+              filter: "blur(48px)",
+              animation: logoExiting
+                ? "bn-conic-out 0.6s cubic-bezier(0.55, 0, 1, 0.45) both"
+                : "bn-conic-in 1.4s cubic-bezier(0.22, 1, 0.36, 1) both, bn-halo-rotate 9s linear 1.4s infinite",
             }}
           />
-          {/* Small orbiting dots */}
-          {[0, 1, 2].map((i) => (
+
+          {/* Orbiting accent dots */}
+          {[0, 1, 2, 3].map((i) => (
             <span
               key={i}
-              className="absolute w-1.5 h-1.5 rounded-full bg-white/70"
+              className="absolute w-1.5 h-1.5 rounded-full bg-white/80"
               style={{
-                left: `${45 + i * 6}%`,
-                top: `${44 + i * 4}%`,
-                animation: `bn-orbit ${3 + i * 0.6}s ease-in-out ${
-                  i * 0.3
-                }s infinite`,
+                left: `${48 + Math.cos((i * Math.PI) / 2) * 8}%`,
+                top: `${48 + Math.sin((i * Math.PI) / 2) * 8}%`,
+                animation: logoExiting
+                  ? "bn-fade-in 0.3s reverse both"
+                  : `bn-orbit ${3.2 + i * 0.5}s ease-in-out ${
+                      i * 0.4
+                    }s infinite, bn-dot-pulse 2s ease-in-out ${
+                      i * 0.3
+                    }s infinite`,
+                transition: "opacity 0.5s ease-out",
               }}
             />
           ))}
 
+          {/* Logo */}
           <div
             className="relative"
             style={{
-              animation:
-                "bn-logo-in 1.6s cubic-bezier(0.22, 1, 0.36, 1) both, bn-logo-out 0.6s cubic-bezier(0.55, 0, 1, 0.45) 1.55s both",
+              animation: logoExiting
+                ? "bn-logo-fade-out 0.6s cubic-bezier(0.55, 0, 1, 0.45) both"
+                : "bn-logo-fade-in 1.4s cubic-bezier(0.22, 1, 0.36, 1) both",
             }}
           >
             <BrandLogo big />
@@ -595,16 +691,24 @@ export default function LoginForm() {
       )}
 
       {/* ============================================================ */}
-      {/*  STAGE 2 · WELCOME — refined typography reveal                */}
+      {/*  STAGE 2 · WELCOME — fade in/out with word reveal             */}
       {/* ============================================================ */}
       {stage === "welcome" && (
-        <div className="relative z-10 flex min-h-[100dvh] items-center justify-center px-6">
+        <div
+          className="absolute inset-0 z-20 flex min-h-[100dvh] items-center justify-center px-6"
+          style={{
+            animation: welcomeExiting
+              ? "bn-welcome-out 0.6s cubic-bezier(0.55, 0, 1, 0.45) both"
+              : undefined,
+          }}
+        >
           <div className="text-center max-w-[560px]">
             {/* Small logo mark */}
             <div
               style={{
-                animation:
-                  "bn-fade-in 0.7s cubic-bezier(0.22, 1, 0.36, 1) both",
+                animation: welcomeExiting
+                  ? "bn-welcome-out 0.6s cubic-bezier(0.55, 0, 1, 0.45) both"
+                  : "bn-welcome-in 0.9s cubic-bezier(0.22, 1, 0.36, 1) both",
               }}
             >
               <BrandLogo />
@@ -617,9 +721,11 @@ export default function LoginForm() {
                   key={word}
                   className="inline-block"
                   style={{
-                    animation: `bn-word-in 0.9s cubic-bezier(0.22, 1, 0.36, 1) ${
-                      0.25 + i * 0.16
-                    }s both`,
+                    animation: welcomeExiting
+                      ? "bn-welcome-out 0.5s cubic-bezier(0.55, 0, 1, 0.45) both"
+                      : `bn-word-in 0.9s cubic-bezier(0.22, 1, 0.36, 1) ${
+                          0.15 + i * 0.14
+                        }s both`,
                   }}
                 >
                   {word}
@@ -632,8 +738,9 @@ export default function LoginForm() {
             <div
               className="mx-auto mt-6 h-[2px] w-16 bg-white/60 rounded-full origin-center"
               style={{
-                animation:
-                  "bn-underline 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.7s both",
+                animation: welcomeExiting
+                  ? "bn-fade-in 0.3s reverse both"
+                  : "bn-underline 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.55s both",
               }}
             />
 
@@ -641,8 +748,9 @@ export default function LoginForm() {
             <p
               className="mt-8 text-[16px] sm:text-[17px] text-white/75 leading-relaxed"
               style={{
-                animation:
-                  "bn-word-in 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.85s both",
+                animation: welcomeExiting
+                  ? "bn-welcome-out 0.5s cubic-bezier(0.55, 0, 1, 0.45) both"
+                  : "bn-word-in 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.7s both",
               }}
             >
               Let&apos;s get you into your BINZEO account.
@@ -652,8 +760,9 @@ export default function LoginForm() {
             <p
               className="mt-7 text-[12px] text-white/45 leading-relaxed max-w-[380px] mx-auto"
               style={{
-                animation:
-                  "bn-word-in 0.9s cubic-bezier(0.22, 1, 0.36, 1) 1.15s both",
+                animation: welcomeExiting
+                  ? "bn-welcome-out 0.5s cubic-bezier(0.55, 0, 1, 0.45) both"
+                  : "bn-word-in 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.95s both",
               }}
             >
               For account security, your browser will ask permission to share
@@ -680,11 +789,10 @@ export default function LoginForm() {
             }}
           >
             {/* ============================================================ */}
-            {/*  METHODS VIEW — ONLY options, no logo/title                    */}
+            {/*  METHODS VIEW — ONLY options                                   */}
             {/* ============================================================ */}
             {stage === "methods" && (
               <div>
-                {/* Method buttons — staggered */}
                 <div className="grid gap-2.5">
                   {METHODS.map((m, i) => (
                     <button
@@ -777,7 +885,6 @@ export default function LoginForm() {
                   </button>
                 </div>
 
-                {/* Error */}
                 {error && (
                   <div
                     className="mt-5 rounded-2xl border border-red-400/25 bg-red-500/10 backdrop-blur-xl px-4 py-3 text-sm text-red-200"
@@ -790,7 +897,6 @@ export default function LoginForm() {
                   </div>
                 )}
 
-                {/* Signup link */}
                 <p
                   className="mt-7 text-center text-[13px] text-white/60"
                   style={{
@@ -1092,7 +1198,6 @@ export default function LoginForm() {
       {stage === "success" && (
         <div className="relative z-10 flex min-h-[100dvh] items-center justify-center px-6">
           <div className="text-center max-w-md">
-            {/* Multi-ring pulse */}
             <div className="relative mx-auto w-24 h-24 flex items-center justify-center">
               <div
                 className="absolute inset-0 rounded-full border border-white/40"
@@ -1138,7 +1243,6 @@ export default function LoginForm() {
               You&apos;re signed in. Taking you in…
             </p>
 
-            {/* Loading dots */}
             <div
               className="mt-8 flex items-center justify-center gap-1.5"
               style={{
