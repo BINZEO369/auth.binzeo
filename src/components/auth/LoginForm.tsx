@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { getClientDeviceId, requestPreciseLocation } from "@/lib/client-device";
@@ -68,7 +68,7 @@ export default function LoginForm() {
     }
   };
 
-  const exchangeTemporaryToken = async (token: string) => {
+  const exchangeTemporaryToken = useCallback(async (token: string) => {
     setTokenLoading(true);
     setError("");
     try {
@@ -89,7 +89,15 @@ export default function LoginForm() {
     } finally {
       setTokenLoading(false);
     }
-  };
+  }, [next, router]);
+
+  useEffect(() => {
+    const hashToken = new URLSearchParams(window.location.hash.replace(/^#/, "")).get("temporary_token");
+    if (!hashToken) return;
+    window.history.replaceState(null, document.title, "/login");
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    void exchangeTemporaryToken(hashToken);
+  }, [exchangeTemporaryToken]);
 
   const handleTemporaryLogin = async (e: React.FormEvent) => {
     e.preventDefault();

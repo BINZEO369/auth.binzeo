@@ -63,7 +63,8 @@ export default function TemporaryLoginTokens() {
     );
     if (response.success) {
       setNewToken(response.data.token);
-      setQrImage(await QRCode.toDataURL(`BINZEO_TEMP_TOKEN:${response.data.token}`, { width: 240, margin: 2, color: { dark: "#101820", light: "#ffffff" } }));
+      const directLoginUrl = `${window.location.origin}/login#temporary_token=${encodeURIComponent(response.data.token)}`;
+      setQrImage(await QRCode.toDataURL(directLoginUrl, { width: 240, margin: 2, color: { dark: "#101820", light: "#ffffff" } }));
       setMessage("Token created. Copy it now; it will not be shown again.");
       await load();
     } else {
@@ -110,7 +111,7 @@ export default function TemporaryLoginTokens() {
             <button onClick={copy} className="rounded-lg border border-[#d8bd6e] px-3 py-1.5 text-xs text-[#7a5b14]">Copy token</button>
             {qrImage && <Image src={qrImage} alt="QR code for temporary login token" width={160} height={160} unoptimized className="h-40 w-40 rounded-lg border border-[#ead39a] bg-white p-2" />}
           </div>
-          <div className="text-[11px] text-[#7a5b14]">Scan this QR from the BINZEO login page. Anyone who scans it can enter the account, so keep it private.</div>
+          <div className="text-[11px] text-[#7a5b14]">Google Lens or any QR camera can open this BINZEO login URL directly and complete login. Anyone who scans it can enter the account, so keep it private.</div>
         </div>
       )}
       {message && <div className="text-xs text-[#5c6b70]">{message}</div>}
