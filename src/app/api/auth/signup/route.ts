@@ -170,7 +170,13 @@ export async function POST(req: NextRequest) {
     }
 
     try {
-      const emailContent = buildOtpEmail(String(verificationCode), 30, getPublicSiteUrl(req.headers));
+      const emailContent = buildOtpEmail(String(verificationCode), 30, getPublicSiteUrl(req.headers), {
+        name: `${first_name} ${last_name}`.trim(),
+        time: new Date().toUTCString(),
+        ipAddress: location.ip,
+        location: [location.city, location.region, location.country].filter(Boolean).join(", "),
+        browser: req.headers.get("user-agent"),
+      });
       await transporter.sendMail({
         from: EMAIL_FROM,
         to: email,

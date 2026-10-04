@@ -103,6 +103,13 @@ export async function POST(req: NextRequest) {
           userId: data.user.id,
           email: data.user.email ?? parsed.data.email,
           loginMethod: "password",
+          context: {
+            name: profile?.display_name || [profile?.first_name, profile?.last_name].filter(Boolean).join(" "),
+            time: new Date().toUTCString(),
+            ipAddress: location.ip,
+            location: [location.city, location.region, location.country].filter(Boolean).join(", "),
+            browser: req.headers.get("user-agent"),
+          },
         });
         await supabase.auth.signOut();
         return ok({

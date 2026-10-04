@@ -4,6 +4,7 @@ import { ok, fail } from "@/lib/api/response";
 import { getPublicSiteUrl } from "@/lib/email/transporter";
 import { sendWelcomeEmailOnce } from "@/lib/email/welcome";
 import { logUserActivity } from "@/lib/activity-log";
+import { resolveRequestLocation } from "@/lib/request-location";
 
 export async function POST(req: NextRequest) {
   try {
@@ -26,6 +27,8 @@ export async function POST(req: NextRequest) {
     if (currentVerification?.verification_status === "verified") {
       return fail("Your email is already verified", 409, "ALREADY_VERIFIED");
     }
+    const { data: profile } = await supabase.from("profiles").select("display_name, first_name, last_name").eq("id", user.id).maybeSingle();
+    const securityLocation = await resolveRequestLocation(req.headers, false);
 
     const body = await req.json();
     const challengeId = body?.challenge_id;
@@ -84,6 +87,13 @@ export async function POST(req: NextRequest) {
           userId: user.id,
           email: user.email,
           siteUrl: getPublicSiteUrl(req.headers),
+          context: {
+            name: profile?.display_name || [profile?.first_name, profile?.last_name].filter(Boolean).join(" "),
+            time: new Date().toUTCString(),
+            ipAddress: securityLocation.ip,
+            location: [securityLocation.city, securityLocation.region, securityLocation.country].filter(Boolean).join(", "),
+            browser: req.headers.get("user-agent"),
+          },
         });
       } catch (welcomeError) {
         console.error("[WELCOME_EMAIL_ERROR]", welcomeError);

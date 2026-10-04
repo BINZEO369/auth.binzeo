@@ -6,6 +6,7 @@ import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { markPasswordOtpEmail } from "@/lib/password-security/service";
 import { PASSWORD_OTP_EXPIRY_SECONDS } from "@/lib/password-security/config";
 import { logUserActivity } from "@/lib/activity-log";
+import { resolveRequestLocation } from "@/lib/request-location";
 
 const schema = z.object({ email: z.string().trim().email().max(320) });
 
@@ -31,6 +32,7 @@ export async function POST(req: NextRequest) {
     if (!parsed.success) return fail("Enter a valid email address.", 422, "VALIDATION_ERROR");
 
     const requestIp = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || req.headers.get("x-real-ip") || "0.0.0.0";
+    const securityLocation = await resolveRequestLocation(req.headers, false);
     const admin = getSupabaseAdmin();
     const { data, error } = await admin.rpc("issue_password_otp", {
       target_user_id: null,
@@ -53,10 +55,18 @@ export async function POST(req: NextRequest) {
     }
 
     try {
+      const { data: profile } = await admin.from("profiles").select("display_name, first_name, last_name").eq("id", String(challenge.resolved_user_id)).maybeSingle();
       const content = buildPasswordResetEmail(
         String(challenge.verification_code),
         PASSWORD_OTP_EXPIRY_SECONDS,
         getPublicSiteUrl(req.headers),
+        {
+          name: profile?.display_name || [profile?.first_name, profile?.last_name].filter(Boolean).join(" "),
+          time: new Date().toUTCString(),
+          ipAddress: securityLocation.ip || requestIp,
+          location: [securityLocation.city, securityLocation.region, securityLocation.country].filter(Boolean).join(", "),
+          browser: req.headers.get("user-agent"),
+        },
       );
       await transporter.sendMail({
         from: EMAIL_FROM,

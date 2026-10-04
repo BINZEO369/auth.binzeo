@@ -1,5 +1,6 @@
 import { buildPasswordChangedEmail, EMAIL_FROM, transporter } from "@/lib/email/transporter";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
+import type { EmailSecurityContext } from "@/lib/email/layout";
 
 type ChangeEvent = {
   id: string;
@@ -29,12 +30,14 @@ export async function sendPasswordChangedEmailOnce({
   challengeId,
   source,
   siteUrl,
+  context,
 }: {
   userId: string;
   email: string;
   challengeId: string;
   source: "reset" | "change";
   siteUrl: string;
+  context?: EmailSecurityContext;
 }) {
   const supabase = getSupabaseAdmin();
   const table = supabase.from("password_change_events");
@@ -90,7 +93,7 @@ export async function sendPasswordChangedEmailOnce({
   if (!claimed) return { sent: false, alreadyInProgress: true };
 
   try {
-    const emailContent = buildPasswordChangedEmail(siteUrl);
+    const emailContent = buildPasswordChangedEmail(siteUrl, context);
     const info = await transporter.sendMail({
       from: EMAIL_FROM,
       to: email,

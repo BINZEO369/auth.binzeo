@@ -4,6 +4,7 @@ import { transporter, EMAIL_FROM, buildOtpEmail, getPublicSiteUrl } from "@/lib/
 import { ok, fail } from "@/lib/api/response";
 import { otpRateLimitResponse } from "@/lib/otp-rate-limit";
 import { logUserActivity } from "@/lib/activity-log";
+import { resolveRequestLocation } from "@/lib/request-location";
 
 export async function POST(req: NextRequest) {
   try {
@@ -36,6 +37,8 @@ export async function POST(req: NextRequest) {
       req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
       req.headers.get("x-real-ip") ||
       "0.0.0.0";
+    const { data: profile } = await supabase.from("profiles").select("display_name, first_name, last_name").eq("id", user.id).maybeSingle();
+    const securityLocation = await resolveRequestLocation(req.headers, false);
 
     // Supabase RPC কল — challenge তৈরি
     const { data, error } = await supabase.rpc(
@@ -81,7 +84,13 @@ export async function POST(req: NextRequest) {
 
     // Gmail SMTP দিয়ে OTP email পাঠানো
     try {
-      const email = buildOtpEmail(String(code), 30, getPublicSiteUrl(req.headers));
+      const email = buildOtpEmail(String(code), 30, getPublicSiteUrl(req.headers), {
+        name: profile?.display_name || [profile?.first_name, profile?.last_name].filter(Boolean).join(" "),
+        time: new Date().toUTCString(),
+        ipAddress: securityLocation.ip || requestIp,
+        location: [securityLocation.city, securityLocation.region, securityLocation.country].filter(Boolean).join(", "),
+        browser: req.headers.get("user-agent"),
+      });
       await transporter.sendMail({
         from: EMAIL_FROM,
         to: user.email,

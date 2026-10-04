@@ -9,6 +9,7 @@ import { logUserActivity } from "@/lib/activity-log";
 import { isTwoFactorEnabled } from "@/lib/two-factor/service";
 import { sendLoginNotification } from "@/lib/email/two-factor";
 import { getPublicSiteUrl } from "@/lib/email/transporter";
+import { resolveRequestLocation } from "@/lib/request-location";
 
 const tokenSchema = z.object({ token: z.string().min(20).max(256) });
 
@@ -54,6 +55,8 @@ export async function POST(req: NextRequest) {
     }
 
     const ip = requestIp(req);
+    const securityLocation = await resolveRequestLocation(req.headers, false);
+    const { data: profile } = await admin.from("profiles").select("display_name, first_name, last_name").eq("id", consumed.user_id).maybeSingle();
     const device = await upsertUserDevice(supabase, consumed.user_id, req.headers, ip);
     const { error: historyError } = await supabase.from("user_login_history").insert({
       user_id: consumed.user_id,
@@ -72,7 +75,7 @@ export async function POST(req: NextRequest) {
       metadata: { login_method: "temporary_token" },
     });
     if (await isTwoFactorEnabled(consumed.user_id)) {
-      try { await sendLoginNotification({ userId: consumed.user_id, email: consumed.email, loginMethod: "temporary token", ipAddress: ip, userAgent: req.headers.get("user-agent"), siteUrl: getPublicSiteUrl(req.headers) }); }
+      try { await sendLoginNotification({ userId: consumed.user_id, email: consumed.email, loginMethod: "temporary token", ipAddress: ip, userAgent: req.headers.get("user-agent"), siteUrl: getPublicSiteUrl(req.headers), context: { name: profile?.display_name || [profile?.first_name, profile?.last_name].filter(Boolean).join(" "), time: new Date().toUTCString(), ipAddress: securityLocation.ip, location: [securityLocation.city, securityLocation.region, securityLocation.country].filter(Boolean).join(", "), browser: req.headers.get("user-agent") } }); }
       catch (notificationError) { console.error("[TEMPORARY_LOGIN_2FA_NOTIFICATION_ERROR]", notificationError); }
     }
 

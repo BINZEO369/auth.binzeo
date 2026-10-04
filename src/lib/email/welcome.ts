@@ -5,6 +5,7 @@ import {
   getPublicSiteUrl,
   transporter,
 } from "@/lib/email/transporter";
+import type { EmailSecurityContext } from "@/lib/email/layout";
 
 const TEMPLATE_VERSION = "welcome-v1";
 
@@ -19,10 +20,12 @@ export async function sendWelcomeEmailOnce({
   userId,
   email,
   siteUrl,
+  context,
 }: {
   userId: string;
   email: string;
   siteUrl?: string;
+  context?: EmailSecurityContext;
 }) {
   if (!email) throw new Error("Cannot send welcome email without a recipient");
 
@@ -87,7 +90,7 @@ export async function sendWelcomeEmailOnce({
   if (!claimed) return { sent: false, alreadyInProgress: true };
 
   try {
-    const emailContent = buildWelcomeEmail(siteUrl ?? "");
+    const emailContent = buildWelcomeEmail(siteUrl ?? "", context);
     const info = await transporter.sendMail({
       from: EMAIL_FROM,
       to: email,

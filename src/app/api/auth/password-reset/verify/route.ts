@@ -6,6 +6,7 @@ import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { getPublicSiteUrl } from "@/lib/email/transporter";
 import { sendPasswordChangedEmailOnce } from "@/lib/password-security/service";
 import { logUserActivity } from "@/lib/activity-log";
+import { resolveRequestLocation } from "@/lib/request-location";
 
 const schema = z.object({
   challenge_id: z.string().uuid(),
@@ -63,12 +64,21 @@ export async function POST(req: NextRequest) {
 
     let notificationSent = false;
     try {
+      const { data: profile } = await admin.from("profiles").select("display_name, first_name, last_name").eq("id", result.user_id).maybeSingle();
+      const securityLocation = await resolveRequestLocation(req.headers, false);
       const notification = await sendPasswordChangedEmailOnce({
         userId: result.user_id,
         email: result.email,
         challengeId: parsed.data.challenge_id,
         source: parsed.data.purpose,
         siteUrl: getPublicSiteUrl(req.headers),
+        context: {
+          name: profile?.display_name || [profile?.first_name, profile?.last_name].filter(Boolean).join(" "),
+          time: new Date().toUTCString(),
+          ipAddress: securityLocation.ip,
+          location: [securityLocation.city, securityLocation.region, securityLocation.country].filter(Boolean).join(", "),
+          browser: req.headers.get("user-agent"),
+        },
       });
       notificationSent = notification.sent || notification.alreadySent === true;
     } catch (notificationError) {
