@@ -30,13 +30,14 @@ export async function sendWelcomeEmailOnce({
   const now = new Date().toISOString();
   const table = supabase.from("welcome_email_deliveries");
 
-  let { data: delivery, error } = await table
+  const { data: initialDelivery, error } = await table
     .select("id, status, attempt_count, sent_at")
     .eq("user_id", userId)
     .eq("template_version", TEMPLATE_VERSION)
     .maybeSingle<DeliveryRow>();
 
   if (error) throw error;
+  let delivery = initialDelivery;
   if (delivery?.status === "sent") return { sent: false, alreadySent: true };
 
   if (!delivery) {

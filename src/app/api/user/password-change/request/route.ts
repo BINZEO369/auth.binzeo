@@ -1,0 +1,82 @@
+import { NextRequest } from "next/server";
+import { fail, ok } from "@/lib/api/response";
+import { createClient } from "@/lib/supabase/server";
+import { getSupabaseAdmin } from "@/lib/supabase/admin";
+import { getPublicSiteUrl, buildPasswordResetEmail, EMAIL_FROM, transporter } from "@/lib/email/transporter";
+import { markPasswordOtpEmail } from "@/lib/password-security/service";
+import { PASSWORD_OTP_EXPIRY_SECONDS } from "@/lib/password-security/config";
+
+function rateLimitFailure(message: string) {
+  const lower = message.toLowerCase();
+  if (lower.startsWith("password_otp_cooldown:")) {
+    const seconds = Number.parseInt(message.split(":")[1] ?? "60", 10);
+    return fail("Please wait before requesting another password code.", 429, "PASSWORD_OTP_COOLDOWN", {
+      retry_after_seconds: Number.isFinite(seconds) ? seconds : 60,
+    });
+  }
+  if (lower.includes("password_otp_hourly_limit")) {
+    return fail("Too many password-code requests. Please try again later.", 429, "PASSWORD_OTP_HOURLY_LIMIT", {
+      retry_after_seconds: 3600,
+    });
+  }
+  return null;
+}
+
+export async function POST(req: NextRequest) {
+  try {
+    const supabase = await createClient();
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    if (authError || !user?.email) return fail("Unauthorized", 401, "UNAUTHORIZED");
+
+    const requestIp = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || req.headers.get("x-real-ip") || "0.0.0.0";
+    const { data, error } = await getSupabaseAdmin().rpc("issue_password_otp", {
+      target_user_id: user.id,
+      target_email: user.email,
+      challenge_purpose: "change",
+      request_ip: requestIp,
+    });
+    if (error) {
+      const limited = rateLimitFailure(error.message);
+      if (limited) return limited;
+      console.error("[PASSWORD_CHANGE_ISSUE_ERROR]", error);
+      return fail("Unable to start password change. Please try again.", 500, "PASSWORD_CHANGE_FAILED");
+    }
+
+    const challenge = Array.isArray(data) ? data[0] : data;
+    if (!challenge?.challenge_id || !challenge?.verification_code) {
+      return fail("Unable to create a password-change challenge.", 500, "NO_CHALLENGE");
+    }
+
+    try {
+      const content = buildPasswordResetEmail(
+        String(challenge.verification_code),
+        PASSWORD_OTP_EXPIRY_SECONDS,
+        getPublicSiteUrl(req.headers),
+      );
+      await transporter.sendMail({
+        from: EMAIL_FROM,
+        to: user.email,
+        subject: content.subject,
+        html: content.html,
+      });
+      await markPasswordOtpEmail(String(challenge.challenge_id), true);
+    } catch (mailError) {
+      console.error("[PASSWORD_CHANGE_MAIL_ERROR]", mailError);
+      await markPasswordOtpEmail(
+        String(challenge.challenge_id),
+        false,
+        mailError instanceof Error ? mailError.message : "Password change email failed",
+      );
+      return fail("Unable to send the password verification email.", 502, "PASSWORD_CHANGE_MAIL_FAILED");
+    }
+
+    return ok({
+      challenge_id: String(challenge.challenge_id),
+      expires_at: challenge.expires_at ?? null,
+      message: "A password verification code has been sent to your email.",
+    });
+  } catch (error) {
+    console.error("[PASSWORD_CHANGE_REQUEST_ERROR]", error);
+    return fail("Unable to start password change. Please try again.", 500, "INTERNAL_ERROR");
+  }
+}

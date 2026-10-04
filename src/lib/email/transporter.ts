@@ -104,3 +104,40 @@ export function buildWelcomeEmail(siteUrl: string) {
     `,
   };
 }
+
+export function buildPasswordResetEmail(code: string, expiresInSeconds: number, siteUrl: string) {
+  const logoUrl = `${siteUrl.replace(/\/+$/, "")}/email-logo-white.png`;
+  return {
+    subject: "Password Reset — Your BINZEO verification code",
+    html: `
+      <div style="margin:0;padding:28px 12px;background:#000;color:#fff;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif">
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;margin:0 auto;background:#000;border:1px solid #272727;border-radius:18px;overflow:hidden">
+          <tr><td style="height:3px;background:#fff"></td></tr>
+          <tr><td style="padding:32px 30px 18px;text-align:center"><img src="${logoUrl}" width="190" alt="BINZEO" style="width:190px;max-width:76%;height:auto" /></td></tr>
+          <tr><td style="padding:12px 30px 0;text-align:center"><h1 style="margin:0 0 12px;font-size:25px">Password Reset</h1><p style="margin:0;color:#c7c7c7;font-size:14px;line-height:1.65">Use this verification code to securely set a new password for your BINZEO account.</p></td></tr>
+          <tr><td style="padding:26px 30px 14px"><div style="padding:20px 14px;border:1px solid #fff;border-radius:13px;background:#090909;text-align:center"><div style="margin-bottom:9px;color:#a1a1a1;font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase">Password verification code</div><div style="color:#fff;font-family:monospace;font-size:35px;font-weight:800;letter-spacing:9px">${code}</div></div></td></tr>
+          <tr><td style="padding:10px 30px 30px;text-align:center"><p style="margin:0 0 9px;color:#d4d4d4;font-size:12px">This code expires in <strong>${expiresInSeconds} seconds</strong>.</p><p style="margin:0;color:#8f8f8f;font-size:11px;line-height:1.6">Never share this code. BINZEO will never ask for it by phone or email.</p></td></tr>
+        </table>
+      </div>
+    `,
+  };
+}
+
+export function buildPasswordChangedEmail(siteUrl: string) {
+  const logoUrl = `${siteUrl.replace(/\/+$/, "")}/email-logo-white.png`;
+  const securityUrl = `${siteUrl.replace(/\/+$/, "")}/dashboard/security`;
+  return {
+    subject: "Password Changed — BINZEO account security notification",
+    html: `
+      <div style="margin:0;padding:28px 12px;background:#000;color:#fff;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif">
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;margin:0 auto;background:#000;border:1px solid #272727;border-radius:18px;overflow:hidden">
+          <tr><td style="height:3px;background:#fff"></td></tr>
+          <tr><td style="padding:32px 30px 18px;text-align:center"><img src="${logoUrl}" width="190" alt="BINZEO" style="width:190px;max-width:76%;height:auto" /></td></tr>
+          <tr><td style="padding:12px 30px 0;text-align:center"><h1 style="margin:0 0 12px;font-size:25px">Password Changed</h1><p style="margin:0;color:#c7c7c7;font-size:14px;line-height:1.65">Your BINZEO account password was changed successfully.</p></td></tr>
+          <tr><td style="padding:26px 30px 18px;text-align:center"><a href="${securityUrl}" style="display:inline-block;padding:13px 24px;border-radius:999px;background:#fff;color:#000;font-size:14px;font-weight:700;text-decoration:none">Review security</a></td></tr>
+          <tr><td style="padding:10px 30px 30px;text-align:center"><p style="margin:0;color:#8f8f8f;font-size:11px;line-height:1.6">If you did not make this change, secure your account immediately and contact support.</p></td></tr>
+        </table>
+      </div>
+    `,
+  };
+}

@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { apiFetch } from "@/lib/api/client";
 import TemporaryLoginTokens from "@/components/security/TemporaryLoginTokens";
 import PasskeyManager from "@/components/security/PasskeyManager";
@@ -125,6 +126,12 @@ export default function SecurityPage() {
           Monitor your account activity and security settings
         </p>
       </div>
+      <Link
+        href="/dashboard/security/password"
+        className="inline-flex items-center rounded-full bg-[#111111] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#333333]"
+      >
+        Change password
+      </Link>
       <TemporaryLoginTokens />
       <PasskeyManager />
 
