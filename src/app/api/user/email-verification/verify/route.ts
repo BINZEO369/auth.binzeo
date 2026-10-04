@@ -1,6 +1,8 @@
 import { NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { ok, fail } from "@/lib/api/response";
+import { getPublicSiteUrl } from "@/lib/email/transporter";
+import { sendWelcomeEmailOnce } from "@/lib/email/welcome";
 
 export async function POST(req: NextRequest) {
   try {
@@ -74,6 +76,19 @@ export async function POST(req: NextRequest) {
     if (verified && result?.user_id !== user.id) {
       return fail("Verification challenge does not belong to this user", 403, "FORBIDDEN");
     }
+
+    if (verified && user.email) {
+      try {
+        await sendWelcomeEmailOnce({
+          userId: user.id,
+          email: user.email,
+          siteUrl: getPublicSiteUrl(req.headers),
+        });
+      } catch (welcomeError) {
+        console.error("[WELCOME_EMAIL_ERROR]", welcomeError);
+      }
+    }
+
     const reason: string = result?.reason ?? (verified ? "verified" : "verification_failed");
 
     return ok({

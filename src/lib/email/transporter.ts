@@ -72,3 +72,35 @@ export function buildOtpEmail(code: string, expiresInSeconds = 30, siteUrl: stri
     `,
   };
 }
+
+export function buildWelcomeEmail(siteUrl: string) {
+  const logoUrl = `${siteUrl.replace(/\/+$/, "")}/email-logo-white.png`;
+  const dashboardUrl = `${siteUrl.replace(/\/+$/, "")}/dashboard`;
+
+  return {
+    subject: "Welcome to BINZEO — your identity is ready",
+    html: `
+      <div style="margin:0; padding:28px 12px; background:#000000; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif; color:#ffffff;">
+        <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="max-width:560px; margin:0 auto;">
+          <tr><td style="padding:0;">
+            <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="background:#000000; border:1px solid #272727; border-radius:18px; overflow:hidden;">
+              <tr><td style="height:3px; background:#ffffff; font-size:0; line-height:0;">&nbsp;</td></tr>
+              <tr><td style="padding:34px 30px 18px; text-align:center;"><img src="${logoUrl}" width="190" alt="BINZEO" style="display:block; width:190px; max-width:76%; height:auto; margin:0 auto; border:0;" /></td></tr>
+              <tr><td style="padding:14px 30px 0; text-align:center;">
+                <h1 style="margin:0 0 12px; color:#ffffff; font-size:25px; line-height:1.3; font-weight:700;">Welcome to BINZEO</h1>
+                <p style="margin:0 auto; max-width:390px; color:#c7c7c7; font-size:14px; line-height:1.65;">Your email is verified and your secure digital identity is ready to use.</p>
+              </td></tr>
+              <tr><td style="padding:26px 30px 18px; text-align:center;">
+                <a href="${dashboardUrl}" style="display:inline-block; padding:13px 24px; border-radius:999px; background:#ffffff; color:#000000; font-size:14px; font-weight:700; text-decoration:none;">Open your dashboard</a>
+              </td></tr>
+              <tr><td style="padding:10px 30px 30px; text-align:center;">
+                <p style="margin:0; color:#8f8f8f; font-size:11px; line-height:1.6;">Manage your profile, security, devices, and connections from one trusted place.</p>
+              </td></tr>
+            </table>
+            <p style="margin:16px 0 0; color:#666666; font-size:10px; line-height:1.5; text-align:center;">You received this email because your BINZEO account was successfully verified.<br />© ${new Date().getFullYear()} BINZEO inc. All rights reserved.</p>
+          </td></tr>
+        </table>
+      </div>
+    `,
+  };
+}
