@@ -5,6 +5,7 @@ import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { getPublicSiteUrl, buildPasswordResetEmail, EMAIL_FROM, transporter } from "@/lib/email/transporter";
 import { markPasswordOtpEmail } from "@/lib/password-security/service";
 import { PASSWORD_OTP_EXPIRY_SECONDS } from "@/lib/password-security/config";
+import { logUserActivity } from "@/lib/activity-log";
 
 function rateLimitFailure(message: string) {
   const lower = message.toLowerCase();
@@ -60,6 +61,12 @@ export async function POST(req: NextRequest) {
         html: content.html,
       });
       await markPasswordOtpEmail(String(challenge.challenge_id), true);
+      await logUserActivity(getSupabaseAdmin(), req, {
+        userId: user.id,
+        activityType: "password_change_requested",
+        description: "Requested a password-change verification code.",
+        metadata: { challenge_id: String(challenge.challenge_id), purpose: "change" },
+      });
     } catch (mailError) {
       console.error("[PASSWORD_CHANGE_MAIL_ERROR]", mailError);
       await markPasswordOtpEmail(

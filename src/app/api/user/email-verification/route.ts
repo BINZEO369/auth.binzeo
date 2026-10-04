@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { transporter, EMAIL_FROM, buildOtpEmail, getPublicSiteUrl } from "@/lib/email/transporter";
 import { ok, fail } from "@/lib/api/response";
 import { otpRateLimitResponse } from "@/lib/otp-rate-limit";
+import { logUserActivity } from "@/lib/activity-log";
 
 export async function POST(req: NextRequest) {
   try {
@@ -91,6 +92,13 @@ export async function POST(req: NextRequest) {
       console.error("[OTP_MAIL_SEND_ERROR]", mailErr);
       return fail("Failed to send verification email", 502, "MAIL_SEND_FAILED");
     }
+
+    await logUserActivity(supabase, req, {
+      userId: user.id,
+      activityType: "email_verification_requested",
+      description: "Requested an email verification code.",
+      metadata: { challenge_id: challengeId, expires_at: challenge.expires_at ?? null },
+    });
 
     // ⚠️ IMPORTANT: ক্লায়েন্টকে code রিটার্ন করবেন না — শুধু challenge_id
     return ok({

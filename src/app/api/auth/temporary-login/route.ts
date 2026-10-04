@@ -5,6 +5,7 @@ import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { upsertUserDevice } from "@/lib/device-tracking";
 import { ok, fail } from "@/lib/api/response";
+import { logUserActivity } from "@/lib/activity-log";
 
 const tokenSchema = z.object({ token: z.string().min(20).max(256) });
 
@@ -60,6 +61,13 @@ export async function POST(req: NextRequest) {
       user_agent: req.headers.get("user-agent"),
     });
     if (historyError) console.error("[TEMPORARY_LOGIN_HISTORY_ERROR]", historyError);
+    await logUserActivity(supabase, req, {
+      userId: consumed.user_id,
+      activityType: "temporary_token_login_success",
+      description: "Signed in successfully with a temporary login token.",
+      deviceId: device.id,
+      metadata: { login_method: "temporary_token" },
+    });
 
     return ok({ user: { id: consumed.user_id, email: consumed.email }, login_method: "temporary_token" });
   } catch (err) {

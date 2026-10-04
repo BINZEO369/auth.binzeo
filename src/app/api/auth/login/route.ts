@@ -4,6 +4,7 @@ import { loginSchema } from "@/lib/validators/auth";
 import { resolveRequestLocation } from "@/lib/request-location";
 import { upsertUserDevice } from "@/lib/device-tracking";
 import { ok, fail } from "@/lib/api/response";
+import { logUserActivity } from "@/lib/activity-log";
 
 export async function POST(req: NextRequest) {
   try {
@@ -77,6 +78,13 @@ export async function POST(req: NextRequest) {
         location_source: location.source,
       });
       if (blockedHistoryError) console.error("[LOGIN_BLOCKED_HISTORY_ERROR]", blockedHistoryError);
+      await logUserActivity(supabase, req, {
+        userId: data.user.id,
+        activityType: "password_login_blocked",
+        description: `Password login blocked because account status is ${profile?.account_status ?? "unknown"}.`,
+        deviceId: device.id,
+        metadata: { account_status: profile?.account_status ?? null },
+      });
       await supabase.auth.signOut();
       return fail(
         `Account ${profile?.account_status ?? "pending"}`,
@@ -100,6 +108,13 @@ export async function POST(req: NextRequest) {
       location_source: location.source,
     });
     if (loginHistoryError) console.error("[LOGIN_HISTORY_ERROR]", loginHistoryError);
+    await logUserActivity(supabase, req, {
+      userId: data.user.id,
+      activityType: "password_login_success",
+      description: "Signed in successfully with email and password.",
+      deviceId: device.id,
+      metadata: { login_method: "password" },
+    });
 
     return ok({
       user: {

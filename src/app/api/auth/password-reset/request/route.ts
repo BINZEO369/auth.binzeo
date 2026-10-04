@@ -5,6 +5,7 @@ import { getPublicSiteUrl, buildPasswordResetEmail, EMAIL_FROM, transporter } fr
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { markPasswordOtpEmail } from "@/lib/password-security/service";
 import { PASSWORD_OTP_EXPIRY_SECONDS } from "@/lib/password-security/config";
+import { logUserActivity } from "@/lib/activity-log";
 
 const schema = z.object({ email: z.string().trim().email().max(320) });
 
@@ -64,6 +65,12 @@ export async function POST(req: NextRequest) {
         html: content.html,
       });
       await markPasswordOtpEmail(String(challenge.challenge_id), true);
+      await logUserActivity(admin, req, {
+        userId: String(challenge.resolved_user_id),
+        activityType: "password_reset_requested",
+        description: "Requested a password reset verification code.",
+        metadata: { challenge_id: String(challenge.challenge_id), purpose: "reset" },
+      });
     } catch (mailError) {
       console.error("[PASSWORD_RESET_MAIL_ERROR]", mailError);
       await markPasswordOtpEmail(

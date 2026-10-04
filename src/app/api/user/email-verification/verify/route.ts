@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { ok, fail } from "@/lib/api/response";
 import { getPublicSiteUrl } from "@/lib/email/transporter";
 import { sendWelcomeEmailOnce } from "@/lib/email/welcome";
+import { logUserActivity } from "@/lib/activity-log";
 
 export async function POST(req: NextRequest) {
   try {
@@ -90,6 +91,13 @@ export async function POST(req: NextRequest) {
     }
 
     const reason: string = result?.reason ?? (verified ? "verified" : "verification_failed");
+
+    await logUserActivity(supabase, req, {
+      userId: user.id,
+      activityType: verified ? "email_verified" : "email_verification_failed",
+      description: verified ? "Email address verified successfully." : "Email verification code was not accepted.",
+      metadata: { challenge_id: challengeId, reason },
+    });
 
     return ok({
       verified,

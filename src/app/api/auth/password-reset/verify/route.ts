@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { getPublicSiteUrl } from "@/lib/email/transporter";
 import { sendPasswordChangedEmailOnce } from "@/lib/password-security/service";
+import { logUserActivity } from "@/lib/activity-log";
 
 const schema = z.object({
   challenge_id: z.string().uuid(),
@@ -52,6 +53,13 @@ export async function POST(req: NextRequest) {
       console.error("[PASSWORD_UPDATE_ERROR]", updateError);
       return fail("Unable to update password. Please try again.", 500, "PASSWORD_UPDATE_FAILED");
     }
+
+    await logUserActivity(admin, req, {
+      userId: result.user_id,
+      activityType: parsed.data.purpose === "reset" ? "password_reset_completed" : "password_changed",
+      description: parsed.data.purpose === "reset" ? "Password was reset successfully with email OTP." : "Password was changed successfully with email OTP.",
+      metadata: { challenge_id: parsed.data.challenge_id, purpose: parsed.data.purpose },
+    });
 
     let notificationSent = false;
     try {

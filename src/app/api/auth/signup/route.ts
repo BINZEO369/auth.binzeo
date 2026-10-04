@@ -7,6 +7,7 @@ import { upsertUserDevice } from "@/lib/device-tracking";
 import { otpRateLimitResponse } from "@/lib/otp-rate-limit";
 import { z } from "zod";
 import { ok, fail } from "@/lib/api/response";
+import { logUserActivity } from "@/lib/activity-log";
 
 const signupSchema = z.object({
   email: z.string().email("Please enter a valid email"),
@@ -180,6 +181,21 @@ export async function POST(req: NextRequest) {
       console.error("[SIGNUP_OTP_MAIL_ERROR]", mailError);
       return fail("Account created, but verification email could not be sent", 502, "OTP_MAIL_SEND_FAILED");
     }
+
+    await logUserActivity(supabase, req, {
+      userId: user.id,
+      activityType: "account_created",
+      description: "BINZEO account created successfully.",
+      deviceId: device.id,
+      metadata: { signup_method: "email_password" },
+    });
+    await logUserActivity(supabase, req, {
+      userId: user.id,
+      activityType: "email_verification_requested",
+      description: "Initial email verification code requested during signup.",
+      deviceId: device.id,
+      metadata: { challenge_id: String(challengeId), expires_at: challenge.expires_at ?? null },
+    });
 
     return ok(
       {
