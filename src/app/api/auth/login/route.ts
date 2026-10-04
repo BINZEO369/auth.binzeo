@@ -5,6 +5,8 @@ import { resolveRequestLocation } from "@/lib/request-location";
 import { upsertUserDevice } from "@/lib/device-tracking";
 import { ok, fail } from "@/lib/api/response";
 import { logUserActivity } from "@/lib/activity-log";
+import { getSupabaseAdmin } from "@/lib/supabase/admin";
+import { isTwoFactorEnabled, issueAndSendTwoFactorCode } from "@/lib/two-factor/service";
 
 export async function POST(req: NextRequest) {
   try {
@@ -91,6 +93,36 @@ export async function POST(req: NextRequest) {
         403,
         "ACCOUNT_BLOCKED"
       );
+    }
+
+    if (await isTwoFactorEnabled(data.user.id)) {
+      try {
+        const challenge = await issueAndSendTwoFactorCode({
+          admin: getSupabaseAdmin(),
+          req,
+          userId: data.user.id,
+          email: data.user.email ?? parsed.data.email,
+          loginMethod: "password",
+        });
+        await supabase.auth.signOut();
+        return ok({
+          requires_two_factor: true,
+          challenge_id: challenge.challengeId,
+          user: {
+            id: data.user.id,
+            email: data.user.email,
+            binzeo_user_id: profile?.binzeo_user_id ?? null,
+            first_name: profile?.first_name ?? null,
+            last_name: profile?.last_name ?? null,
+            display_name: profile?.display_name ?? null,
+            account_status: profile?.account_status ?? "pending",
+          },
+        });
+      } catch (twoFactorError) {
+        console.error("[LOGIN_2FA_EMAIL_ERROR]", twoFactorError);
+        await supabase.auth.signOut();
+        return fail("Unable to send the 2FA verification code", 502, "TWO_FACTOR_EMAIL_FAILED");
+      }
     }
 
     const { error: loginHistoryError } = await supabase.from("user_login_history").insert({

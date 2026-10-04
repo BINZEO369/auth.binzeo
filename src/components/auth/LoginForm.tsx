@@ -15,6 +15,7 @@ type Stage =
   | "welcome"
   | "methods"
   | "email"
+  | "two_factor"
   | "token"
   | "passkey"
   | "qr"
@@ -157,6 +158,8 @@ export default function LoginForm() {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [twoFactorChallengeId, setTwoFactorChallengeId] = useState("");
+  const [twoFactorCode, setTwoFactorCode] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -237,6 +240,13 @@ export default function LoginForm() {
         setLoading(false);
         return;
       }
+      if (data.data?.requires_two_factor) {
+        setTwoFactorChallengeId(data.data.challenge_id);
+        setTwoFactorCode("");
+        setStage("two_factor");
+        setLoading(false);
+        return;
+      }
       handleSuccess();
     } catch (err) {
       setError(
@@ -246,6 +256,22 @@ export default function LoginForm() {
       );
       setLoading(false);
     }
+  };
+
+  const handleTwoFactorSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError("");
+    try {
+      const res = await fetch("/api/auth/two-factor/verify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "x-binzeo-device-id": getClientDeviceId() },
+        body: JSON.stringify({ challenge_id: twoFactorChallengeId, code: twoFactorCode }),
+      });
+      const data = await res.json();
+      if (!data.success) { setError(data.error?.message ?? "2FA verification failed"); setLoading(false); return; }
+      handleSuccess();
+    } catch { setError("2FA verification failed. Please request a new code."); setLoading(false); }
   };
 
   /* ------------------------------------------------------------- */
@@ -777,6 +803,7 @@ export default function LoginForm() {
       {/* ============================================================ */}
       {(stage === "methods" ||
         stage === "email" ||
+        stage === "two_factor" ||
         stage === "token" ||
         stage === "passkey" ||
         stage === "qr") && (
@@ -994,6 +1021,21 @@ export default function LoginForm() {
                   >
                     {loading ? "Signing in..." : "Sign in"}
                   </button>
+                </form>
+              </div>
+            )}
+
+            {stage === "two_factor" && (
+              <div style={{ animation: "bn-slide-in-right 0.55s cubic-bezier(0.22, 1, 0.36, 1) both" }}>
+                <button type="button" onClick={() => { setStage("email"); setError(""); }} className="flex items-center gap-1.5 px-2.5 py-1.5 -ml-2.5 rounded-full text-white/60 hover:text-white hover:bg-white/5 transition-all duration-300 mb-5">
+                  <IconArrowLeft /><span className="text-[12px]">Back</span>
+                </button>
+                <h2 className="text-[24px] font-semibold tracking-[-0.03em]">Verify your sign-in</h2>
+                <p className="mt-1.5 text-[13px] text-white/55">Enter the 6-digit code sent to your email. It expires in 30 seconds.</p>
+                {error && <div className="mt-5 rounded-2xl border border-red-400/25 bg-red-500/10 backdrop-blur-xl px-4 py-3 text-sm text-red-200">{error}</div>}
+                <form onSubmit={handleTwoFactorSubmit} className="mt-6 space-y-3">
+                  <input type="text" inputMode="numeric" pattern="[0-9]{6}" maxLength={6} value={twoFactorCode} onChange={(e) => setTwoFactorCode(e.target.value.replace(/\D/g, "").slice(0, 6))} required autoFocus autoComplete="one-time-code" placeholder="000000" aria-label="2FA code" className={`${fieldClass} text-center text-2xl tracking-[0.35em]`} />
+                  <button type="submit" disabled={loading || twoFactorCode.length !== 6} className="mt-2 w-full rounded-full bg-white py-3.5 text-sm font-semibold text-black transition-all duration-300 hover:bg-white/90 disabled:cursor-not-allowed disabled:opacity-60">{loading ? "Verifying..." : "Verify and sign in"}</button>
                 </form>
               </div>
             )}

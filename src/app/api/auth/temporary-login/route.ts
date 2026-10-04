@@ -6,6 +6,9 @@ import { createClient } from "@/lib/supabase/server";
 import { upsertUserDevice } from "@/lib/device-tracking";
 import { ok, fail } from "@/lib/api/response";
 import { logUserActivity } from "@/lib/activity-log";
+import { isTwoFactorEnabled } from "@/lib/two-factor/service";
+import { sendLoginNotification } from "@/lib/email/two-factor";
+import { getPublicSiteUrl } from "@/lib/email/transporter";
 
 const tokenSchema = z.object({ token: z.string().min(20).max(256) });
 
@@ -68,6 +71,10 @@ export async function POST(req: NextRequest) {
       deviceId: device.id,
       metadata: { login_method: "temporary_token" },
     });
+    if (await isTwoFactorEnabled(consumed.user_id)) {
+      try { await sendLoginNotification({ userId: consumed.user_id, email: consumed.email, loginMethod: "temporary token", ipAddress: ip, userAgent: req.headers.get("user-agent"), siteUrl: getPublicSiteUrl(req.headers) }); }
+      catch (notificationError) { console.error("[TEMPORARY_LOGIN_2FA_NOTIFICATION_ERROR]", notificationError); }
+    }
 
     return ok({ user: { id: consumed.user_id, email: consumed.email }, login_method: "temporary_token" });
   } catch (err) {

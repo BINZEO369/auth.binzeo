@@ -7,6 +7,10 @@ import { createClient } from "@/lib/supabase/server";
 import { byteaFromBase64Url, webauthnConfig } from "@/lib/webauthn";
 import { upsertUserDevice } from "@/lib/device-tracking";
 import { ok, fail } from "@/lib/api/response";
+import { isTwoFactorEnabled } from "@/lib/two-factor/service";
+import { sendLoginNotification } from "@/lib/email/two-factor";
+import { getPublicSiteUrl } from "@/lib/email/transporter";
+import { logUserActivity } from "@/lib/activity-log";
 
 const schema = z.object({ challenge_id: z.string().uuid(), challenge: z.string().min(16).max(512), response: z.unknown() });
 
@@ -62,6 +66,11 @@ export async function POST(req: NextRequest) {
     const ip = requestIp(req);
     const device = await upsertUserDevice(supabase, passkey.user_id, req.headers, ip);
     await supabase.from("user_login_history").insert({ user_id: passkey.user_id, login_method: "passkey", login_status: "success", ip_address: ip, device_id: device.id, user_agent: req.headers.get("user-agent") });
+    await logUserActivity(supabase, req, { userId: passkey.user_id, activityType: "passkey_login_success", description: "Signed in successfully with a passkey.", deviceId: device.id, metadata: { login_method: "passkey" } });
+    if (await isTwoFactorEnabled(passkey.user_id)) {
+      try { await sendLoginNotification({ userId: passkey.user_id, email: authUser.user.email, loginMethod: "passkey", ipAddress: ip, userAgent: req.headers.get("user-agent"), siteUrl: getPublicSiteUrl(req.headers) }); }
+      catch (notificationError) { console.error("[PASSKEY_2FA_NOTIFICATION_ERROR]", notificationError); }
+    }
     return ok({ user: { id: passkey.user_id, email: authUser.user.email }, login_method: "passkey" });
   } catch (err) {
     console.error("[PASSKEY_VERIFY_ERROR]", err);

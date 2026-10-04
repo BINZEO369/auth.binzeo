@@ -6,6 +6,7 @@ import Link from "next/link";
 import { apiFetch } from "@/lib/api/client";
 import TemporaryLoginTokens from "@/components/security/TemporaryLoginTokens";
 import PasskeyManager from "@/components/security/PasskeyManager";
+import TwoFactorSettings from "@/components/security/TwoFactorSettings";
 
 type LoginEntry = {
   id: string;
@@ -134,6 +135,7 @@ export default function SecurityPage() {
       </Link>
       <TemporaryLoginTokens />
       <PasskeyManager />
+      <TwoFactorSettings />
 
       {/* Tabs */}
       <div className="flex gap-2 border-b border-[#dddddd] overflow-x-auto">
