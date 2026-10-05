@@ -944,7 +944,7 @@ export default function RegisterForm() {
                         setError("Last name is required");
                         return;
                       }
-                      transitionTo("password");
+                      transitionTo("date_of_birth");
                     }}
                     className="mt-7 space-y-3"
                   >
