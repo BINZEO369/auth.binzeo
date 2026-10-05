@@ -12,6 +12,7 @@ type Profile = {
   display_name: string | null;
   username: string | null;
   date_of_birth: string | null;
+  age?: number | null;
   gender: string | null;
   country_code: string | null;
   preferred_language: string | null;
@@ -205,6 +206,9 @@ export default function ProfilePage() {
               onChange={(e) => update("date_of_birth", e.target.value)}
               className={inputCls}
             />
+          </Field>
+          <Field label="Current age">
+            <div className={inputCls}>{form.age ?? "Not available"}</div>
           </Field>
           <Field label="Gender">
             <select

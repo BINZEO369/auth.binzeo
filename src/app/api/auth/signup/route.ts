@@ -8,6 +8,7 @@ import { otpRateLimitResponse } from "@/lib/otp-rate-limit";
 import { z } from "zod";
 import { ok, fail } from "@/lib/api/response";
 import { logUserActivity } from "@/lib/activity-log";
+import { upsertUserBirthday, validateBirthDate } from "@/lib/birthday";
 
 const signupSchema = z.object({
   email: z.string().email("Please enter a valid email"),
@@ -23,6 +24,7 @@ const signupSchema = z.object({
     .string()
     .min(1, "Last name is required")
     .max(80, "Last name too long"),
+  date_of_birth: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Date of birth is required"),
   country_code: z
     .string()
     .length(2, "Country code must be 2 characters")
@@ -50,7 +52,9 @@ export async function POST(req: NextRequest) {
       return fail("Precise device location permission is required to create your account", 422, "PRECISE_LOCATION_REQUIRED");
     }
 
-    const { email, password, first_name, last_name, country_code } = parsed.data;
+    const { email, password, first_name, last_name, country_code, date_of_birth } = parsed.data;
+    const birthDateError = validateBirthDate(date_of_birth);
+    if (birthDateError) return fail(birthDateError, 422, "INVALID_DATE_OF_BIRTH");
     const location = await resolveRequestLocation(req.headers, true, {
       latitude: parsed.data.location.latitude,
       longitude: parsed.data.location.longitude,
@@ -95,6 +99,7 @@ export async function POST(req: NextRequest) {
         first_name,
         last_name,
         display_name: `${first_name} ${last_name}`.trim(),
+        date_of_birth,
         country_code: country_code || location.country || null,
         terms_accepted: true,
         terms_version: "2026-10-02",
@@ -108,6 +113,13 @@ export async function POST(req: NextRequest) {
     if (profileError) {
       console.error("[SIGNUP_PROFILE_UPDATE_ERROR]", profileError);
       return fail("Account created, but profile setup failed", 500, "PROFILE_SETUP_FAILED");
+    }
+
+    try {
+      await upsertUserBirthday({ userId: user.id, email: user.email ?? email, displayName: `${first_name} ${last_name}`.trim(), birthDate: date_of_birth });
+    } catch (birthdayError) {
+      console.error("[SIGNUP_BIRTHDAY_REGISTRY_ERROR]", birthdayError);
+      return fail("Account created, but birthday profile setup failed", 500, "BIRTHDAY_PROFILE_FAILED");
     }
 
     const device = await upsertUserDevice(supabase, user.id, req.headers, location.ip);

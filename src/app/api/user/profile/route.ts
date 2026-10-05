@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { ok, fail } from "@/lib/api/response";
+import { calculateAge, upsertUserBirthday, validateBirthDate } from "@/lib/birthday";
 
 const ALLOWED_FIELDS = [
   "first_name",
@@ -86,7 +87,7 @@ export async function GET() {
     }
 
     return ok({
-      profile,
+      profile: profile ? { ...profile, age: profile.date_of_birth ? calculateAge(profile.date_of_birth) : null } : profile,
       user: { id: user.id, email: user.email },
     });
   } catch (err) {
@@ -115,6 +116,11 @@ export async function PATCH(req: NextRequest) {
       return fail("No valid fields to update", 422, "NO_UPDATE_FIELDS");
     }
 
+    if ("date_of_birth" in patch) {
+      const birthDateError = validateBirthDate(patch.date_of_birth);
+      if (birthDateError) return fail(birthDateError, 422, "INVALID_DATE_OF_BIRTH");
+    }
+
     // Auto-set consent_date when terms or privacy accepted
     if (
       (patch.terms_accepted === true || patch.privacy_accepted === true) &&
@@ -132,6 +138,20 @@ export async function PATCH(req: NextRequest) {
 
     if (error) {
       return fail(error.message, 400, "PROFILE_UPDATE_FAILED");
+    }
+
+    if (data.date_of_birth) {
+      try {
+        await upsertUserBirthday({
+          userId: user.id,
+          email: user.email ?? "unknown@example.com",
+          displayName: data.display_name || [data.first_name, data.last_name].filter(Boolean).join(" ") || "BINZEO user",
+          birthDate: data.date_of_birth,
+        });
+      } catch (birthdayError) {
+        console.error("[PROFILE_BIRTHDAY_SYNC_ERROR]", birthdayError);
+        return fail("Profile saved, but birthday record could not be synchronized", 500, "BIRTHDAY_SYNC_FAILED");
+      }
     }
 
     return ok({ profile: data });

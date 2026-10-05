@@ -16,6 +16,7 @@ type Stage =
   | "email"
   | "first_name"
   | "last_name"
+  | "date_of_birth"
   | "password"
   | "terms"
   | "location"
@@ -25,6 +26,7 @@ const STEP_ORDER: Stage[] = [
   "email",
   "first_name",
   "last_name",
+  "date_of_birth",
   "password",
   "terms",
   "location",
@@ -220,6 +222,7 @@ export default function RegisterForm() {
   const [email, setEmail] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
+  const [dateOfBirth, setDateOfBirth] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -295,9 +298,6 @@ export default function RegisterForm() {
     }
   };
 
-  const currentStep = STEP_ORDER.indexOf(stage) + 1;
-  const totalSteps = STEP_ORDER.length;
-
   /* ------------------------------------------------------------- */
   /*  Submit                                                        */
   /* ------------------------------------------------------------- */
@@ -315,6 +315,7 @@ export default function RegisterForm() {
         body: JSON.stringify({
           first_name: firstName.trim(),
           last_name: lastName.trim(),
+          date_of_birth: dateOfBirth,
           email: email.trim(),
           password,
           terms_accepted: acceptTerms,
@@ -684,6 +685,7 @@ export default function RegisterForm() {
         stage === "email" ||
         stage === "first_name" ||
         stage === "last_name" ||
+        stage === "date_of_birth" ||
         stage === "password" ||
         stage === "terms" ||
         stage === "location") && (
@@ -807,7 +809,7 @@ export default function RegisterForm() {
                     <span className="text-[12px]">Back</span>
                   </button>
 
-                  <ProgressBar current={1} total={6} />
+                  <ProgressBar current={1} total={7} />
 
                   <h2 className="text-[24px] font-semibold tracking-[-0.03em]">
                     Your email address
@@ -867,7 +869,7 @@ export default function RegisterForm() {
                     <span className="text-[12px]">Back</span>
                   </button>
 
-                  <ProgressBar current={2} total={6} />
+                  <ProgressBar current={2} total={7} />
 
                   <h2 className="text-[24px] font-semibold tracking-[-0.03em]">
                     What&apos;s your first name?
@@ -926,7 +928,7 @@ export default function RegisterForm() {
                     <span className="text-[12px]">Back</span>
                   </button>
 
-                  <ProgressBar current={3} total={6} />
+                  <ProgressBar current={3} total={7} />
 
                   <h2 className="text-[24px] font-semibold tracking-[-0.03em]">
                     And your last name?
@@ -970,8 +972,25 @@ export default function RegisterForm() {
                 </div>
               )}
 
+              {stage === "date_of_birth" && (
+                <div>
+                  <button type="button" onClick={goBack} aria-label="Back" className="flex items-center gap-1.5 px-2.5 py-1.5 -ml-2.5 rounded-full text-white/60 hover:text-white hover:bg-white/5 transition-all duration-300 mb-4">
+                    <IconArrowLeft /><span className="text-[12px]">Back</span>
+                  </button>
+                  <ProgressBar current={4} total={7} />
+                  <h2 className="text-[24px] font-semibold tracking-[-0.03em]">When is your birthday?</h2>
+                  <p className="mt-1.5 text-[13px] text-white/55">Your date of birth helps us keep your identity accurate and celebrate your day.</p>
+                  <form onSubmit={(e) => { e.preventDefault(); if (!dateOfBirth) { setError("Date of birth is required"); return; } const date = new Date(`${dateOfBirth}T00:00:00Z`); const today = new Date(); let age = today.getUTCFullYear() - date.getUTCFullYear(); const month = today.getUTCMonth() - date.getUTCMonth(); if (month < 0 || (month === 0 && today.getUTCDate() < date.getUTCDate())) age -= 1; if (date > today || age < 13) { setError("You must be at least 13 years old"); return; } transitionTo("password"); }} className="mt-7 space-y-3">
+                    <label className="block text-[11px] uppercase tracking-[0.14em] text-white/50">Date of birth</label>
+                    <input type="date" value={dateOfBirth} onChange={(e) => setDateOfBirth(e.target.value)} autoFocus max={new Date().toISOString().slice(0, 10)} className={fieldClass} />
+                    {error && <div className="rounded-2xl border border-red-400/25 bg-red-500/10 px-4 py-3 text-sm text-red-200">{error}</div>}
+                    <button type="submit" className="w-full rounded-full bg-white py-3.5 text-sm font-semibold text-black transition-all duration-300 hover:bg-white/90">Continue</button>
+                  </form>
+                </div>
+              )}
+
               {/* ============================================================ */}
-              {/*  STEP 4 · PASSWORD                                            */}
+              {/*  STEP 5 · PASSWORD                                            */}
               {/* ============================================================ */}
               {stage === "password" && (
                 <div>
@@ -985,7 +1004,7 @@ export default function RegisterForm() {
                     <span className="text-[12px]">Back</span>
                   </button>
 
-                  <ProgressBar current={4} total={6} />
+                  <ProgressBar current={5} total={7} />
 
                   <h2 className="text-[24px] font-semibold tracking-[-0.03em]">
                     Create a password
@@ -1092,7 +1111,7 @@ export default function RegisterForm() {
                     <span className="text-[12px]">Back</span>
                   </button>
 
-                  <ProgressBar current={5} total={6} />
+                  <ProgressBar current={6} total={7} />
 
                   <h2 className="text-[24px] font-semibold tracking-[-0.03em]">
                     Almost there
@@ -1185,7 +1204,7 @@ export default function RegisterForm() {
                     <span className="text-[12px]">Back</span>
                   </button>
 
-                  <ProgressBar current={6} total={6} />
+                  <ProgressBar current={7} total={7} />
 
                   <div className="text-center">
                     <div
