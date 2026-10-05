@@ -172,6 +172,7 @@ export default function LoginForm() {
   const qrScannerRef = useRef<{ stop: () => Promise<void>; clear: () => void } | null>(null);
 
   const [error, setError] = useState("");
+  const [loginLocked, setLoginLocked] = useState(false);
 
   /* ------------------------------------------------------------- */
   /*  Cinematic transitions with fade-out + fade-in overlap        */
@@ -236,6 +237,7 @@ export default function LoginForm() {
       });
       const data = await res.json();
       if (!data.success) {
+        if (data.error?.code === "LOGIN_RATE_LIMITED") setLoginLocked(true);
         setError(data.error?.message ?? "Login failed");
         setLoading(false);
         return;
@@ -969,8 +971,10 @@ export default function LoginForm() {
                 </p>
 
                 {error && (
-                  <div className="mt-5 rounded-2xl border border-red-400/25 bg-red-500/10 backdrop-blur-xl px-4 py-3 text-sm text-red-200">
-                    {error}
+                  <div className={`mt-5 rounded-2xl border backdrop-blur-xl px-4 py-3 text-sm ${loginLocked ? "border-white/30 bg-white/10 text-white" : "border-red-400/25 bg-red-500/10 text-red-200"}`}>
+                    {loginLocked && <div className="mb-1 font-semibold">Sign-in temporarily locked</div>}
+                    <div>{error}</div>
+                    {loginLocked && <div className="mt-1 text-xs text-white/60">Access resets automatically 24 hours after the fifth failed attempt.</div>}
                   </div>
                 )}
 
@@ -980,6 +984,7 @@ export default function LoginForm() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
+                    disabled={loginLocked}
                     autoComplete="email"
                     placeholder="Your Email"
                     aria-label="Email"
@@ -991,6 +996,7 @@ export default function LoginForm() {
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       required
+                      disabled={loginLocked}
                       autoComplete="current-password"
                       placeholder="Your Password"
                       aria-label="Password"
@@ -1016,7 +1022,7 @@ export default function LoginForm() {
 
                   <button
                     type="submit"
-                    disabled={loading}
+                    disabled={loading || loginLocked}
                     className="mt-2 w-full rounded-full bg-white py-3.5 text-sm font-semibold text-black transition-all duration-300 hover:bg-white/90 hover:shadow-[0_16px_40px_-10px_rgba(255,255,255,0.4)] hover:-translate-y-px active:translate-y-0 disabled:cursor-not-allowed disabled:opacity-60"
                   >
                     {loading ? "Signing in..." : "Sign in"}

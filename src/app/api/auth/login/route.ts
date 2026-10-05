@@ -42,7 +42,7 @@ export async function POST(req: NextRequest) {
       );
       if (exceededRecordError) console.error("[LOGIN_LIMIT_EXCEEDED_RECORD_ERROR]", exceededRecordError);
       return fail(
-        "Daily login limit reached. Please try again tomorrow.",
+        "Too many failed sign-in attempts. Please wait 24 hours before trying again.",
         429,
         "LOGIN_RATE_LIMITED",
         { retry_after: limit.reset_at },
@@ -69,7 +69,7 @@ export async function POST(req: NextRequest) {
       const failure = Array.isArray(failureRows) ? failureRows[0] : failureRows;
       if (failure?.blocked === true) {
         return fail(
-          "Daily login limit reached. Please try again tomorrow.",
+          "Too many failed sign-in attempts. Please wait 24 hours before trying again.",
           429,
           "LOGIN_RATE_LIMITED",
           { retry_after: failure.reset_at },
