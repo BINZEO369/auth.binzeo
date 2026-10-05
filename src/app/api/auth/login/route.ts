@@ -1,7 +1,8 @@
 import { NextRequest } from "next/server";
+import { isIP } from "node:net";
 import { createClient } from "@/lib/supabase/server";
 import { loginSchema } from "@/lib/validators/auth";
-import { resolveRequestLocation } from "@/lib/request-location";
+import { requestIp, resolveRequestLocation } from "@/lib/request-location";
 import { upsertUserDevice } from "@/lib/device-tracking";
 import { ok, fail } from "@/lib/api/response";
 import { logUserActivity } from "@/lib/activity-log";
@@ -19,12 +20,61 @@ export async function POST(req: NextRequest) {
     }
 
     const supabase = await createClient();
+    const rawIp = requestIp(req.headers);
+    const ip = isIP(rawIp) ? rawIp : "0.0.0.0";
+    const { data: limitRows, error: limitError } = await supabase.rpc(
+      "check_daily_login_limit",
+      { p_account_email: parsed.data.email, p_request_ip: ip },
+    );
+    if (limitError) {
+      console.error("[LOGIN_LIMIT_CHECK_ERROR]", limitError);
+      return fail("Login protection is temporarily unavailable", 503, "LOGIN_LIMIT_UNAVAILABLE");
+    }
+    const limit = Array.isArray(limitRows) ? limitRows[0] : limitRows;
+    if (limit && limit.allowed === false) {
+      const { error: exceededRecordError } = await supabase.rpc(
+        "record_failed_login_attempt",
+        {
+          p_account_email: parsed.data.email,
+          p_request_ip: ip,
+          p_user_id: null,
+        },
+      );
+      if (exceededRecordError) console.error("[LOGIN_LIMIT_EXCEEDED_RECORD_ERROR]", exceededRecordError);
+      return fail(
+        "Daily login limit reached. Please try again tomorrow.",
+        429,
+        "LOGIN_RATE_LIMITED",
+        { retry_after: limit.reset_at },
+      );
+    }
+
     const { data, error } = await supabase.auth.signInWithPassword({
       email: parsed.data.email,
       password: parsed.data.password,
     });
 
     if (error) {
+      const { data: failureRows, error: failureError } = await supabase.rpc(
+        "record_failed_login_attempt",
+        {
+          p_account_email: parsed.data.email,
+          p_request_ip: ip,
+          p_user_id: null,
+        },
+      );
+      if (failureError) {
+        console.error("[LOGIN_LIMIT_RECORD_ERROR]", failureError);
+      }
+      const failure = Array.isArray(failureRows) ? failureRows[0] : failureRows;
+      if (failure?.blocked === true) {
+        return fail(
+          "Daily login limit reached. Please try again tomorrow.",
+          429,
+          "LOGIN_RATE_LIMITED",
+          { retry_after: failure.reset_at },
+        );
+      }
       return fail("Invalid email or password", 401, "INVALID_CREDENTIALS");
     }
 
@@ -52,7 +102,7 @@ export async function POST(req: NextRequest) {
             longitude: parsed.data.location.longitude,
             accuracyMeters: parsed.data.location.accuracy_meters,
           }
-        : undefined,
+      : undefined,
     );
     const device = await upsertUserDevice(supabase, data.user.id, req.headers, location.ip);
 
