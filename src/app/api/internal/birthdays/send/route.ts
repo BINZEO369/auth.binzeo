@@ -2,7 +2,7 @@ import { NextRequest } from "next/server";
 import { getPublicSiteUrl } from "@/lib/email/transporter";
 import { sendBirthdayEmails } from "@/lib/birthday";
 
-export async function POST(req: NextRequest) {
+async function handleBirthdayDelivery(req: NextRequest) {
   const configuredSecret = process.env.BIRTHDAY_JOB_SECRET;
   const suppliedSecret = req.headers.get("x-birthday-job-secret");
   const cronSecret = process.env.CRON_SECRET;
@@ -19,4 +19,14 @@ export async function POST(req: NextRequest) {
     console.error("[BIRTHDAY_JOB_ERROR]", error);
     return Response.json({ success: false, error: { code: "BIRTHDAY_JOB_FAILED" } }, { status: 500 });
   }
+}
+
+// Vercel Cron invokes scheduled routes with GET and sends CRON_SECRET as a Bearer token.
+export async function GET(req: NextRequest) {
+  return handleBirthdayDelivery(req);
+}
+
+// Keep POST available for protected manual delivery and external schedulers.
+export async function POST(req: NextRequest) {
+  return handleBirthdayDelivery(req);
 }
