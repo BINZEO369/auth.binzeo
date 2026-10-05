@@ -1,17 +1,11 @@
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { EMAIL_FROM, buildBirthdayEmail, transporter } from "@/lib/email/transporter";
 
-export const MINIMUM_AGE = 13;
-
 export function validateBirthDate(value: unknown) {
   if (typeof value !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return "Enter a valid date of birth.";
   const date = new Date(`${value}T00:00:00Z`);
   if (Number.isNaN(date.getTime()) || date.toISOString().slice(0, 10) !== value) return "Enter a valid date of birth.";
-  const today = new Date();
-  const age = today.getUTCFullYear() - date.getUTCFullYear() - ((today.getUTCMonth() + 1 < date.getUTCMonth() + 1 || (today.getUTCMonth() + 1 === date.getUTCMonth() + 1 && today.getUTCDate() < date.getUTCDate())) ? 1 : 0);
-  if (date > today) return "Date of birth cannot be in the future.";
-  if (age < MINIMUM_AGE) return `You must be at least ${MINIMUM_AGE} years old to create a BINZEO account.`;
-  if (age > 120) return "Please enter a valid date of birth.";
+  if (date > new Date()) return "Date of birth cannot be in the future.";
   return null;
 }
 

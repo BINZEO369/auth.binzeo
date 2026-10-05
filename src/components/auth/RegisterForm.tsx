@@ -980,7 +980,7 @@ export default function RegisterForm() {
                   <ProgressBar current={4} total={7} />
                   <h2 className="text-[24px] font-semibold tracking-[-0.03em]">When is your birthday?</h2>
                   <p className="mt-1.5 text-[13px] text-white/55">Your date of birth helps us keep your identity accurate and celebrate your day.</p>
-                  <form onSubmit={(e) => { e.preventDefault(); if (!dateOfBirth) { setError("Date of birth is required"); return; } const date = new Date(`${dateOfBirth}T00:00:00Z`); const today = new Date(); let age = today.getUTCFullYear() - date.getUTCFullYear(); const month = today.getUTCMonth() - date.getUTCMonth(); if (month < 0 || (month === 0 && today.getUTCDate() < date.getUTCDate())) age -= 1; if (date > today || age < 13) { setError("You must be at least 13 years old"); return; } transitionTo("password"); }} className="mt-7 space-y-3">
+                  <form onSubmit={(e) => { e.preventDefault(); if (!dateOfBirth) { setError("Date of birth is required"); return; } const date = new Date(`${dateOfBirth}T00:00:00Z`); if (Number.isNaN(date.getTime()) || date > new Date()) { setError("Enter a valid date of birth"); return; } transitionTo("password"); }} className="mt-7 space-y-3">
                     <label className="block text-[11px] uppercase tracking-[0.14em] text-white/50">Date of birth</label>
                     <input type="date" value={dateOfBirth} onChange={(e) => setDateOfBirth(e.target.value)} autoFocus max={new Date().toISOString().slice(0, 10)} className={fieldClass} />
                     {error && <div className="rounded-2xl border border-red-400/25 bg-red-500/10 px-4 py-3 text-sm text-red-200">{error}</div>}
