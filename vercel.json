@@ -1,8 +1,0 @@
-{
-  "crons": [
-    {
-      "path": "/api/internal/birthdays/send",
-      "schedule": "0 16 * * *"
-    }
-  ]
-}

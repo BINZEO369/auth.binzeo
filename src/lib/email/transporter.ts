@@ -84,18 +84,3 @@ export function buildPasswordChangedEmail(siteUrl: string, context?: EmailSecuri
     }),
   };
 }
-
-export function buildBirthdayEmail(displayName: string, age: number, siteUrl: string) {
-  const safeName = displayName.replace(/[&<>"']/g, (character) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[character] ?? character);
-  return {
-    subject: `Happy birthday, ${displayName} — BINZEO`,
-    html: renderEmailLayout({
-      siteUrl,
-      eyebrow: "A note from BINZEO",
-      title: "Happy birthday",
-      description: `Hi ${safeName}, wishing you a wonderful birthday and a brilliant year ahead.`,
-      body: `<p style="margin:0;color:#ffffff;font-size:14px;line-height:1.75;">You are celebrating your <strong>${age}${age % 10 === 1 && age % 100 !== 11 ? "st" : age % 10 === 2 && age % 100 !== 12 ? "nd" : age % 10 === 3 && age % 100 !== 13 ? "rd" : "th"}</strong> birthday today.</p><p style="margin:18px 0 0;color:#ffffff;font-size:12px;line-height:1.7;">Thank you for being part of BINZEO. We hope your day is filled with good moments, meaningful connections, and new possibilities.</p>`,
-      footerNote: "You received this message because your birthday is saved in your BINZEO profile.",
-    }),
-  };
-}
