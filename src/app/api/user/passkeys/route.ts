@@ -53,7 +53,15 @@ export async function POST(req: NextRequest) {
       userDisplayName: user.user_metadata?.display_name ?? user.email,
       challenge: issued.challenge,
       attestationType: "none",
-      authenticatorSelection: { residentKey: "preferred", userVerification: "required" },
+      // Device passkeys are protected by the operating system: Face ID,
+      // fingerprint, Windows Hello, Android screen lock, or device PIN.
+      // A discoverable credential lets the user sign in without an email.
+      authenticatorSelection: {
+        authenticatorAttachment: "platform",
+        residentKey: "required",
+        requireResidentKey: true,
+        userVerification: "required",
+      },
       excludeCredentials: (existing ?? []).map((item) => ({
         id: base64UrlFromBytea(item.credential_id),
         transports: item.transports ?? [],
