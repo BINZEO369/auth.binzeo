@@ -44,12 +44,20 @@ export async function POST(req: NextRequest) {
       credential_id: byteaFromBase64Url(credentialId),
       public_key: `\\x${Buffer.from(info.credential.publicKey).toString("hex")}`,
       sign_count: info.credential.counter,
-      authenticator_type: info.credentialDeviceType,
+      // The registration options require a platform authenticator. SimpleWebAuthn
+      // reports backup state as singleDevice/multiDevice, while the BINZEO schema
+      // stores the authenticator family as platform/cross_platform.
+      authenticator_type: "platform",
       device_name: parsed.data.device_name ?? "This device",
       transports: (parsed.data.response as RegistrationResponseJSON).response.transports ?? [],
       aaguid: info.aaguid,
       is_discoverable: true,
       is_backed_up: info.credentialBackedUp,
+      metadata: {
+        authenticator_attachment: "platform",
+        credential_device_type: info.credentialDeviceType,
+        credential_backed_up: info.credentialBackedUp,
+      },
     }).select("id, device_name, authenticator_type, is_backed_up, created_at").single();
     if (error) return fail(error.message, 400, "PASSKEY_SAVE_FAILED");
     return ok({ passkey: data }, 201);
