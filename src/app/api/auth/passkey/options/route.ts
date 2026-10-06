@@ -22,7 +22,10 @@ export async function POST(req: NextRequest) {
       challenge: challenge.challenge,
       userVerification: "required",
     });
-    return ok({ challenge_id: challenge.challenge_id, challenge: challenge.challenge, options }, 201);
+    // The browser receives options.challenge after SimpleWebAuthn converts the
+    // server challenge to Base64URL. Return that exact value to verification;
+    // sending the raw database challenge causes every valid assertion to fail.
+    return ok({ challenge_id: challenge.challenge_id, challenge: options.challenge, options }, 201);
   } catch (err) {
     console.error("[PASSKEY_AUTH_OPTIONS_ERROR]", err);
     return fail("Passkey login is unavailable", 500, "PASSKEY_LOGIN_FAILED");
