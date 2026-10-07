@@ -197,7 +197,7 @@ export default function ProfilePage() {
             disabled
           />
           <p className="mt-1.5 text-xs text-[#777777]">Your username is permanent and cannot be changed.</p>
-          {form.username && <a className="mt-1 block text-xs text-[#333333] underline" href={`/@${form.username}`} target="_blank" rel="noreferrer">binzeo.com/@{form.username}</a>}
+          {form.username && <a className="mt-1 block text-xs text-[#333333] underline" href={`/u/@${form.username}`} target="_blank" rel="noreferrer">binzeo.com/u/@{form.username}</a>}
         </Field>
 
         <div className="grid grid-cols-2 gap-3">
