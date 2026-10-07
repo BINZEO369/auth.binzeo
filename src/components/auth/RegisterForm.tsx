@@ -235,6 +235,10 @@ export default function RegisterForm() {
   const [verificationChallengeId, setVerificationChallengeId] = useState<string | null>(null);
   const [verificationCode, setVerificationCode] = useState("");
   const [verificationResendIn, setVerificationResendIn] = useState(60);
+  const [emailChecking, setEmailChecking] = useState(false);
+  const [emailExists, setEmailExists] = useState(false);
+  const [emailCheckError, setEmailCheckError] = useState("");
+  const [checkedEmail, setCheckedEmail] = useState("");
 
   /* ------------------------------------------------------------- */
   /*  Auto transitions                                              */
@@ -270,6 +274,44 @@ export default function RegisterForm() {
     const timer = setTimeout(() => setVerificationResendIn((value) => value - 1), 1000);
     return () => clearTimeout(timer);
   }, [verificationResendIn]);
+
+  useEffect(() => {
+    const normalized = email.trim().toLowerCase();
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(normalized)) {
+      setEmailChecking(false);
+      setEmailExists(false);
+      setEmailCheckError("");
+      setCheckedEmail("");
+      return;
+    }
+    setEmailChecking(true);
+    setEmailExists(false);
+    setEmailCheckError("");
+    const timer = setTimeout(async () => {
+      try {
+        const response = await fetch("/api/auth/check-email", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: normalized }),
+        });
+        const data = await response.json();
+        if (!data.success) {
+          setEmailCheckError(data.error?.message ?? "Could not check this email");
+          setCheckedEmail("");
+          return;
+        }
+        setEmailExists(data.data.exists === true);
+        setCheckedEmail(normalized);
+      } catch {
+        setEmailCheckError("Could not check this email right now. Please try again.");
+        setCheckedEmail("");
+      } finally {
+        setEmailChecking(false);
+      }
+    }, 450);
+    return () => clearTimeout(timer);
+  }, [email]);
 
   /* ------------------------------------------------------------- */
   /*  Crossfade helper — fade out then fade in                      */
@@ -876,12 +918,19 @@ export default function RegisterForm() {
                   <form
                     onSubmit={(e) => {
                       e.preventDefault();
+                      const normalized = email.trim().toLowerCase();
                       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                      if (!emailRegex.test(email.trim())) {
+                      if (!emailRegex.test(normalized)) {
                         setError("Please enter a valid email address");
-                        return;
+                      } else if (emailChecking || checkedEmail !== normalized) {
+                        setError("Please wait while we check this email address");
+                      } else if (emailExists) {
+                        setError("An account with this email already exists. Please sign in instead.");
+                      } else if (emailCheckError) {
+                        setError(emailCheckError);
+                      } else {
+                        transitionTo("first_name");
                       }
-                      transitionTo("first_name");
                     }}
                     className="mt-7 space-y-3"
                   >
@@ -894,6 +943,19 @@ export default function RegisterForm() {
                       placeholder="you@example.com"
                       className={fieldClass}
                     />
+                    {emailChecking && (
+                      <div className="text-xs text-white/50">Checking email availability...</div>
+                    )}
+                    {!emailChecking && emailExists && (
+                      <div className="rounded-2xl border border-red-400/25 bg-red-500/10 px-4 py-3 text-sm text-red-200">
+                        An account with this email already exists. Please sign in instead.
+                      </div>
+                    )}
+                    {!emailChecking && !emailExists && emailCheckError && (
+                      <div className="rounded-2xl border border-red-400/25 bg-red-500/10 px-4 py-3 text-sm text-red-200">
+                        {emailCheckError}
+                      </div>
+                    )}
                     {error && (
                       <div className="rounded-2xl border border-red-400/25 bg-red-500/10 px-4 py-3 text-sm text-red-200">
                         {error}

@@ -9,6 +9,7 @@ import { z } from "zod";
 import { ok, fail } from "@/lib/api/response";
 import { logUserActivity } from "@/lib/activity-log";
 import { upsertUserBirthday, validateBirthDate } from "@/lib/birthday";
+import { emailAlreadyExists, normalizeEmail } from "@/lib/auth-email";
 
 const signupSchema = z.object({
   email: z.string().email("Please enter a valid email"),
@@ -52,7 +53,16 @@ export async function POST(req: NextRequest) {
       return fail("Precise device location permission is required to create your account", 422, "PRECISE_LOCATION_REQUIRED");
     }
 
-    const { email, password, first_name, last_name, country_code, date_of_birth } = parsed.data;
+    const { password, first_name, last_name, country_code, date_of_birth } = parsed.data;
+    const email = normalizeEmail(parsed.data.email);
+    try {
+      if (await emailAlreadyExists(email)) {
+        return fail("An account with this email already exists. Please sign in instead.", 409, "EMAIL_ALREADY_EXISTS");
+      }
+    } catch (emailLookupError) {
+      console.error("[SIGNUP_EMAIL_LOOKUP_ERROR]", emailLookupError);
+      return fail("We could not verify email availability right now. Please try again.", 503, "EMAIL_CHECK_UNAVAILABLE");
+    }
     const birthDateError = validateBirthDate(date_of_birth);
     if (birthDateError) return fail(birthDateError, 422, "INVALID_DATE_OF_BIRTH");
     const location = await resolveRequestLocation(req.headers, true, {
@@ -82,6 +92,9 @@ export async function POST(req: NextRequest) {
       });
 
     if (createError || !created.user) {
+      if (createError?.message.toLowerCase().includes("already") || createError?.message.toLowerCase().includes("exists")) {
+        return fail("An account with this email already exists. Please sign in instead.", 409, "EMAIL_ALREADY_EXISTS");
+      }
       return fail(createError?.message ?? "Unable to create account", 400, createError?.name ?? "SIGNUP_FAILED");
     }
 
