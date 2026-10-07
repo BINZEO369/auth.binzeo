@@ -344,8 +344,10 @@ export default function RegisterForm() {
         setVerificationChallengeId(data.data.challenge_id);
         setVerificationCode("");
         setVerificationResendIn(60);
+        setLoading(false);
         setStage("email_verification");
       } else {
+        setLoading(false);
         setStage("success");
         setTimeout(() => { router.push("/dashboard"); router.refresh(); }, 1800);
       }

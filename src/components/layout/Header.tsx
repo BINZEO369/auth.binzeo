@@ -27,7 +27,6 @@ const dashboardNavigation = [
   { href: "/dashboard/contacts", label: "Contacts", sub: "Ways to reach you", icon: "/icons/message.svg" },
   { href: "/dashboard/sectors", label: "Sectors", sub: "Industry access", icon: "/icons/building.svg" },
   { href: "/dashboard/devices", label: "Devices", sub: "Logged-in devices", icon: "/icons/device.svg" },
-  { href: "/dashboard/verify-email", label: "Verify Email", sub: "Confirm your address", icon: "/icons/email.svg" },
   { href: "/dashboard/security", label: "Security", sub: "Activity & sessions", icon: "/icons/shield.svg" },
 ] as const;
 
