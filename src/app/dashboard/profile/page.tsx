@@ -192,10 +192,12 @@ export default function ProfilePage() {
           <input
             type="text"
             value={form.username ?? ""}
-            onChange={(e) => update("username", e.target.value)}
             className={inputCls}
-            placeholder="unique_username"
+            readOnly
+            disabled
           />
+          <p className="mt-1.5 text-xs text-[#777777]">Your username is permanent and cannot be changed.</p>
+          {form.username && <a className="mt-1 block text-xs text-[#333333] underline" href={`/@${form.username}`} target="_blank" rel="noreferrer">binzeo.com/@{form.username}</a>}
         </Field>
 
         <div className="grid grid-cols-2 gap-3">

@@ -8,7 +8,6 @@ const ALLOWED_FIELDS = [
   "middle_name",
   "last_name",
   "display_name",
-  "username",
   "date_of_birth",
   "gender",
   "profile_photo_url",
@@ -106,6 +105,9 @@ export async function PATCH(req: NextRequest) {
     }
 
     const body = await req.json();
+    if ("username" in body) {
+      return fail("Username cannot be changed after registration", 409, "USERNAME_IMMUTABLE");
+    }
     const patch: Record<string, unknown> = {};
 
     for (const key of ALLOWED_FIELDS) {

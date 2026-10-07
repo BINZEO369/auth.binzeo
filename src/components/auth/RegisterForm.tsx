@@ -14,6 +14,7 @@ type Stage =
   | "welcome"
   | "methods"
   | "email"
+  | "username"
   | "first_name"
   | "last_name"
   | "date_of_birth"
@@ -25,6 +26,7 @@ type Stage =
 
 const STEP_ORDER: Stage[] = [
   "email",
+  "username",
   "first_name",
   "last_name",
   "date_of_birth",
@@ -221,6 +223,7 @@ export default function RegisterForm() {
 
   /* Form state */
   const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [dateOfBirth, setDateOfBirth] = useState("");
@@ -239,6 +242,11 @@ export default function RegisterForm() {
   const [emailExists, setEmailExists] = useState(false);
   const [emailCheckError, setEmailCheckError] = useState("");
   const [checkedEmail, setCheckedEmail] = useState("");
+  const [usernameChecking, setUsernameChecking] = useState(false);
+  const [usernameAvailable, setUsernameAvailable] = useState(false);
+  const [usernameSuggestions, setUsernameSuggestions] = useState<string[]>([]);
+  const [usernameCheckError, setUsernameCheckError] = useState("");
+  const [checkedUsername, setCheckedUsername] = useState("");
 
   /* ------------------------------------------------------------- */
   /*  Auto transitions                                              */
@@ -313,6 +321,47 @@ export default function RegisterForm() {
     return () => clearTimeout(timer);
   }, [email]);
 
+  useEffect(() => {
+    const normalized = username.trim().toLowerCase().replace(/^@/, "");
+    if (!normalized) {
+      setUsernameChecking(false);
+      setUsernameAvailable(false);
+      setUsernameSuggestions([]);
+      setUsernameCheckError("");
+      setCheckedUsername("");
+      return;
+    }
+    setUsernameChecking(true);
+    setUsernameAvailable(false);
+    setUsernameSuggestions([]);
+    setUsernameCheckError("");
+    const timer = setTimeout(async () => {
+      try {
+        const response = await fetch("/api/auth/check-username", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username: normalized }),
+        });
+        const data = await response.json();
+        if (!data.success) {
+          setUsernameCheckError(data.error?.message ?? "Could not check this username");
+          setCheckedUsername("");
+          return;
+        }
+        setUsernameAvailable(data.data.available === true);
+        setUsernameSuggestions(data.data.suggestions ?? []);
+        setUsernameCheckError(data.data.available ? "" : data.data.message ?? "Username is not available");
+        setCheckedUsername(normalized);
+      } catch {
+        setUsernameCheckError("Could not check this username right now. Please try again.");
+        setCheckedUsername("");
+      } finally {
+        setUsernameChecking(false);
+      }
+    }, 450);
+    return () => clearTimeout(timer);
+  }, [username]);
+
   /* ------------------------------------------------------------- */
   /*  Crossfade helper — fade out then fade in                      */
   /* ------------------------------------------------------------- */
@@ -369,6 +418,7 @@ export default function RegisterForm() {
           last_name: lastName.trim(),
           date_of_birth: dateOfBirth,
           email: email.trim(),
+          username: username.trim().toLowerCase().replace(/^@/, ""),
           password,
           terms_accepted: acceptTerms,
           privacy_accepted: acceptTerms,
@@ -779,6 +829,7 @@ export default function RegisterForm() {
       {/* ============================================================ */}
       {(stage === "methods" ||
         stage === "email" ||
+        stage === "username" ||
         stage === "first_name" ||
         stage === "last_name" ||
         stage === "date_of_birth" ||
@@ -906,7 +957,7 @@ export default function RegisterForm() {
                     <span className="text-[12px]">Back</span>
                   </button>
 
-                  <ProgressBar current={1} total={7} />
+                  <ProgressBar current={1} total={8} />
 
                   <h2 className="text-[24px] font-semibold tracking-[-0.03em]">
                     Your email address
@@ -929,7 +980,7 @@ export default function RegisterForm() {
                       } else if (emailCheckError) {
                         setError(emailCheckError);
                       } else {
-                        transitionTo("first_name");
+                        transitionTo("username");
                       }
                     }}
                     className="mt-7 space-y-3"
@@ -971,8 +1022,25 @@ export default function RegisterForm() {
                 </div>
               )}
 
+              {stage === "username" && (
+                <div>
+                  <button type="button" onClick={goBack} aria-label="Back" className="flex items-center gap-1.5 px-2.5 py-1.5 -ml-2.5 rounded-full text-white/60 hover:text-white hover:bg-white/5 transition-all duration-300 mb-4"><IconArrowLeft /><span className="text-[12px]">Back</span></button>
+                  <ProgressBar current={2} total={8} />
+                  <h2 className="text-[24px] font-semibold tracking-[-0.03em]">Choose your username</h2>
+                  <p className="mt-1.5 text-[13px] text-white/55">This becomes your permanent public BINZEO link.</p>
+                  <form onSubmit={(e) => { e.preventDefault(); if (usernameAvailable && checkedUsername === username.trim().toLowerCase().replace(/^@/, "")) transitionTo("first_name"); }} className="mt-7 space-y-3">
+                    <div className="flex items-center rounded-2xl border border-white/15 bg-white/5 px-4 focus-within:border-white/40"><span className="text-white/50">@</span><input type="text" value={username} onChange={(e) => setUsername(e.target.value.toLowerCase().replace(/[^a-z0-9_@]/g, ""))} autoComplete="username" autoFocus placeholder="sharif" className="w-full bg-transparent px-2 py-3.5 text-sm text-white outline-none" /></div>
+                    {usernameChecking && <div className="text-xs text-white/50">Checking username availability...</div>}
+                    {!usernameChecking && usernameAvailable && <div className="text-sm text-white/75">@{checkedUsername} is available.</div>}
+                    {!usernameChecking && !usernameAvailable && usernameCheckError && <div className="rounded-2xl border border-red-400/25 bg-red-500/10 px-4 py-3 text-sm text-red-200">{usernameCheckError}</div>}
+                    {!usernameChecking && usernameSuggestions.length > 0 && <div className="space-y-2"><p className="text-xs text-white/50">Available suggestions</p><div className="flex flex-wrap gap-2">{usernameSuggestions.map((suggestion) => <button key={suggestion} type="button" onClick={() => setUsername(suggestion)} className="rounded-full border border-white/20 px-3 py-1.5 text-xs text-white/80 hover:bg-white/10">@{suggestion}</button>)}</div></div>}
+                    <button type="submit" disabled={usernameChecking || !usernameAvailable || checkedUsername !== username.trim().toLowerCase().replace(/^@/, "")} className="w-full rounded-full bg-white py-3.5 text-sm font-semibold text-black transition-all duration-300 hover:bg-white/90 disabled:cursor-not-allowed disabled:opacity-40">Continue</button>
+                  </form>
+                </div>
+              )}
+
               {/* ============================================================ */}
-              {/*  STEP 2 · FIRST NAME                                          */}
+              {/*  STEP 3 · FIRST NAME                                          */}
               {/* ============================================================ */}
               {stage === "first_name" && (
                 <div>
@@ -986,7 +1054,7 @@ export default function RegisterForm() {
                     <span className="text-[12px]">Back</span>
                   </button>
 
-                  <ProgressBar current={2} total={7} />
+                  <ProgressBar current={3} total={8} />
 
                   <h2 className="text-[24px] font-semibold tracking-[-0.03em]">
                     What&apos;s your first name?
@@ -1045,7 +1113,7 @@ export default function RegisterForm() {
                     <span className="text-[12px]">Back</span>
                   </button>
 
-                  <ProgressBar current={3} total={7} />
+                  <ProgressBar current={4} total={8} />
 
                   <h2 className="text-[24px] font-semibold tracking-[-0.03em]">
                     And your last name?
@@ -1094,7 +1162,7 @@ export default function RegisterForm() {
                   <button type="button" onClick={goBack} aria-label="Back" className="flex items-center gap-1.5 px-2.5 py-1.5 -ml-2.5 rounded-full text-white/60 hover:text-white hover:bg-white/5 transition-all duration-300 mb-4">
                     <IconArrowLeft /><span className="text-[12px]">Back</span>
                   </button>
-                  <ProgressBar current={4} total={7} />
+                  <ProgressBar current={5} total={8} />
                   <h2 className="text-[24px] font-semibold tracking-[-0.03em]">When is your birthday?</h2>
                   <p className="mt-1.5 text-[13px] text-white/55">Your date of birth helps us keep your identity accurate and celebrate your day.</p>
                   <form onSubmit={(e) => { e.preventDefault(); if (!dateOfBirth) { setError("Date of birth is required"); return; } const date = new Date(`${dateOfBirth}T00:00:00Z`); if (Number.isNaN(date.getTime()) || date > new Date()) { setError("Enter a valid date of birth"); return; } transitionTo("password"); }} className="mt-7 space-y-3">
@@ -1121,7 +1189,7 @@ export default function RegisterForm() {
                     <span className="text-[12px]">Back</span>
                   </button>
 
-                  <ProgressBar current={5} total={7} />
+                  <ProgressBar current={6} total={8} />
 
                   <h2 className="text-[24px] font-semibold tracking-[-0.03em]">
                     Create a password
@@ -1228,7 +1296,7 @@ export default function RegisterForm() {
                     <span className="text-[12px]">Back</span>
                   </button>
 
-                  <ProgressBar current={6} total={7} />
+                  <ProgressBar current={7} total={8} />
 
                   <h2 className="text-[24px] font-semibold tracking-[-0.03em]">
                     Almost there
@@ -1321,7 +1389,7 @@ export default function RegisterForm() {
                     <span className="text-[12px]">Back</span>
                   </button>
 
-                  <ProgressBar current={7} total={7} />
+                  <ProgressBar current={8} total={8} />
 
                   <div className="text-center">
                     <div

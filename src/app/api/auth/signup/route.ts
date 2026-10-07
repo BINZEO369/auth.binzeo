@@ -10,9 +10,11 @@ import { ok, fail } from "@/lib/api/response";
 import { logUserActivity } from "@/lib/activity-log";
 import { upsertUserBirthday, validateBirthDate } from "@/lib/birthday";
 import { emailAlreadyExists, normalizeEmail } from "@/lib/auth-email";
+import { isValidUsername, normalizeUsername, usernameExists } from "@/lib/username";
 
 const signupSchema = z.object({
   email: z.string().email("Please enter a valid email"),
+  username: z.string().min(3).max(30),
   password: z
     .string()
     .min(8, "Password must be at least 8 characters")
@@ -55,6 +57,18 @@ export async function POST(req: NextRequest) {
 
     const { password, first_name, last_name, country_code, date_of_birth } = parsed.data;
     const email = normalizeEmail(parsed.data.email);
+    const username = normalizeUsername(parsed.data.username);
+    if (!isValidUsername(username)) {
+      return fail("Choose a valid available username", 422, "INVALID_USERNAME");
+    }
+    try {
+      if (await usernameExists(username)) {
+        return fail(`@${username} is already taken. Choose another username.`, 409, "USERNAME_ALREADY_EXISTS");
+      }
+    } catch (usernameLookupError) {
+      console.error("[SIGNUP_USERNAME_LOOKUP_ERROR]", usernameLookupError);
+      return fail("We could not verify username availability right now. Please try again.", 503, "USERNAME_CHECK_UNAVAILABLE");
+    }
     try {
       if (await emailAlreadyExists(email)) {
         return fail("An account with this email already exists. Please sign in instead.", 409, "EMAIL_ALREADY_EXISTS");
@@ -82,6 +96,7 @@ export async function POST(req: NextRequest) {
         user_metadata: {
           first_name,
           last_name,
+          username,
           country_code: country_code || location.country || null,
           terms_accepted: true,
           privacy_accepted: true,
@@ -112,6 +127,7 @@ export async function POST(req: NextRequest) {
         first_name,
         last_name,
         display_name: `${first_name} ${last_name}`.trim(),
+        username,
         date_of_birth,
         country_code: country_code || location.country || null,
         terms_accepted: true,
@@ -124,6 +140,9 @@ export async function POST(req: NextRequest) {
       })
       .eq("id", user.id);
     if (profileError) {
+      if (profileError.code === "23505") {
+        return fail(`@${username} is already taken. Choose another username.`, 409, "USERNAME_ALREADY_EXISTS");
+      }
       console.error("[SIGNUP_PROFILE_UPDATE_ERROR]", profileError);
       return fail("Account created, but profile setup failed", 500, "PROFILE_SETUP_FAILED");
     }
