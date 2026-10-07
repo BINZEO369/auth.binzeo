@@ -20,6 +20,7 @@ type Stage =
   | "password"
   | "terms"
   | "location"
+  | "email_verification"
   | "success";
 
 const STEP_ORDER: Stage[] = [
@@ -231,6 +232,9 @@ export default function RegisterForm() {
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [verificationChallengeId, setVerificationChallengeId] = useState<string | null>(null);
+  const [verificationCode, setVerificationCode] = useState("");
+  const [verificationResendIn, setVerificationResendIn] = useState(60);
 
   /* ------------------------------------------------------------- */
   /*  Auto transitions                                              */
@@ -260,6 +264,12 @@ export default function RegisterForm() {
       };
     }
   }, [stage]);
+
+  useEffect(() => {
+    if (verificationResendIn <= 0) return;
+    const timer = setTimeout(() => setVerificationResendIn((value) => value - 1), 1000);
+    return () => clearTimeout(timer);
+  }, [verificationResendIn]);
 
   /* ------------------------------------------------------------- */
   /*  Crossfade helper — fade out then fade in                      */
@@ -330,22 +340,15 @@ export default function RegisterForm() {
         setLoading(false);
         return;
       }
-      setStage("success");
-      setTimeout(() => {
-        if (
-          data.data?.requires_custom_email_verification &&
-          data.data.challenge_id
-        ) {
-          router.push(
-            `/dashboard/verify-email?challenge_id=${encodeURIComponent(
-              data.data.challenge_id
-            )}`
-          );
-        } else {
-          router.push("/dashboard");
-        }
-        router.refresh();
-      }, 1800);
+      if (data.data?.requires_custom_email_verification && data.data.challenge_id) {
+        setVerificationChallengeId(data.data.challenge_id);
+        setVerificationCode("");
+        setVerificationResendIn(60);
+        setStage("email_verification");
+      } else {
+        setStage("success");
+        setTimeout(() => { router.push("/dashboard"); router.refresh(); }, 1800);
+      }
     } catch (err) {
       setError(
         err instanceof Error
@@ -354,6 +357,55 @@ export default function RegisterForm() {
       );
       setLoading(false);
     }
+  };
+
+  const handleVerificationSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!verificationChallengeId || verificationCode.length !== 6) return;
+    setLoading(true);
+    setError("");
+    try {
+      const res = await fetch("/api/user/email-verification/verify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ challenge_id: verificationChallengeId, code: verificationCode }),
+      });
+      const data = await res.json();
+      if (!data.success || !data.data?.verified) {
+        setError(data.error?.message ?? `Verification failed: ${data.data?.reason ?? "invalid_code"}`);
+        setVerificationCode("");
+        setLoading(false);
+        return;
+      }
+      setStage("success");
+      setTimeout(() => { router.push("/dashboard"); router.refresh(); }, 1800);
+    } catch {
+      setError("Verification failed. Please try again.");
+      setLoading(false);
+    }
+  };
+
+  const resendVerificationCode = async () => {
+    if (verificationResendIn > 0 || loading) return;
+    setLoading(true);
+    setError("");
+    try {
+      const res = await fetch("/api/user/email-verification", { method: "POST" });
+      const data = await res.json();
+      if (!data.success) {
+        setError(data.error?.message ?? "Could not send a new verification code");
+        setVerificationResendIn(data.error?.retry_after_seconds ?? 60);
+        setLoading(false);
+        return;
+      }
+      setVerificationChallengeId(data.data.challenge_id);
+      setVerificationCode("");
+      setVerificationResendIn(60);
+      setError("");
+    } catch {
+      setError("Could not send a new verification code. Please try again.");
+    }
+    setLoading(false);
   };
 
   /* ================================================================== */
@@ -688,7 +740,8 @@ export default function RegisterForm() {
         stage === "date_of_birth" ||
         stage === "password" ||
         stage === "terms" ||
-        stage === "location") && (
+        stage === "location" ||
+        stage === "email_verification") && (
         <div className="relative z-10 flex min-h-[100dvh] items-center justify-center px-4 py-8 sm:py-12">
           <div
             className="w-full max-w-[460px] rounded-[32px] border border-white/12 bg-white/[0.06] backdrop-blur-2xl shadow-[0_32px_80px_-24px_rgba(0,0,0,0.8),inset_0_1px_0_0_rgba(255,255,255,0.15)] px-6 py-8 sm:px-8 sm:py-9 text-white overflow-hidden"
@@ -1304,6 +1357,39 @@ export default function RegisterForm() {
                   </div>
                 </div>
               )}
+
+              {stage === "email_verification" && (
+                <div style={{ animation: "bn-card-fade-in 0.55s cubic-bezier(0.22, 1, 0.36, 1) both" }}>
+                  <h2 className="text-[24px] font-semibold tracking-[-0.03em]">Verify your email</h2>
+                  <p className="mt-1.5 text-[13px] text-white/55">Enter the 6-digit code sent to your email. It expires in 5 minutes.</p>
+
+                  {error && <div className="mt-5 rounded-2xl border border-red-400/25 bg-red-500/10 backdrop-blur-xl px-4 py-3 text-sm text-red-200">{error}</div>}
+
+                  <form onSubmit={handleVerificationSubmit} className="mt-6 space-y-3">
+                    <input
+                      type="text"
+                      inputMode="numeric"
+                      pattern="[0-9]{6}"
+                      maxLength={6}
+                      value={verificationCode}
+                      onChange={(e) => setVerificationCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
+                      required
+                      autoFocus
+                      autoComplete="one-time-code"
+                      placeholder="000000"
+                      aria-label="Email verification code"
+                      className={`${fieldClass} text-center text-2xl tracking-[0.35em]`}
+                    />
+                    <button type="submit" disabled={loading || verificationCode.length !== 6} className="mt-2 w-full rounded-full bg-white py-3.5 text-sm font-semibold text-black transition-all duration-300 hover:bg-white/90 disabled:cursor-not-allowed disabled:opacity-60">
+                      {loading ? "Verifying..." : "Verify email"}
+                    </button>
+                  </form>
+
+                  <button type="button" onClick={resendVerificationCode} disabled={verificationResendIn > 0 || loading} className="mt-4 w-full text-center text-[12px] text-white/55 hover:text-white disabled:cursor-not-allowed disabled:text-white/25">
+                    {verificationResendIn > 0 ? `Resend code in ${verificationResendIn}s` : "Resend verification code"}
+                  </button>
+                </div>
+              )}
             </StepCard>
           </div>
         </div>
@@ -1357,7 +1443,7 @@ export default function RegisterForm() {
                   "bn-word-in 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.35s both",
               }}
             >
-              Your ID has been created. Redirecting to verification…
+              Your email has been verified. Redirecting to your dashboard…
             </p>
 
             <div
