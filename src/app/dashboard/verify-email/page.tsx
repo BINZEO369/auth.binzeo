@@ -158,7 +158,7 @@ export default function VerifyEmailPage() {
           {step === "idle" &&
             "We'll send a 6-digit code to your registered email."}
           {step === "sent" &&
-            "Enter the 6-digit code sent to your email. It expires in 30 seconds. You can request a new code once per minute."}
+            "Enter the 6-digit code sent to your email. It expires in 5 minutes. You can request a new code once per minute."}
           {step === "verified" &&
             "Your email has been verified successfully. Redirecting..."}
         </p>

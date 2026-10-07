@@ -84,7 +84,7 @@ export async function POST(req: NextRequest) {
 
     // Gmail SMTP দিয়ে OTP email পাঠানো
     try {
-      const email = buildOtpEmail(String(code), 30, getPublicSiteUrl(req.headers), {
+      const email = buildOtpEmail(String(code), 300, getPublicSiteUrl(req.headers), {
         name: profile?.display_name || [profile?.first_name, profile?.last_name].filter(Boolean).join(" "),
         time: new Date().toUTCString(),
         ipAddress: securityLocation.ip || requestIp,
