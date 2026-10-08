@@ -5,6 +5,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { getClientDeviceId, requestPreciseLocation } from "@/lib/client-device";
+import { createClient as createSupabaseClient } from "@/lib/supabase/client";
 
 /* ================================================================== */
 /*  Types                                                              */
@@ -13,6 +14,7 @@ type Stage =
   | "logo"
   | "welcome"
   | "methods"
+  | "google"
   | "email"
   | "username"
   | "first_name"
@@ -159,11 +161,11 @@ const METHODS = [
     available: true,
   },
   {
-    key: "methods" as Stage,
+    key: "google" as Stage,
     icon: <IconGoogle />,
     label: "Continue with Google",
-    sub: "Coming soon",
-    available: false,
+    sub: "Use your Google account",
+    available: true,
   },
   {
     key: "methods" as Stage,
@@ -375,6 +377,22 @@ export default function RegisterForm() {
       setTimeout(() => setCardFade("idle"), 800);
     }, 380);
   }, []);
+
+  const handleGoogleSignup = async () => {
+    setError("");
+    setLoading(true);
+    const supabase = createSupabaseClient();
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: `${window.location.origin}/api/auth/callback?next=${encodeURIComponent("/dashboard")}`,
+      },
+    });
+    if (error) {
+      setError(error.message);
+      setLoading(false);
+    }
+  };
 
   /* ------------------------------------------------------------- */
   /*  Navigation                                                    */
@@ -858,7 +876,9 @@ export default function RegisterForm() {
                         type="button"
                         disabled={!m.available}
                         onClick={() => {
-                          if (m.available) {
+                          if (m.key === "google") {
+                            void handleGoogleSignup();
+                          } else if (m.available) {
                             transitionTo(m.key);
                           } else {
                             setError(`${m.label} is not available yet.`);
