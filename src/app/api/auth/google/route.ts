@@ -23,7 +23,9 @@ export async function GET(req: NextRequest) {
   authorizationUrl.searchParams.set("scope", "openid email profile");
   authorizationUrl.searchParams.set("state", state);
   authorizationUrl.searchParams.set("access_type", "online");
-  authorizationUrl.searchParams.set("prompt", "select_account");
+  // Keep account selection and the explicit Google consent/Continue step.
+  // `select_account` alone can immediately continue for an already-approved account.
+  authorizationUrl.searchParams.set("prompt", "select_account consent");
 
   const response = NextResponse.redirect(authorizationUrl);
   response.cookies.set("binzeo_google_oauth_state", `${state}.${encodeURIComponent(next)}`, {
