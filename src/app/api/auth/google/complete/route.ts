@@ -9,15 +9,12 @@ import { isValidUsername, normalizeUsername, usernameExists } from "@/lib/userna
 import { ok, fail } from "@/lib/api/response";
 import { logUserActivity } from "@/lib/activity-log";
 
-const optionalName = (minimum: number) => z.preprocess(
-  (value) => typeof value === "string" && value.trim() === "" ? undefined : value,
-  z.string().trim().min(minimum).max(80).optional(),
-);
+const requiredName = (minimum: number) => z.string().trim().min(minimum).max(80);
 
 const completeSchema = z.object({
   username: z.string().min(3).max(30),
-  first_name: optionalName(2),
-  last_name: optionalName(1),
+  first_name: requiredName(2),
+  last_name: requiredName(1),
   date_of_birth: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
   terms_accepted: z.literal(true),
   privacy_accepted: z.literal(true),
@@ -35,6 +32,22 @@ export async function POST(req: NextRequest) {
     const { data: { user }, error: userError } = await supabase.auth.getUser();
     if (userError || !user) return fail("Please continue with Google first", 401, "UNAUTHORIZED");
 
+    const metadata = user.user_metadata ?? {};
+    const isGoogleUser = metadata.auth_provider === "google" || Boolean(metadata.google_sub);
+    if (!isGoogleUser || !user.email_confirmed_at) {
+      return fail("A verified Google signup session is required", 403, "GOOGLE_SIGNUP_REQUIRED");
+    }
+
+    const admin = getSupabaseAdmin();
+    const { data: currentProfile } = await admin
+      .from("profiles")
+      .select("id, account_status, username")
+      .eq("id", user.id)
+      .maybeSingle();
+    if (currentProfile?.account_status === "active") {
+      return fail("This Google account has already been completed", 409, "GOOGLE_SIGNUP_ALREADY_COMPLETED");
+    }
+
     const parsed = completeSchema.safeParse(await req.json());
     if (!parsed.success) return fail(parsed.error.issues[0]?.message ?? "Invalid input", 422, "VALIDATION_ERROR");
     const input = parsed.data;
@@ -42,24 +55,19 @@ export async function POST(req: NextRequest) {
     if (!isValidUsername(username)) return fail("Choose a valid available username", 422, "INVALID_USERNAME");
     const birthDateError = validateBirthDate(input.date_of_birth);
     if (birthDateError) return fail(birthDateError, 422, "INVALID_DATE_OF_BIRTH");
+
     const location = await resolveRequestLocation(req.headers, true, {
       latitude: input.location.latitude,
       longitude: input.location.longitude,
       accuracyMeters: input.location.accuracy_meters,
     });
-    const admin = getSupabaseAdmin();
-    const { data: profile } = await admin
-      .from("profiles")
-      .select("first_name, last_name")
-      .eq("id", user.id)
-      .maybeSingle();
-    const firstName = input.first_name?.trim() || profile?.first_name || String(user.user_metadata?.given_name ?? "Google").trim();
-    const lastName = input.last_name?.trim() || profile?.last_name || String(user.user_metadata?.family_name ?? "User").trim();
     if (await usernameExists(username)) {
-      const { data: current } = await admin.from("profiles").select("username").eq("id", user.id).maybeSingle();
-      if (current?.username !== username) return fail(`@${username} is already taken. Choose another username.`, 409, "USERNAME_ALREADY_EXISTS");
+      if (currentProfile?.username !== username) return fail(`@${username} is already taken. Choose another username.`, 409, "USERNAME_ALREADY_EXISTS");
     }
+
     const consentDate = new Date().toISOString();
+    const firstName = input.first_name.trim();
+    const lastName = input.last_name.trim();
     const { data: savedProfile, error: profileError } = await admin.from("profiles").upsert({
       id: user.id,
       first_name: firstName,
@@ -76,12 +84,27 @@ export async function POST(req: NextRequest) {
       location_consent_at: consentDate,
       consent_date: consentDate,
       account_status: "active",
-    }, { onConflict: "id" }).select("id").maybeSingle();
+      status_reason: "google_signup_completed",
+    }, { onConflict: "id" }).select("id, binzeo_user_id").maybeSingle();
     if (profileError || !savedProfile) {
       if (profileError?.code === "23505") return fail(`@${username} is already taken. Choose another username.`, 409, "USERNAME_ALREADY_EXISTS");
       console.error("[GOOGLE_PROFILE_SETUP_ERROR]", profileError);
       return fail("Profile setup failed", 500, "PROFILE_SETUP_FAILED");
     }
+
+    const { data: updatedAuth, error: authUpdateError } = await admin.auth.admin.updateUserById(user.id, {
+      user_metadata: {
+        ...metadata,
+        auth_provider: "google",
+        signup_flow: "google_complete",
+        google_signup_completed_at: consentDate,
+      },
+    });
+    if (authUpdateError || !updatedAuth.user) {
+      console.error("[GOOGLE_AUTH_COMPLETION_METADATA_ERROR]", authUpdateError);
+      return fail("Account completion could not be finalized", 500, "ACCOUNT_COMPLETION_FAILED");
+    }
+
     await upsertUserBirthday({ userId: user.id, email: user.email ?? "", displayName: `${firstName} ${lastName}`.trim(), birthDate: input.date_of_birth });
     const { error: verificationError } = await admin.from("user_verification_records").upsert({
       user_id: user.id,
@@ -95,6 +118,7 @@ export async function POST(req: NextRequest) {
       updated_at: consentDate,
     }, { onConflict: "user_id,verification_type" });
     if (verificationError) throw verificationError;
+
     const device = await upsertUserDevice(supabase, user.id, req.headers, location.ip);
     await supabase.from("user_login_history").insert({
       user_id: user.id,
@@ -128,11 +152,12 @@ export async function POST(req: NextRequest) {
     await logUserActivity(supabase, req, {
       userId: user.id,
       activityType: "account_created",
-      description: "BINZEO account created with Google OAuth.",
+      description: "BINZEO account created with Google OAuth after profile completion.",
       deviceId: device.id,
-      metadata: { signup_method: "google", email_verified_by: "google_oauth" },
+      metadata: { signup_method: "google", email_verified_by: "google_oauth", binzeo_user_id: savedProfile.binzeo_user_id ?? null },
     });
-    return ok({ user: { id: user.id, email: user.email, first_name: firstName, last_name: lastName } }, 201);
+
+    return ok({ user: { id: user.id, email: user.email, first_name: firstName, last_name: lastName, binzeo_user_id: savedProfile.binzeo_user_id ?? null } }, 201);
   } catch (err) {
     console.error("[GOOGLE_PROFILE_SETUP_ERROR]", err);
     return fail("Internal server error", 500, "INTERNAL_ERROR");

@@ -3,6 +3,12 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 
+type GoogleUser = {
+  id: string;
+  email?: string;
+  user_metadata?: Record<string, unknown>;
+};
+
 function safeNext(value: string | null) {
   return value && value.startsWith("/") && !value.startsWith("//") ? value : "/dashboard";
 }
@@ -18,20 +24,23 @@ function envValue(value: string | undefined) {
 async function findOrCreateUser(email: string, metadata: Record<string, unknown>) {
   const admin = getSupabaseAdmin();
   let page = 1;
-  type ExistingUser = { id: string; user_metadata?: Record<string, unknown> };
-  let existing: ExistingUser | null = null;
+  let existing: GoogleUser | null = null;
 
   while (!existing) {
     const { data, error } = await admin.auth.admin.listUsers({ page, perPage: 1000 });
     if (error) throw error;
     const match = data.users.find((user) => user.email?.toLowerCase() === email.toLowerCase());
-    existing = match ? { id: match.id, user_metadata: match.user_metadata } : null;
+    existing = match ? { id: match.id, email: match.email, user_metadata: match.user_metadata } : null;
     if (data.users.length < 1000) break;
     page += 1;
   }
 
   if (existing) {
-    const mergedMetadata = { ...(existing.user_metadata ?? {}), ...metadata, auth_provider: "google" };
+    const mergedMetadata = {
+      ...(existing.user_metadata ?? {}),
+      ...metadata,
+      auth_provider: "google",
+    };
     const { data, error } = await admin.auth.admin.updateUserById(existing.id, {
       user_metadata: mergedMetadata,
     });
@@ -39,31 +48,21 @@ async function findOrCreateUser(email: string, metadata: Record<string, unknown>
     return data.user;
   }
 
+  // The database trigger deliberately skips public profile creation for this marker.
+  // The profile and BINZEO ID are created only by /api/auth/google/complete.
   const { data, error } = await admin.auth.admin.createUser({
     email,
     email_confirm: true,
-    user_metadata: { ...metadata, auth_provider: "google" },
+    user_metadata: {
+      ...metadata,
+      auth_provider: "google",
+      signup_flow: "google_pending",
+      google_signup_started_at: new Date().toISOString(),
+    },
   });
   if (error || !data.user) throw error ?? new Error("Google account creation failed");
   return data.user;
 }
-
-async function seedGoogleIdentity(user: {
-  id: string;
-  user_metadata?: Record<string, unknown>;
-}) {
-  const metadata = user.user_metadata ?? {};
-  const admin = getSupabaseAdmin();
-  const { error } = await admin.from("profiles").upsert({
-    id: user.id,
-    first_name: String(metadata.given_name ?? "").trim() || null,
-    last_name: String(metadata.family_name ?? "").trim() || null,
-    display_name: String(metadata.name ?? "Google user").trim() || "Google user",
-    profile_photo_url: String(metadata.picture ?? "") || null,
-  }, { onConflict: "id" });
-  if (error) throw error;
-}
-
 
 export async function GET(req: NextRequest) {
   const code = req.nextUrl.searchParams.get("code");
@@ -136,7 +135,6 @@ export async function GET(req: NextRequest) {
       family_name: googleUser.family_name ?? null,
       picture: googleUser.picture ?? null,
     });
-    await seedGoogleIdentity(user);
 
     const admin = getSupabaseAdmin();
     const setupRedirect = new URL(`/signup?google_setup=1&next=${encodeURIComponent(next)}`, req.url).toString();
@@ -153,8 +151,14 @@ export async function GET(req: NextRequest) {
     if (hashedToken) {
       const { data: sessionData, error: sessionError } = await supabase.auth.verifyOtp({ token_hash: hashedToken, type: "email" });
       if (!sessionError && sessionData.session && sessionData.user?.id === user.id) {
-        const { data: profile } = await admin.from("profiles").select("account_status, username, date_of_birth, terms_accepted, location_consent").eq("id", user.id).maybeSingle();
-        const isComplete = profile?.account_status === "active" && Boolean(profile.username && profile.date_of_birth && profile.terms_accepted && profile.location_consent);
+        const { data: profile } = await admin
+          .from("profiles")
+          .select("account_status, username, date_of_birth, terms_accepted, privacy_accepted, location_consent")
+          .eq("id", user.id)
+          .maybeSingle();
+        const isComplete = profile?.account_status === "active" && Boolean(
+          profile.username && profile.date_of_birth && profile.terms_accepted && profile.privacy_accepted && profile.location_consent,
+        );
         const destination = isComplete ? next : `/signup?google_setup=1&next=${encodeURIComponent(next)}`;
         const response = NextResponse.redirect(new URL(destination, req.url));
         response.cookies.delete("binzeo_google_oauth_state");
