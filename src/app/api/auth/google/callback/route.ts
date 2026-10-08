@@ -125,20 +125,36 @@ export async function GET(req: NextRequest) {
     await seedGoogleIdentity(user);
 
     const admin = getSupabaseAdmin();
-    const { data: linkData, error: linkError } = await admin.auth.admin.generateLink({ type: "magiclink", email: googleUser.email });
+    const setupRedirect = new URL(`/signup?google_setup=1&next=${encodeURIComponent(next)}`, req.url).toString();
+    const { data: linkData, error: linkError } = await admin.auth.admin.generateLink({
+      type: "magiclink",
+      email: googleUser.email,
+      options: { redirectTo: setupRedirect },
+    });
+    const actionLink = linkData?.properties?.action_link;
     const hashedToken = linkData?.properties?.hashed_token;
-    if (linkError || !hashedToken) return errorRedirect(req, "google_session_failed");
+    if (linkError || (!hashedToken && !actionLink)) return errorRedirect(req, "google_session_failed");
 
     const supabase = await createClient();
-    const { data: sessionData, error: sessionError } = await supabase.auth.verifyOtp({ token_hash: hashedToken, type: "email" });
-    if (sessionError || !sessionData.session || sessionData.user?.id !== user.id) return errorRedirect(req, "google_session_failed");
+    if (hashedToken) {
+      const { data: sessionData, error: sessionError } = await supabase.auth.verifyOtp({ token_hash: hashedToken, type: "email" });
+      if (!sessionError && sessionData.session && sessionData.user?.id === user.id) {
+        const { data: profile } = await admin.from("profiles").select("account_status, username, date_of_birth, terms_accepted, location_consent").eq("id", user.id).maybeSingle();
+        const isComplete = profile?.account_status === "active" && Boolean(profile.username && profile.date_of_birth && profile.terms_accepted && profile.location_consent);
+        const destination = isComplete ? next : `/signup?google_setup=1&next=${encodeURIComponent(next)}`;
+        const response = NextResponse.redirect(new URL(destination, req.url));
+        response.cookies.delete("binzeo_google_oauth_state");
+        return response;
+      }
+    }
 
-    const { data: profile } = await admin.from("profiles").select("account_status, username, date_of_birth, terms_accepted, location_consent").eq("id", user.id).maybeSingle();
-    const isComplete = profile?.account_status === "active" && Boolean(profile.username && profile.date_of_birth && profile.terms_accepted && profile.location_consent);
-    const destination = isComplete ? next : `/signup?google_setup=1&next=${encodeURIComponent(next)}`;
-    const response = NextResponse.redirect(new URL(destination, req.url));
-    response.cookies.delete("binzeo_google_oauth_state");
-    return response;
+    if (actionLink) {
+      const response = NextResponse.redirect(actionLink);
+      response.cookies.delete("binzeo_google_oauth_state");
+      return response;
+    }
+
+    return errorRedirect(req, "google_session_failed");
   } catch (error) {
     console.error("[GOOGLE_OAUTH_ERROR]", error);
     return errorRedirect(req, "google_login_failed");
