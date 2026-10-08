@@ -4,28 +4,15 @@ import { createClient } from "@/lib/supabase/server";
 const trustItems = ["Encrypted by default", "Passkey ready", "Location-aware", "One memorable ID", "Built for everyone"];
 
 const featureCards = [
-  {
-    title: "Identity that grows with you",
-    body: "Keep your profile, access and connections organised in one secure identity layer.",
-    image: "/images/img3D.jpg",
-    tone: "lavender",
-  },
-  {
-    title: "Always private, always yours",
-    body: "Choose what you share, when you share it, and keep control of every verified session.",
-    tone: "ink",
-  },
-  {
-    title: "Ready wherever you go",
-    body: "A calm, reliable identity for work, community and the digital spaces you use every day.",
-    tone: "ink",
-  },
+  { title: "Identity that grows with you", body: "Keep your profile, access and connections organised in one secure identity layer.", image: "/images/img16.jpg", tone: "lavender" },
+  { title: "Always private, always yours", body: "Choose what you share, when you share it, and keep control of every verified session.", tone: "ink" },
+  { title: "Ready wherever you go", body: "A calm, reliable identity for work, community and the digital spaces you use every day.", tone: "ink" },
 ];
 
 const useCases = [
-  { label: "Personal identity", title: "Your digital self, beautifully organised.", image: "/images/img7.jpg" },
-  { label: "Secure access", title: "A softer way to move through the internet.", image: "/images/img8.jpg" },
-  { label: "Connected life", title: "Share the right details with confidence.", image: "/images/img9.jpg" },
+  { label: "Personal identity", title: "Your digital self, beautifully organised.", image: "/images/img12.jpg" },
+  { label: "Secure access", title: "A softer way to move through the internet.", image: "/images/img11.jpg" },
+  { label: "Connected life", title: "Share the right details with confidence.", image: "/images/img20.jpg" },
 ];
 
 export default async function HomePage() {
@@ -36,28 +23,12 @@ export default async function HomePage() {
   return (
     <main className="reference-home">
       <div className="reference-shell">
-        <section className="reference-hero">
-          <div className="reference-hero-copy">
-            <span className="reference-mark" aria-hidden="true">✦</span>
-            <p className="reference-eyebrow">BINZEO digital identity</p>
+        <section className="reference-hero-banner">
+          <img src="/images/img20.jpg" alt="A luminous digital world" />
+          <div className="reference-hero-banner-overlay" />
+          <div className="reference-hero-title">
+            <p>BINZEO digital identity</p>
             <h1>Where your identity feels at home.</h1>
-            <p className="reference-lede">A secure, memorable identity for the way you live, work and connect online.</p>
-            <div className="reference-actions">
-              <Link href={isLoggedIn ? "/dashboard" : "/signup"} className="reference-button reference-button-dark">
-                {isLoggedIn ? "Open dashboard" : "Create your BINZEO ID"}
-                <span aria-hidden="true">→</span>
-              </Link>
-              <Link href="#what-is-binzeo" className="reference-button reference-button-soft">Explore BINZEO</Link>
-            </div>
-          </div>
-          <div className="reference-hero-art" aria-label="A 3D digital identity landscape">
-            <div className="reference-art-glow" />
-            <div className="reference-orbit reference-orbit-a" />
-            <div className="reference-orbit reference-orbit-b" />
-            <div className="reference-identity-disc"><span>BZ</span></div>
-            <span className="reference-art-chip reference-art-chip-a">verified / live</span>
-            <span className="reference-art-chip reference-art-chip-b">BZ-U / 01</span>
-            <img src="/images/img3D.jpg" alt="Soft green digital landscape" />
           </div>
         </section>
 
@@ -88,10 +59,7 @@ export default async function HomePage() {
 
         <section className="reference-usecases">
           <div className="reference-usecase-heading">
-            <div>
-              <p className="reference-kicker">BINZEO in action</p>
-              <h2>Use cases</h2>
-            </div>
+            <div><p className="reference-kicker">BINZEO in action</p><h2>Use cases</h2></div>
             <p>One identity layer for people, teams and communities that value clarity, privacy and connection.</p>
           </div>
           <div className="reference-usecase-grid">
@@ -109,7 +77,7 @@ export default async function HomePage() {
         </section>
 
         <section className="reference-bottom-cta">
-          <img src="/images/img5.jpg" alt="Open sky and a calm landscape" />
+          <img src="/images/img13.jpg" alt="A connected cloud data environment" />
           <div>
             <p className="reference-kicker">A better beginning</p>
             <h2>One ID. More room to be you.</h2>
