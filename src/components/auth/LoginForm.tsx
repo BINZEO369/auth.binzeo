@@ -6,7 +6,6 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { getClientDeviceId, requestPreciseLocation } from "@/lib/client-device";
 import { startAuthentication } from "@simplewebauthn/browser";
-import { createClient as createSupabaseClient } from "@/lib/supabase/client";
 
 /* ================================================================== */
 /*  Types                                                              */
@@ -428,19 +427,7 @@ export default function LoginForm() {
   /*  Navigation helpers                                            */
   /* ------------------------------------------------------------- */
   const handleGoogleLogin = async () => {
-    setError("");
-    setLoading(true);
-    const supabase = createSupabaseClient();
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: {
-        redirectTo: `${window.location.origin}/api/auth/callback?next=${encodeURIComponent(next)}`,
-      },
-    });
-    if (error) {
-      setError(error.message);
-      setLoading(false);
-    }
+    window.location.assign(`/api/auth/google?next=${encodeURIComponent(next)}`);
   };
 
   const selectMethod = (m: Stage) => {

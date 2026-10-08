@@ -5,7 +5,6 @@ import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { getClientDeviceId, requestPreciseLocation } from "@/lib/client-device";
-import { createClient as createSupabaseClient } from "@/lib/supabase/client";
 
 /* ================================================================== */
 /*  Types                                                              */
@@ -379,19 +378,7 @@ export default function RegisterForm() {
   }, []);
 
   const handleGoogleSignup = async () => {
-    setError("");
-    setLoading(true);
-    const supabase = createSupabaseClient();
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: {
-        redirectTo: `${window.location.origin}/api/auth/callback?next=${encodeURIComponent("/dashboard")}`,
-      },
-    });
-    if (error) {
-      setError(error.message);
-      setLoading(false);
-    }
+    window.location.assign(`/api/auth/google?next=${encodeURIComponent("/dashboard")}`);
   };
 
   /* ------------------------------------------------------------- */
