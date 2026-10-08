@@ -9,10 +9,15 @@ import { isValidUsername, normalizeUsername, usernameExists } from "@/lib/userna
 import { ok, fail } from "@/lib/api/response";
 import { logUserActivity } from "@/lib/activity-log";
 
+const optionalName = (minimum: number) => z.preprocess(
+  (value) => typeof value === "string" && value.trim() === "" ? undefined : value,
+  z.string().trim().min(minimum).max(80).optional(),
+);
+
 const completeSchema = z.object({
   username: z.string().min(3).max(30),
-  first_name: z.string().min(2).max(80).optional(),
-  last_name: z.string().min(1).max(80).optional(),
+  first_name: optionalName(2),
+  last_name: optionalName(1),
   date_of_birth: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
   terms_accepted: z.literal(true),
   privacy_accepted: z.literal(true),
