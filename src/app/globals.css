@@ -1113,3 +1113,39 @@ a { color: inherit; text-decoration: none; }
   .reference-hero-banner { min-height: 66vh; }
   .reference-hero-title h1 { font-size: clamp(3rem, 13vw, 6rem); }
 }
+
+.reference-video-banner {
+  position: relative;
+  min-height: min(62vh, 620px);
+  overflow: hidden;
+  isolation: isolate;
+  background: #141426;
+}
+.reference-video-banner video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  filter: saturate(0.82) contrast(1.04);
+}
+.reference-video-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(180deg, rgba(20,20,44,0.08), rgba(20,20,44,0.16) 44%, rgba(20,20,44,0.82));
+}
+.reference-video-caption {
+  position: absolute;
+  right: clamp(1.25rem, 6vw, 5.5rem);
+  bottom: clamp(1.5rem, 5vw, 4rem);
+  z-index: 2;
+  max-width: 28rem;
+  color: white;
+}
+.reference-video-caption .reference-kicker { margin: 0 0 0.75rem; color: rgba(255,255,255,0.65); }
+.reference-video-caption h2 { margin: 0; font-size: clamp(2.3rem, 5vw, 5rem); font-weight: 500; letter-spacing: -0.065em; line-height: 0.96; }
+@media (max-width: 640px) {
+  .reference-video-banner { min-height: 52vh; }
+}

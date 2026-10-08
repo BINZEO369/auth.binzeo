@@ -4,7 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 const trustItems = ["Encrypted by default", "Passkey ready", "Location-aware", "One memorable ID", "Built for everyone"];
 
 const featureCards = [
-  { title: "Identity that grows with you", body: "Keep your profile, access and connections organised in one secure identity layer.", image: "/images/img16.jpg", tone: "lavender" },
+  { title: "Identity that grows with you", body: "Keep your profile, access and connections organised in one secure identity layer.", tone: "lavender" },
   { title: "Always private, always yours", body: "Choose what you share, when you share it, and keep control of every verified session.", tone: "ink" },
   { title: "Ready wherever you go", body: "A calm, reliable identity for work, community and the digital spaces you use every day.", tone: "ink" },
 ];
@@ -47,7 +47,6 @@ export default async function HomePage() {
               <div className="reference-card-topline"><span>0{index + 1}</span><span aria-hidden="true">↗</span></div>
               <h3>{card.title}</h3>
               <p>{card.body}</p>
-              {card.image && <img src={card.image} alt="" />}
             </article>
           ))}
         </section>
@@ -73,6 +72,17 @@ export default async function HomePage() {
                 <img src={item.image} alt="" />
               </article>
             ))}
+          </div>
+        </section>
+
+        <section className="reference-video-banner" aria-label="BINZEO video showcase">
+          <video autoPlay muted loop playsInline preload="metadata" poster="/images/img19.jpg">
+            <source src="/videos/vid3.mp4" type="video/mp4" />
+          </video>
+          <div className="reference-video-overlay" />
+          <div className="reference-video-caption">
+            <p className="reference-kicker">BINZEO in motion</p>
+            <h2>Identity for the way you move.</h2>
           </div>
         </section>
 
