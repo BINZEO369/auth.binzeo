@@ -1,7 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { ok, fail } from "@/lib/api/response";
 
-export const revalidate = 3600; // cache 1 hour
+export const dynamic = "force-dynamic";
 
 export async function GET() {
   try {
