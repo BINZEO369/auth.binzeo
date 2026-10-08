@@ -6,8 +6,10 @@ function safeNext(value: string | null) {
 }
 
 export async function GET(req: NextRequest) {
-  const clientId = process.env.GOOGLE_CLIENT_ID;
-  const redirectUri = process.env.GOOGLE_REDIRECT_URI || new URL("/api/auth/google/callback", req.url).toString();
+  const clientId = process.env.GOOGLE_CLIENT_ID?.trim().replace(/^['"]|['"]$/g, "");
+  // Keep the authorization and token exchange on the exact same production URI.
+  // A stale GOOGLE_REDIRECT_URI is a common cause of Google's invalid_grant error.
+  const redirectUri = new URL("/api/auth/google/callback", req.url).toString();
   if (!clientId) {
     return NextResponse.redirect(new URL("/signin?error=google_not_configured", req.url));
   }

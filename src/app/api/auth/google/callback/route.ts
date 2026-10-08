@@ -11,6 +11,10 @@ function errorRedirect(req: NextRequest, code: string) {
   return NextResponse.redirect(new URL(`/signin?error=${encodeURIComponent(code)}`, req.url));
 }
 
+function envValue(value: string | undefined) {
+  return value?.trim().replace(/^['"]|['"]$/g, "");
+}
+
 async function findOrCreateUser(email: string, metadata: Record<string, unknown>) {
   const admin = getSupabaseAdmin();
   let page = 1;
@@ -66,7 +70,7 @@ export async function GET(req: NextRequest) {
   const returnedState = req.nextUrl.searchParams.get("state");
   const oauthError = req.nextUrl.searchParams.get("error");
   const stateCookie = req.cookies.get("binzeo_google_oauth_state")?.value;
-  const redirectUri = process.env.GOOGLE_REDIRECT_URI || new URL("/api/auth/google/callback", req.url).toString();
+  const redirectUri = new URL("/api/auth/google/callback", req.url).toString();
 
   if (oauthError) return errorRedirect(req, `google_${oauthError}`);
   if (!code || !returnedState || !stateCookie) return errorRedirect(req, "google_invalid_callback");
@@ -78,8 +82,8 @@ export async function GET(req: NextRequest) {
     return errorRedirect(req, "google_invalid_state");
   }
   const next = safeNext(decodeURIComponent(encodedNext));
-  const clientId = process.env.GOOGLE_CLIENT_ID;
-  const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
+  const clientId = envValue(process.env.GOOGLE_CLIENT_ID);
+  const clientSecret = envValue(process.env.GOOGLE_CLIENT_SECRET);
   if (!clientId || !clientSecret) return errorRedirect(req, "google_not_configured");
 
   try {
@@ -95,8 +99,18 @@ export async function GET(req: NextRequest) {
       }),
       cache: "no-store",
     });
-    const tokenData = await tokenResponse.json() as { access_token?: string; error?: string };
-    if (!tokenResponse.ok || !tokenData.access_token) return errorRedirect(req, "google_token_exchange_failed");
+    const tokenData = await tokenResponse.json() as { access_token?: string; error?: string; error_description?: string };
+    if (!tokenResponse.ok || !tokenData.access_token) {
+      console.error("[GOOGLE_TOKEN_EXCHANGE_ERROR]", {
+        status: tokenResponse.status,
+        error: tokenData.error,
+        description: tokenData.error_description,
+        redirectUri,
+        clientIdSuffix: clientId?.slice(-8),
+      });
+      const detail = tokenData.error === "invalid_client" ? "invalid_client" : tokenData.error === "invalid_grant" ? "invalid_grant" : "provider_error";
+      return errorRedirect(req, `google_token_exchange_failed_${detail}`);
+    }
 
     const userResponse = await fetch("https://www.googleapis.com/oauth2/v3/userinfo", {
       headers: { Authorization: `Bearer ${tokenData.access_token}` },
