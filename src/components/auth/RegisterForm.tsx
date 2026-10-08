@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useCallback, useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { getClientDeviceId, requestPreciseLocation } from "@/lib/client-device";
 
@@ -216,8 +216,10 @@ function StepCard({
 /* ================================================================== */
 export default function RegisterForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const googleSetup = searchParams.get("google_setup") === "1";
 
-  const [stage, setStage] = useState<Stage>("logo");
+  const [stage, setStage] = useState<Stage>(googleSetup ? "username" : "logo");
   const [logoExiting, setLogoExiting] = useState(false);
   const [welcomeExiting, setWelcomeExiting] = useState(false);
   const [cardFade, setCardFade] = useState<"idle" | "in" | "out">("idle");
@@ -249,6 +251,22 @@ export default function RegisterForm() {
   const [usernameCheckError, setUsernameCheckError] = useState("");
   const [checkedUsername, setCheckedUsername] = useState("");
 
+  useEffect(() => {
+    if (!googleSetup) return;
+    let cancelled = false;
+    fetch("/api/auth/session", { cache: "no-store" })
+      .then((response) => response.json())
+      .then((data) => {
+        if (cancelled || !data.success) return;
+        const profile = data.data?.profile;
+        const user = data.data?.user;
+        setEmail(user?.email ?? "");
+        setFirstName(profile?.first_name ?? "");
+        setLastName(profile?.last_name ?? "");
+      })
+      .catch(() => undefined);
+    return () => { cancelled = true; };
+  }, []);
   /* ------------------------------------------------------------- */
   /*  Auto transitions                                              */
   /* ------------------------------------------------------------- */
@@ -412,6 +430,35 @@ export default function RegisterForm() {
     setLoading(true);
     try {
       const preciseLocation = await requestPreciseLocation();
+      if (googleSetup) {
+        const res = await fetch("/api/auth/google/complete", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "x-binzeo-device-id": getClientDeviceId(),
+          },
+          body: JSON.stringify({
+            first_name: firstName.trim(),
+            last_name: lastName.trim(),
+            date_of_birth: dateOfBirth,
+            username: username.trim().toLowerCase().replace(/^@/, ""),
+            terms_accepted: acceptTerms,
+            privacy_accepted: acceptTerms,
+            location_consent: allowLocation,
+            location: preciseLocation,
+          }),
+        });
+        const data = await res.json();
+        if (!data.success) {
+          setError(data.error?.message ?? "Profile setup failed");
+          setLoading(false);
+          return;
+        }
+        setLoading(false);
+        setStage("success");
+        setTimeout(() => { router.push("/dashboard"); router.refresh(); }, 1200);
+        return;
+      }
       const res = await fetch("/api/auth/signup", {
         method: "POST",
         headers: {
@@ -1035,7 +1082,7 @@ export default function RegisterForm() {
                   <ProgressBar current={2} total={8} />
                   <h2 className="text-[24px] font-semibold tracking-[-0.03em]">Choose your username</h2>
                   <p className="mt-1.5 text-[13px] text-white/55">This becomes your permanent public BINZEO link.</p>
-                  <form onSubmit={(e) => { e.preventDefault(); if (usernameAvailable && checkedUsername === username.trim().toLowerCase().replace(/^@/, "")) transitionTo("first_name"); }} className="mt-7 space-y-3">
+                  <form onSubmit={(e) => { e.preventDefault(); if (usernameAvailable && checkedUsername === username.trim().toLowerCase().replace(/^@/, "")) transitionTo(googleSetup ? "date_of_birth" : "first_name"); }} className="mt-7 space-y-3">
                     <div className="flex items-center rounded-2xl border border-white/15 bg-white/5 px-4 focus-within:border-white/40"><span className="text-white/50">@</span><input type="text" value={username} onChange={(e) => setUsername(e.target.value.toLowerCase().replace(/[^a-z0-9_@]/g, ""))} autoComplete="username" autoFocus placeholder="sharif" className="w-full bg-transparent px-2 py-3.5 text-sm text-white outline-none" /></div>
                     {usernameChecking && <div className="text-xs text-white/50">Checking username availability...</div>}
                     {!usernameChecking && usernameAvailable && <div className="text-sm text-white/75">@{checkedUsername} is available.</div>}
@@ -1172,7 +1219,7 @@ export default function RegisterForm() {
                   <ProgressBar current={5} total={8} />
                   <h2 className="text-[24px] font-semibold tracking-[-0.03em]">When is your birthday?</h2>
                   <p className="mt-1.5 text-[13px] text-white/55">Your date of birth helps us keep your identity accurate and celebrate your day.</p>
-                  <form onSubmit={(e) => { e.preventDefault(); if (!dateOfBirth) { setError("Date of birth is required"); return; } const date = new Date(`${dateOfBirth}T00:00:00Z`); if (Number.isNaN(date.getTime()) || date > new Date()) { setError("Enter a valid date of birth"); return; } transitionTo("password"); }} className="mt-7 space-y-3">
+                  <form onSubmit={(e) => { e.preventDefault(); if (!dateOfBirth) { setError("Date of birth is required"); return; } const date = new Date(`${dateOfBirth}T00:00:00Z`); if (Number.isNaN(date.getTime()) || date > new Date()) { setError("Enter a valid date of birth"); return; } transitionTo(googleSetup ? "terms" : "password"); }} className="mt-7 space-y-3">
                     <label className="block text-[11px] uppercase tracking-[0.14em] text-white/50">Date of birth</label>
                     <input type="date" value={dateOfBirth} onChange={(e) => setDateOfBirth(e.target.value)} autoFocus max={new Date().toISOString().slice(0, 10)} className={fieldClass} />
                     {error && <div className="rounded-2xl border border-red-400/25 bg-red-500/10 px-4 py-3 text-sm text-red-200">{error}</div>}

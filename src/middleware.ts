@@ -36,7 +36,8 @@ export async function middleware(req: NextRequest) {
     return NextResponse.redirect(url)
   }
 
-  if (user && AUTH_ONLY.some((p) => pathname.startsWith(p))) {
+  const isGoogleSetup = pathname === "/signup" && req.nextUrl.searchParams.get("google_setup") === "1"
+  if (user && AUTH_ONLY.some((p) => pathname.startsWith(p)) && !isGoogleSetup) {
     const url = req.nextUrl.clone()
     url.pathname = '/dashboard'
     return NextResponse.redirect(url)

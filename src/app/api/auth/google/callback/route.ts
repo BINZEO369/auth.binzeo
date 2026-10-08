@@ -2,7 +2,6 @@ import { timingSafeEqual } from "node:crypto";
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
-import { isValidUsername, normalizeUsername } from "@/lib/username";
 
 function safeNext(value: string | null) {
   return value && value.startsWith("/") && !value.startsWith("//") ? value : "/dashboard";
@@ -45,50 +44,34 @@ async function findOrCreateUser(email: string, metadata: Record<string, unknown>
   return data.user;
 }
 
-async function prepareProfile(user: {
+async function seedGoogleIdentity(user: {
   id: string;
-  email?: string;
   user_metadata?: Record<string, unknown>;
 }) {
-  const admin = getSupabaseAdmin();
   const metadata = user.user_metadata ?? {};
-  const givenName = String(metadata.given_name ?? metadata.first_name ?? "").trim();
-  const familyName = String(metadata.family_name ?? metadata.last_name ?? "").trim();
-  const emailName = (user.email ?? "").split("@")[0] ?? "";
-  const displayName = String(metadata.name ?? metadata.full_name ?? `${givenName} ${familyName}`).trim() || emailName || "Google user";
+  const admin = getSupabaseAdmin();
+  await admin.from("profiles").update({
+    first_name: String(metadata.given_name ?? "").trim() || null,
+    last_name: String(metadata.family_name ?? "").trim() || null,
+    display_name: String(metadata.name ?? "Google user").trim() || "Google user",
+    profile_photo_url: String(metadata.picture ?? "") || null,
+  }).eq("id", user.id);
+}
 
-  const { data: profile, error: profileError } = await admin
-    .from("profiles")
-    .select("id, username")
-    .eq("id", user.id)
-    .maybeSingle();
-  if (profileError) throw profileError;
-
-  let username = profile?.username ?? "";
-  if (!username || !isValidUsername(username)) {
-    const base = (normalizeUsername(String(metadata.email_name ?? emailName))
-      .replace(/[^a-z0-9_]/g, "")
-      .replace(/^[^a-z]+/, "")
-      .slice(0, 24) || `user${user.id.slice(0, 8)}`);
-    const candidates = [base, ...Array.from({ length: 30 }, (_, index) => `${base.slice(0, 27)}${index + 1}`)];
-    const { data: usedRows, error: usedError } = await admin.from("profiles").select("username").in("username", candidates);
-    if (usedError) throw usedError;
-    const used = new Set((usedRows ?? []).map((row) => String(row.username).toLowerCase()));
-    username = candidates.find((candidate) => isValidUsername(candidate) && !used.has(candidate)) ?? `user${user.id.slice(0, 8)}`;
-  }
-
-  const { error: updateError } = await admin
-    .from("profiles")
-    .update({
-      first_name: givenName || null,
-      last_name: familyName || null,
-      display_name: displayName,
-      username,
-      profile_photo_url: String(metadata.picture ?? metadata.avatar_url ?? "") || null,
-      account_status: "active",
-    })
-    .eq("id", user.id);
-  if (updateError) throw updateError;
+async function markGoogleEmailVerified(userId: string) {
+  const now = new Date().toISOString();
+  const { error } = await getSupabaseAdmin().from("user_verification_records").upsert({
+    user_id: userId,
+    verification_type: "email",
+    verification_status: "verified",
+    source_of_truth: "google_oauth",
+    verified_at: now,
+    last_requested_at: null,
+    expires_at: null,
+    attempt_count: 0,
+    updated_at: now,
+  }, { onConflict: "user_id,verification_type" });
+  if (error) throw error;
 }
 
 export async function GET(req: NextRequest) {
@@ -152,7 +135,8 @@ export async function GET(req: NextRequest) {
       family_name: googleUser.family_name ?? null,
       picture: googleUser.picture ?? null,
     });
-    await prepareProfile(user);
+    await seedGoogleIdentity(user);
+    await markGoogleEmailVerified(user.id);
 
     const admin = getSupabaseAdmin();
     const { data: linkData, error: linkError } = await admin.auth.admin.generateLink({ type: "magiclink", email: googleUser.email });
@@ -163,7 +147,10 @@ export async function GET(req: NextRequest) {
     const { data: sessionData, error: sessionError } = await supabase.auth.verifyOtp({ token_hash: hashedToken, type: "email" });
     if (sessionError || !sessionData.session || sessionData.user?.id !== user.id) return errorRedirect(req, "google_session_failed");
 
-    const response = NextResponse.redirect(new URL(next, req.url));
+    const { data: profile } = await admin.from("profiles").select("account_status, username, date_of_birth, terms_accepted, location_consent").eq("id", user.id).maybeSingle();
+    const isComplete = profile?.account_status === "active" && Boolean(profile.username && profile.date_of_birth && profile.terms_accepted && profile.location_consent);
+    const destination = isComplete ? next : `/signup?google_setup=1&next=${encodeURIComponent(next)}`;
+    const response = NextResponse.redirect(new URL(destination, req.url));
     response.cookies.delete("binzeo_google_oauth_state");
     return response;
   } catch (error) {
