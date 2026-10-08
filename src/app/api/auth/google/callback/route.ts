@@ -2,11 +2,13 @@ import { timingSafeEqual } from "node:crypto";
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
+import { completeGoogleAccount } from "@/lib/google-account";
 
 type GoogleUser = {
   id: string;
   email?: string;
   user_metadata?: Record<string, unknown>;
+  email_confirmed_at?: string | null;
 };
 
 function safeNext(value: string | null) {
@@ -30,26 +32,18 @@ async function findOrCreateUser(email: string, metadata: Record<string, unknown>
     const { data, error } = await admin.auth.admin.listUsers({ page, perPage: 1000 });
     if (error) throw error;
     const match = data.users.find((user) => user.email?.toLowerCase() === email.toLowerCase());
-    existing = match ? { id: match.id, email: match.email, user_metadata: match.user_metadata } : null;
+    existing = match ? { id: match.id, email: match.email, user_metadata: match.user_metadata, email_confirmed_at: match.email_confirmed_at } : null;
     if (data.users.length < 1000) break;
     page += 1;
   }
 
   if (existing) {
-    const mergedMetadata = {
-      ...(existing.user_metadata ?? {}),
-      ...metadata,
-      auth_provider: "google",
-    };
-    const { data, error } = await admin.auth.admin.updateUserById(existing.id, {
-      user_metadata: mergedMetadata,
-    });
+    const mergedMetadata = { ...(existing.user_metadata ?? {}), ...metadata, auth_provider: "google" };
+    const { data, error } = await admin.auth.admin.updateUserById(existing.id, { user_metadata: mergedMetadata });
     if (error || !data.user) throw error ?? new Error("Google account update failed");
     return data.user;
   }
 
-  // The database trigger deliberately skips public profile creation for this marker.
-  // The profile and BINZEO ID are created only by /api/auth/google/complete.
   const { data, error } = await admin.auth.admin.createUser({
     email,
     email_confirm: true,
@@ -89,24 +83,12 @@ export async function GET(req: NextRequest) {
     const tokenResponse = await fetch("https://oauth2.googleapis.com/token", {
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      body: new URLSearchParams({
-        code,
-        client_id: clientId,
-        client_secret: clientSecret,
-        redirect_uri: redirectUri,
-        grant_type: "authorization_code",
-      }),
+      body: new URLSearchParams({ code, client_id: clientId, client_secret: clientSecret, redirect_uri: redirectUri, grant_type: "authorization_code" }),
       cache: "no-store",
     });
     const tokenData = await tokenResponse.json() as { access_token?: string; error?: string; error_description?: string };
     if (!tokenResponse.ok || !tokenData.access_token) {
-      console.error("[GOOGLE_TOKEN_EXCHANGE_ERROR]", {
-        status: tokenResponse.status,
-        error: tokenData.error,
-        description: tokenData.error_description,
-        redirectUri,
-        clientIdSuffix: clientId?.slice(-8),
-      });
+      console.error("[GOOGLE_TOKEN_EXCHANGE_ERROR]", { status: tokenResponse.status, error: tokenData.error, description: tokenData.error_description, redirectUri, clientIdSuffix: clientId.slice(-8) });
       const detail = tokenData.error === "invalid_client" ? "invalid_client" : tokenData.error === "invalid_grant" ? "invalid_grant" : "provider_error";
       return errorRedirect(req, `google_token_exchange_failed_${detail}`);
     }
@@ -115,18 +97,8 @@ export async function GET(req: NextRequest) {
       headers: { Authorization: `Bearer ${tokenData.access_token}` },
       cache: "no-store",
     });
-    const googleUser = await userResponse.json() as {
-      sub?: string;
-      email?: string;
-      email_verified?: boolean;
-      name?: string;
-      given_name?: string;
-      family_name?: string;
-      picture?: string;
-    };
-    if (!userResponse.ok || !googleUser.email || googleUser.email_verified !== true) {
-      return errorRedirect(req, "google_email_not_verified");
-    }
+    const googleUser = await userResponse.json() as { sub?: string; email?: string; email_verified?: boolean; name?: string; given_name?: string; family_name?: string; picture?: string };
+    if (!userResponse.ok || !googleUser.email || googleUser.email_verified !== true) return errorRedirect(req, "google_email_not_verified");
 
     const user = await findOrCreateUser(googleUser.email, {
       google_sub: googleUser.sub ?? null,
@@ -137,11 +109,11 @@ export async function GET(req: NextRequest) {
     });
 
     const admin = getSupabaseAdmin();
-    const setupRedirect = new URL(`/signup?google_setup=1&next=${encodeURIComponent(next)}`, req.url).toString();
+    const redirectTo = new URL(`/api/auth/callback?next=${encodeURIComponent(next)}`, req.url).toString();
     const { data: linkData, error: linkError } = await admin.auth.admin.generateLink({
       type: "magiclink",
       email: googleUser.email,
-      options: { redirectTo: setupRedirect },
+      options: { redirectTo },
     });
     const actionLink = linkData?.properties?.action_link;
     const hashedToken = linkData?.properties?.hashed_token;
@@ -151,19 +123,12 @@ export async function GET(req: NextRequest) {
     if (hashedToken) {
       const { data: sessionData, error: sessionError } = await supabase.auth.verifyOtp({ token_hash: hashedToken, type: "email" });
       if (!sessionError && sessionData.session && sessionData.user?.id === user.id) {
-        const { data: profile } = await admin
-          .from("profiles")
-          .select("account_status, username, date_of_birth, terms_accepted, privacy_accepted, location_consent")
-          .eq("id", user.id)
-          .maybeSingle();
-        const isComplete = profile?.account_status === "active" && Boolean(
-          profile.username && profile.date_of_birth && profile.terms_accepted && profile.privacy_accepted && profile.location_consent,
-        );
-        const destination = isComplete ? next : `/signup?google_setup=1&next=${encodeURIComponent(next)}`;
-        const response = NextResponse.redirect(new URL(destination, req.url));
+        await completeGoogleAccount(sessionData.user, req);
+        const response = NextResponse.redirect(new URL(next, req.url));
         response.cookies.delete("binzeo_google_oauth_state");
         return response;
       }
+      console.error("[GOOGLE_SESSION_VERIFY_ERROR]", sessionError);
     }
 
     if (actionLink) {
@@ -171,7 +136,6 @@ export async function GET(req: NextRequest) {
       response.cookies.delete("binzeo_google_oauth_state");
       return response;
     }
-
     return errorRedirect(req, "google_session_failed");
   } catch (error) {
     console.error("[GOOGLE_OAUTH_ERROR]", error);
