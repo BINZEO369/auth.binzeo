@@ -86,7 +86,7 @@ export default async function HomePage() {
   const isLoggedIn = Boolean(user);
 
   return (
-    <main className="relative w-full overflow-x-hidden bg-black text-white antialiased">
+    <main className="liquid-page relative w-full overflow-x-hidden bg-black text-white antialiased">
       {/* ============================================================ */}
       {/*  KEYFRAMES                                                    */}
       {/* ============================================================ */}
@@ -135,12 +135,15 @@ export default async function HomePage() {
       {/* ============================================================ */}
       <section className="relative min-h-[100dvh] w-full flex items-center overflow-hidden pt-24 pb-16">
         <div className="absolute inset-0 z-0 overflow-hidden">
+          <div className="liquid-hero-surface absolute inset-0" />
           <div
-            className="absolute inset-0 bg-center bg-cover bg-no-repeat"
+            aria-hidden="true"
+            className="absolute inset-0 opacity-35"
             style={{
-              backgroundImage: "url('/images/img1.jpg')",
-              backgroundColor: "#000",
-              animation: "bz-kenburns 26s ease-in-out infinite",
+              backgroundImage:
+                "linear-gradient(rgba(190,240,255,0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(190,240,255,0.08) 1px, transparent 1px)",
+              backgroundSize: "72px 72px",
+              maskImage: "linear-gradient(to bottom, rgba(0,0,0,0.7), transparent 84%)",
             }}
           />
         </div>
@@ -298,6 +301,18 @@ export default async function HomePage() {
                   "bz-fade-up 1.1s cubic-bezier(0.22, 1, 0.36, 1) 0.45s both",
               }}
             >
+              <div aria-hidden="true" className="tech-scene">
+                <div className="tech-ring tech-ring-one" />
+                <div className="tech-ring tech-ring-two" />
+                <div className="tech-ring tech-ring-three" />
+                <div className="tech-core" />
+                <span className="tech-node tech-node-one" />
+                <span className="tech-node tech-node-two" />
+                <span className="tech-node tech-node-three" />
+                <span className="tech-node tech-node-four" />
+                <span className="tech-chip tech-chip-one">identity / live</span>
+                <span className="tech-chip tech-chip-two">secure node 01</span>
+              </div>
               <div
                 aria-hidden="true"
                 className="absolute -inset-8 -z-10 rounded-full blur-3xl"
@@ -309,7 +324,7 @@ export default async function HomePage() {
               />
 
               <div
-                className="relative overflow-hidden rounded-[36px] border border-white/15 p-7 sm:p-8"
+                className="relative z-10 overflow-hidden rounded-[36px] border border-white/15 p-7 sm:p-8"
                 style={{
                   background:
                     "linear-gradient(180deg, rgba(255,255,255,0.10) 0%, rgba(255,255,255,0.04) 100%)",
