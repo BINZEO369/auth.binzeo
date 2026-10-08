@@ -1,0 +1,29 @@
+import { NextResponse } from "next/server";
+import { createClient } from "@/lib/supabase/server";
+import { getSupabaseAdmin } from "@/lib/supabase/admin";
+import { fail } from "@/lib/api/response";
+
+export async function GET() {
+  try {
+    const supabase = await createClient();
+    const { data: { user }, error } = await supabase.auth.getUser();
+    if (error || !user) return fail("Please continue with Google first", 401, "UNAUTHORIZED");
+    const { data: profile, error: profileError } = await getSupabaseAdmin()
+      .from("profiles")
+      .select("first_name, last_name, username, date_of_birth")
+      .eq("id", user.id)
+      .maybeSingle();
+    if (profileError) throw profileError;
+    return NextResponse.json({
+      success: true,
+      data: {
+        user: { id: user.id, email: user.email ?? null },
+        profile: profile ?? null,
+        google_verified: user.email_confirmed_at != null,
+      },
+    });
+  } catch (err) {
+    console.error("[GOOGLE_SETUP_ERROR]", err);
+    return fail("Unable to load Google account setup", 500, "GOOGLE_SETUP_FAILED");
+  }
+}

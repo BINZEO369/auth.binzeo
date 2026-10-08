@@ -254,7 +254,7 @@ export default function RegisterForm() {
   useEffect(() => {
     if (!googleSetup) return;
     let cancelled = false;
-    fetch("/api/auth/session", { cache: "no-store" })
+    fetch("/api/auth/google/setup", { cache: "no-store" })
       .then((response) => response.json())
       .then((data) => {
         if (cancelled || !data.success) return;

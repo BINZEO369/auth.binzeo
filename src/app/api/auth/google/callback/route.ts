@@ -50,29 +50,16 @@ async function seedGoogleIdentity(user: {
 }) {
   const metadata = user.user_metadata ?? {};
   const admin = getSupabaseAdmin();
-  await admin.from("profiles").update({
+  const { error } = await admin.from("profiles").upsert({
+    id: user.id,
     first_name: String(metadata.given_name ?? "").trim() || null,
     last_name: String(metadata.family_name ?? "").trim() || null,
     display_name: String(metadata.name ?? "Google user").trim() || "Google user",
     profile_photo_url: String(metadata.picture ?? "") || null,
-  }).eq("id", user.id);
-}
-
-async function markGoogleEmailVerified(userId: string) {
-  const now = new Date().toISOString();
-  const { error } = await getSupabaseAdmin().from("user_verification_records").upsert({
-    user_id: userId,
-    verification_type: "email",
-    verification_status: "verified",
-    source_of_truth: "google_oauth",
-    verified_at: now,
-    last_requested_at: null,
-    expires_at: null,
-    attempt_count: 0,
-    updated_at: now,
-  }, { onConflict: "user_id,verification_type" });
+  }, { onConflict: "id" });
   if (error) throw error;
 }
+
 
 export async function GET(req: NextRequest) {
   const code = req.nextUrl.searchParams.get("code");
@@ -136,7 +123,6 @@ export async function GET(req: NextRequest) {
       picture: googleUser.picture ?? null,
     });
     await seedGoogleIdentity(user);
-    await markGoogleEmailVerified(user.id);
 
     const admin = getSupabaseAdmin();
     const { data: linkData, error: linkError } = await admin.auth.admin.generateLink({ type: "magiclink", email: googleUser.email });

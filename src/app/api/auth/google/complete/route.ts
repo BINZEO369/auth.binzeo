@@ -55,7 +55,7 @@ export async function POST(req: NextRequest) {
       if (current?.username !== username) return fail(`@${username} is already taken. Choose another username.`, 409, "USERNAME_ALREADY_EXISTS");
     }
     const consentDate = new Date().toISOString();
-    const { error: profileError } = await admin.from("profiles").update({
+    const { data: savedProfile, error: profileError } = await admin.from("profiles").upsert({
       first_name: firstName,
       last_name: lastName,
       display_name: `${firstName} ${lastName}`.trim(),
@@ -70,14 +70,14 @@ export async function POST(req: NextRequest) {
       location_consent_at: consentDate,
       consent_date: consentDate,
       account_status: "active",
-    }).eq("id", user.id);
-    if (profileError) {
-      if (profileError.code === "23505") return fail(`@${username} is already taken. Choose another username.`, 409, "USERNAME_ALREADY_EXISTS");
+    }, { onConflict: "id" }).select("id").maybeSingle();
+    if (profileError || !savedProfile) {
+      if (profileError?.code === "23505") return fail(`@${username} is already taken. Choose another username.`, 409, "USERNAME_ALREADY_EXISTS");
       console.error("[GOOGLE_PROFILE_SETUP_ERROR]", profileError);
       return fail("Profile setup failed", 500, "PROFILE_SETUP_FAILED");
     }
     await upsertUserBirthday({ userId: user.id, email: user.email ?? "", displayName: `${firstName} ${lastName}`.trim(), birthDate: input.date_of_birth });
-    await admin.from("user_verification_records").upsert({
+    const { error: verificationError } = await admin.from("user_verification_records").upsert({
       user_id: user.id,
       verification_type: "email",
       verification_status: "verified",
@@ -88,6 +88,7 @@ export async function POST(req: NextRequest) {
       attempt_count: 0,
       updated_at: consentDate,
     }, { onConflict: "user_id,verification_type" });
+    if (verificationError) throw verificationError;
     const device = await upsertUserDevice(supabase, user.id, req.headers, location.ip);
     await supabase.from("user_login_history").insert({
       user_id: user.id,
