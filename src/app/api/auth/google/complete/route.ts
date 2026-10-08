@@ -56,6 +56,7 @@ export async function POST(req: NextRequest) {
     }
     const consentDate = new Date().toISOString();
     const { data: savedProfile, error: profileError } = await admin.from("profiles").upsert({
+      id: user.id,
       first_name: firstName,
       last_name: lastName,
       display_name: `${firstName} ${lastName}`.trim(),
