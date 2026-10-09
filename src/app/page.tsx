@@ -11,33 +11,26 @@ const partnerLogos = [
 ];
 
 /* ================================================================== */
-/*  Cinematic text helper — splits text into letter spans             */
+/*  Cinematic letter reveal                                            */
 /* ================================================================== */
 function Letters({
   text,
   delayBase = 0,
-  stagger = 0.035,
+  stagger = 0.05,
   className = "",
-  letterClassName = "",
 }: {
   text: string;
   delayBase?: number;
   stagger?: number;
   className?: string;
-  letterClassName?: string;
 }) {
   return (
     <span className={className}>
       {text.split("").map((ch, i) => (
         <span
           key={i}
-          className={`inline-block ${letterClassName}`}
-          style={{
-            animation: `bz-letter-in 0.9s cubic-bezier(0.22, 1, 0.36, 1) ${
-              delayBase + i * stagger
-            }s both`,
-            whiteSpace: ch === " " ? "pre" : undefined,
-          }}
+          className="bz-letter"
+          style={{ ["--rd" as any]: `${delayBase + i * stagger}s` }}
         >
           {ch === " " ? "\u00A0" : ch}
         </span>
@@ -47,12 +40,12 @@ function Letters({
 }
 
 /* ================================================================== */
-/*  Cinematic word reveal                                             */
+/*  Cinematic word reveal                                              */
 /* ================================================================== */
 function Words({
   words,
   delayBase = 0,
-  stagger = 0.08,
+  stagger = 0.1,
   className = "",
 }: {
   words: string[];
@@ -65,12 +58,8 @@ function Words({
       {words.map((w, i) => (
         <span
           key={i}
-          className="inline-block"
-          style={{
-            animation: `bz-word-in 1s cubic-bezier(0.22, 1, 0.36, 1) ${
-              delayBase + i * stagger
-            }s both`,
-          }}
+          className="bz-word"
+          style={{ ["--rd" as any]: `${delayBase + i * stagger}s` }}
         >
           {w}&nbsp;
         </span>
@@ -87,40 +76,68 @@ export default async function HomePage() {
   const isLoggedIn = Boolean(user);
 
   return (
-    <main
-      className="reference-home"
-      style={{ backgroundColor: "#f7f7f5" }}
-    >
+    <main className="reference-home" style={{ backgroundColor: "#f7f7f5" }}>
       <style>{`
         /* ============================================================ */
-        /*  CINEMATIC ANIMATIONS                                          */
+        /*  CINEMATIC REVEAL SYSTEM                                      */
         /* ============================================================ */
-        @keyframes bz-fade-up {
-          from { opacity: 0; transform: translateY(28px); filter: blur(10px); }
-          to   { opacity: 1; transform: translateY(0); filter: blur(0); }
+
+        /* Any element marked [data-reveal] starts hidden and fades in  */
+        [data-reveal] {
+          opacity: 0;
+          transform: translateY(34px) scale(0.985);
+          filter: blur(12px);
+          transition:
+            opacity 1.15s cubic-bezier(0.22, 1, 0.36, 1),
+            transform 1.15s cubic-bezier(0.22, 1, 0.36, 1),
+            filter 1.15s cubic-bezier(0.22, 1, 0.36, 1);
+          transition-delay: var(--rd, 0s);
+          will-change: opacity, transform, filter;
         }
-        @keyframes bz-fade-in {
-          from { opacity: 0; }
-          to   { opacity: 1; }
+        [data-reveal].is-visible {
+          opacity: 1;
+          transform: none;
+          filter: none;
         }
-        @keyframes bz-letter-in {
-          0%   { opacity: 0; transform: translateY(60%) rotateX(-45deg) scale(1.1); filter: blur(12px); }
-          55%  { opacity: 1; filter: blur(0); }
-          100% { opacity: 1; transform: translateY(0) rotateX(0deg) scale(1); filter: blur(0); }
+
+        /* Letter-by-letter children */
+        .bz-letter {
+          display: inline-block;
+          opacity: 0;
+          transform: translateY(70%) rotateX(-55deg) scale(1.06);
+          filter: blur(14px);
+          transform-origin: 50% 100%;
+          transition:
+            opacity 1.25s cubic-bezier(0.22, 1, 0.36, 1),
+            transform 1.25s cubic-bezier(0.22, 1, 0.36, 1),
+            filter 1.25s cubic-bezier(0.22, 1, 0.36, 1);
+          transition-delay: var(--rd, 0s);
+          will-change: opacity, transform, filter;
         }
-        @keyframes bz-word-in {
-          0%   { opacity: 0; transform: translateY(50%) scale(0.96); filter: blur(14px); }
-          60%  { opacity: 1; filter: blur(0); }
-          100% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+
+        /* Word-by-word children */
+        .bz-word {
+          display: inline-block;
+          opacity: 0;
+          transform: translateY(55%) scale(0.96);
+          filter: blur(16px);
+          transition:
+            opacity 1.15s cubic-bezier(0.22, 1, 0.36, 1),
+            transform 1.15s cubic-bezier(0.22, 1, 0.36, 1),
+            filter 1.15s cubic-bezier(0.22, 1, 0.36, 1);
+          transition-delay: var(--rd, 0s);
+          will-change: opacity, transform, filter;
         }
-        @keyframes bz-title-in {
-          0%   { opacity: 0; transform: translateY(40px) scale(0.98); filter: blur(14px); }
-          100% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+
+        /* Group parents trigger their children */
+        [data-reveal-group].is-visible .bz-letter,
+        [data-reveal-group].is-visible .bz-word {
+          opacity: 1;
+          transform: none;
+          filter: none;
         }
-        @keyframes bz-logo-in {
-          0%   { opacity: 0; transform: scale(0.9) translateY(20px); filter: blur(12px); }
-          100% { opacity: 1; transform: scale(1) translateY(0); filter: blur(0); }
-        }
+
+        /* Ken Burns + float */
         @keyframes bz-kenburns {
           0%, 100% { transform: scale(1.05) translate(0, 0); }
           50%      { transform: scale(1.15) translate(-1.5%, -1%); }
@@ -131,30 +148,20 @@ export default async function HomePage() {
         }
 
         /* ============================================================ */
-        /*  LIQUID MERGE — Soft shadows & transitions                     */
+        /*  LIQUID MERGE                                                 */
         /* ============================================================ */
-
-        .liquid-section {
-          position: relative;
-          isolation: isolate;
-        }
-
-        .liquid-shadow-top {
-          box-shadow: inset 0 60px 80px -50px rgba(0, 0, 0, 0.20);
-        }
-        .liquid-shadow-bottom {
-          box-shadow: inset 0 -60px 80px -50px rgba(0, 0, 0, 0.20);
-        }
+        .liquid-section { position: relative; isolation: isolate; }
+        .liquid-shadow-top { box-shadow: inset 0 60px 80px -50px rgba(0,0,0,0.20); }
+        .liquid-shadow-bottom { box-shadow: inset 0 -60px 80px -50px rgba(0,0,0,0.20); }
         .liquid-shadow-both {
           box-shadow:
-            inset 0 60px 80px -50px rgba(0, 0, 0, 0.15),
-            inset 0 -60px 80px -50px rgba(0, 0, 0, 0.15);
+            inset 0 60px 80px -50px rgba(0,0,0,0.15),
+            inset 0 -60px 80px -50px rgba(0,0,0,0.15);
         }
 
         /* ============================================================ */
-        /*  PHONE CASE GRIDS                                              */
+        /*  PHONE CASE GRIDS                                             */
         /* ============================================================ */
-
         .phone-case-1-grid,
         .phone-case-2-grid,
         .phone-case-4-grid,
@@ -169,9 +176,7 @@ export default async function HomePage() {
           .phone-case-1-grid,
           .phone-case-2-grid,
           .phone-case-4-grid,
-          .phone-case-5-grid {
-            grid-template-columns: 1fr 1fr;
-          }
+          .phone-case-5-grid { grid-template-columns: 1fr 1fr; }
         }
 
         @media (max-width: 640px) {
@@ -190,12 +195,8 @@ export default async function HomePage() {
           .phone-case-1-image,
           .phone-case-2-image,
           .phone-case-4-image,
-          .phone-case-5-image {
-            min-height: 100vh !important;
-          }
-          .phone-case-text-content {
-            padding: 32px 18px !important;
-          }
+          .phone-case-5-image { min-height: 100vh !important; }
+          .phone-case-text-content { padding: 32px 18px !important; }
           .phone-case-kicker {
             padding: 6px 12px !important;
             font-size: 9.5px !important;
@@ -212,41 +213,33 @@ export default async function HomePage() {
             line-height: 1.6 !important;
             margin-bottom: 18px !important;
           }
-          .phone-case-list {
-            margin-bottom: 18px !important;
-            gap: 8px !important;
-          }
-          .phone-case-list li {
-            font-size: 11.5px !important;
-            gap: 8px !important;
-          }
+          .phone-case-list { margin-bottom: 18px !important; gap: 8px !important; }
+          .phone-case-list li { font-size: 11.5px !important; gap: 8px !important; }
           .phone-case-list .phone-case-check {
-            width: 16px !important;
-            height: 16px !important;
-            font-size: 8px !important;
+            width: 16px !important; height: 16px !important; font-size: 8px !important;
           }
-          .phone-case-cta {
-            padding: 10px 18px !important;
-            font-size: 12px !important;
-          }
-          .phone-case-seam {
-            height: 40px !important;
-          }
+          .phone-case-cta { padding: 10px 18px !important; font-size: 12px !important; }
+          .phone-case-seam { height: 40px !important; }
           .liquid-shadow-top,
           .liquid-shadow-bottom,
-          .liquid-shadow-both {
-            box-shadow: none !important;
-          }
+          .liquid-shadow-both { box-shadow: none !important; }
         }
 
         @media (max-width: 380px) {
-          .phone-case-1-grid,
-          .phone-case-4-grid { grid-template-columns: 40% 60%; }
-          .phone-case-2-grid,
-          .phone-case-5-grid { grid-template-columns: 60% 40%; }
+          .phone-case-1-grid, .phone-case-4-grid { grid-template-columns: 40% 60%; }
+          .phone-case-2-grid, .phone-case-5-grid { grid-template-columns: 60% 40%; }
           .phone-case-text-content { padding: 24px 14px !important; }
           .phone-case-title { font-size: 22px !important; }
           .phone-case-desc { font-size: 11px !important; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+          [data-reveal], .bz-letter, .bz-word {
+            opacity: 1 !important;
+            transform: none !important;
+            filter: none !important;
+            transition: none !important;
+          }
         }
       `}</style>
 
@@ -292,18 +285,19 @@ export default async function HomePage() {
               margin: "0 auto",
               padding: "clamp(20px, 4vw, 48px)",
               textAlign: "center",
-              perspective: "1000px",
+              perspective: "1200px",
             }}
           >
+            {/* Logo */}
             <div
+              data-reveal
               style={{
+                ["--rd" as any]: "0.05s",
                 width: "100%",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
                 marginBottom: "clamp(40px, 6vh, 72px)",
-                animation:
-                  "bz-logo-in 1.2s cubic-bezier(0.22, 1, 0.36, 1) 0.1s both",
               }}
             >
               <img
@@ -321,8 +315,9 @@ export default async function HomePage() {
               />
             </div>
 
-            {/* "Own your" — word by word */}
+            {/* "Own your" */}
             <p
+              data-reveal-group
               style={{
                 margin: "0 0 clamp(12px, 1.8vh, 22px)",
                 fontSize: "clamp(16px, 1.6vw, 22px)",
@@ -331,11 +326,12 @@ export default async function HomePage() {
                 letterSpacing: "-0.01em",
               }}
             >
-              <Words words={["Own", "your"]} delayBase={0.35} stagger={0.12} />
+              <Words words={["Own", "your"]} delayBase={0.35} stagger={0.14} />
             </p>
 
-            {/* "Identity" — letter by letter cinematic */}
+            {/* "Identity" */}
             <h1
+              data-reveal-group
               style={{
                 margin: 0,
                 fontSize: "clamp(52px, 11vw, 168px)",
@@ -346,15 +342,12 @@ export default async function HomePage() {
                 transformStyle: "preserve-3d",
               }}
             >
-              <Letters
-                text="Identity"
-                delayBase={0.55}
-                stagger={0.05}
-              />
+              <Letters text="Identity" delayBase={0.55} stagger={0.055} />
             </h1>
 
-            {/* "that feels like home." — word by word */}
+            {/* "that feels like home." */}
             <p
+              data-reveal-group
               style={{
                 margin: "clamp(12px, 1.6vh, 22px) 0 0",
                 fontSize: "clamp(18px, 2vw, 28px)",
@@ -365,20 +358,21 @@ export default async function HomePage() {
             >
               <Words
                 words={["that", "feels", "like", "home."]}
-                delayBase={1.15}
-                stagger={0.09}
+                delayBase={1.25}
+                stagger={0.11}
               />
             </p>
 
+            {/* Description */}
             <p
+              data-reveal
               style={{
+                ["--rd" as any]: "1.85s",
                 margin: "clamp(24px, 3.5vh, 40px) auto 0",
                 maxWidth: "520px",
                 fontSize: "clamp(13px, 1.15vw, 15px)",
                 lineHeight: 1.6,
                 color: "rgba(0,0,0,0.65)",
-                animation:
-                  "bz-fade-up 1.1s cubic-bezier(0.22, 1, 0.36, 1) 1.7s both",
               }}
             >
               A quieter, safer way to hold your digital self. One secure
@@ -386,14 +380,15 @@ export default async function HomePage() {
               simple on the surface.
             </p>
 
+            {/* CTA */}
             <div
+              data-reveal
               style={{
+                ["--rd" as any]: "2.1s",
                 marginTop: "clamp(32px, 4.5vh, 52px)",
                 display: "flex",
                 justifyContent: "center",
                 gap: "12px",
-                animation:
-                  "bz-fade-up 0.9s cubic-bezier(0.22, 1, 0.36, 1) 1.95s both",
               }}
             >
               <Link
@@ -423,6 +418,7 @@ export default async function HomePage() {
               </Link>
             </div>
 
+            {/* Partner logos */}
             <div
               style={{
                 marginTop: "clamp(48px, 7vh, 80px)",
@@ -431,14 +427,14 @@ export default async function HomePage() {
                 alignItems: "center",
                 justifyContent: "center",
                 gap: "clamp(10px, 1.6vw, 20px)",
-                animation:
-                  "bz-fade-in 1.2s cubic-bezier(0.22, 1, 0.36, 1) 2.15s both",
               }}
             >
               {partnerLogos.map((logo, i) => (
                 <div
                   key={logo.alt}
+                  data-reveal
                   style={{
+                    ["--rd" as any]: `${2.3 + i * 0.09}s`,
                     width: "clamp(30px, 3vw, 42px)",
                     height: "clamp(30px, 3vw, 42px)",
                     borderRadius: "999px",
@@ -453,9 +449,6 @@ export default async function HomePage() {
                       "inset 0 1px 0 0 rgba(255,255,255,1), 0 6px 18px -8px rgba(0,0,0,0.15)",
                     padding: "clamp(5px, 0.6vw, 8px)",
                     flexShrink: 0,
-                    animation: `bz-logo-in 0.8s cubic-bezier(0.22, 1, 0.36, 1) ${
-                      2.15 + i * 0.08
-                    }s both`,
                   }}
                   title={logo.alt}
                 >
@@ -475,7 +468,7 @@ export default async function HomePage() {
             </div>
           </div>
 
-          {/* 🌊 Bottom fade — dark → light gray */}
+          {/* Bottom fade */}
           <div
             aria-hidden="true"
             style={{
@@ -506,9 +499,8 @@ export default async function HomePage() {
             overflow: "hidden",
           }}
         >
-          {/* PHONE CASE 1 — IMAGE LEFT + TEXT RIGHT */}
+          {/* ---------- PHONE CASE 1 ---------- */}
           <section className="phone-case-1-grid">
-            {/* LEFT — IMAGE */}
             <div
               className="phone-case-1-image"
               style={{
@@ -534,10 +526,7 @@ export default async function HomePage() {
                 aria-hidden="true"
                 style={{
                   position: "absolute",
-                  top: 0,
-                  right: 0,
-                  bottom: 0,
-                  width: "120px",
+                  top: 0, right: 0, bottom: 0, width: "120px",
                   background:
                     "linear-gradient(270deg, rgba(247,247,245,1) 0%, rgba(247,247,245,0.7) 40%, rgba(247,247,245,0) 100%)",
                   pointerEvents: "none",
@@ -547,10 +536,7 @@ export default async function HomePage() {
                 aria-hidden="true"
                 style={{
                   position: "absolute",
-                  bottom: 0,
-                  left: 0,
-                  right: 0,
-                  height: "45%",
+                  bottom: 0, left: 0, right: 0, height: "45%",
                   background:
                     "linear-gradient(0deg, rgba(247,247,245,1) 0%, rgba(247,247,245,0.7) 35%, rgba(247,247,245,0) 100%)",
                   pointerEvents: "none",
@@ -560,10 +546,7 @@ export default async function HomePage() {
                 aria-hidden="true"
                 style={{
                   position: "absolute",
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  height: "25%",
+                  top: 0, left: 0, right: 0, height: "25%",
                   background:
                     "linear-gradient(180deg, rgba(247,247,245,0.9) 0%, rgba(247,247,245,0) 100%)",
                   pointerEvents: "none",
@@ -571,9 +554,8 @@ export default async function HomePage() {
               />
             </div>
 
-            {/* RIGHT — TEXT */}
             <div
-              className="phone-case-1-text phone-case-text-content"
+              className="phone-case-text-content"
               style={{
                 position: "relative",
                 display: "flex",
@@ -582,13 +564,15 @@ export default async function HomePage() {
                 padding: "clamp(32px, 6vw, 96px) clamp(20px, 4vw, 72px)",
                 backgroundColor: "#f7f7f5",
                 zIndex: 2,
-                perspective: "1000px",
+                perspective: "1200px",
               }}
             >
               <div style={{ maxWidth: "560px", width: "100%" }}>
                 <div
+                  data-reveal
                   className="phone-case-kicker"
                   style={{
+                    ["--rd" as any]: "0.1s",
                     display: "inline-flex",
                     alignItems: "center",
                     gap: "8px",
@@ -606,8 +590,6 @@ export default async function HomePage() {
                     letterSpacing: "0.16em",
                     textTransform: "uppercase",
                     marginBottom: "clamp(16px, 3vh, 32px)",
-                    animation:
-                      "bz-fade-up 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.15s both",
                   }}
                 >
                   <span
@@ -622,8 +604,8 @@ export default async function HomePage() {
                   Carry it with you
                 </div>
 
-                {/* Cinematic title — word reveal */}
                 <h2
+                  data-reveal-group
                   className="phone-case-title"
                   style={{
                     margin: "0 0 clamp(12px, 2.2vh, 26px)",
@@ -636,27 +618,27 @@ export default async function HomePage() {
                 >
                   <Words
                     words={["Your", "identity,"]}
-                    delayBase={0.3}
-                    stagger={0.12}
+                    delayBase={0.25}
+                    stagger={0.14}
                   />
                   <br />
                   <Words
                     words={["in", "your", "pocket."]}
                     delayBase={0.55}
-                    stagger={0.12}
+                    stagger={0.13}
                   />
                 </h2>
 
                 <p
+                  data-reveal
                   className="phone-case-desc"
                   style={{
+                    ["--rd" as any]: "0.9s",
                     margin: "0 0 clamp(18px, 4vh, 40px)",
                     fontSize: "clamp(12px, 1.25vw, 17px)",
                     lineHeight: 1.65,
                     color: "rgba(0,0,0,0.65)",
                     maxWidth: "480px",
-                    animation:
-                      "bz-fade-up 1s cubic-bezier(0.22, 1, 0.36, 1) 0.95s both",
                   }}
                 >
                   BINZEO is designed to live where you do — a calm, secure
@@ -682,15 +664,14 @@ export default async function HomePage() {
                   ].map((item, i) => (
                     <li
                       key={item}
+                      data-reveal
                       style={{
+                        ["--rd" as any]: `${1.05 + i * 0.12}s`,
                         display: "flex",
                         alignItems: "center",
                         gap: "10px",
                         fontSize: "clamp(11.5px, 1.1vw, 15px)",
                         color: "rgba(0,0,0,0.7)",
-                        animation: `bz-fade-up 0.8s cubic-bezier(0.22, 1, 0.36, 1) ${
-                          1.1 + i * 0.1
-                        }s both`,
                       }}
                     >
                       <span
@@ -716,10 +697,8 @@ export default async function HomePage() {
                 </ul>
 
                 <div
-                  style={{
-                    animation:
-                      "bz-fade-up 1s cubic-bezier(0.22, 1, 0.36, 1) 1.5s both",
-                  }}
+                  data-reveal
+                  style={{ ["--rd" as any]: "1.5s" }}
                 >
                   <Link
                     href={isLoggedIn ? "/dashboard" : "/signup"}
@@ -778,9 +757,8 @@ export default async function HomePage() {
             />
           </div>
 
-          {/* PHONE CASE 2 — TEXT LEFT + IMAGE RIGHT */}
+          {/* ---------- PHONE CASE 2 ---------- */}
           <section className="phone-case-2-grid">
-            {/* LEFT — TEXT */}
             <div
               className="phone-case-text-content"
               style={{
@@ -791,13 +769,15 @@ export default async function HomePage() {
                 padding: "clamp(32px, 6vw, 96px) clamp(20px, 4vw, 72px)",
                 backgroundColor: "#f7f7f5",
                 zIndex: 2,
-                perspective: "1000px",
+                perspective: "1200px",
               }}
             >
               <div style={{ maxWidth: "560px", width: "100%" }}>
                 <div
+                  data-reveal
                   className="phone-case-kicker"
                   style={{
+                    ["--rd" as any]: "0.1s",
                     display: "inline-flex",
                     alignItems: "center",
                     gap: "8px",
@@ -815,8 +795,6 @@ export default async function HomePage() {
                     letterSpacing: "0.16em",
                     textTransform: "uppercase",
                     marginBottom: "clamp(16px, 3vh, 32px)",
-                    animation:
-                      "bz-fade-up 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.15s both",
                   }}
                 >
                   <span
@@ -832,6 +810,7 @@ export default async function HomePage() {
                 </div>
 
                 <h2
+                  data-reveal-group
                   className="phone-case-title"
                   style={{
                     margin: "0 0 clamp(12px, 2.2vh, 26px)",
@@ -844,27 +823,27 @@ export default async function HomePage() {
                 >
                   <Words
                     words={["One", "identity."]}
-                    delayBase={0.3}
-                    stagger={0.12}
+                    delayBase={0.25}
+                    stagger={0.14}
                   />
                   <br />
                   <Words
                     words={["Every", "screen", "you", "own."]}
                     delayBase={0.55}
-                    stagger={0.1}
+                    stagger={0.11}
                   />
                 </h2>
 
                 <p
+                  data-reveal
                   className="phone-case-desc"
                   style={{
+                    ["--rd" as any]: "0.95s",
                     margin: "0 0 clamp(18px, 4vh, 40px)",
                     fontSize: "clamp(12px, 1.25vw, 17px)",
                     lineHeight: 1.65,
                     color: "rgba(0,0,0,0.65)",
                     maxWidth: "480px",
-                    animation:
-                      "bz-fade-up 1s cubic-bezier(0.22, 1, 0.36, 1) 1.05s both",
                   }}
                 >
                   Whether you&apos;re on your phone, tablet, laptop, or the web
@@ -891,15 +870,14 @@ export default async function HomePage() {
                   ].map((item, i) => (
                     <li
                       key={item}
+                      data-reveal
                       style={{
+                        ["--rd" as any]: `${1.15 + i * 0.12}s`,
                         display: "flex",
                         alignItems: "center",
                         gap: "10px",
                         fontSize: "clamp(11.5px, 1.1vw, 15px)",
                         color: "rgba(0,0,0,0.7)",
-                        animation: `bz-fade-up 0.8s cubic-bezier(0.22, 1, 0.36, 1) ${
-                          1.2 + i * 0.1
-                        }s both`,
                       }}
                     >
                       <span
@@ -924,12 +902,7 @@ export default async function HomePage() {
                   ))}
                 </ul>
 
-                <div
-                  style={{
-                    animation:
-                      "bz-fade-up 1s cubic-bezier(0.22, 1, 0.36, 1) 1.6s both",
-                  }}
-                >
+                <div data-reveal style={{ ["--rd" as any]: "1.6s" }}>
                   <Link
                     href={isLoggedIn ? "/dashboard" : "/signup"}
                     className="phone-case-cta"
@@ -957,7 +930,6 @@ export default async function HomePage() {
               </div>
             </div>
 
-            {/* RIGHT — IMAGE */}
             <div
               className="phone-case-2-image"
               style={{
@@ -983,10 +955,7 @@ export default async function HomePage() {
                 aria-hidden="true"
                 style={{
                   position: "absolute",
-                  top: 0,
-                  left: 0,
-                  bottom: 0,
-                  width: "120px",
+                  top: 0, left: 0, bottom: 0, width: "120px",
                   background:
                     "linear-gradient(90deg, rgba(247,247,245,1) 0%, rgba(247,247,245,0.7) 40%, rgba(247,247,245,0) 100%)",
                   pointerEvents: "none",
@@ -996,10 +965,7 @@ export default async function HomePage() {
                 aria-hidden="true"
                 style={{
                   position: "absolute",
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  height: "35%",
+                  top: 0, left: 0, right: 0, height: "35%",
                   background:
                     "linear-gradient(180deg, rgba(247,247,245,1) 0%, rgba(247,247,245,0.6) 40%, rgba(247,247,245,0) 100%)",
                   pointerEvents: "none",
@@ -1009,10 +975,7 @@ export default async function HomePage() {
                 aria-hidden="true"
                 style={{
                   position: "absolute",
-                  bottom: 0,
-                  left: 0,
-                  right: 0,
-                  height: "35%",
+                  bottom: 0, left: 0, right: 0, height: "35%",
                   background:
                     "linear-gradient(0deg, rgba(247,247,245,1) 0%, rgba(247,247,245,0.6) 40%, rgba(247,247,245,0) 100%)",
                   pointerEvents: "none",
@@ -1021,7 +984,7 @@ export default async function HomePage() {
             </div>
           </section>
 
-          {/* 🌊 Bottom fade — light gray → dark */}
+          {/* Bottom fade */}
           <div
             aria-hidden="true"
             style={{
@@ -1074,10 +1037,7 @@ export default async function HomePage() {
             aria-hidden="true"
             style={{
               position: "absolute",
-              top: 0,
-              left: 0,
-              right: 0,
-              height: "150px",
+              top: 0, left: 0, right: 0, height: "150px",
               background:
                 "linear-gradient(180deg, rgba(247,247,245,0.85) 0%, rgba(247,247,245,0.4) 45%, rgba(247,247,245,0) 100%)",
               pointerEvents: "none",
@@ -1088,10 +1048,7 @@ export default async function HomePage() {
             aria-hidden="true"
             style={{
               position: "absolute",
-              bottom: 0,
-              left: 0,
-              right: 0,
-              height: "200px",
+              bottom: 0, left: 0, right: 0, height: "200px",
               background:
                 "linear-gradient(0deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.5) 45%, rgba(255,255,255,0) 100%)",
               pointerEvents: "none",
@@ -1146,10 +1103,7 @@ export default async function HomePage() {
             aria-hidden="true"
             style={{
               position: "absolute",
-              top: 0,
-              left: 0,
-              right: 0,
-              height: "150px",
+              top: 0, left: 0, right: 0, height: "150px",
               background:
                 "linear-gradient(180deg, rgba(10,10,10,0.75) 0%, rgba(10,10,10,0.35) 45%, rgba(10,10,10,0) 100%)",
               pointerEvents: "none",
@@ -1160,10 +1114,7 @@ export default async function HomePage() {
             aria-hidden="true"
             style={{
               position: "absolute",
-              bottom: 0,
-              left: 0,
-              right: 0,
-              height: "200px",
+              bottom: 0, left: 0, right: 0, height: "200px",
               background:
                 "linear-gradient(0deg, rgba(247,247,245,0.98) 0%, rgba(247,247,245,0.5) 45%, rgba(247,247,245,0) 100%)",
               pointerEvents: "none",
@@ -1229,33 +1180,6 @@ export default async function HomePage() {
               <path d="M19.07 4.93a10 10 0 0 1 0 14.14" />
             </svg>
           </button>
-
-          <script
-            dangerouslySetInnerHTML={{
-              __html: `
-                (function() {
-                  var v = document.getElementById('binzeo-setup-video');
-                  var b = document.getElementById('binzeo-video-sound-toggle');
-                  var on = document.getElementById('binzeo-sound-on-icon');
-                  var off = document.getElementById('binzeo-sound-off-icon');
-                  if (!v || !b || !on || !off) return;
-                  v.muted = true;
-                  b.addEventListener('click', function() {
-                    v.muted = !v.muted;
-                    if (v.muted) {
-                      on.style.display = 'none';
-                      off.style.display = 'block';
-                      b.setAttribute('aria-label', 'Turn sound on');
-                    } else {
-                      on.style.display = 'block';
-                      off.style.display = 'none';
-                      b.setAttribute('aria-label', 'Turn sound off');
-                    }
-                  });
-                })();
-              `,
-            }}
-          />
         </section>
 
         {/* ============================================================ */}
@@ -1273,7 +1197,7 @@ export default async function HomePage() {
             paddingBottom: 0,
           }}
         >
-          {/* PHONE CASE 4 — IMAGE LEFT + TEXT RIGHT */}
+          {/* ---------- PHONE CASE 4 ---------- */}
           <section className="phone-case-4-grid">
             <div
               className="phone-case-4-image"
@@ -1300,10 +1224,7 @@ export default async function HomePage() {
                 aria-hidden="true"
                 style={{
                   position: "absolute",
-                  top: 0,
-                  right: 0,
-                  bottom: 0,
-                  width: "120px",
+                  top: 0, right: 0, bottom: 0, width: "120px",
                   background:
                     "linear-gradient(270deg, rgba(247,247,245,1) 0%, rgba(247,247,245,0.7) 40%, rgba(247,247,245,0) 100%)",
                   pointerEvents: "none",
@@ -1313,10 +1234,7 @@ export default async function HomePage() {
                 aria-hidden="true"
                 style={{
                   position: "absolute",
-                  bottom: 0,
-                  left: 0,
-                  right: 0,
-                  height: "45%",
+                  bottom: 0, left: 0, right: 0, height: "45%",
                   background:
                     "linear-gradient(0deg, rgba(247,247,245,1) 0%, rgba(247,247,245,0.7) 35%, rgba(247,247,245,0) 100%)",
                   pointerEvents: "none",
@@ -1326,10 +1244,7 @@ export default async function HomePage() {
                 aria-hidden="true"
                 style={{
                   position: "absolute",
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  height: "25%",
+                  top: 0, left: 0, right: 0, height: "25%",
                   background:
                     "linear-gradient(180deg, rgba(247,247,245,0.9) 0%, rgba(247,247,245,0) 100%)",
                   pointerEvents: "none",
@@ -1347,13 +1262,15 @@ export default async function HomePage() {
                 padding: "clamp(32px, 6vw, 96px) clamp(20px, 4vw, 72px)",
                 backgroundColor: "#f7f7f5",
                 zIndex: 2,
-                perspective: "1000px",
+                perspective: "1200px",
               }}
             >
               <div style={{ maxWidth: "560px", width: "100%" }}>
                 <div
+                  data-reveal
                   className="phone-case-kicker"
                   style={{
+                    ["--rd" as any]: "0.1s",
                     display: "inline-flex",
                     alignItems: "center",
                     gap: "8px",
@@ -1371,8 +1288,6 @@ export default async function HomePage() {
                     letterSpacing: "0.16em",
                     textTransform: "uppercase",
                     marginBottom: "clamp(16px, 3vh, 32px)",
-                    animation:
-                      "bz-fade-up 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.15s both",
                   }}
                 >
                   <span
@@ -1388,6 +1303,7 @@ export default async function HomePage() {
                 </div>
 
                 <h2
+                  data-reveal-group
                   className="phone-case-title"
                   style={{
                     margin: "0 0 clamp(12px, 2.2vh, 26px)",
@@ -1400,27 +1316,27 @@ export default async function HomePage() {
                 >
                   <Words
                     words={["Protection", "that"]}
-                    delayBase={0.3}
-                    stagger={0.12}
+                    delayBase={0.25}
+                    stagger={0.14}
                   />
                   <br />
                   <Words
                     words={["feels", "personal."]}
                     delayBase={0.55}
-                    stagger={0.12}
+                    stagger={0.14}
                   />
                 </h2>
 
                 <p
+                  data-reveal
                   className="phone-case-desc"
                   style={{
+                    ["--rd" as any]: "0.9s",
                     margin: "0 0 clamp(18px, 4vh, 40px)",
                     fontSize: "clamp(12px, 1.25vw, 17px)",
                     lineHeight: 1.65,
                     color: "rgba(0,0,0,0.65)",
                     maxWidth: "480px",
-                    animation:
-                      "bz-fade-up 1s cubic-bezier(0.22, 1, 0.36, 1) 0.95s both",
                   }}
                 >
                   Every BINZEO case is designed with the same care we bring to
@@ -1446,15 +1362,14 @@ export default async function HomePage() {
                   ].map((item, i) => (
                     <li
                       key={item}
+                      data-reveal
                       style={{
+                        ["--rd" as any]: `${1.05 + i * 0.12}s`,
                         display: "flex",
                         alignItems: "center",
                         gap: "10px",
                         fontSize: "clamp(11.5px, 1.1vw, 15px)",
                         color: "rgba(0,0,0,0.7)",
-                        animation: `bz-fade-up 0.8s cubic-bezier(0.22, 1, 0.36, 1) ${
-                          1.1 + i * 0.1
-                        }s both`,
                       }}
                     >
                       <span
@@ -1479,12 +1394,7 @@ export default async function HomePage() {
                   ))}
                 </ul>
 
-                <div
-                  style={{
-                    animation:
-                      "bz-fade-up 1s cubic-bezier(0.22, 1, 0.36, 1) 1.5s both",
-                  }}
-                >
+                <div data-reveal style={{ ["--rd" as any]: "1.5s" }}>
                   <Link
                     href={isLoggedIn ? "/dashboard" : "/signup"}
                     className="phone-case-cta"
@@ -1542,7 +1452,7 @@ export default async function HomePage() {
             />
           </div>
 
-          {/* PHONE CASE 5 — TEXT LEFT + IMAGE RIGHT */}
+          {/* ---------- PHONE CASE 5 ---------- */}
           <section className="phone-case-5-grid">
             <div
               className="phone-case-text-content"
@@ -1554,13 +1464,15 @@ export default async function HomePage() {
                 padding: "clamp(32px, 6vw, 96px) clamp(20px, 4vw, 72px)",
                 backgroundColor: "#f7f7f5",
                 zIndex: 2,
-                perspective: "1000px",
+                perspective: "1200px",
               }}
             >
               <div style={{ maxWidth: "560px", width: "100%" }}>
                 <div
+                  data-reveal
                   className="phone-case-kicker"
                   style={{
+                    ["--rd" as any]: "0.1s",
                     display: "inline-flex",
                     alignItems: "center",
                     gap: "8px",
@@ -1578,8 +1490,6 @@ export default async function HomePage() {
                     letterSpacing: "0.16em",
                     textTransform: "uppercase",
                     marginBottom: "clamp(16px, 3vh, 32px)",
-                    animation:
-                      "bz-fade-up 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.15s both",
                   }}
                 >
                   <span
@@ -1595,6 +1505,7 @@ export default async function HomePage() {
                 </div>
 
                 <h2
+                  data-reveal-group
                   className="phone-case-title"
                   style={{
                     margin: "0 0 clamp(12px, 2.2vh, 26px)",
@@ -1607,27 +1518,27 @@ export default async function HomePage() {
                 >
                   <Words
                     words={["A", "companion", "for"]}
-                    delayBase={0.3}
-                    stagger={0.12}
+                    delayBase={0.25}
+                    stagger={0.13}
                   />
                   <br />
                   <Words
                     words={["every", "day."]}
-                    delayBase={0.65}
-                    stagger={0.12}
+                    delayBase={0.6}
+                    stagger={0.14}
                   />
                 </h2>
 
                 <p
+                  data-reveal
                   className="phone-case-desc"
                   style={{
+                    ["--rd" as any]: "0.95s",
                     margin: "0 0 clamp(18px, 4vh, 40px)",
                     fontSize: "clamp(12px, 1.25vw, 17px)",
                     lineHeight: 1.65,
                     color: "rgba(0,0,0,0.65)",
                     maxWidth: "480px",
-                    animation:
-                      "bz-fade-up 1s cubic-bezier(0.22, 1, 0.36, 1) 1.05s both",
                   }}
                 >
                   Carry your identity with quiet confidence. BINZEO cases
@@ -1652,15 +1563,14 @@ export default async function HomePage() {
                   ].map((item, i) => (
                     <li
                       key={item}
+                      data-reveal
                       style={{
+                        ["--rd" as any]: `${1.15 + i * 0.12}s`,
                         display: "flex",
                         alignItems: "center",
                         gap: "10px",
                         fontSize: "clamp(11.5px, 1.1vw, 15px)",
                         color: "rgba(0,0,0,0.7)",
-                        animation: `bz-fade-up 0.8s cubic-bezier(0.22, 1, 0.36, 1) ${
-                          1.2 + i * 0.1
-                        }s both`,
                       }}
                     >
                       <span
@@ -1685,12 +1595,7 @@ export default async function HomePage() {
                   ))}
                 </ul>
 
-                <div
-                  style={{
-                    animation:
-                      "bz-fade-up 1s cubic-bezier(0.22, 1, 0.36, 1) 1.6s both",
-                  }}
-                >
+                <div data-reveal style={{ ["--rd" as any]: "1.6s" }}>
                   <Link
                     href={isLoggedIn ? "/dashboard" : "/signup"}
                     className="phone-case-cta"
@@ -1743,10 +1648,7 @@ export default async function HomePage() {
                 aria-hidden="true"
                 style={{
                   position: "absolute",
-                  top: 0,
-                  left: 0,
-                  bottom: 0,
-                  width: "120px",
+                  top: 0, left: 0, bottom: 0, width: "120px",
                   background:
                     "linear-gradient(90deg, rgba(247,247,245,1) 0%, rgba(247,247,245,0.7) 40%, rgba(247,247,245,0) 100%)",
                   pointerEvents: "none",
@@ -1756,10 +1658,7 @@ export default async function HomePage() {
                 aria-hidden="true"
                 style={{
                   position: "absolute",
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  height: "35%",
+                  top: 0, left: 0, right: 0, height: "35%",
                   background:
                     "linear-gradient(180deg, rgba(247,247,245,1) 0%, rgba(247,247,245,0.6) 40%, rgba(247,247,245,0) 100%)",
                   pointerEvents: "none",
@@ -1769,6 +1668,92 @@ export default async function HomePage() {
           </section>
         </div>
       </div>
+
+      {/* ============================================================ */}
+      {/*  Scripts: video sound + scroll-triggered reveals              */}
+      {/* ============================================================ */}
+      <script
+        dangerouslySetInnerHTML={{
+          __html: `
+            (function() {
+              // ---------- VIDEO SOUND TOGGLE ----------
+              var v = document.getElementById('binzeo-setup-video');
+              var b = document.getElementById('binzeo-video-sound-toggle');
+              var on = document.getElementById('binzeo-sound-on-icon');
+              var off = document.getElementById('binzeo-sound-off-icon');
+              if (v && b && on && off) {
+                v.muted = true;
+                b.addEventListener('click', function() {
+                  v.muted = !v.muted;
+                  if (v.muted) {
+                    on.style.display = 'none';
+                    off.style.display = 'block';
+                    b.setAttribute('aria-label', 'Turn sound on');
+                  } else {
+                    on.style.display = 'block';
+                    off.style.display = 'none';
+                    b.setAttribute('aria-label', 'Turn sound off');
+                  }
+                });
+              }
+
+              // ---------- SCROLL-TRIGGERED CINEMATIC REVEALS ----------
+              function revealAll() {
+                document
+                  .querySelectorAll('[data-reveal], [data-reveal-group]')
+                  .forEach(function(el) { el.classList.add('is-visible'); });
+              }
+
+              function setupReveals() {
+                var els = document.querySelectorAll(
+                  '[data-reveal], [data-reveal-group]'
+                );
+                if (!els.length) return;
+
+                var reduce = window.matchMedia &&
+                  window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+                if (reduce || !('IntersectionObserver' in window)) {
+                  revealAll();
+                  return;
+                }
+
+                var io = new IntersectionObserver(
+                  function(entries) {
+                    entries.forEach(function(entry) {
+                      if (entry.isIntersecting) {
+                        entry.target.classList.add('is-visible');
+                        io.unobserve(entry.target);
+                      }
+                    });
+                  },
+                  {
+                    threshold: 0.15,
+                    rootMargin: '0px 0px -8% 0px',
+                  }
+                );
+
+                els.forEach(function(el) { io.observe(el); });
+
+                // Hero is above-the-fold — nudge it to reveal on first paint
+                window.requestAnimationFrame(function() {
+                  document
+                    .querySelectorAll(
+                      'main > .reference-shell > section:first-child [data-reveal], ' +
+                      'main > .reference-shell > section:first-child [data-reveal-group]'
+                    )
+                    .forEach(function(el) { io.observe(el); });
+                });
+              }
+
+              if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', setupReveals);
+              } else {
+                setupReveals();
+              }
+            })();
+          `,
+        }}
+      />
     </main>
   );
 }
