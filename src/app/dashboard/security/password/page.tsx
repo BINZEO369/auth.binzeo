@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 /*  SHARED LAYOUT TOKENS                                               */
 /* ================================================================== */
 const containerCls =
-  "relative z-10 mx-auto max-w-3xl space-y-5 px-3 py-5 sm:space-y-6 sm:px-5 sm:py-8";
+  "relative z-10 mx-auto w-full max-w-2xl space-y-5 px-3 py-5 sm:space-y-6 sm:px-5 sm:py-8";
 
 /* ================================================================== */
 /*  Background layer — full viewport                                   */
@@ -39,9 +39,9 @@ function PageBackground() {
 
 export default function ChangePasswordPage() {
   return (
-    <div className="relative isolate min-h-[80vh]">
+    <div className="relative isolate min-h-[80vh] w-full">
       {/* ============================================================ */}
-      {/*  KEYFRAMES                                                    */}
+      {/*  KEYFRAMES + SCOPED FORM OVERRIDES                            */}
       {/* ============================================================ */}
       <style
         dangerouslySetInnerHTML={{
@@ -62,12 +62,221 @@ export default function ChangePasswordPage() {
               0%, 100% { transform: scale(1.04) translate(0, 0); }
               50%      { transform: scale(1.12) translate(-1%, -0.8%); }
             }
+
+            /* ============================================================ */
+            /*  SCOPED FORM OVERRIDES — force the embedded PasswordOtpForm  */
+            /*  to fit and match the liquid-glass theme                     */
+            /* ============================================================ */
+
+            /* Kill any max-width / fixed width that could overflow */
+            [data-pw-form],
+            [data-pw-form] * {
+              box-sizing: border-box;
+              max-width: 100%;
+            }
+
+            [data-pw-form] > * {
+              width: 100% !important;
+              margin-left: 0 !important;
+              margin-right: 0 !important;
+            }
+
+            /* Prevent horizontal overflow from OTP rows */
+            [data-pw-form] {
+              overflow-x: hidden;
+            }
+
+            /* Any input / select inside the form → liquid glass */
+            [data-pw-form] input:not([type="checkbox"]):not([type="radio"]):not([type="submit"]):not([type="button"]),
+            [data-pw-form] select,
+            [data-pw-form] textarea {
+              width: 100% !important;
+              padding: 14px 16px !important;
+              border-radius: 14px !important;
+              border: 1px solid rgba(255,255,255,0.4) !important;
+              background: rgba(255,255,255,0.4) !important;
+              backdrop-filter: blur(14px) saturate(180%);
+              -webkit-backdrop-filter: blur(14px) saturate(180%);
+              color: rgba(0,0,0,0.9) !important;
+              font-size: 15px !important;
+              line-height: 1.4 !important;
+              outline: none !important;
+              box-shadow:
+                inset 0 1px 0 0 rgba(255,255,255,0.9),
+                0 1px 2px rgba(0,0,0,0.03) !important;
+              transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+            }
+
+            [data-pw-form] input::placeholder,
+            [data-pw-form] textarea::placeholder {
+              color: rgba(0,0,0,0.35) !important;
+            }
+
+            [data-pw-form] input:focus,
+            [data-pw-form] select:focus,
+            [data-pw-form] textarea:focus {
+              border-color: rgba(255,255,255,0.7) !important;
+              background: rgba(255,255,255,0.6) !important;
+              box-shadow:
+                inset 0 1px 0 0 rgba(255,255,255,1),
+                0 0 0 4px rgba(255,255,255,0.3) !important;
+            }
+
+            /* OTP digit inputs — keep them compact and centered */
+            [data-pw-form] input[inputmode="numeric"],
+            [data-pw-form] input[autocomplete="one-time-code"],
+            [data-pw-form] input[maxlength="1"] {
+              text-align: center !important;
+              font-size: 18px !important;
+              font-weight: 600 !important;
+              padding: 12px 4px !important;
+            }
+
+            /* Labels */
+            [data-pw-form] label {
+              display: block !important;
+              font-size: 11px !important;
+              font-weight: 600 !important;
+              text-transform: uppercase !important;
+              letter-spacing: 0.14em !important;
+              color: rgba(0,0,0,0.6) !important;
+              margin-bottom: 8px !important;
+            }
+
+            /* Any button inside the form */
+            [data-pw-form] button:not([type="submit"]):not([data-primary]) {
+              border-radius: 999px !important;
+              border: 1px solid rgba(255,255,255,0.4) !important;
+              background: rgba(255,255,255,0.4) !important;
+              backdrop-filter: blur(14px) saturate(180%);
+              -webkit-backdrop-filter: blur(14px) saturate(180%);
+              color: rgba(0,0,0,0.75) !important;
+              font-weight: 500 !important;
+              padding: 12px 20px !important;
+              transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+            }
+
+            [data-pw-form] button:not([type="submit"]):hover {
+              background: rgba(255,255,255,0.65) !important;
+              border-color: rgba(255,255,255,0.65) !important;
+              color: rgba(0,0,0,0.95) !important;
+              transform: translateY(-2px);
+            }
+
+            /* Primary / submit button — BLACK with WHITE text, forced */
+            [data-pw-form] button[type="submit"],
+            [data-pw-form] button[data-primary] {
+              width: 100% !important;
+              border-radius: 999px !important;
+              border: 1px solid #0a0a0a !important;
+              background: #0a0a0a !important;
+              color: #ffffff !important;
+              font-weight: 500 !important;
+              font-size: 13.5px !important;
+              padding: 14px 22px !important;
+              box-shadow:
+                inset 0 1px 0 0 rgba(255,255,255,0.14),
+                0 2px 4px rgba(0,0,0,0.08),
+                0 12px 28px -12px rgba(0,0,0,0.5) !important;
+              transition: all 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+              cursor: pointer;
+            }
+
+            [data-pw-form] button[type="submit"] *,
+            [data-pw-form] button[data-primary] * {
+              color: #ffffff !important;
+            }
+
+            [data-pw-form] button[type="submit"]:hover,
+            [data-pw-form] button[data-primary]:hover {
+              transform: translateY(-2px);
+              box-shadow:
+                inset 0 1px 0 0 rgba(255,255,255,0.2),
+                0 4px 8px rgba(0,0,0,0.1),
+                0 18px 36px -12px rgba(0,0,0,0.55) !important;
+            }
+
+            [data-pw-form] button[type="submit"]:disabled {
+              opacity: 0.6 !important;
+              cursor: not-allowed !important;
+              transform: none !important;
+            }
+
+            /* Any section/card inside the form → flatten */
+            [data-pw-form] > div,
+            [data-pw-form] section,
+            [data-pw-form] form {
+              background: transparent !important;
+              border: none !important;
+              box-shadow: none !important;
+              padding: 0 !important;
+              border-radius: 0 !important;
+            }
+
+            /* Text inside form */
+            [data-pw-form] h1,
+            [data-pw-form] h2,
+            [data-pw-form] h3 {
+              color: rgba(0,0,0,0.9) !important;
+              font-weight: 600 !important;
+              letter-spacing: -0.01em !important;
+            }
+
+            [data-pw-form] p,
+            [data-pw-form] small,
+            [data-pw-form] span {
+              color: rgba(0,0,0,0.6);
+            }
+
+            [data-pw-form] a {
+              color: rgba(0,0,0,0.75) !important;
+              text-decoration: underline;
+              text-underline-offset: 2px;
+              transition: color 0.3s;
+            }
+
+            [data-pw-form] a:hover {
+              color: #000 !important;
+            }
+
+            /* Grids inside form → responsive */
+            [data-pw-form] .grid,
+            [data-pw-form] [class*="grid-cols"] {
+              gap: 10px !important;
+            }
+
+            /* Prevent any fixed-width flex rows from overflowing */
+            [data-pw-form] [class*="flex"],
+            [data-pw-form] [class*="grid"] {
+              min-width: 0 !important;
+            }
+
+            /* Any error/success box inside form */
+            [data-pw-form] [class*="error"],
+            [data-pw-form] [class*="Error"] {
+              background: rgba(254, 226, 226, 0.6) !important;
+              border: 1px solid rgba(252, 165, 165, 0.7) !important;
+              color: #991b1b !important;
+              border-radius: 14px !important;
+              padding: 12px 14px !important;
+              backdrop-filter: blur(14px);
+            }
+
+            [data-pw-form] [class*="success"],
+            [data-pw-form] [class*="Success"] {
+              background: rgba(209, 250, 229, 0.6) !important;
+              border: 1px solid rgba(110, 231, 183, 0.7) !important;
+              color: #065f46 !important;
+              border-radius: 14px !important;
+              padding: 12px 14px !important;
+              backdrop-filter: blur(14px);
+            }
+
             @media (prefers-reduced-motion: reduce) {
-              [data-pw-anim] {
+              [data-pw-anim],
+              [data-pw-form] * {
                 animation: none !important;
-                opacity: 1 !important;
-                transform: none !important;
-                filter: none !important;
+                transition: none !important;
               }
             }
           `,
@@ -86,7 +295,7 @@ export default function ChangePasswordPage() {
         {/* ============================================================ */}
         <div
           data-pw-anim
-          className="relative overflow-hidden rounded-3xl border border-white/[0.4] p-6 sm:p-9"
+          className="relative w-full overflow-hidden rounded-3xl border border-white/[0.4] p-6 sm:p-8"
           style={{
             background:
               "radial-gradient(120% 120% at 30% 12%, rgba(255,255,255,0.58) 0%, rgba(255,255,255,0.42) 45%, rgba(255,255,255,0.30) 100%)",
@@ -144,8 +353,8 @@ export default function ChangePasswordPage() {
               </span>
             </div>
 
-            <div className="flex flex-wrap items-start justify-between gap-5">
-              <div className="min-w-0">
+            <div className="flex flex-wrap items-start justify-between gap-4">
+              <div className="min-w-0 flex-1">
                 <h1
                   className="mb-3 text-2xl font-semibold tracking-[-0.02em] text-black sm:text-3xl"
                   style={{
@@ -155,7 +364,7 @@ export default function ChangePasswordPage() {
                 >
                   Change password
                 </h1>
-                <p className="max-w-lg text-[13.5px] leading-6 text-black/70">
+                <p className="max-w-md text-[13.5px] leading-6 text-black/70">
                   Verify your identity with a one-time code sent to your
                   email, then choose a new password.
                 </p>
@@ -163,7 +372,7 @@ export default function ChangePasswordPage() {
 
               <Link
                 href="/dashboard/security"
-                className="group relative inline-flex items-center gap-2 overflow-hidden rounded-full border border-white/40 bg-white/40 px-3.5 py-2 text-[12px] font-medium text-black/75 backdrop-blur-md transition-all duration-500 hover:-translate-y-0.5 hover:border-white/60 hover:bg-white/60 hover:text-black"
+                className="group relative inline-flex shrink-0 items-center gap-2 overflow-hidden rounded-full border border-white/40 bg-white/40 px-3.5 py-2 text-[12px] font-medium text-black/75 backdrop-blur-md transition-all duration-500 hover:-translate-y-0.5 hover:border-white/60 hover:bg-white/60 hover:text-black"
               >
                 <span
                   className="flex h-3.5 w-3.5 items-center justify-center transition-transform duration-500 group-hover:-translate-x-0.5"
@@ -191,7 +400,7 @@ export default function ChangePasswordPage() {
         {/*  FORM CARD — liquid glass wrapper                             */}
         {/* ============================================================ */}
         <section
-          className="relative overflow-hidden rounded-3xl border border-white/[0.35] p-6 sm:p-7"
+          className="relative w-full overflow-hidden rounded-3xl border border-white/[0.35] p-5 sm:p-7"
           style={{
             background:
               "radial-gradient(120% 120% at 30% 12%, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0.40) 45%, rgba(255,255,255,0.28) 100%)",
@@ -213,7 +422,7 @@ export default function ChangePasswordPage() {
             }}
           />
 
-          <div className="relative">
+          <div className="relative w-full">
             {/* Section heading */}
             <div className="mb-5 flex items-center gap-3">
               <span className="whitespace-nowrap text-[10px] font-semibold uppercase tracking-[0.18em] text-black/55">
@@ -229,8 +438,10 @@ export default function ChangePasswordPage() {
               />
             </div>
 
-            {/* The OTP form itself */}
-            <PasswordOtpForm mode="change" />
+            {/* The OTP form — wrapped so we can scope styles */}
+            <div data-pw-form className="w-full">
+              <PasswordOtpForm mode="change" />
+            </div>
           </div>
         </section>
 
