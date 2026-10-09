@@ -894,6 +894,141 @@ export default async function HomePage() {
         </section>
 
         {/* ============================================================ */}
+        {/*  SETUP GUIDE VIDEO — Full-screen (with sound toggle)           */}
+        {/* ============================================================ */}
+        <section
+          style={{
+            position: "relative",
+            width: "100vw",
+            height: "100vh",
+            minHeight: "100dvh",
+            marginLeft: "calc(-50vw + 50%)",
+            marginRight: "calc(-50vw + 50%)",
+            overflow: "hidden",
+            backgroundColor: "#ffffff",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          {/* VIDEO — auto-plays, muted by default */}
+          <video
+            id="binzeo-setup-video"
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="auto"
+            poster="/images/img3.jpg"
+            style={{
+              position: "absolute",
+              inset: 0,
+              width: "100%",
+              height: "100%",
+              objectFit: "cover",
+              objectPosition: "center",
+              display: "block",
+            }}
+          >
+            <source src="/videos/vid1.mp4" type="video/mp4" />
+          </video>
+
+          {/* SOUND TOGGLE BUTTON — bottom-right */}
+          <button
+            id="binzeo-video-sound-toggle"
+            type="button"
+            aria-label="Toggle video sound"
+            title="Toggle sound"
+            style={{
+              position: "absolute",
+              bottom: "clamp(24px, 5vh, 56px)",
+              right: "clamp(24px, 5vw, 56px)",
+              zIndex: 5,
+              display: "inline-flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: "8px",
+              width: "clamp(44px, 5vw, 56px)",
+              height: "clamp(44px, 5vw, 56px)",
+              padding: "0",
+              borderRadius: "999px",
+              border: "1px solid rgba(0,0,0,0.08)",
+              backgroundColor: "rgba(255,255,255,0.85)",
+              color: "#0a0a0a",
+              backdropFilter: "blur(20px) saturate(180%)",
+              WebkitBackdropFilter: "blur(20px) saturate(180%)",
+              boxShadow:
+                "inset 0 1px 0 0 rgba(255,255,255,1), 0 12px 32px -12px rgba(0,0,0,0.25)",
+              cursor: "pointer",
+              transition: "all 0.3s cubic-bezier(0.22, 1, 0.36, 1)",
+            }}
+          >
+            {/* Speaker icon (muted) */}
+            <svg
+              id="binzeo-sound-off-icon"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.8"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              style={{ width: "55%", height: "55%" }}
+            >
+              <path d="M11 5 6 9H2v6h4l5 4V5z" />
+              <line x1="23" y1="9" x2="17" y2="15" />
+              <line x1="17" y1="9" x2="23" y2="15" />
+            </svg>
+
+            {/* Speaker icon (unmuted) */}
+            <svg
+              id="binzeo-sound-on-icon"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.8"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              style={{ width: "55%", height: "55%", display: "none" }}
+            >
+              <path d="M11 5 6 9H2v6h4l5 4V5z" />
+              <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
+              <path d="M19.07 4.93a10 10 0 0 1 0 14.14" />
+            </svg>
+          </button>
+
+          {/* Inline script: handle sound toggle without client component */}
+          <script
+            dangerouslySetInnerHTML={{
+              __html: `
+                (function() {
+                  var v = document.getElementById('binzeo-setup-video');
+                  var b = document.getElementById('binzeo-video-sound-toggle');
+                  var on = document.getElementById('binzeo-sound-on-icon');
+                  var off = document.getElementById('binzeo-sound-off-icon');
+                  if (!v || !b || !on || !off) return;
+
+                  // Ensure video starts muted (browser autoplay policy)
+                  v.muted = true;
+
+                  b.addEventListener('click', function() {
+                    v.muted = !v.muted;
+                    if (v.muted) {
+                      on.style.display = 'none';
+                      off.style.display = 'block';
+                      b.setAttribute('aria-label', 'Turn sound on');
+                    } else {
+                      on.style.display = 'block';
+                      off.style.display = 'none';
+                      b.setAttribute('aria-label', 'Turn sound off');
+                    }
+                  });
+                })();
+              `,
+            }}
+          />
+        </section>
+
+        {/* ============================================================ */}
         {/*  WRAPPER 2 — Case 4 + Seam + Case 5                           */}
         {/* ============================================================ */}
         <div
