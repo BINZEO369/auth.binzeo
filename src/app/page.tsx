@@ -16,7 +16,7 @@ const partnerLogos = [
 function Letters({
   text,
   delayBase = 0,
-  stagger = 0.05,
+  stagger = 0.04,
   className = "",
 }: {
   text: string;
@@ -45,7 +45,7 @@ function Letters({
 function Words({
   words,
   delayBase = 0,
-  stagger = 0.1,
+  stagger = 0.08,
   className = "",
 }: {
   words: string[];
@@ -79,17 +79,17 @@ export default async function HomePage() {
     <main className="reference-home" style={{ backgroundColor: "#f7f7f5" }}>
       <style>{`
         /* ============================================================ */
-        /*  CINEMATIC REVEAL SYSTEM                                      */
+        /*  CINEMATIC REVEAL SYSTEM — ফাস্টার টাইমিং                      */
         /* ============================================================ */
 
         [data-reveal] {
           opacity: 0;
-          transform: translateY(34px) scale(0.985);
-          filter: blur(12px);
+          transform: translateY(28px) scale(0.99);
+          filter: blur(10px);
           transition:
-            opacity 1.15s cubic-bezier(0.22, 1, 0.36, 1),
-            transform 1.15s cubic-bezier(0.22, 1, 0.36, 1),
-            filter 1.15s cubic-bezier(0.22, 1, 0.36, 1);
+            opacity 0.85s cubic-bezier(0.22, 1, 0.36, 1),
+            transform 0.85s cubic-bezier(0.22, 1, 0.36, 1),
+            filter 0.85s cubic-bezier(0.22, 1, 0.36, 1);
           transition-delay: var(--rd, 0s);
           will-change: opacity, transform, filter;
         }
@@ -102,13 +102,13 @@ export default async function HomePage() {
         .bz-letter {
           display: inline-block;
           opacity: 0;
-          transform: translateY(70%) rotateX(-55deg) scale(1.06);
-          filter: blur(14px);
+          transform: translateY(60%) rotateX(-50deg) scale(1.05);
+          filter: blur(12px);
           transform-origin: 50% 100%;
           transition:
-            opacity 1.25s cubic-bezier(0.22, 1, 0.36, 1),
-            transform 1.25s cubic-bezier(0.22, 1, 0.36, 1),
-            filter 1.25s cubic-bezier(0.22, 1, 0.36, 1);
+            opacity 0.9s cubic-bezier(0.22, 1, 0.36, 1),
+            transform 0.9s cubic-bezier(0.22, 1, 0.36, 1),
+            filter 0.9s cubic-bezier(0.22, 1, 0.36, 1);
           transition-delay: var(--rd, 0s);
           will-change: opacity, transform, filter;
         }
@@ -116,12 +116,12 @@ export default async function HomePage() {
         .bz-word {
           display: inline-block;
           opacity: 0;
-          transform: translateY(55%) scale(0.96);
-          filter: blur(16px);
+          transform: translateY(48%) scale(0.97);
+          filter: blur(13px);
           transition:
-            opacity 1.15s cubic-bezier(0.22, 1, 0.36, 1),
-            transform 1.15s cubic-bezier(0.22, 1, 0.36, 1),
-            filter 1.15s cubic-bezier(0.22, 1, 0.36, 1);
+            opacity 0.85s cubic-bezier(0.22, 1, 0.36, 1),
+            transform 0.85s cubic-bezier(0.22, 1, 0.36, 1),
+            filter 0.85s cubic-bezier(0.22, 1, 0.36, 1);
           transition-delay: var(--rd, 0s);
           will-change: opacity, transform, filter;
         }
@@ -143,7 +143,7 @@ export default async function HomePage() {
         }
 
         /* ============================================================ */
-        /*  LIQUID MERGE — সব শ্যাডো এখন সাদা                            */
+        /*  LIQUID MERGE — সব শ্যাডো সাদা                                */
         /* ============================================================ */
         .liquid-section { position: relative; isolation: isolate; }
         .liquid-shadow-top {
@@ -291,7 +291,7 @@ export default async function HomePage() {
             <div
               data-reveal
               style={{
-                ["--rd" as any]: "0.05s",
+                ["--rd" as any]: "0.02s",
                 width: "100%",
                 display: "flex",
                 alignItems: "center",
@@ -314,6 +314,7 @@ export default async function HomePage() {
               />
             </div>
 
+            {/* "Own your" — was 0.35, now 0.18 */}
             <p
               data-reveal-group
               style={{
@@ -324,9 +325,10 @@ export default async function HomePage() {
                 letterSpacing: "-0.01em",
               }}
             >
-              <Words words={["Own", "your"]} delayBase={0.35} stagger={0.14} />
+              <Words words={["Own", "your"]} delayBase={0.18} stagger={0.1} />
             </p>
 
+            {/* "Identity" — was 0.55, now 0.3 */}
             <h1
               data-reveal-group
               style={{
@@ -339,9 +341,10 @@ export default async function HomePage() {
                 transformStyle: "preserve-3d",
               }}
             >
-              <Letters text="Identity" delayBase={0.55} stagger={0.055} />
+              <Letters text="Identity" delayBase={0.3} stagger={0.04} />
             </h1>
 
+            {/* "that feels like home." — was 1.25, now 0.7 */}
             <p
               data-reveal-group
               style={{
@@ -354,15 +357,16 @@ export default async function HomePage() {
             >
               <Words
                 words={["that", "feels", "like", "home."]}
-                delayBase={1.25}
-                stagger={0.11}
+                delayBase={0.7}
+                stagger={0.08}
               />
             </p>
 
+            {/* Description — was 1.85, now 1.0 */}
             <p
               data-reveal
               style={{
-                ["--rd" as any]: "1.85s",
+                ["--rd" as any]: "1s",
                 margin: "clamp(24px, 3.5vh, 40px) auto 0",
                 maxWidth: "520px",
                 fontSize: "clamp(13px, 1.15vw, 15px)",
@@ -375,10 +379,11 @@ export default async function HomePage() {
               simple on the surface.
             </p>
 
+            {/* CTA — was 2.1, now 1.15 */}
             <div
               data-reveal
               style={{
-                ["--rd" as any]: "2.1s",
+                ["--rd" as any]: "1.15s",
                 marginTop: "clamp(32px, 4.5vh, 52px)",
                 display: "flex",
                 justifyContent: "center",
@@ -412,6 +417,7 @@ export default async function HomePage() {
               </Link>
             </div>
 
+            {/* Partner logos — was 2.3, now 1.3 */}
             <div
               style={{
                 marginTop: "clamp(48px, 7vh, 80px)",
@@ -427,7 +433,7 @@ export default async function HomePage() {
                   key={logo.alt}
                   data-reveal
                   style={{
-                    ["--rd" as any]: `${2.3 + i * 0.09}s`,
+                    ["--rd" as any]: `${1.3 + i * 0.06}s`,
                     width: "clamp(30px, 3vw, 42px)",
                     height: "clamp(30px, 3vw, 42px)",
                     borderRadius: "999px",
@@ -461,7 +467,7 @@ export default async function HomePage() {
             </div>
           </div>
 
-          {/* Bottom fade — dark → white */}
+          {/* Bottom fade */}
           <div
             aria-hidden="true"
             style={{
@@ -565,7 +571,7 @@ export default async function HomePage() {
                   data-reveal
                   className="phone-case-kicker"
                   style={{
-                    ["--rd" as any]: "0.1s",
+                    ["--rd" as any]: "0.05s",
                     display: "inline-flex",
                     alignItems: "center",
                     gap: "8px",
@@ -611,14 +617,14 @@ export default async function HomePage() {
                 >
                   <Words
                     words={["Your", "identity,"]}
-                    delayBase={0.25}
-                    stagger={0.14}
+                    delayBase={0.15}
+                    stagger={0.1}
                   />
                   <br />
                   <Words
                     words={["in", "your", "pocket."]}
-                    delayBase={0.55}
-                    stagger={0.13}
+                    delayBase={0.35}
+                    stagger={0.09}
                   />
                 </h2>
 
@@ -626,7 +632,7 @@ export default async function HomePage() {
                   data-reveal
                   className="phone-case-desc"
                   style={{
-                    ["--rd" as any]: "0.9s",
+                    ["--rd" as any]: "0.55s",
                     margin: "0 0 clamp(18px, 4vh, 40px)",
                     fontSize: "clamp(12px, 1.25vw, 17px)",
                     lineHeight: 1.65,
@@ -659,7 +665,7 @@ export default async function HomePage() {
                       key={item}
                       data-reveal
                       style={{
-                        ["--rd" as any]: `${1.05 + i * 0.12}s`,
+                        ["--rd" as any]: `${0.65 + i * 0.08}s`,
                         display: "flex",
                         alignItems: "center",
                         gap: "10px",
@@ -689,7 +695,7 @@ export default async function HomePage() {
                   ))}
                 </ul>
 
-                <div data-reveal style={{ ["--rd" as any]: "1.5s" }}>
+                <div data-reveal style={{ ["--rd" as any]: "0.95s" }}>
                   <Link
                     href={isLoggedIn ? "/dashboard" : "/signup"}
                     className="phone-case-cta"
@@ -767,7 +773,7 @@ export default async function HomePage() {
                   data-reveal
                   className="phone-case-kicker"
                   style={{
-                    ["--rd" as any]: "0.1s",
+                    ["--rd" as any]: "0.05s",
                     display: "inline-flex",
                     alignItems: "center",
                     gap: "8px",
@@ -813,14 +819,14 @@ export default async function HomePage() {
                 >
                   <Words
                     words={["One", "identity."]}
-                    delayBase={0.25}
-                    stagger={0.14}
+                    delayBase={0.15}
+                    stagger={0.1}
                   />
                   <br />
                   <Words
                     words={["Every", "screen", "you", "own."]}
-                    delayBase={0.55}
-                    stagger={0.11}
+                    delayBase={0.35}
+                    stagger={0.08}
                   />
                 </h2>
 
@@ -828,7 +834,7 @@ export default async function HomePage() {
                   data-reveal
                   className="phone-case-desc"
                   style={{
-                    ["--rd" as any]: "0.95s",
+                    ["--rd" as any]: "0.55s",
                     margin: "0 0 clamp(18px, 4vh, 40px)",
                     fontSize: "clamp(12px, 1.25vw, 17px)",
                     lineHeight: 1.65,
@@ -862,7 +868,7 @@ export default async function HomePage() {
                       key={item}
                       data-reveal
                       style={{
-                        ["--rd" as any]: `${1.15 + i * 0.12}s`,
+                        ["--rd" as any]: `${0.7 + i * 0.08}s`,
                         display: "flex",
                         alignItems: "center",
                         gap: "10px",
@@ -892,7 +898,7 @@ export default async function HomePage() {
                   ))}
                 </ul>
 
-                <div data-reveal style={{ ["--rd" as any]: "1.6s" }}>
+                <div data-reveal style={{ ["--rd" as any]: "1s" }}>
                   <Link
                     href={isLoggedIn ? "/dashboard" : "/signup"}
                     className="phone-case-cta"
@@ -974,7 +980,7 @@ export default async function HomePage() {
             </div>
           </section>
 
-          {/* Bottom fade — এখন সাদা */}
+          {/* Bottom fade — সাদা */}
           <div
             aria-hidden="true"
             style={{
@@ -1023,7 +1029,6 @@ export default async function HomePage() {
               display: "block",
             }}
           />
-          {/* Top fade — সাদা */}
           <div
             aria-hidden="true"
             style={{
@@ -1035,7 +1040,6 @@ export default async function HomePage() {
               zIndex: 2,
             }}
           />
-          {/* Bottom fade — সাদা */}
           <div
             aria-hidden="true"
             style={{
@@ -1091,7 +1095,6 @@ export default async function HomePage() {
             <source src="/videos/vid1.mp4" type="video/mp4" />
           </video>
 
-          {/* Top fade — সাদা (আগে ছিল কালো) */}
           <div
             aria-hidden="true"
             style={{
@@ -1103,7 +1106,6 @@ export default async function HomePage() {
               zIndex: 2,
             }}
           />
-          {/* Bottom fade — সাদা */}
           <div
             aria-hidden="true"
             style={{
@@ -1264,7 +1266,7 @@ export default async function HomePage() {
                   data-reveal
                   className="phone-case-kicker"
                   style={{
-                    ["--rd" as any]: "0.1s",
+                    ["--rd" as any]: "0.05s",
                     display: "inline-flex",
                     alignItems: "center",
                     gap: "8px",
@@ -1310,14 +1312,14 @@ export default async function HomePage() {
                 >
                   <Words
                     words={["Protection", "that"]}
-                    delayBase={0.25}
-                    stagger={0.14}
+                    delayBase={0.15}
+                    stagger={0.1}
                   />
                   <br />
                   <Words
                     words={["feels", "personal."]}
-                    delayBase={0.55}
-                    stagger={0.14}
+                    delayBase={0.35}
+                    stagger={0.1}
                   />
                 </h2>
 
@@ -1325,7 +1327,7 @@ export default async function HomePage() {
                   data-reveal
                   className="phone-case-desc"
                   style={{
-                    ["--rd" as any]: "0.9s",
+                    ["--rd" as any]: "0.55s",
                     margin: "0 0 clamp(18px, 4vh, 40px)",
                     fontSize: "clamp(12px, 1.25vw, 17px)",
                     lineHeight: 1.65,
@@ -1358,7 +1360,7 @@ export default async function HomePage() {
                       key={item}
                       data-reveal
                       style={{
-                        ["--rd" as any]: `${1.05 + i * 0.12}s`,
+                        ["--rd" as any]: `${0.65 + i * 0.08}s`,
                         display: "flex",
                         alignItems: "center",
                         gap: "10px",
@@ -1388,7 +1390,7 @@ export default async function HomePage() {
                   ))}
                 </ul>
 
-                <div data-reveal style={{ ["--rd" as any]: "1.5s" }}>
+                <div data-reveal style={{ ["--rd" as any]: "0.95s" }}>
                   <Link
                     href={isLoggedIn ? "/dashboard" : "/signup"}
                     className="phone-case-cta"
@@ -1466,7 +1468,7 @@ export default async function HomePage() {
                   data-reveal
                   className="phone-case-kicker"
                   style={{
-                    ["--rd" as any]: "0.1s",
+                    ["--rd" as any]: "0.05s",
                     display: "inline-flex",
                     alignItems: "center",
                     gap: "8px",
@@ -1512,14 +1514,14 @@ export default async function HomePage() {
                 >
                   <Words
                     words={["A", "companion", "for"]}
-                    delayBase={0.25}
-                    stagger={0.13}
+                    delayBase={0.15}
+                    stagger={0.09}
                   />
                   <br />
                   <Words
                     words={["every", "day."]}
-                    delayBase={0.6}
-                    stagger={0.14}
+                    delayBase={0.38}
+                    stagger={0.1}
                   />
                 </h2>
 
@@ -1527,7 +1529,7 @@ export default async function HomePage() {
                   data-reveal
                   className="phone-case-desc"
                   style={{
-                    ["--rd" as any]: "0.95s",
+                    ["--rd" as any]: "0.55s",
                     margin: "0 0 clamp(18px, 4vh, 40px)",
                     fontSize: "clamp(12px, 1.25vw, 17px)",
                     lineHeight: 1.65,
@@ -1559,7 +1561,7 @@ export default async function HomePage() {
                       key={item}
                       data-reveal
                       style={{
-                        ["--rd" as any]: `${1.15 + i * 0.12}s`,
+                        ["--rd" as any]: `${0.7 + i * 0.08}s`,
                         display: "flex",
                         alignItems: "center",
                         gap: "10px",
@@ -1589,7 +1591,7 @@ export default async function HomePage() {
                   ))}
                 </ul>
 
-                <div data-reveal style={{ ["--rd" as any]: "1.6s" }}>
+                <div data-reveal style={{ ["--rd" as any]: "1s" }}>
                   <Link
                     href={isLoggedIn ? "/dashboard" : "/signup"}
                     className="phone-case-cta"
@@ -1664,7 +1666,7 @@ export default async function HomePage() {
       </div>
 
       {/* ============================================================ */}
-      {/*  Scripts: video sound + scroll-triggered reveals              */}
+      {/*  Scripts                                                      */}
       {/* ============================================================ */}
       <script
         dangerouslySetInnerHTML={{
@@ -1719,8 +1721,8 @@ export default async function HomePage() {
                     });
                   },
                   {
-                    threshold: 0.15,
-                    rootMargin: '0px 0px -8% 0px',
+                    threshold: 0.12,
+                    rootMargin: '0px 0px -5% 0px',
                   }
                 );
 
