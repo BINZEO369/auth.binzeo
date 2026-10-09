@@ -45,6 +45,18 @@ const useCases = [
   },
 ];
 
+/* ================================================================== */
+/*  Partner / Brand logos (small row under CTA)                        */
+/* ================================================================== */
+const partnerLogos = [
+  { src: "/images/jabiyenlogo.png", alt: "Jabiyen" },
+  { src: "/images/isyenlogo.png", alt: "Isyen" },
+  { src: "/images/hiryenlogo.png", alt: "Hiryen" },
+  { src: "/images/jayenwarelogo.png", alt: "Jayenware" },
+  { src: "/images/binzeoorglogo.png", alt: "Binzeo Org" },
+  { src: "/images/bcloudlogo.png", alt: "Bcloud" },
+];
+
 export default async function HomePage() {
   const supabase = await createClient();
   const {
@@ -70,6 +82,10 @@ export default async function HomePage() {
           from { opacity: 0; transform: translateY(40px) scale(0.98); filter: blur(14px); }
           to   { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
         }
+        @keyframes bz-logo-in {
+          from { opacity: 0; transform: scale(0.9) translateY(20px); filter: blur(12px); }
+          to   { opacity: 1; transform: scale(1) translateY(0); filter: blur(0); }
+        }
         @keyframes bz-kenburns {
           0%, 100% { transform: scale(1.05) translate(0, 0); }
           50%      { transform: scale(1.15) translate(-1.5%, -1%); }
@@ -86,7 +102,7 @@ export default async function HomePage() {
 
       <div className="reference-shell">
         {/* ============================================================ */}
-        {/*  HERO BANNER — img3.jpg background + centered content         */}
+        {/*  HERO BANNER — Pure img3.jpg + Text + Logos                   */}
         {/* ============================================================ */}
         <section
           className="reference-hero-banner"
@@ -105,7 +121,7 @@ export default async function HomePage() {
           }}
         >
           {/* ==================================================== */}
-          {/*  BACKGROUND IMAGE — img3.jpg with Ken Burns           */}
+          {/*  BACKGROUND IMAGE — img3.jpg only (Ken Burns slow)    */}
           {/* ==================================================== */}
           <div
             aria-hidden="true"
@@ -120,40 +136,6 @@ export default async function HomePage() {
             }}
           />
 
-          {/* Light overlay — soft white for text legibility */}
-          <div
-            aria-hidden="true"
-            style={{
-              position: "absolute",
-              inset: 0,
-              background:
-                "linear-gradient(180deg, rgba(255,255,255,0.65) 0%, rgba(255,255,255,0.45) 35%, rgba(255,255,255,0.55) 70%, rgba(255,255,255,0.8) 100%)",
-            }}
-          />
-
-          {/* Radial vignette for center focus */}
-          <div
-            aria-hidden="true"
-            style={{
-              position: "absolute",
-              inset: 0,
-              background:
-                "radial-gradient(ellipse 90% 70% at 50% 45%, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.45) 100%)",
-            }}
-          />
-
-          {/* Subtle pastel tint at bottom (for consistency) */}
-          <div
-            aria-hidden="true"
-            style={{
-              position: "absolute",
-              inset: 0,
-              background:
-                "radial-gradient(ellipse 55% 40% at 20% 100%, rgba(255,200,140,0.25) 0%, transparent 60%), radial-gradient(ellipse 55% 40% at 80% 100%, rgba(140,190,255,0.25) 0%, transparent 60%)",
-              filter: "blur(20px)",
-            }}
-          />
-
           {/* ==================================================== */}
           {/*  CONTENT — Centered                                    */}
           {/* ==================================================== */}
@@ -164,44 +146,33 @@ export default async function HomePage() {
               width: "100%",
               maxWidth: "1100px",
               margin: "0 auto",
-              padding: "0 clamp(20px, 4vw, 48px)",
+              padding: "clamp(20px, 4vw, 48px)",
               textAlign: "center",
             }}
           >
-            {/* Kicker — frosted glass pill */}
+            {/* ============================================ */}
+            {/*  BIG BINZEO LOGO (replaces "Introducing")     */}
+            {/* ============================================ */}
             <div
               style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "10px",
-                padding: "8px 16px",
-                borderRadius: "999px",
-                border: "1px solid rgba(0,0,0,0.08)",
-                background: "rgba(255,255,255,0.7)",
-                backdropFilter: "blur(24px) saturate(180%)",
-                WebkitBackdropFilter: "blur(24px) saturate(180%)",
-                boxShadow:
-                  "inset 0 1px 0 0 rgba(255,255,255,1), 0 8px 24px -10px rgba(0,0,0,0.12)",
-                color: "rgba(0,0,0,0.75)",
-                fontSize: "clamp(11px, 1.1vw, 13px)",
-                fontWeight: 500,
-                letterSpacing: "0.14em",
-                textTransform: "uppercase",
-                marginBottom: "clamp(24px, 3vh, 40px)",
+                display: "flex",
+                justifyContent: "center",
+                marginBottom: "clamp(28px, 4vh, 48px)",
                 animation:
-                  "bz-fade-up 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.1s both",
+                  "bz-logo-in 1.2s cubic-bezier(0.22, 1, 0.36, 1) 0.1s both",
               }}
             >
-              <span
+              <img
+                src="/logo.svg"
+                alt="BINZEO"
                 style={{
-                  width: "6px",
-                  height: "6px",
-                  borderRadius: "999px",
-                  backgroundColor: "#111",
-                  animation: "bz-pulse-dot 2.4s ease-in-out infinite",
+                  height: "clamp(48px, 7vw, 92px)",
+                  width: "auto",
+                  maxWidth: "90vw",
+                  filter:
+                    "brightness(0) drop-shadow(0 4px 24px rgba(255,255,255,0.5))",
                 }}
               />
-              Introducing BINZEO
             </div>
 
             {/* Small intro line */}
@@ -210,10 +181,10 @@ export default async function HomePage() {
                 margin: "0 0 clamp(8px, 1.2vh, 16px)",
                 fontSize: "clamp(16px, 1.6vw, 22px)",
                 fontWeight: 400,
-                color: "rgba(0,0,0,0.6)",
+                color: "rgba(0,0,0,0.65)",
                 letterSpacing: "-0.01em",
                 animation:
-                  "bz-fade-up 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.25s both",
+                  "bz-fade-up 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.3s both",
               }}
             >
               Own your
@@ -228,9 +199,8 @@ export default async function HomePage() {
                 letterSpacing: "-0.06em",
                 fontWeight: 600,
                 color: "#0a0a0a",
-                textShadow: "0 2px 40px rgba(255,255,255,0.5)",
                 animation:
-                  "bz-title-in 1.1s cubic-bezier(0.22, 1, 0.36, 1) 0.4s both",
+                  "bz-title-in 1.1s cubic-bezier(0.22, 1, 0.36, 1) 0.45s both",
               }}
             >
               Identity
@@ -242,10 +212,10 @@ export default async function HomePage() {
                 margin: "clamp(12px, 1.6vh, 22px) 0 0",
                 fontSize: "clamp(18px, 2vw, 28px)",
                 fontWeight: 400,
-                color: "rgba(0,0,0,0.65)",
+                color: "rgba(0,0,0,0.7)",
                 letterSpacing: "-0.015em",
                 animation:
-                  "bz-fade-up 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.6s both",
+                  "bz-fade-up 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.65s both",
               }}
             >
               that feels like home.
@@ -258,9 +228,9 @@ export default async function HomePage() {
                 maxWidth: "520px",
                 fontSize: "clamp(13px, 1.15vw, 15px)",
                 lineHeight: 1.6,
-                color: "rgba(0,0,0,0.6)",
+                color: "rgba(0,0,0,0.65)",
                 animation:
-                  "bz-fade-up 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.8s both",
+                  "bz-fade-up 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.85s both",
               }}
             >
               A quieter, safer way to hold your digital self. One secure
@@ -276,7 +246,7 @@ export default async function HomePage() {
                 justifyContent: "center",
                 gap: "12px",
                 animation:
-                  "bz-fade-up 0.9s cubic-bezier(0.22, 1, 0.36, 1) 1s both",
+                  "bz-fade-up 0.9s cubic-bezier(0.22, 1, 0.36, 1) 1.05s both",
               }}
             >
               <Link
@@ -307,63 +277,39 @@ export default async function HomePage() {
             </div>
 
             {/* ==================================================== */}
-            {/*  LOGO MARQUEE — BINZEO logo repeated                  */}
+            {/*  SMALL PARTNER LOGO ROW — below CTA button           */}
             {/* ==================================================== */}
             <div
               style={{
-                marginTop: "clamp(48px, 8vh, 88px)",
-                width: "100%",
-                overflow: "hidden",
+                marginTop: "clamp(40px, 6vh, 64px)",
+                display: "flex",
+                flexWrap: "wrap",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: "clamp(20px, 3.5vw, 44px)",
                 animation:
                   "bz-fade-in 1.2s cubic-bezier(0.22, 1, 0.36, 1) 1.3s both",
-                maskImage:
-                  "linear-gradient(90deg, transparent 0%, #000 12%, #000 88%, transparent 100%)",
-                WebkitMaskImage:
-                  "linear-gradient(90deg, transparent 0%, #000 12%, #000 88%, transparent 100%)",
               }}
             >
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "clamp(40px, 6vw, 80px)",
-                  width: "max-content",
-                  animation: "bz-logo-scroll 30s linear infinite",
-                }}
-              >
-                {[...Array(8)].map((_, i) => (
-                  <img
-                    key={i}
-                    src="/logo.svg"
-                    alt="BINZEO"
-                    style={{
-                      height: "clamp(18px, 2vw, 26px)",
-                      width: "auto",
-                      opacity: 0.7,
-                      filter: "grayscale(1) brightness(0.35)",
-                      transition: "opacity 0.3s ease",
-                      flexShrink: 0,
-                    }}
-                  />
-                ))}
-              </div>
+              {partnerLogos.map((logo) => (
+                <img
+                  key={logo.alt}
+                  src={logo.src}
+                  alt={logo.alt}
+                  style={{
+                    height: "clamp(16px, 2vw, 26px)",
+                    width: "auto",
+                    maxWidth: "80px",
+                    objectFit: "contain",
+                    opacity: 0.7,
+                    filter: "grayscale(1) brightness(0.35)",
+                    transition:
+                      "opacity 0.35s cubic-bezier(0.22, 1, 0.36, 1), filter 0.35s cubic-bezier(0.22, 1, 0.36, 1)",
+                  }}
+                />
+              ))}
             </div>
           </div>
-
-          {/* Bottom fade for smooth transition into next section */}
-          <div
-            aria-hidden="true"
-            style={{
-              position: "absolute",
-              bottom: 0,
-              left: 0,
-              right: 0,
-              height: "120px",
-              background:
-                "linear-gradient(180deg, transparent 0%, rgba(247,247,245,0.7) 100%)",
-              pointerEvents: "none",
-            }}
-          />
         </section>
 
         {/* ============================================================ */}
