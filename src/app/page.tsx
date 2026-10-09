@@ -303,7 +303,7 @@ export default async function HomePage() {
         </section>
 
         {/* ============================================================ */}
-        {/*  PHONE CASE — PURE FULL-SCREEN IMAGE (NO TEXT, NO ANIMATION)  */}
+        {/*  PHONE CASE 1 — PURE FULL-SCREEN IMAGE                        */}
         {/* ============================================================ */}
         <section
           style={{
@@ -330,6 +330,105 @@ export default async function HomePage() {
               display: "block",
             }}
           />
+        </section>
+
+        {/* ============================================================ */}
+        {/*  PHONE CASE 2 — FULL-SCREEN WITH SOFT FRAME                   */}
+        {/*  Unique touch: image contained within a soft rounded frame    */}
+        {/*  with subtle gradient background and deep shadow             */}
+        {/* ============================================================ */}
+        <section
+          style={{
+            position: "relative",
+            width: "100vw",
+            minHeight: "100dvh",
+            marginLeft: "calc(-50vw + 50%)",
+            marginRight: "calc(-50vw + 50%)",
+            overflow: "hidden",
+            backgroundColor: "#0a0a0a",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: "clamp(40px, 8vh, 96px) clamp(20px, 4vw, 64px)",
+          }}
+        >
+          {/* Ambient gradient glow behind the frame */}
+          <div
+            aria-hidden="true"
+            style={{
+              position: "absolute",
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+              width: "min(120vw, 1200px)",
+              height: "min(120vw, 1200px)",
+              background:
+                "radial-gradient(circle, rgba(160,180,255,0.18) 0%, rgba(255,180,200,0.10) 40%, transparent 70%)",
+              filter: "blur(80px)",
+              pointerEvents: "none",
+            }}
+          />
+
+          {/* Soft frosted frame around the phone case */}
+          <div
+            style={{
+              position: "relative",
+              zIndex: 2,
+              width: "100%",
+              maxWidth: "min(92vw, 860px)",
+              borderRadius: "clamp(28px, 4vw, 48px)",
+              padding: "clamp(12px, 1.6vw, 20px)",
+              background:
+                "linear-gradient(180deg, rgba(255,255,255,0.10) 0%, rgba(255,255,255,0.03) 100%)",
+              backdropFilter: "blur(40px) saturate(180%)",
+              WebkitBackdropFilter: "blur(40px) saturate(180%)",
+              border: "1px solid rgba(255,255,255,0.14)",
+              boxShadow:
+                "inset 0 1px 0 0 rgba(255,255,255,0.22), 0 40px 120px -32px rgba(0,0,0,0.9), 0 12px 40px -14px rgba(0,0,0,0.6)",
+            }}
+          >
+            {/* Top sheen line */}
+            <span
+              aria-hidden="true"
+              style={{
+                position: "absolute",
+                top: 0,
+                left: "15%",
+                right: "15%",
+                height: "1px",
+                background:
+                  "linear-gradient(90deg, transparent, rgba(255,255,255,0.55), transparent)",
+                pointerEvents: "none",
+              }}
+            />
+
+            {/* Inner image container */}
+            <div
+              style={{
+                position: "relative",
+                width: "100%",
+                aspectRatio: "16 / 10",
+                borderRadius: "clamp(20px, 3vw, 36px)",
+                overflow: "hidden",
+                boxShadow:
+                  "0 20px 60px -24px rgba(0,0,0,0.7), 0 4px 12px -4px rgba(0,0,0,0.4)",
+              }}
+            >
+              <img
+                src="/images/phonecase2.jpg"
+                alt=""
+                style={{
+                  position: "absolute",
+                  inset: 0,
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "cover",
+                  objectPosition: "center",
+                  display: "block",
+                }}
+              />
+            </div>
+          </div>
         </section>
 
         {/* ============================================================ */}
