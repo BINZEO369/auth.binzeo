@@ -333,101 +333,257 @@ export default async function HomePage() {
         </section>
 
         {/* ============================================================ */}
-        {/*  PHONE CASE 2 — FULL-SCREEN WITH SOFT FRAME                   */}
-        {/*  Unique touch: image contained within a soft rounded frame    */}
-        {/*  with subtle gradient background and deep shadow             */}
+        {/*  PHONE CASE 2 — SPLIT: TEXT LEFT + IMAGE RIGHT                */}
         {/* ============================================================ */}
         <section
           style={{
             position: "relative",
             width: "100vw",
+            height: "100vh",
             minHeight: "100dvh",
             marginLeft: "calc(-50vw + 50%)",
             marginRight: "calc(-50vw + 50%)",
             overflow: "hidden",
-            backgroundColor: "#0a0a0a",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            padding: "clamp(40px, 8vh, 96px) clamp(20px, 4vw, 64px)",
+            backgroundColor: "#f7f7f5",
+            display: "grid",
+            gridTemplateColumns: "1fr 1fr",
           }}
+          className="phone-case-2-grid"
         >
-          {/* Ambient gradient glow behind the frame */}
-          <div
-            aria-hidden="true"
-            style={{
-              position: "absolute",
-              top: "50%",
-              left: "50%",
-              transform: "translate(-50%, -50%)",
-              width: "min(120vw, 1200px)",
-              height: "min(120vw, 1200px)",
-              background:
-                "radial-gradient(circle, rgba(160,180,255,0.18) 0%, rgba(255,180,200,0.10) 40%, transparent 70%)",
-              filter: "blur(80px)",
-              pointerEvents: "none",
-            }}
-          />
+          {/* Responsive: mobile এ stack হবে */}
+          <style>{`
+            @media (max-width: 900px) {
+              .phone-case-2-grid {
+                grid-template-columns: 1fr !important;
+                height: auto !important;
+                min-height: 100dvh !important;
+              }
+            }
+          `}</style>
 
-          {/* Soft frosted frame around the phone case */}
+          {/* ==================================================== */}
+          {/*  LEFT — TEXT CONTENT                                  */}
+          {/* ==================================================== */}
           <div
             style={{
               position: "relative",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              padding: "clamp(40px, 6vw, 96px) clamp(24px, 4vw, 72px)",
+              backgroundColor: "#f7f7f5",
               zIndex: 2,
-              width: "100%",
-              maxWidth: "min(92vw, 860px)",
-              borderRadius: "clamp(28px, 4vw, 48px)",
-              padding: "clamp(12px, 1.6vw, 20px)",
-              background:
-                "linear-gradient(180deg, rgba(255,255,255,0.10) 0%, rgba(255,255,255,0.03) 100%)",
-              backdropFilter: "blur(40px) saturate(180%)",
-              WebkitBackdropFilter: "blur(40px) saturate(180%)",
-              border: "1px solid rgba(255,255,255,0.14)",
-              boxShadow:
-                "inset 0 1px 0 0 rgba(255,255,255,0.22), 0 40px 120px -32px rgba(0,0,0,0.9), 0 12px 40px -14px rgba(0,0,0,0.6)",
             }}
           >
-            {/* Top sheen line */}
-            <span
-              aria-hidden="true"
+            <div style={{ maxWidth: "560px", width: "100%" }}>
+              {/* Kicker */}
+              <div
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "10px",
+                  padding: "8px 16px",
+                  borderRadius: "999px",
+                  border: "1px solid rgba(0,0,0,0.08)",
+                  background: "rgba(255,255,255,0.7)",
+                  backdropFilter: "blur(20px) saturate(180%)",
+                  WebkitBackdropFilter: "blur(20px) saturate(180%)",
+                  boxShadow:
+                    "inset 0 1px 0 0 rgba(255,255,255,0.9), 0 4px 16px -8px rgba(0,0,0,0.08)",
+                  color: "rgba(0,0,0,0.7)",
+                  fontSize: "clamp(10.5px, 1vw, 12.5px)",
+                  fontWeight: 500,
+                  letterSpacing: "0.16em",
+                  textTransform: "uppercase",
+                  marginBottom: "clamp(20px, 3vh, 32px)",
+                  animation:
+                    "bz-fade-up 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.15s both",
+                }}
+              >
+                <span
+                  style={{
+                    width: "6px",
+                    height: "6px",
+                    borderRadius: "999px",
+                    backgroundColor: "#111",
+                  }}
+                />
+                Built for every device
+              </div>
+
+              {/* Title */}
+              <h2
+                style={{
+                  margin: "0 0 clamp(16px, 2.2vh, 26px)",
+                  fontSize: "clamp(34px, 4.5vw, 62px)",
+                  lineHeight: 1.02,
+                  letterSpacing: "-0.045em",
+                  fontWeight: 600,
+                  color: "#0a0a0a",
+                  animation:
+                    "bz-fade-up 1s cubic-bezier(0.22, 1, 0.36, 1) 0.3s both",
+                }}
+              >
+                One identity.
+                <br />
+                Every screen you own.
+              </h2>
+
+              {/* Subtitle */}
+              <p
+                style={{
+                  margin: "0 0 clamp(28px, 4vh, 40px)",
+                  fontSize: "clamp(14px, 1.25vw, 17px)",
+                  lineHeight: 1.65,
+                  color: "rgba(0,0,0,0.65)",
+                  maxWidth: "480px",
+                  animation:
+                    "bz-fade-up 1s cubic-bezier(0.22, 1, 0.36, 1) 0.45s both",
+                }}
+              >
+                Whether you&apos;re on your phone, tablet, laptop, or the web —
+                BINZEO stays with you. Sign in once, move seamlessly, and keep
+                your identity calm and secure across every device you use.
+              </p>
+
+              {/* Small feature list */}
+              <ul
+                style={{
+                  listStyle: "none",
+                  padding: 0,
+                  margin: "0 0 clamp(28px, 4vh, 40px)",
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "clamp(10px, 1.4vh, 14px)",
+                  animation:
+                    "bz-fade-up 1s cubic-bezier(0.22, 1, 0.36, 1) 0.6s both",
+                }}
+              >
+                {[
+                  "Instant sign-in with passkeys",
+                  "Consistent across iOS, Android & web",
+                  "Your data, always in sync",
+                ].map((item) => (
+                  <li
+                    key={item}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "12px",
+                      fontSize: "clamp(13px, 1.1vw, 15px)",
+                      color: "rgba(0,0,0,0.7)",
+                    }}
+                  >
+                    <span
+                      style={{
+                        display: "inline-flex",
+                        width: "20px",
+                        height: "20px",
+                        borderRadius: "999px",
+                        backgroundColor: "#0a0a0a",
+                        color: "#ffffff",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        flexShrink: 0,
+                        fontSize: "10px",
+                      }}
+                    >
+                      ✓
+                    </span>
+                    {item}
+                  </li>
+                ))}
+              </ul>
+
+              {/* CTA */}
+              <div
+                style={{
+                  animation:
+                    "bz-fade-up 1s cubic-bezier(0.22, 1, 0.36, 1) 0.75s both",
+                }}
+              >
+                <Link
+                  href={isLoggedIn ? "/dashboard" : "/signup"}
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "8px",
+                    padding: "14px 28px",
+                    borderRadius: "999px",
+                    background:
+                      "linear-gradient(180deg, #1a1a1a 0%, #0a0a0a 100%)",
+                    color: "#ffffff",
+                    fontSize: "clamp(13px, 1.1vw, 14.5px)",
+                    fontWeight: 500,
+                    letterSpacing: "-0.005em",
+                    boxShadow:
+                      "inset 0 1px 0 0 rgba(255,255,255,0.14), 0 1px 2px rgba(0,0,0,0.2), 0 10px 28px -10px rgba(0,0,0,0.45)",
+                    transition: "all 0.35s cubic-bezier(0.22, 1, 0.36, 1)",
+                  }}
+                >
+                  {isLoggedIn ? "Open dashboard" : "Get started free"}
+                  <span aria-hidden="true">→</span>
+                </Link>
+              </div>
+            </div>
+          </div>
+
+          {/* ==================================================== */}
+          {/*  RIGHT — PHONE CASE 2 IMAGE (full bleed)             */}
+          {/* ==================================================== */}
+          <div
+            style={{
+              position: "relative",
+              overflow: "hidden",
+              backgroundColor: "#0a0a0a",
+              minHeight: "clamp(400px, 60vh, 100dvh)",
+              animation:
+                "bz-fade-in 1.2s cubic-bezier(0.22, 1, 0.36, 1) 0.2s both",
+            }}
+          >
+            <img
+              src="/images/phonecase2.jpg"
+              alt="BINZEO phone case on a modern smartphone"
               style={{
                 position: "absolute",
-                top: 0,
-                left: "15%",
-                right: "15%",
-                height: "1px",
-                background:
-                  "linear-gradient(90deg, transparent, rgba(255,255,255,0.55), transparent)",
-                pointerEvents: "none",
+                inset: 0,
+                width: "100%",
+                height: "100%",
+                objectFit: "cover",
+                objectPosition: "center",
+                display: "block",
               }}
             />
 
-            {/* Inner image container */}
+            {/* Subtle left-edge fade to blend with text side */}
             <div
+              aria-hidden="true"
+              className="phone-case-2-fade"
               style={{
-                position: "relative",
-                width: "100%",
-                aspectRatio: "16 / 10",
-                borderRadius: "clamp(20px, 3vw, 36px)",
-                overflow: "hidden",
-                boxShadow:
-                  "0 20px 60px -24px rgba(0,0,0,0.7), 0 4px 12px -4px rgba(0,0,0,0.4)",
+                position: "absolute",
+                top: 0,
+                left: 0,
+                bottom: 0,
+                width: "80px",
+                background:
+                  "linear-gradient(90deg, rgba(247,247,245,1) 0%, rgba(247,247,245,0) 100%)",
+                pointerEvents: "none",
               }}
-            >
-              <img
-                src="/images/phonecase2.jpg"
-                alt=""
-                style={{
-                  position: "absolute",
-                  inset: 0,
-                  width: "100%",
-                  height: "100%",
-                  objectFit: "cover",
-                  objectPosition: "center",
-                  display: "block",
-                }}
-              />
-            </div>
+            />
+            {/* Responsive: mobile এ fade হবে vertical */}
+            <style>{`
+              @media (max-width: 900px) {
+                .phone-case-2-fade {
+                  width: 100% !important;
+                  height: 60px !important;
+                  top: 0 !important;
+                  left: 0 !important;
+                  right: 0 !important;
+                  bottom: auto !important;
+                  background: linear-gradient(180deg, rgba(247,247,245,1) 0%, rgba(247,247,245,0) 100%) !important;
+                }
+              }
+            `}</style>
           </div>
         </section>
 
