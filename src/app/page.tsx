@@ -89,7 +89,6 @@ export default async function HomePage() {
         /*  PHONE CASE GRIDS — responsive side-by-side on ALL screens    */
         /* ============================================================ */
 
-        /* Case 1: Image (left) + Text (right) — always side-by-side */
         .phone-case-1-grid {
           display: grid;
           grid-template-columns: 1fr 1fr;
@@ -97,7 +96,6 @@ export default async function HomePage() {
           min-height: 100dvh;
         }
 
-        /* Case 2: Text (left) + Image (right) — always side-by-side */
         .phone-case-2-grid {
           display: grid;
           grid-template-columns: 1fr 1fr;
@@ -105,7 +103,6 @@ export default async function HomePage() {
           min-height: 100dvh;
         }
 
-        /* Tablet / small desktop */
         @media (max-width: 900px) {
           .phone-case-1-grid,
           .phone-case-2-grid {
@@ -113,7 +110,6 @@ export default async function HomePage() {
           }
         }
 
-        /* Mobile — keep 40/60 split for better text readability */
         @media (max-width: 640px) {
           .phone-case-1-grid {
             grid-template-columns: 42% 58%;
@@ -173,7 +169,6 @@ export default async function HomePage() {
           }
         }
 
-        /* Very small mobile (iPhone SE etc) */
         @media (max-width: 380px) {
           .phone-case-1-grid {
             grid-template-columns: 40% 60%;
@@ -423,7 +418,7 @@ export default async function HomePage() {
           }}
         >
           {/* ============================================================ */}
-          {/*  PHONE CASE 1 — IMAGE LEFT + TEXT RIGHT (all screens)         */}
+          {/*  PHONE CASE 1 — IMAGE LEFT + TEXT RIGHT                       */}
           {/* ============================================================ */}
           <section className="phone-case-1-grid">
             {/* LEFT — IMAGE */}
@@ -451,7 +446,6 @@ export default async function HomePage() {
                 }}
               />
 
-              {/* Right edge fade → blends with text side */}
               <div
                 aria-hidden="true"
                 style={{
@@ -466,7 +460,6 @@ export default async function HomePage() {
                 }}
               />
 
-              {/* Bottom fade → smooths connection to Case 2 */}
               <div
                 aria-hidden="true"
                 style={{
@@ -496,7 +489,6 @@ export default async function HomePage() {
               }}
             >
               <div style={{ maxWidth: "560px", width: "100%" }}>
-                {/* Kicker */}
                 <div
                   className="phone-case-kicker"
                   style={{
@@ -532,7 +524,6 @@ export default async function HomePage() {
                   Carry it with you
                 </div>
 
-                {/* Title */}
                 <h2
                   className="phone-case-title"
                   style={{
@@ -551,7 +542,6 @@ export default async function HomePage() {
                   in your pocket.
                 </h2>
 
-                {/* Subtitle */}
                 <p
                   className="phone-case-desc"
                   style={{
@@ -569,7 +559,6 @@ export default async function HomePage() {
                   every day.
                 </p>
 
-                {/* Feature list */}
                 <ul
                   className="phone-case-list"
                   style={{
@@ -620,7 +609,6 @@ export default async function HomePage() {
                   ))}
                 </ul>
 
-                {/* CTA */}
                 <div
                   style={{
                     animation:
@@ -699,7 +687,7 @@ export default async function HomePage() {
           </div>
 
           {/* ============================================================ */}
-          {/*  PHONE CASE 2 — TEXT LEFT + IMAGE RIGHT (all screens)         */}
+          {/*  PHONE CASE 2 — TEXT LEFT + IMAGE RIGHT                       */}
           {/* ============================================================ */}
           <section className="phone-case-2-grid">
             {/* LEFT — TEXT */}
@@ -716,7 +704,6 @@ export default async function HomePage() {
               }}
             >
               <div style={{ maxWidth: "560px", width: "100%" }}>
-                {/* Kicker */}
                 <div
                   className="phone-case-kicker"
                   style={{
@@ -752,7 +739,6 @@ export default async function HomePage() {
                   Built for every device
                 </div>
 
-                {/* Title */}
                 <h2
                   className="phone-case-title"
                   style={{
@@ -771,7 +757,6 @@ export default async function HomePage() {
                   Every screen you own.
                 </h2>
 
-                {/* Subtitle */}
                 <p
                   className="phone-case-desc"
                   style={{
@@ -790,7 +775,6 @@ export default async function HomePage() {
                   use.
                 </p>
 
-                {/* Feature list */}
                 <ul
                   className="phone-case-list"
                   style={{
@@ -841,7 +825,6 @@ export default async function HomePage() {
                   ))}
                 </ul>
 
-                {/* CTA */}
                 <div
                   style={{
                     animation:
@@ -900,7 +883,6 @@ export default async function HomePage() {
                 }}
               />
 
-              {/* Left edge fade → blends with text side */}
               <div
                 aria-hidden="true"
                 style={{
@@ -915,7 +897,6 @@ export default async function HomePage() {
                 }}
               />
 
-              {/* Top fade → smooths connection from Case 1 */}
               <div
                 aria-hidden="true"
                 style={{
@@ -932,6 +913,36 @@ export default async function HomePage() {
             </div>
           </section>
         </div>
+
+        {/* ============================================================ */}
+        {/*  PHONE CASE 3 — PURE FULL-SCREEN IMAGE (no text)              */}
+        {/* ============================================================ */}
+        <section
+          style={{
+            position: "relative",
+            width: "100vw",
+            height: "100vh",
+            minHeight: "100dvh",
+            marginLeft: "calc(-50vw + 50%)",
+            marginRight: "calc(-50vw + 50%)",
+            overflow: "hidden",
+            backgroundColor: "#0a0a0a",
+          }}
+        >
+          <img
+            src="/images/phonecase3.jpg"
+            alt=""
+            style={{
+              position: "absolute",
+              inset: 0,
+              width: "100%",
+              height: "100%",
+              objectFit: "cover",
+              objectPosition: "center",
+              display: "block",
+            }}
+          />
+        </section>
 
         {/* ============================================================ */}
         {/*  INTRO                                                        */}
