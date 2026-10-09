@@ -122,7 +122,7 @@ export default function ChangePasswordPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [maskedEmail, setMaskedEmail] = useState<string | null>(null);
-  const [verifyToken, setVerifyToken] = useState<string | null>(null);
+  const [challengeId, setChallengeId] = useState<string | null>(null);
   const [cooldown, setCooldown] = useState(0);
 
   const resetError = () => setError(null);
@@ -146,17 +146,18 @@ export default function ChangePasswordPage() {
     setLoading(true);
     setError(null);
     try {
-      // ⚠️ Adjust this endpoint if your API path is different
-      const res = await apiFetch<{ masked_email?: string }>(
-        "/api/user/password/send-otp",
+      const res = await apiFetch<{ challenge_id?: string; message: string }>(
+        "/api/user/password-change/request",
         { method: "POST" }
       );
-      if (res.success) {
-        setMaskedEmail(res.data?.masked_email ?? null);
+      if (res.success && res.data.challenge_id) {
+        setChallengeId(res.data.challenge_id);
+        setMaskedEmail(null);
         setOtp("");
-        setVerifyToken(null);
         setStep("verify");
         startCooldown();
+      } else if (res.success) {
+        setError("The verification challenge was not created. Please try again.");
       } else {
         setError(res.error.message || "Couldn't send the code");
       }
@@ -168,28 +169,19 @@ export default function ChangePasswordPage() {
 
   const handleVerifyOtp = async () => {
     const code = otp.replace(/\D/g, "");
-    if (code.length < 4) {
-      setError("Enter the code we sent to your email");
+    if (code.length !== 6) {
+      setError("Enter the 6-digit code we sent to your email");
       return;
     }
     setLoading(true);
     setError(null);
-    try {
-      // ⚠️ Adjust endpoint if needed
-      const res = await apiFetch<{ token?: string }>(
-        "/api/user/password/verify-otp",
-        { method: "POST", body: JSON.stringify({ code }) }
-      );
-      if (res.success) {
-        setVerifyToken(res.data?.token ?? null);
-        setOtp(code);
-        setStep("password");
-      } else {
-        setError(res.error.message || "That code didn't work");
-      }
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Something went wrong");
+    if (!challengeId) {
+      setError("Your verification session has expired. Request a new code.");
+      setLoading(false);
+      return;
     }
+    setOtp(code);
+    setStep("password");
     setLoading(false);
   };
 
@@ -205,17 +197,25 @@ export default function ChangePasswordPage() {
     setLoading(true);
     setError(null);
     try {
-      // ⚠️ Adjust endpoint if needed
-      const res = await apiFetch("/api/user/password/change", {
+      if (!challengeId || otp.length !== 6) {
+        setError("Enter the 6-digit verification code first.");
+        setLoading(false);
+        return;
+      }
+      const res = await apiFetch<{ verified: boolean; reason: string }>("/api/auth/password-reset/verify", {
         method: "POST",
         body: JSON.stringify({
+          challenge_id: challengeId,
           code: otp,
-          token: verifyToken,
           new_password: newPassword,
+          confirm_password: confirmPassword,
+          purpose: "change",
         }),
       });
-      if (res.success) {
+      if (res.success && res.data.verified) {
         setStep("done");
+      } else if (res.success) {
+        setError(`Verification failed: ${res.data.reason}`);
       } else {
         setError(res.error.message || "Couldn't update your password");
       }
