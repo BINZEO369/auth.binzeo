@@ -58,16 +58,49 @@ function CheckIcon() {
 }
 
 /* ================================================================== */
-/*  Liquid glass wrapper helper                                        */
+/*  Liquid glass — stronger because no overlay behind it              */
 /* ================================================================== */
 const liquidGlass = {
   background:
-    "radial-gradient(120% 120% at 30% 12%, rgba(255,255,255,1) 0%, rgba(255,255,255,0.78) 45%, rgba(255,255,255,0.55) 100%)",
-  backdropFilter: "blur(22px) saturate(180%)",
-  WebkitBackdropFilter: "blur(22px) saturate(180%)",
+    "radial-gradient(120% 120% at 30% 12%, rgba(255,255,255,0.98) 0%, rgba(255,255,255,0.85) 45%, rgba(255,255,255,0.72) 100%)",
+  backdropFilter: "blur(24px) saturate(180%)",
+  WebkitBackdropFilter: "blur(24px) saturate(180%)",
   boxShadow:
-    "inset 0 1px 0 0 rgba(255,255,255,1), inset 0 0 0 1px rgba(255,255,255,0.45), 0 1px 2px rgba(0,0,0,0.03), 0 12px 32px -18px rgba(0,0,0,0.12)",
+    "inset 0 1px 0 0 rgba(255,255,255,1), inset 0 0 0 1px rgba(255,255,255,0.5), 0 2px 4px rgba(0,0,0,0.04), 0 16px 40px -22px rgba(0,0,0,0.22)",
 } as const;
+
+/* ================================================================== */
+/*  Background layer — image only, no overlay                         */
+/* ================================================================== */
+function PageBackground() {
+  return (
+    <div
+      aria-hidden="true"
+      className="pointer-events-none absolute inset-0 overflow-hidden"
+      style={{ zIndex: 0 }}
+    >
+      {/* Image — full bleed */}
+      <div
+        className="absolute -inset-[6%]"
+        style={{
+          backgroundImage: "url('/images/img3.jpg')",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat",
+          animation: "db-kenburns 32s ease-in-out infinite",
+        }}
+      />
+      {/* Very soft bottom fade so page bottom blends nicely (NOT covering content) */}
+      <div
+        className="absolute inset-x-0 bottom-0 h-32"
+        style={{
+          background:
+            "linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.35) 100%)",
+        }}
+      />
+    </div>
+  );
+}
 
 /* ================================================================== */
 /*  Stat Card                                                          */
@@ -87,7 +120,7 @@ function StatCard({
 }) {
   const inner = (
     <div
-      className="group relative h-full overflow-hidden rounded-2xl border border-black/[0.06] p-5 transition-all duration-500 hover:-translate-y-0.5 hover:border-black/[0.10] hover:shadow-[0_20px_44px_-22px_rgba(0,0,0,0.20)]"
+      className="group relative h-full overflow-hidden rounded-2xl border border-black/[0.06] p-5 transition-all duration-500 hover:-translate-y-0.5 hover:border-black/[0.10] hover:shadow-[0_20px_44px_-22px_rgba(0,0,0,0.28)]"
       style={{
         ...liquidGlass,
         animation: `db-item-in 0.6s cubic-bezier(0.22, 1, 0.36, 1) ${delay}s both`,
@@ -102,14 +135,14 @@ function StatCard({
         }}
       />
 
-      <div className="relative text-[10px] font-semibold uppercase tracking-[0.16em] text-black/40">
+      <div className="relative text-[10px] font-semibold uppercase tracking-[0.16em] text-black/45">
         {title}
       </div>
-      <div className="relative mt-2 truncate text-[17px] font-semibold text-black/85">
+      <div className="relative mt-2 truncate text-[17px] font-semibold text-black/90">
         {value}
       </div>
       {hint && (
-        <div className="relative mt-1 truncate text-[11.5px] text-black/45">
+        <div className="relative mt-1 truncate text-[11.5px] text-black/50">
           {hint}
         </div>
       )}
@@ -142,7 +175,7 @@ function ManageTile({
   return (
     <Link
       href={href}
-      className="group relative flex flex-col overflow-hidden rounded-2xl border border-black/[0.06] p-5 transition-all duration-500 hover:-translate-y-0.5 hover:border-black/[0.10] hover:shadow-[0_20px_44px_-22px_rgba(0,0,0,0.20)]"
+      className="group relative flex flex-col overflow-hidden rounded-2xl border border-black/[0.06] p-5 transition-all duration-500 hover:-translate-y-0.5 hover:border-black/[0.10] hover:shadow-[0_20px_44px_-22px_rgba(0,0,0,0.28)]"
       style={{
         ...liquidGlass,
         animation: `db-item-in 0.6s cubic-bezier(0.22, 1, 0.36, 1) ${delay}s both`,
@@ -158,14 +191,14 @@ function ManageTile({
       />
 
       <div className="relative flex items-center justify-between mb-2">
-        <div className="text-[14px] font-semibold text-black/85 transition-colors group-hover:text-black">
+        <div className="text-[14px] font-semibold text-black/90 transition-colors group-hover:text-black">
           {title}
         </div>
-        <span className="text-black/25 transition-all duration-500 group-hover:translate-x-0.5 group-hover:text-black/70">
+        <span className="text-black/30 transition-all duration-500 group-hover:translate-x-0.5 group-hover:text-black/80">
           <ArrowIcon />
         </span>
       </div>
-      <div className="relative text-[12px] leading-5 text-black/50">{desc}</div>
+      <div className="relative text-[12px] leading-5 text-black/55">{desc}</div>
     </Link>
   );
 }
@@ -187,30 +220,9 @@ export default function DashboardOverviewPage() {
 
   if (loading) {
     return (
-      <div className="relative isolate flex min-h-[60vh] items-center justify-center">
-        {/* Background */}
-        <div
-          aria-hidden="true"
-          className="pointer-events-none fixed inset-0 z-0"
-          style={{
-            backgroundImage: "url('/images/img3.jpg')",
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-            backgroundRepeat: "no-repeat",
-            animation: "db-kenburns 32s ease-in-out infinite",
-          }}
-        />
-        <div
-          aria-hidden="true"
-          className="pointer-events-none fixed inset-0 z-0"
-          style={{
-            background:
-              "linear-gradient(180deg, rgba(255,255,255,0.72) 0%, rgba(255,255,255,0.82) 45%, rgba(255,255,255,0.90) 100%)",
-            backdropFilter: "blur(2px)",
-            WebkitBackdropFilter: "blur(2px)",
-          }}
-        />
-        <div className="relative z-10 h-6 w-6 animate-spin rounded-full border-2 border-black/20 border-t-black/70" />
+      <div className="relative isolate flex min-h-[80vh] items-center justify-center">
+        <PageBackground />
+        <div className="relative z-10 h-6 w-6 animate-spin rounded-full border-2 border-black/25 border-t-black/80" />
       </div>
     );
   }
@@ -220,81 +232,63 @@ export default function DashboardOverviewPage() {
   const isActive = profile?.account_status === "active";
 
   return (
-    <div className="relative isolate">
-      {/* ============================================================ */}
-      {/*  FIXED BACKGROUND IMAGE — z-0 (not negative)                 */}
-      {/* ============================================================ */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none fixed inset-0 z-0"
-        style={{
-          backgroundImage: "url('/images/img3.jpg')",
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          backgroundRepeat: "no-repeat",
-          animation: "db-kenburns 32s ease-in-out infinite",
-        }}
-      />
+    <div className="relative isolate min-h-[80vh]">
+      {/* Keyframes */}
+      <style jsx global>{`
+        @keyframes db-item-in {
+          from {
+            opacity: 0;
+            transform: translateY(20px) scale(0.99);
+            filter: blur(8px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+            filter: blur(0);
+          }
+        }
+        @keyframes db-banner-in {
+          from {
+            opacity: 0;
+            transform: translateY(24px);
+            filter: blur(10px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+            filter: blur(0);
+          }
+        }
+        @keyframes db-float-soft {
+          0%, 100% { transform: translateY(0); }
+          50%      { transform: translateY(-5px); }
+        }
+        @keyframes db-kenburns {
+          0%, 100% { transform: scale(1.04) translate(0, 0); }
+          50%      { transform: scale(1.12) translate(-1%, -0.8%); }
+        }
+        @media (prefers-reduced-motion: reduce) {
+          [data-db-anim] {
+            animation: none !important;
+            opacity: 1 !important;
+            transform: none !important;
+            filter: none !important;
+          }
+          .db-bg-img {
+            animation: none !important;
+          }
+        }
+      `}</style>
 
-      {/* Soft white overlay for readability */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none fixed inset-0 z-0"
-        style={{
-          background:
-            "linear-gradient(180deg, rgba(255,255,255,0.72) 0%, rgba(255,255,255,0.82) 45%, rgba(255,255,255,0.90) 100%)",
-          backdropFilter: "blur(2px)",
-          WebkitBackdropFilter: "blur(2px)",
-        }}
-      />
+      {/* ============================================================ */}
+      {/*  BACKGROUND IMAGE — no overlay, just the image                */}
+      {/* ============================================================ */}
+      <PageBackground />
 
       {/* ============================================================ */}
-      {/*  CONTENT — relative z-10                                     */}
+      {/*  CONTENT                                                      */}
       {/* ============================================================ */}
-      <div className="relative z-10 mx-auto max-w-5xl space-y-6 py-4 sm:py-6">
-        <style jsx global>{`
-          @keyframes db-item-in {
-            from {
-              opacity: 0;
-              transform: translateY(20px) scale(0.99);
-              filter: blur(8px);
-            }
-            to {
-              opacity: 1;
-              transform: translateY(0) scale(1);
-              filter: blur(0);
-            }
-          }
-          @keyframes db-banner-in {
-            from {
-              opacity: 0;
-              transform: translateY(24px);
-              filter: blur(10px);
-            }
-            to {
-              opacity: 1;
-              transform: translateY(0);
-              filter: blur(0);
-            }
-          }
-          @keyframes db-float-soft {
-            0%, 100% { transform: translateY(0); }
-            50%      { transform: translateY(-5px); }
-          }
-          @keyframes db-kenburns {
-            0%, 100% { transform: scale(1.05) translate(0, 0); }
-            50%      { transform: scale(1.14) translate(-1.4%, -1%); }
-          }
-          @media (prefers-reduced-motion: reduce) {
-            [data-db-anim] {
-              animation: none !important;
-              opacity: 1 !important;
-              transform: none !important;
-              filter: none !important;
-            }
-          }
-        `}</style>
-
+      <div className="relative z-10 mx-auto max-w-5xl space-y-6 px-4 py-6 sm:px-6 sm:py-8">
         {/* ============================================================ */}
         {/*  WELCOME BANNER                                               */}
         {/* ============================================================ */}
@@ -303,11 +297,11 @@ export default function DashboardOverviewPage() {
           className="relative overflow-hidden rounded-3xl border border-black/[0.06] p-7 sm:p-9"
           style={{
             background:
-              "linear-gradient(180deg, rgba(255,255,255,0.72) 0%, rgba(255,255,255,0.55) 100%)",
-            backdropFilter: "blur(28px) saturate(180%)",
-            WebkitBackdropFilter: "blur(28px) saturate(180%)",
+              "radial-gradient(120% 120% at 30% 12%, rgba(255,255,255,0.98) 0%, rgba(255,255,255,0.88) 45%, rgba(255,255,255,0.78) 100%)",
+            backdropFilter: "blur(32px) saturate(180%)",
+            WebkitBackdropFilter: "blur(32px) saturate(180%)",
             boxShadow:
-              "inset 0 1px 0 0 rgba(255,255,255,1), inset 0 0 0 1px rgba(255,255,255,0.4), 0 24px 60px -28px rgba(0,0,0,0.22)",
+              "inset 0 1px 0 0 rgba(255,255,255,1), inset 0 0 0 1px rgba(255,255,255,0.5), 0 2px 4px rgba(0,0,0,0.04), 0 28px 60px -28px rgba(0,0,0,0.30)",
             animation:
               "db-banner-in 0.85s cubic-bezier(0.22, 1, 0.36, 1) 0.05s both",
           }}
@@ -323,32 +317,32 @@ export default function DashboardOverviewPage() {
 
           <div
             aria-hidden="true"
-            className="pointer-events-none absolute -left-16 -top-16 h-52 w-52 rounded-full opacity-70"
+            className="pointer-events-none absolute -left-16 -top-16 h-52 w-52 rounded-full opacity-60"
             style={{
               background:
-                "radial-gradient(circle, rgba(180,200,255,0.35) 0%, rgba(180,200,255,0) 70%)",
+                "radial-gradient(circle, rgba(180,200,255,0.4) 0%, rgba(180,200,255,0) 70%)",
               filter: "blur(36px)",
               animation: "db-float-soft 7s ease-in-out infinite",
             }}
           />
           <div
             aria-hidden="true"
-            className="pointer-events-none absolute -right-16 -bottom-16 h-52 w-52 rounded-full opacity-70"
+            className="pointer-events-none absolute -right-16 -bottom-16 h-52 w-52 rounded-full opacity-60"
             style={{
               background:
-                "radial-gradient(circle, rgba(255,200,180,0.30) 0%, rgba(255,200,180,0) 70%)",
+                "radial-gradient(circle, rgba(255,200,180,0.35) 0%, rgba(255,200,180,0) 70%)",
               filter: "blur(36px)",
               animation: "db-float-soft 7s ease-in-out 1.4s infinite",
             }}
           />
 
           <div className="relative">
-            <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-black/[0.06] bg-white/70 px-3 py-1.5 backdrop-blur-md">
+            <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-black/[0.06] bg-white/80 px-3 py-1.5 backdrop-blur-md">
               <span
                 className="h-1.5 w-1.5 rounded-full bg-black"
                 style={{ animation: "db-float-soft 2.4s ease-in-out infinite" }}
               />
-              <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-black/55">
+              <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-black/60">
                 Welcome back
               </span>
             </div>
@@ -362,15 +356,15 @@ export default function DashboardOverviewPage() {
                 className="inline-flex items-center gap-2 rounded-xl border border-black/[0.06] px-3 py-2"
                 style={{
                   background:
-                    "radial-gradient(120% 120% at 30% 15%, rgba(255,255,255,1) 0%, rgba(255,255,255,0.65) 100%)",
+                    "radial-gradient(120% 120% at 30% 15%, rgba(255,255,255,1) 0%, rgba(255,255,255,0.75) 100%)",
                   boxShadow:
-                    "inset 0 1px 0 0 rgba(255,255,255,1), 0 2px 8px -4px rgba(0,0,0,0.06)",
+                    "inset 0 1px 0 0 rgba(255,255,255,1), 0 2px 8px -4px rgba(0,0,0,0.08)",
                 }}
               >
-                <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-black/40">
+                <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-black/45">
                   Your ID
                 </span>
-                <span className="font-mono text-[12.5px] font-medium text-black/75">
+                <span className="font-mono text-[12.5px] font-medium text-black/80">
                   {profile.binzeo_user_id}
                 </span>
               </div>
@@ -380,8 +374,8 @@ export default function DashboardOverviewPage() {
               <span
                 className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-[11px] font-medium backdrop-blur-md ${
                   isActive
-                    ? "border-emerald-200/70 bg-emerald-50/70 text-emerald-700"
-                    : "border-amber-200/70 bg-amber-50/70 text-amber-700"
+                    ? "border-emerald-200/80 bg-emerald-50/80 text-emerald-700"
+                    : "border-amber-200/80 bg-amber-50/80 text-amber-700"
                 }`}
               >
                 <span className="flex h-3.5 w-3.5 items-center justify-center">
@@ -392,7 +386,7 @@ export default function DashboardOverviewPage() {
 
               <Link
                 href="/dashboard/profile"
-                className="group inline-flex items-center gap-1.5 rounded-full border border-black/[0.08] bg-white/60 px-3 py-1.5 text-[11px] font-medium text-black/70 backdrop-blur-md transition-all duration-500 hover:-translate-y-0.5 hover:border-black/[0.14] hover:text-black hover:shadow-[0_10px_24px_-12px_rgba(0,0,0,0.18)]"
+                className="group inline-flex items-center gap-1.5 rounded-full border border-black/[0.08] bg-white/75 px-3 py-1.5 text-[11px] font-medium text-black/75 backdrop-blur-md transition-all duration-500 hover:-translate-y-0.5 hover:border-black/[0.14] hover:text-black hover:shadow-[0_10px_24px_-12px_rgba(0,0,0,0.24)]"
               >
                 Edit profile
                 <span className="transition-transform duration-500 group-hover:translate-x-0.5">
@@ -451,7 +445,7 @@ export default function DashboardOverviewPage() {
                 "db-item-in 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.35s both",
             }}
           >
-            <span className="whitespace-nowrap text-[10px] font-semibold uppercase tracking-[0.18em] text-black/40">
+            <span className="whitespace-nowrap text-[10px] font-semibold uppercase tracking-[0.18em] text-black/60">
               Manage
             </span>
             <span
@@ -459,7 +453,7 @@ export default function DashboardOverviewPage() {
               className="h-px flex-1"
               style={{
                 background:
-                  "linear-gradient(90deg, rgba(0,0,0,0.10), rgba(0,0,0,0))",
+                  "linear-gradient(90deg, rgba(0,0,0,0.18), rgba(0,0,0,0))",
               }}
             />
           </div>
