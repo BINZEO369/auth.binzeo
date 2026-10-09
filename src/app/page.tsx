@@ -82,7 +82,6 @@ export default async function HomePage() {
         /*  CINEMATIC REVEAL SYSTEM                                      */
         /* ============================================================ */
 
-        /* Any element marked [data-reveal] starts hidden and fades in  */
         [data-reveal] {
           opacity: 0;
           transform: translateY(34px) scale(0.985);
@@ -100,7 +99,6 @@ export default async function HomePage() {
           filter: none;
         }
 
-        /* Letter-by-letter children */
         .bz-letter {
           display: inline-block;
           opacity: 0;
@@ -115,7 +113,6 @@ export default async function HomePage() {
           will-change: opacity, transform, filter;
         }
 
-        /* Word-by-word children */
         .bz-word {
           display: inline-block;
           opacity: 0;
@@ -129,7 +126,6 @@ export default async function HomePage() {
           will-change: opacity, transform, filter;
         }
 
-        /* Group parents trigger their children */
         [data-reveal-group].is-visible .bz-letter,
         [data-reveal-group].is-visible .bz-word {
           opacity: 1;
@@ -137,7 +133,6 @@ export default async function HomePage() {
           filter: none;
         }
 
-        /* Ken Burns + float */
         @keyframes bz-kenburns {
           0%, 100% { transform: scale(1.05) translate(0, 0); }
           50%      { transform: scale(1.15) translate(-1.5%, -1%); }
@@ -148,15 +143,19 @@ export default async function HomePage() {
         }
 
         /* ============================================================ */
-        /*  LIQUID MERGE                                                 */
+        /*  LIQUID MERGE — সব শ্যাডো এখন সাদা                            */
         /* ============================================================ */
         .liquid-section { position: relative; isolation: isolate; }
-        .liquid-shadow-top { box-shadow: inset 0 60px 80px -50px rgba(0,0,0,0.20); }
-        .liquid-shadow-bottom { box-shadow: inset 0 -60px 80px -50px rgba(0,0,0,0.20); }
+        .liquid-shadow-top {
+          box-shadow: inset 0 60px 80px -50px rgba(255,255,255,0.95);
+        }
+        .liquid-shadow-bottom {
+          box-shadow: inset 0 -60px 80px -50px rgba(255,255,255,0.95);
+        }
         .liquid-shadow-both {
           box-shadow:
-            inset 0 60px 80px -50px rgba(0,0,0,0.15),
-            inset 0 -60px 80px -50px rgba(0,0,0,0.15);
+            inset 0 60px 80px -50px rgba(255,255,255,0.9),
+            inset 0 -60px 80px -50px rgba(255,255,255,0.9);
         }
 
         /* ============================================================ */
@@ -315,7 +314,6 @@ export default async function HomePage() {
               />
             </div>
 
-            {/* "Own your" */}
             <p
               data-reveal-group
               style={{
@@ -329,7 +327,6 @@ export default async function HomePage() {
               <Words words={["Own", "your"]} delayBase={0.35} stagger={0.14} />
             </p>
 
-            {/* "Identity" */}
             <h1
               data-reveal-group
               style={{
@@ -345,7 +342,6 @@ export default async function HomePage() {
               <Letters text="Identity" delayBase={0.55} stagger={0.055} />
             </h1>
 
-            {/* "that feels like home." */}
             <p
               data-reveal-group
               style={{
@@ -363,7 +359,6 @@ export default async function HomePage() {
               />
             </p>
 
-            {/* Description */}
             <p
               data-reveal
               style={{
@@ -380,7 +375,6 @@ export default async function HomePage() {
               simple on the surface.
             </p>
 
-            {/* CTA */}
             <div
               data-reveal
               style={{
@@ -418,7 +412,6 @@ export default async function HomePage() {
               </Link>
             </div>
 
-            {/* Partner logos */}
             <div
               style={{
                 marginTop: "clamp(48px, 7vh, 80px)",
@@ -468,7 +461,7 @@ export default async function HomePage() {
             </div>
           </div>
 
-          {/* Bottom fade */}
+          {/* Bottom fade — dark → white */}
           <div
             aria-hidden="true"
             style={{
@@ -478,7 +471,7 @@ export default async function HomePage() {
               right: 0,
               height: "200px",
               background:
-                "linear-gradient(180deg, rgba(247,247,245,0) 0%, rgba(247,247,245,0.2) 30%, rgba(247,247,245,0.7) 65%, rgba(247,247,245,0.97) 90%, rgba(247,247,245,1) 100%)",
+                "linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.2) 30%, rgba(255,255,255,0.7) 65%, rgba(255,255,255,0.97) 90%, rgba(255,255,255,1) 100%)",
               pointerEvents: "none",
               zIndex: 3,
             }}
@@ -696,10 +689,7 @@ export default async function HomePage() {
                   ))}
                 </ul>
 
-                <div
-                  data-reveal
-                  style={{ ["--rd" as any]: "1.5s" }}
-                >
+                <div data-reveal style={{ ["--rd" as any]: "1.5s" }}>
                   <Link
                     href={isLoggedIn ? "/dashboard" : "/signup"}
                     className="phone-case-cta"
@@ -984,7 +974,7 @@ export default async function HomePage() {
             </div>
           </section>
 
-          {/* Bottom fade */}
+          {/* Bottom fade — এখন সাদা */}
           <div
             aria-hidden="true"
             style={{
@@ -994,7 +984,7 @@ export default async function HomePage() {
               right: 0,
               height: "200px",
               background:
-                "linear-gradient(0deg, rgba(10,10,10,0.98) 0%, rgba(10,10,10,0.85) 25%, rgba(10,10,10,0.4) 55%, rgba(10,10,10,0) 100%)",
+                "linear-gradient(0deg, rgba(255,255,255,0.98) 0%, rgba(255,255,255,0.85) 25%, rgba(255,255,255,0.4) 55%, rgba(255,255,255,0) 100%)",
               pointerEvents: "none",
               zIndex: 5,
             }}
@@ -1014,7 +1004,7 @@ export default async function HomePage() {
             marginLeft: "calc(-50vw + 50%)",
             marginRight: "calc(-50vw + 50%)",
             overflow: "hidden",
-            backgroundColor: "#0a0a0a",
+            backgroundColor: "#ffffff",
             display: "block",
             padding: 0,
             margin: 0,
@@ -1033,24 +1023,26 @@ export default async function HomePage() {
               display: "block",
             }}
           />
+          {/* Top fade — সাদা */}
           <div
             aria-hidden="true"
             style={{
               position: "absolute",
-              top: 0, left: 0, right: 0, height: "150px",
+              top: 0, left: 0, right: 0, height: "180px",
               background:
-                "linear-gradient(180deg, rgba(247,247,245,0.85) 0%, rgba(247,247,245,0.4) 45%, rgba(247,247,245,0) 100%)",
+                "linear-gradient(180deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.6) 40%, rgba(255,255,255,0.2) 70%, rgba(255,255,255,0) 100%)",
               pointerEvents: "none",
               zIndex: 2,
             }}
           />
+          {/* Bottom fade — সাদা */}
           <div
             aria-hidden="true"
             style={{
               position: "absolute",
               bottom: 0, left: 0, right: 0, height: "200px",
               background:
-                "linear-gradient(0deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.5) 45%, rgba(255,255,255,0) 100%)",
+                "linear-gradient(0deg, rgba(255,255,255,0.98) 0%, rgba(255,255,255,0.6) 45%, rgba(255,255,255,0) 100%)",
               pointerEvents: "none",
               zIndex: 2,
             }}
@@ -1099,24 +1091,26 @@ export default async function HomePage() {
             <source src="/videos/vid1.mp4" type="video/mp4" />
           </video>
 
+          {/* Top fade — সাদা (আগে ছিল কালো) */}
           <div
             aria-hidden="true"
             style={{
               position: "absolute",
-              top: 0, left: 0, right: 0, height: "150px",
+              top: 0, left: 0, right: 0, height: "180px",
               background:
-                "linear-gradient(180deg, rgba(10,10,10,0.75) 0%, rgba(10,10,10,0.35) 45%, rgba(10,10,10,0) 100%)",
+                "linear-gradient(180deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.6) 40%, rgba(255,255,255,0.2) 70%, rgba(255,255,255,0) 100%)",
               pointerEvents: "none",
               zIndex: 2,
             }}
           />
+          {/* Bottom fade — সাদা */}
           <div
             aria-hidden="true"
             style={{
               position: "absolute",
               bottom: 0, left: 0, right: 0, height: "200px",
               background:
-                "linear-gradient(0deg, rgba(247,247,245,0.98) 0%, rgba(247,247,245,0.5) 45%, rgba(247,247,245,0) 100%)",
+                "linear-gradient(0deg, rgba(255,255,255,0.98) 0%, rgba(255,255,255,0.6) 45%, rgba(255,255,255,0) 100%)",
               pointerEvents: "none",
               zIndex: 2,
             }}
@@ -1676,7 +1670,6 @@ export default async function HomePage() {
         dangerouslySetInnerHTML={{
           __html: `
             (function() {
-              // ---------- VIDEO SOUND TOGGLE ----------
               var v = document.getElementById('binzeo-setup-video');
               var b = document.getElementById('binzeo-video-sound-toggle');
               var on = document.getElementById('binzeo-sound-on-icon');
@@ -1697,7 +1690,6 @@ export default async function HomePage() {
                 });
               }
 
-              // ---------- SCROLL-TRIGGERED CINEMATIC REVEALS ----------
               function revealAll() {
                 document
                   .querySelectorAll('[data-reveal], [data-reveal-group]')
@@ -1734,7 +1726,6 @@ export default async function HomePage() {
 
                 els.forEach(function(el) { io.observe(el); });
 
-                // Hero is above-the-fold — nudge it to reveal on first paint
                 window.requestAnimationFrame(function() {
                   document
                     .querySelectorAll(
