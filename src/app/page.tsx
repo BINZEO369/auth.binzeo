@@ -18,7 +18,7 @@ export default async function HomePage() {
   const isLoggedIn = Boolean(user);
 
   return (
-    <main className="reference-home">
+    <main className="reference-home" style={{ backgroundColor: "#0a0a0a" }}>
       <style>{`
         @keyframes bz-fade-up {
           from { opacity: 0; transform: translateY(28px); filter: blur(10px); }
@@ -42,7 +42,33 @@ export default async function HomePage() {
         }
 
         /* ============================================================ */
-        /*  PHONE CASE GRIDS — responsive side-by-side on ALL screens    */
+        /*  LIQUID MERGE — Soft shadow between sections                  */
+        /* ============================================================ */
+
+        .liquid-section {
+          position: relative;
+          isolation: isolate;
+        }
+
+        /* Soft shadow at the TOP of a section — like the section is resting on the previous */
+        .liquid-shadow-top {
+          box-shadow: inset 0 40px 60px -40px rgba(0, 0, 0, 0.18);
+        }
+
+        /* Soft shadow at the BOTTOM — section blends into the next */
+        .liquid-shadow-bottom {
+          box-shadow: inset 0 -40px 60px -40px rgba(0, 0, 0, 0.18);
+        }
+
+        /* Both top & bottom — for middle sections */
+        .liquid-shadow-both {
+          box-shadow:
+            inset 0 40px 60px -40px rgba(0, 0, 0, 0.15),
+            inset 0 -40px 60px -40px rgba(0, 0, 0, 0.15);
+        }
+
+        /* ============================================================ */
+        /*  PHONE CASE GRIDS                                              */
         /* ============================================================ */
 
         .phone-case-1-grid,
@@ -125,6 +151,11 @@ export default async function HomePage() {
           .phone-case-seam-line {
             width: 40px !important;
           }
+          .liquid-shadow-top,
+          .liquid-shadow-bottom,
+          .liquid-shadow-both {
+            box-shadow: none !important;
+          }
         }
 
         @media (max-width: 380px) {
@@ -150,10 +181,10 @@ export default async function HomePage() {
 
       <div className="reference-shell">
         {/* ============================================================ */}
-        {/*  HERO BANNER                                                  */}
+        {/*  1. HERO BANNER — dark image, fades to light gray at bottom   */}
         {/* ============================================================ */}
         <section
-          className="reference-hero-banner"
+          className="liquid-section"
           style={{
             position: "relative",
             width: "100vw",
@@ -362,12 +393,30 @@ export default async function HomePage() {
               ))}
             </div>
           </div>
+
+          {/* 🌊 Bottom fade — dark → light gray (liquid merge into Wrapper 1) */}
+          <div
+            aria-hidden="true"
+            style={{
+              position: "absolute",
+              bottom: 0,
+              left: 0,
+              right: 0,
+              height: "180px",
+              background:
+                "linear-gradient(180deg, rgba(247,247,245,0) 0%, rgba(247,247,245,0.4) 45%, rgba(247,247,245,0.95) 85%, rgba(247,247,245,1) 100%)",
+              pointerEvents: "none",
+              zIndex: 3,
+            }}
+          />
         </section>
 
         {/* ============================================================ */}
-        {/*  WRAPPER 1 — Case 1 + Seam + Case 2                           */}
+        {/*  2. WRAPPER 1 — Case 1 + Seam + Case 2                        */}
+        {/*  Shadow at top & bottom — liquid rest                          */}
         {/* ============================================================ */}
         <div
+          className="liquid-section liquid-shadow-both"
           style={{
             position: "relative",
             width: "100vw",
@@ -377,6 +426,21 @@ export default async function HomePage() {
             overflow: "hidden",
           }}
         >
+          {/* 🌊 Top fade — dark from Hero smoothly blends */}
+          <div
+            aria-hidden="true"
+            style={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              right: 0,
+              height: "1px",
+              background: "rgba(247,247,245,1)",
+              pointerEvents: "none",
+              zIndex: 3,
+            }}
+          />
+
           {/* PHONE CASE 1 — IMAGE LEFT + TEXT RIGHT */}
           <section className="phone-case-1-grid">
             {/* LEFT — IMAGE */}
@@ -410,7 +474,7 @@ export default async function HomePage() {
                   top: 0,
                   right: 0,
                   bottom: 0,
-                  width: "60px",
+                  width: "80px",
                   background:
                     "linear-gradient(270deg, rgba(247,247,245,1) 0%, rgba(247,247,245,0) 100%)",
                   pointerEvents: "none",
@@ -599,42 +663,32 @@ export default async function HomePage() {
             </div>
           </section>
 
-          {/* SEAM between Case 1 & Case 2 */}
+          {/* SEAM between Case 1 & Case 2 — soft liquid divider */}
           <div
             aria-hidden="true"
             className="phone-case-seam"
             style={{
               position: "relative",
               width: "100%",
-              height: "clamp(60px, 12vh, 160px)",
+              height: "clamp(80px, 14vh, 180px)",
               background: "#f7f7f5",
               pointerEvents: "none",
               zIndex: 3,
             }}
           >
-            <div
-              className="phone-case-seam-line"
-              style={{
-                position: "absolute",
-                top: "50%",
-                left: "50%",
-                transform: "translate(-50%, -50%)",
-                width: "clamp(60px, 8vw, 120px)",
-                height: "1px",
-                background:
-                  "linear-gradient(90deg, transparent, rgba(0,0,0,0.15), transparent)",
-              }}
-            />
+            {/* Soft center dot only — no harsh line */}
             <div
               style={{
                 position: "absolute",
                 top: "50%",
                 left: "50%",
                 transform: "translate(-50%, -50%)",
-                width: "6px",
-                height: "6px",
+                width: "8px",
+                height: "8px",
                 borderRadius: "999px",
-                backgroundColor: "rgba(0,0,0,0.15)",
+                backgroundColor: "rgba(0,0,0,0.08)",
+                boxShadow:
+                  "0 0 0 6px rgba(0,0,0,0.02), 0 0 0 12px rgba(0,0,0,0.01)",
               }}
             />
           </div>
@@ -840,7 +894,7 @@ export default async function HomePage() {
                   top: 0,
                   left: 0,
                   bottom: 0,
-                  width: "60px",
+                  width: "80px",
                   background:
                     "linear-gradient(90deg, rgba(247,247,245,1) 0%, rgba(247,247,245,0) 100%)",
                   pointerEvents: "none",
@@ -859,8 +913,6 @@ export default async function HomePage() {
                   pointerEvents: "none",
                 }}
               />
-
-              {/* ⭐ Bottom fade — smooths transition into Case 3 */}
               <div
                 aria-hidden="true"
                 style={{
@@ -868,20 +920,38 @@ export default async function HomePage() {
                   bottom: 0,
                   left: 0,
                   right: 0,
-                  height: "25%",
+                  height: "35%",
                   background:
-                    "linear-gradient(0deg, rgba(247,247,245,1) 0%, rgba(247,247,245,0.5) 50%, rgba(247,247,245,0) 100%)",
+                    "linear-gradient(0deg, rgba(247,247,245,1) 0%, rgba(247,247,245,0.6) 40%, rgba(247,247,245,0) 100%)",
                   pointerEvents: "none",
                 }}
               />
             </div>
           </section>
+
+          {/* 🌊 Bottom fade — light gray → dark (liquid merge into Case 3) */}
+          <div
+            aria-hidden="true"
+            style={{
+              position: "absolute",
+              bottom: 0,
+              left: 0,
+              right: 0,
+              height: "180px",
+              background:
+                "linear-gradient(0deg, rgba(10,10,10,0) 0%, rgba(10,10,10,0.3) 45%, rgba(10,10,10,0.85) 85%, rgba(10,10,10,1) 100%)",
+              pointerEvents: "none",
+              zIndex: 5,
+            }}
+          />
         </div>
 
         {/* ============================================================ */}
-        {/*  PHONE CASE 3 — PURE FULL-SCREEN IMAGE (stable, no jump)      */}
+        {/*  3. PHONE CASE 3 — full-screen image                           */}
+        {/*  Top shadow + liquid fade from above                           */}
         {/* ============================================================ */}
         <section
+          className="liquid-section liquid-shadow-top"
           style={{
             position: "relative",
             width: "100vw",
@@ -910,7 +980,7 @@ export default async function HomePage() {
             }}
           />
 
-          {/* ⭐ Top fade — softens entry from Case 2's light gray */}
+          {/* 🌊 Top fade — light gray from above smoothly blends */}
           <div
             aria-hidden="true"
             style={{
@@ -918,15 +988,15 @@ export default async function HomePage() {
               top: 0,
               left: 0,
               right: 0,
-              height: "80px",
+              height: "140px",
               background:
-                "linear-gradient(180deg, rgba(247,247,245,0.95) 0%, rgba(247,247,245,0) 100%)",
+                "linear-gradient(180deg, rgba(247,247,245,0.9) 0%, rgba(247,247,245,0.5) 45%, rgba(247,247,245,0) 100%)",
               pointerEvents: "none",
               zIndex: 2,
             }}
           />
 
-          {/* ⭐ Bottom fade — softens exit into Video's white */}
+          {/* 🌊 Bottom fade — dark → white (liquid merge into Video) */}
           <div
             aria-hidden="true"
             style={{
@@ -934,9 +1004,9 @@ export default async function HomePage() {
               bottom: 0,
               left: 0,
               right: 0,
-              height: "80px",
+              height: "180px",
               background:
-                "linear-gradient(0deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0) 100%)",
+                "linear-gradient(0deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.5) 45%, rgba(255,255,255,0) 100%)",
               pointerEvents: "none",
               zIndex: 2,
             }}
@@ -944,9 +1014,11 @@ export default async function HomePage() {
         </section>
 
         {/* ============================================================ */}
-        {/*  SETUP GUIDE VIDEO — Stable full-screen                        */}
+        {/*  4. SETUP GUIDE VIDEO — white background, muted autoplay       */}
+        {/*  Top shadow + liquid fades                                     */}
         {/* ============================================================ */}
         <section
+          className="liquid-section liquid-shadow-top"
           style={{
             position: "relative",
             width: "100vw",
@@ -963,7 +1035,6 @@ export default async function HomePage() {
             margin: 0,
           }}
         >
-          {/* VIDEO — auto-plays, muted by default */}
           <video
             id="binzeo-setup-video"
             autoPlay
@@ -985,7 +1056,7 @@ export default async function HomePage() {
             <source src="/videos/vid1.mp4" type="video/mp4" />
           </video>
 
-          {/* ⭐ Top fade — softens entry from Case 3's dark */}
+          {/* 🌊 Top fade — dark from Case 3 */}
           <div
             aria-hidden="true"
             style={{
@@ -993,15 +1064,15 @@ export default async function HomePage() {
               top: 0,
               left: 0,
               right: 0,
-              height: "80px",
+              height: "140px",
               background:
-                "linear-gradient(180deg, rgba(10,10,10,0.85) 0%, rgba(10,10,10,0) 100%)",
+                "linear-gradient(180deg, rgba(10,10,10,0.75) 0%, rgba(10,10,10,0.35) 45%, rgba(10,10,10,0) 100%)",
               pointerEvents: "none",
               zIndex: 2,
             }}
           />
 
-          {/* ⭐ Bottom fade — softens exit into Case 4's light gray */}
+          {/* 🌊 Bottom fade — white → light gray (into Case 4) */}
           <div
             aria-hidden="true"
             style={{
@@ -1009,19 +1080,19 @@ export default async function HomePage() {
               bottom: 0,
               left: 0,
               right: 0,
-              height: "80px",
+              height: "180px",
               background:
-                "linear-gradient(0deg, rgba(247,247,245,0.95) 0%, rgba(247,247,245,0) 100%)",
+                "linear-gradient(0deg, rgba(247,247,245,1) 0%, rgba(247,247,245,0.5) 45%, rgba(247,247,245,0) 100%)",
               pointerEvents: "none",
               zIndex: 2,
             }}
           />
 
-          {/* SOUND TOGGLE BUTTON — bottom-right */}
+          {/* SOUND TOGGLE BUTTON */}
           <button
             id="binzeo-video-sound-toggle"
             type="button"
-            aria-label="Toggle video sound"
+            aria-label="Turn sound on"
             title="Toggle sound"
             style={{
               position: "absolute",
@@ -1037,17 +1108,16 @@ export default async function HomePage() {
               padding: "0",
               borderRadius: "999px",
               border: "1px solid rgba(0,0,0,0.08)",
-              backgroundColor: "rgba(255,255,255,0.85)",
+              backgroundColor: "rgba(255,255,255,0.9)",
               color: "#0a0a0a",
-              backdropFilter: "blur(20px) saturate(180%)",
-              WebkitBackdropFilter: "blur(20px) saturate(180%)",
+              backdropFilter: "blur(24px) saturate(180%)",
+              WebkitBackdropFilter: "blur(24px) saturate(180%)",
               boxShadow:
-                "inset 0 1px 0 0 rgba(255,255,255,1), 0 12px 32px -12px rgba(0,0,0,0.25)",
+                "inset 0 1px 0 0 rgba(255,255,255,1), 0 12px 32px -12px rgba(0,0,0,0.28)",
               cursor: "pointer",
               transition: "all 0.3s cubic-bezier(0.22, 1, 0.36, 1)",
             }}
           >
-            {/* Speaker icon (muted) */}
             <svg
               id="binzeo-sound-off-icon"
               viewBox="0 0 24 24"
@@ -1062,8 +1132,6 @@ export default async function HomePage() {
               <line x1="23" y1="9" x2="17" y2="15" />
               <line x1="17" y1="9" x2="23" y2="15" />
             </svg>
-
-            {/* Speaker icon (unmuted) */}
             <svg
               id="binzeo-sound-on-icon"
               viewBox="0 0 24 24"
@@ -1080,7 +1148,6 @@ export default async function HomePage() {
             </svg>
           </button>
 
-          {/* Inline script: handle sound toggle without client component */}
           <script
             dangerouslySetInnerHTML={{
               __html: `
@@ -1090,10 +1157,7 @@ export default async function HomePage() {
                   var on = document.getElementById('binzeo-sound-on-icon');
                   var off = document.getElementById('binzeo-sound-off-icon');
                   if (!v || !b || !on || !off) return;
-
-                  // Ensure video starts muted (browser autoplay policy)
                   v.muted = true;
-
                   b.addEventListener('click', function() {
                     v.muted = !v.muted;
                     if (v.muted) {
@@ -1113,9 +1177,10 @@ export default async function HomePage() {
         </section>
 
         {/* ============================================================ */}
-        {/*  WRAPPER 2 — Case 4 + Seam + Case 5                           */}
+        {/*  5. WRAPPER 2 — Case 4 + Seam + Case 5                        */}
         {/* ============================================================ */}
         <div
+          className="liquid-section liquid-shadow-top"
           style={{
             position: "relative",
             width: "100vw",
@@ -1127,7 +1192,6 @@ export default async function HomePage() {
         >
           {/* PHONE CASE 4 — IMAGE LEFT + TEXT RIGHT */}
           <section className="phone-case-4-grid">
-            {/* LEFT — IMAGE */}
             <div
               className="phone-case-4-image"
               style={{
@@ -1158,7 +1222,7 @@ export default async function HomePage() {
                   top: 0,
                   right: 0,
                   bottom: 0,
-                  width: "60px",
+                  width: "80px",
                   background:
                     "linear-gradient(270deg, rgba(247,247,245,1) 0%, rgba(247,247,245,0) 100%)",
                   pointerEvents: "none",
@@ -1184,15 +1248,14 @@ export default async function HomePage() {
                   top: 0,
                   left: 0,
                   right: 0,
-                  height: "15%",
+                  height: "20%",
                   background:
-                    "linear-gradient(180deg, rgba(247,247,245,0.85) 0%, rgba(247,247,245,0) 100%)",
+                    "linear-gradient(180deg, rgba(247,247,245,0.95) 0%, rgba(247,247,245,0.4) 50%, rgba(247,247,245,0) 100%)",
                   pointerEvents: "none",
                 }}
               />
             </div>
 
-            {/* RIGHT — TEXT */}
             <div
               className="phone-case-text-content"
               style={{
@@ -1360,49 +1423,37 @@ export default async function HomePage() {
             </div>
           </section>
 
-          {/* SEAM between Case 4 & Case 5 */}
+          {/* SEAM between Case 4 & Case 5 — soft liquid divider */}
           <div
             aria-hidden="true"
             className="phone-case-seam"
             style={{
               position: "relative",
               width: "100%",
-              height: "clamp(60px, 12vh, 160px)",
+              height: "clamp(80px, 14vh, 180px)",
               background: "#f7f7f5",
               pointerEvents: "none",
               zIndex: 3,
             }}
           >
             <div
-              className="phone-case-seam-line"
               style={{
                 position: "absolute",
                 top: "50%",
                 left: "50%",
                 transform: "translate(-50%, -50%)",
-                width: "clamp(60px, 8vw, 120px)",
-                height: "1px",
-                background:
-                  "linear-gradient(90deg, transparent, rgba(0,0,0,0.15), transparent)",
-              }}
-            />
-            <div
-              style={{
-                position: "absolute",
-                top: "50%",
-                left: "50%",
-                transform: "translate(-50%, -50%)",
-                width: "6px",
-                height: "6px",
+                width: "8px",
+                height: "8px",
                 borderRadius: "999px",
-                backgroundColor: "rgba(0,0,0,0.15)",
+                backgroundColor: "rgba(0,0,0,0.08)",
+                boxShadow:
+                  "0 0 0 6px rgba(0,0,0,0.02), 0 0 0 12px rgba(0,0,0,0.01)",
               }}
             />
           </div>
 
           {/* PHONE CASE 5 — TEXT LEFT + IMAGE RIGHT */}
           <section className="phone-case-5-grid">
-            {/* LEFT — TEXT */}
             <div
               className="phone-case-text-content"
               style={{
@@ -1568,7 +1619,6 @@ export default async function HomePage() {
               </div>
             </div>
 
-            {/* RIGHT — IMAGE */}
             <div
               className="phone-case-5-image"
               style={{
@@ -1599,7 +1649,7 @@ export default async function HomePage() {
                   top: 0,
                   left: 0,
                   bottom: 0,
-                  width: "60px",
+                  width: "80px",
                   background:
                     "linear-gradient(90deg, rgba(247,247,245,1) 0%, rgba(247,247,245,0) 100%)",
                   pointerEvents: "none",
