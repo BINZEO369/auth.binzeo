@@ -27,13 +27,13 @@ export function uploadProfileImage(buffer: Buffer, userId: string) {
         overwrite: true,
         invalidate: true,
         type: "upload",
-        transformation: [
-          { width: 800, height: 800, crop: "limit", quality: "auto", fetch_format: "auto" },
-        ],
       },
       (error, result) => {
         if (error || !result?.secure_url || !result.public_id) {
-          reject(error ?? new Error("Cloudinary did not return an image URL."));
+          const details = error as (Error & { http_code?: number; name?: string }) | undefined;
+          const diagnostic = new Error(error?.message ?? "Cloudinary did not return an image URL.");
+          Object.assign(diagnostic, { http_code: details?.http_code, cloudinary_name: details?.name });
+          reject(diagnostic);
           return;
         }
         resolve({ secure_url: result.secure_url, public_id: result.public_id });

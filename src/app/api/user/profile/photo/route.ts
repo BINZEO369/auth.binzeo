@@ -34,9 +34,16 @@ export async function POST(req: NextRequest) {
 
     return ok({ profile });
   } catch (error) {
-    console.error("[PROFILE_PHOTO_UPLOAD_ERROR]", error);
+    const uploadError = error as Error & { http_code?: number; cloudinary_name?: string };
+    console.error("[PROFILE_PHOTO_UPLOAD_ERROR]", {
+      message: uploadError.message,
+      http_code: uploadError.http_code,
+      cloudinary_name: uploadError.cloudinary_name,
+    });
     const message = error instanceof Error && error.message.startsWith("Cloudinary is not configured")
       ? "Profile image storage is not configured yet."
+      : uploadError.http_code === 401 || uploadError.http_code === 403
+        ? "Cloudinary rejected the upload credentials or permissions. Verify the Production Cloudinary API key, API secret, and cloud name."
       : "Unable to upload profile image. Please try again.";
     return fail(message, 500, "PROFILE_PHOTO_UPLOAD_FAILED");
   }
