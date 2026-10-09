@@ -74,7 +74,7 @@ const liquidGlass = {
 } as const;
 
 const containerCls =
-  "relative z-10 mx-auto max-w-6xl space-y-5 px-3 py-5 sm:space-y-6 sm:px-5 sm:py-8";
+  "relative z-10 mx-auto w-full max-w-6xl space-y-5 px-3 py-5 sm:space-y-6 sm:px-5 sm:py-8";
 
 /* ================================================================== */
 /*  Background                                                         */
@@ -102,23 +102,6 @@ function PageBackground() {
 /* ================================================================== */
 /*  Icons                                                              */
 /* ================================================================== */
-function ChevronIcon() {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2.2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className="h-3.5 w-3.5"
-      aria-hidden="true"
-    >
-      <path d="m6 9 6 6 6-6" />
-    </svg>
-  );
-}
-
 function LockIcon({ className = "h-4 w-4" }: { className?: string }) {
   return (
     <svg
@@ -175,7 +158,7 @@ function SectionHeading({ children }: { children: React.ReactNode }) {
 }
 
 /* ================================================================== */
-/*  Status pill — semantic color per status                            */
+/*  Status pill                                                        */
 /* ================================================================== */
 function StatusPill({ status }: { status: string }) {
   const map: Record<string, string> = {
@@ -185,8 +168,7 @@ function StatusPill({ status }: { status: string }) {
     blocked: "border-amber-300/70 bg-amber-100/60 text-amber-800",
     pending: "border-amber-300/70 bg-amber-100/60 text-amber-800",
   };
-  const cls =
-    map[status] ?? "border-white/40 bg-white/40 text-black/70";
+  const cls = map[status] ?? "border-white/40 bg-white/40 text-black/70";
   return (
     <span
       className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] backdrop-blur-md ${cls}`}
@@ -197,7 +179,7 @@ function StatusPill({ status }: { status: string }) {
 }
 
 /* ================================================================== */
-/*  PRIMARY BUTTON — always white text, forced                        */
+/*  Primary button — always white text                                 */
 /* ================================================================== */
 function PrimaryButton({
   href,
@@ -340,8 +322,10 @@ export default function SecurityPage() {
   }
 
   return (
-    <div className="relative isolate min-h-[80vh]">
-      {/* KEYFRAMES */}
+    <div className="relative isolate min-h-[80vh] w-full overflow-x-hidden">
+      {/* ============================================================ */}
+      {/*  KEYFRAMES + SCOPED OVERRIDES FOR EMBEDDED COMPONENTS         */}
+      {/* ============================================================ */}
       <style jsx global>{`
         @keyframes sec-item-in {
           from { opacity: 0; transform: translateY(20px) scale(0.99); filter: blur(8px); }
@@ -359,12 +343,265 @@ export default function SecurityPage() {
           0%, 100% { transform: scale(1.04) translate(0, 0); }
           50%      { transform: scale(1.12) translate(-1%, -0.8%); }
         }
+
+        /* ============================================================ */
+        /*  SCOPED OVERRIDES — [data-sec-tool] wrapper                   */
+        /*  Forces TemporaryLoginTokens / PasskeyManager / 2FA          */
+        /*  to fit into the liquid glass theme without overflow         */
+        /* ============================================================ */
+
+        [data-sec-tool],
+        [data-sec-tool] * {
+          box-sizing: border-box;
+          max-width: 100%;
+        }
+
+        [data-sec-tool] {
+          width: 100% !important;
+          overflow-x: hidden;
+          text-align: left;
+        }
+
+        [data-sec-tool] > * {
+          width: 100% !important;
+          margin-left: 0 !important;
+          margin-right: 0 !important;
+          max-width: 100% !important;
+        }
+
+        /* Flatten any nested outer containers (double card / borders) */
+        [data-sec-tool] > div,
+        [data-sec-tool] > section,
+        [data-sec-tool] > article {
+          background: transparent !important;
+          border: none !important;
+          box-shadow: none !important;
+          padding: 0 !important;
+          border-radius: 0 !important;
+          width: 100% !important;
+        }
+
+        /* All inputs → liquid glass */
+        [data-sec-tool] input:not([type="checkbox"]):not([type="radio"]):not([type="submit"]):not([type="button"]):not([type="hidden"]),
+        [data-sec-tool] select,
+        [data-sec-tool] textarea {
+          width: 100% !important;
+          padding: 12px 14px !important;
+          border-radius: 12px !important;
+          border: 1px solid rgba(255,255,255,0.4) !important;
+          background: rgba(255,255,255,0.4) !important;
+          backdrop-filter: blur(14px) saturate(180%);
+          -webkit-backdrop-filter: blur(14px) saturate(180%);
+          color: rgba(0,0,0,0.9) !important;
+          font-size: 14px !important;
+          line-height: 1.4 !important;
+          outline: none !important;
+          box-shadow:
+            inset 0 1px 0 0 rgba(255,255,255,0.9),
+            0 1px 2px rgba(0,0,0,0.03) !important;
+          transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        [data-sec-tool] input::placeholder,
+        [data-sec-tool] textarea::placeholder {
+          color: rgba(0,0,0,0.35) !important;
+        }
+
+        [data-sec-tool] input:focus,
+        [data-sec-tool] select:focus,
+        [data-sec-tool] textarea:focus {
+          border-color: rgba(255,255,255,0.7) !important;
+          background: rgba(255,255,255,0.6) !important;
+          box-shadow:
+            inset 0 1px 0 0 rgba(255,255,255,1),
+            0 0 0 4px rgba(255,255,255,0.3) !important;
+        }
+
+        /* All labels */
+        [data-sec-tool] label {
+          display: block !important;
+          font-size: 10px !important;
+          font-weight: 600 !important;
+          text-transform: uppercase !important;
+          letter-spacing: 0.16em !important;
+          color: rgba(0,0,0,0.6) !important;
+          margin-bottom: 8px !important;
+        }
+
+        /* Secondary buttons → liquid glass pill */
+        [data-sec-tool] button:not([type="submit"]):not([data-primary]) {
+          border-radius: 999px !important;
+          border: 1px solid rgba(255,255,255,0.4) !important;
+          background: rgba(255,255,255,0.4) !important;
+          backdrop-filter: blur(14px) saturate(180%);
+          -webkit-backdrop-filter: blur(14px) saturate(180%);
+          color: rgba(0,0,0,0.75) !important;
+          font-weight: 500 !important;
+          padding: 10px 18px !important;
+          font-size: 12.5px !important;
+          transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+          box-shadow:
+            inset 0 1px 0 0 rgba(255,255,255,0.85),
+            0 2px 4px rgba(0,0,0,0.04) !important;
+          max-width: 100% !important;
+          white-space: normal !important;
+        }
+
+        [data-sec-tool] button:not([type="submit"]):not([data-primary]):hover {
+          background: rgba(255,255,255,0.65) !important;
+          border-color: rgba(255,255,255,0.7) !important;
+          color: rgba(0,0,0,0.95) !important;
+          transform: translateY(-2px);
+        }
+
+        /* Primary / submit buttons → BLACK with WHITE text (forced) */
+        [data-sec-tool] button[type="submit"],
+        [data-sec-tool] button[data-primary] {
+          border-radius: 999px !important;
+          border: 1px solid #0a0a0a !important;
+          background: #0a0a0a !important;
+          color: #ffffff !important;
+          font-weight: 500 !important;
+          font-size: 12.5px !important;
+          padding: 12px 22px !important;
+          box-shadow:
+            inset 0 1px 0 0 rgba(255,255,255,0.14),
+            0 2px 4px rgba(0,0,0,0.08),
+            0 12px 28px -12px rgba(0,0,0,0.5) !important;
+          transition: all 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+          cursor: pointer;
+          max-width: 100% !important;
+          white-space: normal !important;
+        }
+
+        [data-sec-tool] button[type="submit"] *,
+        [data-sec-tool] button[data-primary] * {
+          color: #ffffff !important;
+        }
+
+        [data-sec-tool] button[type="submit"]:hover,
+        [data-sec-tool] button[data-primary]:hover {
+          transform: translateY(-2px);
+          box-shadow:
+            inset 0 1px 0 0 rgba(255,255,255,0.2),
+            0 4px 8px rgba(0,0,0,0.1),
+            0 18px 36px -12px rgba(0,0,0,0.55) !important;
+        }
+
+        [data-sec-tool] button[type="submit"]:disabled,
+        [data-sec-tool] button[data-primary]:disabled {
+          opacity: 0.6 !important;
+          cursor: not-allowed !important;
+          transform: none !important;
+        }
+
+        /* Heading / text inside tools */
+        [data-sec-tool] h1,
+        [data-sec-tool] h2,
+        [data-sec-tool] h3,
+        [data-sec-tool] h4 {
+          color: rgba(0,0,0,0.9) !important;
+          font-weight: 600 !important;
+          letter-spacing: -0.01em !important;
+        }
+
+        [data-sec-tool] p,
+        [data-sec-tool] small,
+        [data-sec-tool] span {
+          color: rgba(0,0,0,0.65);
+        }
+
+        [data-sec-tool] a {
+          color: rgba(0,0,0,0.75) !important;
+          text-decoration: underline;
+          text-underline-offset: 2px;
+          transition: color 0.3s;
+        }
+
+        [data-sec-tool] a:hover {
+          color: #000 !important;
+        }
+
+        /* Nested grids — responsive */
+        [data-sec-tool] .grid,
+        [data-sec-tool] [class*="grid-cols"] {
+          gap: 12px !important;
+          width: 100% !important;
+        }
+
+        [data-sec-tool] [class*="flex"],
+        [data-sec-tool] [class*="grid"] {
+          min-width: 0 !important;
+        }
+
+        /* Any inner card-like element → keep it inside bounds */
+        [data-sec-tool] [class*="rounded"],
+        [data-sec-tool] [class*="border"] {
+          max-width: 100% !important;
+        }
+
+        /* Code / OTP / mono inputs — keep compact */
+        [data-sec-tool] input[inputmode="numeric"],
+        [data-sec-tool] input[autocomplete="one-time-code"] {
+          text-align: center !important;
+          font-size: 16px !important;
+          font-weight: 600 !important;
+        }
+
+        /* Error / success */
+        [data-sec-tool] [class*="error"],
+        [data-sec-tool] [class*="Error"] {
+          background: rgba(254, 226, 226, 0.6) !important;
+          border: 1px solid rgba(252, 165, 165, 0.7) !important;
+          color: #991b1b !important;
+          border-radius: 12px !important;
+          padding: 10px 14px !important;
+          backdrop-filter: blur(14px);
+          max-width: 100% !important;
+        }
+
+        [data-sec-tool] [class*="success"],
+        [data-sec-tool] [class*="Success"] {
+          background: rgba(209, 250, 229, 0.6) !important;
+          border: 1px solid rgba(110, 231, 183, 0.7) !important;
+          color: #065f46 !important;
+          border-radius: 12px !important;
+          padding: 10px 14px !important;
+          backdrop-filter: blur(14px);
+          max-width: 100% !important;
+        }
+
+        /* ============================================================ */
+        /*  WRAPPER for each tool — a liquid glass section              */
+        /* ============================================================ */
+        .sec-tool-wrap {
+          position: relative;
+          overflow: hidden;
+          border-radius: 24px;
+          border: 1px solid rgba(255,255,255,0.35);
+          padding: 20px;
+          transition: border-color 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+                      box-shadow 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        @media (min-width: 640px) {
+          .sec-tool-wrap { padding: 24px; }
+        }
+
+        .sec-tool-wrap:hover {
+          border-color: rgba(255,255,255,0.5);
+          box-shadow:
+            inset 0 1px 0 0 rgba(255,255,255,0.9),
+            inset 0 0 0 1px rgba(255,255,255,0.4),
+            0 2px 4px rgba(0,0,0,0.04),
+            0 22px 48px -22px rgba(0,0,0,0.32) !important;
+        }
+
         @media (prefers-reduced-motion: reduce) {
-          [data-sec-anim] {
+          [data-sec-anim],
+          [data-sec-tool] * {
             animation: none !important;
-            opacity: 1 !important;
-            transform: none !important;
-            filter: none !important;
+            transition: none !important;
           }
         }
       `}</style>
@@ -377,7 +614,7 @@ export default function SecurityPage() {
         {/* ============================================================ */}
         <div
           data-sec-anim
-          className="relative overflow-hidden rounded-3xl border border-white/[0.4] p-6 sm:p-9"
+          className="relative w-full overflow-hidden rounded-3xl border border-white/[0.4] p-6 sm:p-9"
           style={{
             background:
               "radial-gradient(120% 120% at 30% 12%, rgba(255,255,255,0.58) 0%, rgba(255,255,255,0.42) 45%, rgba(255,255,255,0.30) 100%)",
@@ -456,25 +693,53 @@ export default function SecurityPage() {
         </div>
 
         {/* ============================================================ */}
-        {/*  SECURITY TOOLS (existing components)                        */}
+        {/*  SECURITY TOOLS — each wrapped in its own liquid glass card   */}
         {/* ============================================================ */}
+
         <div
-          className="space-y-5 sm:space-y-6"
+          className="sec-tool-wrap"
           style={{
+            ...liquidGlass,
             animation:
               "sec-item-in 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.15s both",
           }}
         >
-          <TemporaryLoginTokens />
-          <PasskeyManager />
-          <TwoFactorSettings />
+          <span
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-x-0 top-0 h-px"
+            style={{
+              background:
+                "linear-gradient(90deg, transparent, rgba(255,255,255,1), transparent)",
+            }}
+          />
+          <div data-sec-tool className="relative w-full">
+            <TemporaryLoginTokens />
+          </div>
         </div>
 
-        {/* ============================================================ */}
-        {/*  AUDIT LOGS — tabs inside liquid glass card                   */}
-        {/* ============================================================ */}
-        <section
-          className="relative overflow-hidden rounded-3xl border border-white/[0.35] p-5 sm:p-7"
+        <div
+          className="sec-tool-wrap"
+          style={{
+            ...liquidGlass,
+            animation:
+              "sec-item-in 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.2s both",
+          }}
+        >
+          <span
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-x-0 top-0 h-px"
+            style={{
+              background:
+                "linear-gradient(90deg, transparent, rgba(255,255,255,1), transparent)",
+            }}
+          />
+          <div data-sec-tool className="relative w-full">
+            <PasskeyManager />
+          </div>
+        </div>
+
+        <div
+          className="sec-tool-wrap"
           style={{
             ...liquidGlass,
             animation:
@@ -489,11 +754,35 @@ export default function SecurityPage() {
                 "linear-gradient(90deg, transparent, rgba(255,255,255,1), transparent)",
             }}
           />
+          <div data-sec-tool className="relative w-full">
+            <TwoFactorSettings />
+          </div>
+        </div>
+
+        {/* ============================================================ */}
+        {/*  AUDIT LOGS — tabs inside liquid glass card                   */}
+        {/* ============================================================ */}
+        <section
+          className="relative w-full overflow-hidden rounded-3xl border border-white/[0.35] p-5 sm:p-7"
+          style={{
+            ...liquidGlass,
+            animation:
+              "sec-item-in 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.3s both",
+          }}
+        >
+          <span
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-x-0 top-0 h-px"
+            style={{
+              background:
+                "linear-gradient(90deg, transparent, rgba(255,255,255,1), transparent)",
+            }}
+          />
 
           <div className="relative">
             <SectionHeading>Account Activity</SectionHeading>
 
-            {/* Tabs — liquid glass pills */}
+            {/* Tabs */}
             <div className="mb-5 flex flex-wrap gap-2">
               {TABS.map((t) => {
                 const active = tab === t.id;
@@ -570,7 +859,6 @@ export default function SecurityPage() {
 
                       <div className="relative flex items-start justify-between gap-3">
                         <div className="min-w-0 flex-1">
-                          {/* Top row — status + method */}
                           <div className="mb-2 flex flex-wrap items-center gap-2">
                             <StatusPill status={l.login_status} />
                             <span className="rounded-full border border-white/40 bg-white/40 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-black/65 backdrop-blur-md">
@@ -578,14 +866,12 @@ export default function SecurityPage() {
                             </span>
                           </div>
 
-                          {/* Location */}
                           <div className="truncate text-[12.5px] text-black/70">
                             {l.ip_address ?? "No IP"} ·{" "}
                             {[l.city, l.country].filter(Boolean).join(", ") ||
                               "Unknown location"}
                           </div>
 
-                          {/* Coordinates */}
                           {l.latitude !== null && l.longitude !== null && (
                             <div className="mt-0.5 text-[11px] text-black/50">
                               {Number(l.latitude).toFixed(6)},{" "}
@@ -599,7 +885,6 @@ export default function SecurityPage() {
                             </div>
                           )}
 
-                          {/* Device */}
                           {l.user_devices && (
                             <div className="mt-1 text-[11.5px] text-black/55">
                               {l.user_devices.device_name ??
@@ -620,7 +905,6 @@ export default function SecurityPage() {
                             </div>
                           )}
 
-                          {/* User agent */}
                           {l.user_agent && (
                             <div
                               className="mt-1 truncate text-[10.5px] text-black/40"
