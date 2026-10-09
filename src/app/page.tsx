@@ -165,8 +165,8 @@ export default async function HomePage() {
           bottom: clamp(20px, 4vh, 40px);
           right: clamp(20px, 4vw, 40px);
           z-index: 6;
-          width: clamp(34px, 3.4vw, 42px);
-          height: clamp(34px, 3.4vw, 42px);
+          width: clamp(36px, 3.6vw, 44px);
+          height: clamp(36px, 3.6vw, 44px);
           padding: 0;
           border: none;
           border-radius: 999px;
@@ -196,12 +196,14 @@ export default async function HomePage() {
             0 2px 6px -2px rgba(0,0,0,0.08);
           transition:
             transform 0.45s cubic-bezier(0.22, 1, 0.36, 1),
-            box-shadow 0.45s cubic-bezier(0.22, 1, 0.36, 1),
-            background 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+            box-shadow 0.45s cubic-bezier(0.22, 1, 0.36, 1);
           will-change: transform, box-shadow;
+          -webkit-tap-highlight-color: transparent;
+          touch-action: manipulation;
+          user-select: none;
         }
 
-        /* Shimmering specular highlight on top */
+        /* Specular highlight on top */
         .bz-sound-btn::before {
           content: "";
           position: absolute;
@@ -218,9 +220,10 @@ export default async function HomePage() {
           );
           pointer-events: none;
           filter: blur(0.5px);
+          z-index: 1;
         }
 
-        /* Soft inner liquid blob */
+        /* Soft inner liquid shadow */
         .bz-sound-btn::after {
           content: "";
           position: absolute;
@@ -236,6 +239,7 @@ export default async function HomePage() {
             rgba(0,0,0,0) 70%
           );
           pointer-events: none;
+          z-index: 0;
         }
 
         .bz-sound-btn:hover {
@@ -267,27 +271,34 @@ export default async function HomePage() {
             0 10px 26px -10px rgba(0,0,0,0.25);
         }
 
+        /* Both icons sit absolutely centered, only opacity/scale change */
         .bz-sound-btn svg {
-          position: relative;
-          z-index: 2;
-          width: 42%;
-          height: 42%;
-          display: block;
-          transition: opacity 0.35s cubic-bezier(0.22, 1, 0.36, 1),
-                      transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
-        }
-
-        .bz-sound-btn .bz-icon-hidden {
-          opacity: 0;
-          transform: scale(0.7);
           position: absolute;
           inset: 0;
           margin: auto;
+          width: 44%;
+          height: 44%;
+          display: block;
+          color: #0a0a0a;
+          pointer-events: none;
+          z-index: 2;
+          opacity: 0;
+          transform: scale(0.6);
+          transition:
+            opacity 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+            transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+          will-change: opacity, transform;
         }
-        .bz-sound-btn .bz-icon-shown {
+
+        /* Muted state → show muted (crossed) icon */
+        .bz-sound-btn[data-muted="true"] .bz-icon-muted {
           opacity: 1;
           transform: scale(1);
-          position: relative;
+        }
+        /* Unmuted state → show speaker-with-waves icon */
+        .bz-sound-btn[data-muted="false"] .bz-icon-unmuted {
+          opacity: 1;
+          transform: scale(1);
         }
 
         /* ============================================================ */
@@ -1233,12 +1244,12 @@ export default async function HomePage() {
             className="bz-sound-btn"
             type="button"
             aria-label="Turn sound on"
-            title="Toggle sound"
+            title="Turn sound on"
+            data-muted="true"
           >
-            {/* Sound OFF icon (muted) */}
+            {/* Muted icon (speaker crossed) — visible when muted */}
             <svg
-              id="binzeo-sound-off-icon"
-              className="bz-icon-shown"
+              className="bz-icon-muted"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
@@ -1252,10 +1263,9 @@ export default async function HomePage() {
               <line x1="16" y1="9" x2="22" y2="15" />
             </svg>
 
-            {/* Sound ON icon */}
+            {/* Unmuted icon (speaker with waves) — visible when unmuted */}
             <svg
-              id="binzeo-sound-on-icon"
-              className="bz-icon-hidden"
+              className="bz-icon-unmuted"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
@@ -1751,48 +1761,61 @@ export default async function HomePage() {
             (function() {
 
               /* ---------- VIDEO SOUND TOGGLE + AUTO-MUTE ON SCROLL ---------- */
-              var v = document.getElementById('binzeo-setup-video');
-              var b = document.getElementById('binzeo-video-sound-toggle');
-              var on = document.getElementById('binzeo-sound-on-icon');
-              var off = document.getElementById('binzeo-sound-off-icon');
-              var videoSection = document.getElementById('binzeo-video-section');
+              function initVideo() {
+                var v = document.getElementById('binzeo-setup-video');
+                var b = document.getElementById('binzeo-video-sound-toggle');
+                var videoSection = document.getElementById('binzeo-video-section');
 
-              function setMutedUI(muted) {
-                if (!on || !off) return;
-                if (muted) {
-                  on.classList.add('bz-icon-hidden');
-                  on.classList.remove('bz-icon-shown');
-                  off.classList.add('bz-icon-shown');
-                  off.classList.remove('bz-icon-hidden');
-                  b.setAttribute('aria-label', 'Turn sound on');
-                  b.setAttribute('title', 'Turn sound on');
-                } else {
-                  off.classList.add('bz-icon-hidden');
-                  off.classList.remove('bz-icon-shown');
-                  on.classList.add('bz-icon-shown');
-                  on.classList.remove('bz-icon-hidden');
-                  b.setAttribute('aria-label', 'Turn sound off');
-                  b.setAttribute('title', 'Turn sound off');
+                if (!v || !b) return false;
+
+                // Ensure initial state is muted & UI reflects it
+                try { v.muted = true; } catch (e) {}
+                b.setAttribute('data-muted', 'true');
+                b.setAttribute('aria-label', 'Turn sound on');
+                b.setAttribute('title', 'Turn sound on');
+
+                function applyMuted(muted) {
+                  b.setAttribute('data-muted', muted ? 'true' : 'false');
+                  b.setAttribute('aria-label', muted ? 'Turn sound on' : 'Turn sound off');
+                  b.setAttribute('title', muted ? 'Turn sound on' : 'Turn sound off');
                 }
-              }
 
-              if (v && b && on && off) {
-                v.muted = true;
-                setMutedUI(true);
+                // Idempotent click handler (avoid stacking listeners)
+                if (b.__bz_bound !== true) {
+                  b.__bz_bound = true;
+                  b.addEventListener('click', function(ev) {
+                    ev.preventDefault();
+                    ev.stopPropagation();
 
-                b.addEventListener('click', function() {
-                  v.muted = !v.muted;
-                  setMutedUI(v.muted);
-                });
+                    var willUnmute = v.muted === true;
 
-                /* Auto-mute when video section leaves viewport */
-                if ('IntersectionObserver' in window && videoSection) {
+                    // Toggle muted
+                    try { v.muted = !willUnmute; } catch (e) {}
+
+                    // If unmuting: guarantee volume + play
+                    if (willUnmute) {
+                      try { v.volume = 1; } catch (e) {}
+                      try {
+                        var p = v.play();
+                        if (p && typeof p.catch === 'function') {
+                          p.catch(function() { /* ignore autoplay rejection */ });
+                        }
+                      } catch (e) {}
+                    }
+
+                    applyMuted(v.muted);
+                  }, { passive: false });
+                }
+
+                // Auto-mute when section leaves viewport
+                if ('IntersectionObserver' in window && videoSection && videoSection.__bz_bound !== true) {
+                  videoSection.__bz_bound = true;
                   var vIO = new IntersectionObserver(
                     function(entries) {
                       entries.forEach(function(entry) {
-                        if (!entry.isIntersecting && !v.muted) {
-                          v.muted = true;
-                          setMutedUI(true);
+                        if (!entry.isIntersecting && v.muted === false) {
+                          try { v.muted = true; } catch (e) {}
+                          applyMuted(true);
                         }
                       });
                     },
@@ -1801,13 +1824,33 @@ export default async function HomePage() {
                   vIO.observe(videoSection);
                 }
 
-                /* Fallback: also handle tab visibility */
-                document.addEventListener('visibilitychange', function() {
-                  if (document.hidden && !v.muted) {
-                    v.muted = true;
-                    setMutedUI(true);
-                  }
+                // Auto-mute when tab hidden
+                if (document.__bz_vis_bound !== true) {
+                  document.__bz_vis_bound = true;
+                  document.addEventListener('visibilitychange', function() {
+                    if (document.hidden && v.muted === false) {
+                      try { v.muted = true; } catch (e) {}
+                      applyMuted(true);
+                    }
+                  });
+                }
+
+                // Sync UI in case React re-hydrates muted attribute
+                v.addEventListener('volumechange', function() {
+                  applyMuted(v.muted);
                 });
+
+                return true;
+              }
+
+              // Try immediately, then retry (React streaming safety)
+              if (!initVideo()) {
+                if (document.readyState === 'loading') {
+                  document.addEventListener('DOMContentLoaded', initVideo);
+                }
+                window.addEventListener('load', initVideo);
+                setTimeout(initVideo, 300);
+                setTimeout(initVideo, 800);
               }
 
               /* ---------- SCROLL-TRIGGERED CINEMATIC REVEALS ---------- */
