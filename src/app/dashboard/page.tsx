@@ -93,7 +93,6 @@ function StatCard({
         animation: `db-item-in 0.6s cubic-bezier(0.22, 1, 0.36, 1) ${delay}s both`,
       }}
     >
-      {/* Sheen on hover */}
       <span
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
@@ -149,7 +148,6 @@ function ManageTile({
         animation: `db-item-in 0.6s cubic-bezier(0.22, 1, 0.36, 1) ${delay}s both`,
       }}
     >
-      {/* Sheen */}
       <span
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
@@ -189,8 +187,30 @@ export default function DashboardOverviewPage() {
 
   if (loading) {
     return (
-      <div className="relative flex min-h-[60vh] items-center justify-center">
-        <div className="h-6 w-6 animate-spin rounded-full border-2 border-black/20 border-t-black/70" />
+      <div className="relative isolate flex min-h-[60vh] items-center justify-center">
+        {/* Background */}
+        <div
+          aria-hidden="true"
+          className="pointer-events-none fixed inset-0 z-0"
+          style={{
+            backgroundImage: "url('/images/img3.jpg')",
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+            backgroundRepeat: "no-repeat",
+            animation: "db-kenburns 32s ease-in-out infinite",
+          }}
+        />
+        <div
+          aria-hidden="true"
+          className="pointer-events-none fixed inset-0 z-0"
+          style={{
+            background:
+              "linear-gradient(180deg, rgba(255,255,255,0.72) 0%, rgba(255,255,255,0.82) 45%, rgba(255,255,255,0.90) 100%)",
+            backdropFilter: "blur(2px)",
+            WebkitBackdropFilter: "blur(2px)",
+          }}
+        />
+        <div className="relative z-10 h-6 w-6 animate-spin rounded-full border-2 border-black/20 border-t-black/70" />
       </div>
     );
   }
@@ -200,13 +220,13 @@ export default function DashboardOverviewPage() {
   const isActive = profile?.account_status === "active";
 
   return (
-    <div className="relative">
+    <div className="relative isolate">
       {/* ============================================================ */}
-      {/*  FIXED BACKGROUND IMAGE — হোম পেজের img3.jpg                  */}
+      {/*  FIXED BACKGROUND IMAGE — z-0 (not negative)                 */}
       {/* ============================================================ */}
       <div
         aria-hidden="true"
-        className="pointer-events-none fixed inset-0 -z-10"
+        className="pointer-events-none fixed inset-0 z-0"
         style={{
           backgroundImage: "url('/images/img3.jpg')",
           backgroundSize: "cover",
@@ -219,7 +239,7 @@ export default function DashboardOverviewPage() {
       {/* Soft white overlay for readability */}
       <div
         aria-hidden="true"
-        className="pointer-events-none fixed inset-0 -z-10"
+        className="pointer-events-none fixed inset-0 z-0"
         style={{
           background:
             "linear-gradient(180deg, rgba(255,255,255,0.72) 0%, rgba(255,255,255,0.82) 45%, rgba(255,255,255,0.90) 100%)",
@@ -229,9 +249,9 @@ export default function DashboardOverviewPage() {
       />
 
       {/* ============================================================ */}
-      {/*  CONTENT                                                      */}
+      {/*  CONTENT — relative z-10                                     */}
       {/* ============================================================ */}
-      <div className="mx-auto max-w-5xl space-y-6 py-4 sm:py-6">
+      <div className="relative z-10 mx-auto max-w-5xl space-y-6 py-4 sm:py-6">
         <style jsx global>{`
           @keyframes db-item-in {
             from {
@@ -276,7 +296,7 @@ export default function DashboardOverviewPage() {
         `}</style>
 
         {/* ============================================================ */}
-        {/*  WELCOME BANNER — liquid glass, matches home hero            */}
+        {/*  WELCOME BANNER                                               */}
         {/* ============================================================ */}
         <div
           data-db-anim
@@ -292,7 +312,6 @@ export default function DashboardOverviewPage() {
               "db-banner-in 0.85s cubic-bezier(0.22, 1, 0.36, 1) 0.05s both",
           }}
         >
-          {/* Top sheen */}
           <div
             aria-hidden="true"
             className="pointer-events-none absolute inset-x-0 top-0 h-px"
@@ -302,7 +321,6 @@ export default function DashboardOverviewPage() {
             }}
           />
 
-          {/* Floating light blobs */}
           <div
             aria-hidden="true"
             className="pointer-events-none absolute -left-16 -top-16 h-52 w-52 rounded-full opacity-70"
@@ -325,7 +343,6 @@ export default function DashboardOverviewPage() {
           />
 
           <div className="relative">
-            {/* Kicker */}
             <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-black/[0.06] bg-white/70 px-3 py-1.5 backdrop-blur-md">
               <span
                 className="h-1.5 w-1.5 rounded-full bg-black"
@@ -359,7 +376,6 @@ export default function DashboardOverviewPage() {
               </div>
             )}
 
-            {/* Quick status row */}
             <div className="mt-5 flex flex-wrap items-center gap-2">
               <span
                 className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-[11px] font-medium backdrop-blur-md ${
@@ -428,7 +444,6 @@ export default function DashboardOverviewPage() {
         {/*  MANAGE                                                       */}
         {/* ============================================================ */}
         <div>
-          {/* Section heading — matches home pattern */}
           <div
             className="mb-4 flex items-center gap-3"
             style={{
