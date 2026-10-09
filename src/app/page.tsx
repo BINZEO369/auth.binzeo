@@ -1,32 +1,6 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 
-const trustItems = [
-  "Encrypted by default",
-  "Passkey ready",
-  "Location-aware",
-  "One memorable ID",
-  "Built for everyone",
-];
-
-const featureCards = [
-  {
-    title: "Identity that grows with you",
-    body: "Keep your profile, access and connections organised in one secure identity layer.",
-    tone: "lavender",
-  },
-  {
-    title: "Always private, always yours",
-    body: "Choose what you share, when you share it, and keep control of every verified session.",
-    tone: "ink",
-  },
-  {
-    title: "Ready wherever you go",
-    body: "A calm, reliable identity for work, community and the digital spaces you use every day.",
-    tone: "ink",
-  },
-];
-
 const partnerLogos = [
   { src: "/images/jabiyenlogo.png", alt: "Jabiyen" },
   { src: "/images/isyenlogo.png", alt: "Isyen" },
@@ -71,14 +45,10 @@ export default async function HomePage() {
         /*  PHONE CASE GRIDS — responsive side-by-side on ALL screens    */
         /* ============================================================ */
 
-        .phone-case-1-grid {
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          height: 100vh;
-          min-height: 100dvh;
-        }
-
-        .phone-case-2-grid {
+        .phone-case-1-grid,
+        .phone-case-2-grid,
+        .phone-case-4-grid,
+        .phone-case-5-grid {
           display: grid;
           grid-template-columns: 1fr 1fr;
           height: 100vh;
@@ -87,24 +57,30 @@ export default async function HomePage() {
 
         @media (max-width: 900px) {
           .phone-case-1-grid,
-          .phone-case-2-grid {
+          .phone-case-2-grid,
+          .phone-case-4-grid,
+          .phone-case-5-grid {
             grid-template-columns: 1fr 1fr;
           }
         }
 
         @media (max-width: 640px) {
-          .phone-case-1-grid {
+          .phone-case-1-grid,
+          .phone-case-4-grid {
             grid-template-columns: 42% 58%;
             height: auto;
             min-height: 100dvh;
           }
-          .phone-case-2-grid {
+          .phone-case-2-grid,
+          .phone-case-5-grid {
             grid-template-columns: 58% 42%;
             height: auto;
             min-height: 100dvh;
           }
           .phone-case-1-image,
-          .phone-case-2-image {
+          .phone-case-2-image,
+          .phone-case-4-image,
+          .phone-case-5-image {
             min-height: 100dvh !important;
           }
           .phone-case-text-content {
@@ -152,10 +128,12 @@ export default async function HomePage() {
         }
 
         @media (max-width: 380px) {
-          .phone-case-1-grid {
+          .phone-case-1-grid,
+          .phone-case-4-grid {
             grid-template-columns: 40% 60%;
           }
-          .phone-case-2-grid {
+          .phone-case-2-grid,
+          .phone-case-5-grid {
             grid-template-columns: 60% 40%;
           }
           .phone-case-text-content {
@@ -387,7 +365,7 @@ export default async function HomePage() {
         </section>
 
         {/* ============================================================ */}
-        {/*  WRAPPER — Two Phone Cases as one connected composition       */}
+        {/*  WRAPPER 1 — Case 1 + Seam + Case 2                           */}
         {/* ============================================================ */}
         <div
           style={{
@@ -399,9 +377,7 @@ export default async function HomePage() {
             overflow: "hidden",
           }}
         >
-          {/* ============================================================ */}
-          {/*  PHONE CASE 1 — IMAGE LEFT + TEXT RIGHT                       */}
-          {/* ============================================================ */}
+          {/* PHONE CASE 1 — IMAGE LEFT + TEXT RIGHT */}
           <section className="phone-case-1-grid">
             {/* LEFT — IMAGE */}
             <div
@@ -427,7 +403,6 @@ export default async function HomePage() {
                   display: "block",
                 }}
               />
-
               <div
                 aria-hidden="true"
                 style={{
@@ -441,7 +416,6 @@ export default async function HomePage() {
                   pointerEvents: "none",
                 }}
               />
-
               <div
                 aria-hidden="true"
                 style={{
@@ -625,9 +599,7 @@ export default async function HomePage() {
             </div>
           </section>
 
-          {/* ============================================================ */}
-          {/*  SEAM — soft bridge between the two cases                     */}
-          {/* ============================================================ */}
+          {/* SEAM between Case 1 & Case 2 */}
           <div
             aria-hidden="true"
             className="phone-case-seam"
@@ -653,7 +625,6 @@ export default async function HomePage() {
                   "linear-gradient(90deg, transparent, rgba(0,0,0,0.15), transparent)",
               }}
             />
-
             <div
               style={{
                 position: "absolute",
@@ -668,9 +639,7 @@ export default async function HomePage() {
             />
           </div>
 
-          {/* ============================================================ */}
-          {/*  PHONE CASE 2 — TEXT LEFT + IMAGE RIGHT                       */}
-          {/* ============================================================ */}
+          {/* PHONE CASE 2 — TEXT LEFT + IMAGE RIGHT */}
           <section className="phone-case-2-grid">
             {/* LEFT — TEXT */}
             <div
@@ -864,7 +833,6 @@ export default async function HomePage() {
                   display: "block",
                 }}
               />
-
               <div
                 aria-hidden="true"
                 style={{
@@ -878,7 +846,6 @@ export default async function HomePage() {
                   pointerEvents: "none",
                 }}
               />
-
               <div
                 aria-hidden="true"
                 style={{
@@ -897,7 +864,7 @@ export default async function HomePage() {
         </div>
 
         {/* ============================================================ */}
-        {/*  PHONE CASE 3 — PURE FULL-SCREEN IMAGE (no text)              */}
+        {/*  PHONE CASE 3 — PURE FULL-SCREEN IMAGE                        */}
         {/* ============================================================ */}
         <section
           style={{
@@ -927,83 +894,501 @@ export default async function HomePage() {
         </section>
 
         {/* ============================================================ */}
-        {/*  INTRO                                                        */}
+        {/*  WRAPPER 2 — Case 4 + Seam + Case 5                           */}
         {/* ============================================================ */}
-        <section id="what-is-binzeo" className="reference-intro">
-          <div>
-            <p className="reference-kicker">What is BINZEO?</p>
-            <h2>A quieter way to own your digital identity.</h2>
-            <Link
-              href={isLoggedIn ? "/dashboard/profile" : "/signup"}
-              className="reference-button reference-button-dark reference-button-small"
-            >
-              Explore now <span aria-hidden="true">→</span>
-            </Link>
-          </div>
-          <p className="reference-intro-text">
-            BINZEO brings your profile, access and connections into one
-            considered space. It is made to feel simple on the surface, while
-            the protection underneath does the hard work.
-          </p>
-        </section>
-
-        {/* ============================================================ */}
-        {/*  FEATURE GRID                                                 */}
-        {/* ============================================================ */}
-        <section
-          className="reference-feature-grid"
-          aria-label="BINZEO benefits"
+        <div
+          style={{
+            position: "relative",
+            width: "100vw",
+            marginLeft: "calc(-50vw + 50%)",
+            marginRight: "calc(-50vw + 50%)",
+            backgroundColor: "#f7f7f5",
+            overflow: "hidden",
+          }}
         >
-          {featureCards.map((card, index) => (
-            <article
-              key={card.title}
-              className={`reference-feature-card reference-feature-${card.tone}`}
+          {/* PHONE CASE 4 — IMAGE LEFT + TEXT RIGHT */}
+          <section className="phone-case-4-grid">
+            {/* LEFT — IMAGE */}
+            <div
+              className="phone-case-4-image"
+              style={{
+                position: "relative",
+                overflow: "hidden",
+                backgroundColor: "#0a0a0a",
+                animation:
+                  "bz-fade-in 1.2s cubic-bezier(0.22, 1, 0.36, 1) 0.2s both",
+              }}
             >
-              <div className="reference-card-topline">
-                <span>0{index + 1}</span>
-                <span aria-hidden="true">↗</span>
+              <img
+                src="/images/phonecase4.jpg"
+                alt="BINZEO phone case variant 4"
+                style={{
+                  position: "absolute",
+                  inset: 0,
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "cover",
+                  objectPosition: "center",
+                  display: "block",
+                }}
+              />
+              <div
+                aria-hidden="true"
+                style={{
+                  position: "absolute",
+                  top: 0,
+                  right: 0,
+                  bottom: 0,
+                  width: "60px",
+                  background:
+                    "linear-gradient(270deg, rgba(247,247,245,1) 0%, rgba(247,247,245,0) 100%)",
+                  pointerEvents: "none",
+                }}
+              />
+              <div
+                aria-hidden="true"
+                style={{
+                  position: "absolute",
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  height: "35%",
+                  background:
+                    "linear-gradient(0deg, rgba(247,247,245,1) 0%, rgba(247,247,245,0.6) 40%, rgba(247,247,245,0) 100%)",
+                  pointerEvents: "none",
+                }}
+              />
+            </div>
+
+            {/* RIGHT — TEXT */}
+            <div
+              className="phone-case-text-content"
+              style={{
+                position: "relative",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                padding: "clamp(32px, 6vw, 96px) clamp(20px, 4vw, 72px)",
+                backgroundColor: "#f7f7f5",
+                zIndex: 2,
+              }}
+            >
+              <div style={{ maxWidth: "560px", width: "100%" }}>
+                <div
+                  className="phone-case-kicker"
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "8px",
+                    padding: "8px 16px",
+                    borderRadius: "999px",
+                    border: "1px solid rgba(0,0,0,0.08)",
+                    background: "rgba(255,255,255,0.7)",
+                    backdropFilter: "blur(20px) saturate(180%)",
+                    WebkitBackdropFilter: "blur(20px) saturate(180%)",
+                    boxShadow:
+                      "inset 0 1px 0 0 rgba(255,255,255,0.9), 0 4px 16px -8px rgba(0,0,0,0.08)",
+                    color: "rgba(0,0,0,0.7)",
+                    fontSize: "clamp(10px, 1vw, 12.5px)",
+                    fontWeight: 500,
+                    letterSpacing: "0.16em",
+                    textTransform: "uppercase",
+                    marginBottom: "clamp(16px, 3vh, 32px)",
+                    animation:
+                      "bz-fade-up 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.15s both",
+                  }}
+                >
+                  <span
+                    style={{
+                      width: "5px",
+                      height: "5px",
+                      borderRadius: "999px",
+                      backgroundColor: "#111",
+                    }}
+                  />
+                  Crafted for you
+                </div>
+
+                <h2
+                  className="phone-case-title"
+                  style={{
+                    margin: "0 0 clamp(12px, 2.2vh, 26px)",
+                    fontSize: "clamp(24px, 4.5vw, 62px)",
+                    lineHeight: 1.02,
+                    letterSpacing: "-0.045em",
+                    fontWeight: 600,
+                    color: "#0a0a0a",
+                    animation:
+                      "bz-fade-up 1s cubic-bezier(0.22, 1, 0.36, 1) 0.3s both",
+                  }}
+                >
+                  Protection that
+                  <br />
+                  feels personal.
+                </h2>
+
+                <p
+                  className="phone-case-desc"
+                  style={{
+                    margin: "0 0 clamp(18px, 4vh, 40px)",
+                    fontSize: "clamp(12px, 1.25vw, 17px)",
+                    lineHeight: 1.65,
+                    color: "rgba(0,0,0,0.65)",
+                    maxWidth: "480px",
+                    animation:
+                      "bz-fade-up 1s cubic-bezier(0.22, 1, 0.36, 1) 0.45s both",
+                  }}
+                >
+                  Every BINZEO case is designed with the same care we bring to
+                  your identity — premium materials, considered details, and a
+                  finish that lasts.
+                </p>
+
+                <ul
+                  className="phone-case-list"
+                  style={{
+                    listStyle: "none",
+                    padding: 0,
+                    margin: "0 0 clamp(18px, 4vh, 40px)",
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: "clamp(8px, 1.4vh, 14px)",
+                    animation:
+                      "bz-fade-up 1s cubic-bezier(0.22, 1, 0.36, 1) 0.6s both",
+                  }}
+                >
+                  {[
+                    "Premium materials, everyday durability",
+                    "Precision-engineered for a perfect fit",
+                    "Designed to feel as good as it looks",
+                  ].map((item) => (
+                    <li
+                      key={item}
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "10px",
+                        fontSize: "clamp(11.5px, 1.1vw, 15px)",
+                        color: "rgba(0,0,0,0.7)",
+                      }}
+                    >
+                      <span
+                        className="phone-case-check"
+                        style={{
+                          display: "inline-flex",
+                          width: "18px",
+                          height: "18px",
+                          borderRadius: "999px",
+                          backgroundColor: "#0a0a0a",
+                          color: "#ffffff",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          flexShrink: 0,
+                          fontSize: "9px",
+                        }}
+                      >
+                        ✓
+                      </span>
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+
+                <div
+                  style={{
+                    animation:
+                      "bz-fade-up 1s cubic-bezier(0.22, 1, 0.36, 1) 0.75s both",
+                  }}
+                >
+                  <Link
+                    href={isLoggedIn ? "/dashboard" : "/signup"}
+                    className="phone-case-cta"
+                    style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: "6px",
+                      padding: "12px 24px",
+                      borderRadius: "999px",
+                      background:
+                        "linear-gradient(180deg, #1a1a1a 0%, #0a0a0a 100%)",
+                      color: "#ffffff",
+                      fontSize: "clamp(12px, 1.1vw, 14.5px)",
+                      fontWeight: 500,
+                      letterSpacing: "-0.005em",
+                      boxShadow:
+                        "inset 0 1px 0 0 rgba(255,255,255,0.14), 0 1px 2px rgba(0,0,0,0.2), 0 10px 28px -10px rgba(0,0,0,0.45)",
+                      transition: "all 0.35s cubic-bezier(0.22, 1, 0.36, 1)",
+                    }}
+                  >
+                    {isLoggedIn ? "Open dashboard" : "Discover more"}
+                    <span aria-hidden="true">→</span>
+                  </Link>
+                </div>
               </div>
-              <h3>{card.title}</h3>
-              <p>{card.body}</p>
-            </article>
-          ))}
-        </section>
+            </div>
+          </section>
 
-        {/* ============================================================ */}
-        {/*  TRUST STRIP                                                  */}
-        {/* ============================================================ */}
-        <section
-          className="reference-trust-strip"
-          aria-label="BINZEO trust signals"
-        >
-          <p>Built with care for the moments that matter.</p>
-          <div>
-            {trustItems.map((item) => (
-              <span key={item}>{item}</span>
-            ))}
+          {/* SEAM between Case 4 & Case 5 */}
+          <div
+            aria-hidden="true"
+            className="phone-case-seam"
+            style={{
+              position: "relative",
+              width: "100%",
+              height: "clamp(60px, 12vh, 160px)",
+              background: "#f7f7f5",
+              pointerEvents: "none",
+              zIndex: 3,
+            }}
+          >
+            <div
+              className="phone-case-seam-line"
+              style={{
+                position: "absolute",
+                top: "50%",
+                left: "50%",
+                transform: "translate(-50%, -50%)",
+                width: "clamp(60px, 8vw, 120px)",
+                height: "1px",
+                background:
+                  "linear-gradient(90deg, transparent, rgba(0,0,0,0.15), transparent)",
+              }}
+            />
+            <div
+              style={{
+                position: "absolute",
+                top: "50%",
+                left: "50%",
+                transform: "translate(-50%, -50%)",
+                width: "6px",
+                height: "6px",
+                borderRadius: "999px",
+                backgroundColor: "rgba(0,0,0,0.15)",
+              }}
+            />
           </div>
-        </section>
 
-        {/* ============================================================ */}
-        {/*  BOTTOM CTA                                                   */}
-        {/* ============================================================ */}
-        <section className="reference-bottom-cta">
-          <img
-            src="/images/img13.jpg"
-            alt="A connected cloud data environment"
-          />
-          <div>
-            <p className="reference-kicker">A better beginning</p>
-            <h2>One ID. More room to be you.</h2>
-            <Link
-              href={isLoggedIn ? "/dashboard" : "/signup"}
-              className="reference-button reference-button-dark"
+          {/* PHONE CASE 5 — TEXT LEFT + IMAGE RIGHT */}
+          <section className="phone-case-5-grid">
+            {/* LEFT — TEXT */}
+            <div
+              className="phone-case-text-content"
+              style={{
+                position: "relative",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                padding: "clamp(32px, 6vw, 96px) clamp(20px, 4vw, 72px)",
+                backgroundColor: "#f7f7f5",
+                zIndex: 2,
+              }}
             >
-              {isLoggedIn ? "Go to dashboard" : "Start with BINZEO"}{" "}
-              <span aria-hidden="true">→</span>
-            </Link>
-          </div>
-        </section>
+              <div style={{ maxWidth: "560px", width: "100%" }}>
+                <div
+                  className="phone-case-kicker"
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "8px",
+                    padding: "8px 16px",
+                    borderRadius: "999px",
+                    border: "1px solid rgba(0,0,0,0.08)",
+                    background: "rgba(255,255,255,0.7)",
+                    backdropFilter: "blur(20px) saturate(180%)",
+                    WebkitBackdropFilter: "blur(20px) saturate(180%)",
+                    boxShadow:
+                      "inset 0 1px 0 0 rgba(255,255,255,0.9), 0 4px 16px -8px rgba(0,0,0,0.08)",
+                    color: "rgba(0,0,0,0.7)",
+                    fontSize: "clamp(10px, 1vw, 12.5px)",
+                    fontWeight: 500,
+                    letterSpacing: "0.16em",
+                    textTransform: "uppercase",
+                    marginBottom: "clamp(16px, 3vh, 32px)",
+                    animation:
+                      "bz-fade-up 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.15s both",
+                  }}
+                >
+                  <span
+                    style={{
+                      width: "5px",
+                      height: "5px",
+                      borderRadius: "999px",
+                      backgroundColor: "#111",
+                    }}
+                  />
+                  Made to last
+                </div>
+
+                <h2
+                  className="phone-case-title"
+                  style={{
+                    margin: "0 0 clamp(12px, 2.2vh, 26px)",
+                    fontSize: "clamp(24px, 4.5vw, 62px)",
+                    lineHeight: 1.02,
+                    letterSpacing: "-0.045em",
+                    fontWeight: 600,
+                    color: "#0a0a0a",
+                    animation:
+                      "bz-fade-up 1s cubic-bezier(0.22, 1, 0.36, 1) 0.3s both",
+                  }}
+                >
+                  A companion for
+                  <br />
+                  every day.
+                </h2>
+
+                <p
+                  className="phone-case-desc"
+                  style={{
+                    margin: "0 0 clamp(18px, 4vh, 40px)",
+                    fontSize: "clamp(12px, 1.25vw, 17px)",
+                    lineHeight: 1.65,
+                    color: "rgba(0,0,0,0.65)",
+                    maxWidth: "480px",
+                    animation:
+                      "bz-fade-up 1s cubic-bezier(0.22, 1, 0.36, 1) 0.45s both",
+                  }}
+                >
+                  Carry your identity with quiet confidence. BINZEO cases
+                  protect what matters — and look beautiful doing it.
+                </p>
+
+                <ul
+                  className="phone-case-list"
+                  style={{
+                    listStyle: "none",
+                    padding: 0,
+                    margin: "0 0 clamp(18px, 4vh, 40px)",
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: "clamp(8px, 1.4vh, 14px)",
+                    animation:
+                      "bz-fade-up 1s cubic-bezier(0.22, 1, 0.36, 1) 0.6s both",
+                  }}
+                >
+                  {[
+                    "Slim profile, serious protection",
+                    "Considered details you'll feel daily",
+                    "Made for the way you actually live",
+                  ].map((item) => (
+                    <li
+                      key={item}
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "10px",
+                        fontSize: "clamp(11.5px, 1.1vw, 15px)",
+                        color: "rgba(0,0,0,0.7)",
+                      }}
+                    >
+                      <span
+                        className="phone-case-check"
+                        style={{
+                          display: "inline-flex",
+                          width: "18px",
+                          height: "18px",
+                          borderRadius: "999px",
+                          backgroundColor: "#0a0a0a",
+                          color: "#ffffff",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          flexShrink: 0,
+                          fontSize: "9px",
+                        }}
+                      >
+                        ✓
+                      </span>
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+
+                <div
+                  style={{
+                    animation:
+                      "bz-fade-up 1s cubic-bezier(0.22, 1, 0.36, 1) 0.75s both",
+                  }}
+                >
+                  <Link
+                    href={isLoggedIn ? "/dashboard" : "/signup"}
+                    className="phone-case-cta"
+                    style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: "6px",
+                      padding: "12px 24px",
+                      borderRadius: "999px",
+                      background:
+                        "linear-gradient(180deg, #1a1a1a 0%, #0a0a0a 100%)",
+                      color: "#ffffff",
+                      fontSize: "clamp(12px, 1.1vw, 14.5px)",
+                      fontWeight: 500,
+                      letterSpacing: "-0.005em",
+                      boxShadow:
+                        "inset 0 1px 0 0 rgba(255,255,255,0.14), 0 1px 2px rgba(0,0,0,0.2), 0 10px 28px -10px rgba(0,0,0,0.45)",
+                      transition: "all 0.35s cubic-bezier(0.22, 1, 0.36, 1)",
+                    }}
+                  >
+                    {isLoggedIn ? "Open dashboard" : "Get started free"}
+                    <span aria-hidden="true">→</span>
+                  </Link>
+                </div>
+              </div>
+            </div>
+
+            {/* RIGHT — IMAGE */}
+            <div
+              className="phone-case-5-image"
+              style={{
+                position: "relative",
+                overflow: "hidden",
+                backgroundColor: "#0a0a0a",
+                animation:
+                  "bz-fade-in 1.2s cubic-bezier(0.22, 1, 0.36, 1) 0.2s both",
+              }}
+            >
+              <img
+                src="/images/phonecase5.jpg"
+                alt="BINZEO phone case variant 5"
+                style={{
+                  position: "absolute",
+                  inset: 0,
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "cover",
+                  objectPosition: "center",
+                  display: "block",
+                }}
+              />
+              <div
+                aria-hidden="true"
+                style={{
+                  position: "absolute",
+                  top: 0,
+                  left: 0,
+                  bottom: 0,
+                  width: "60px",
+                  background:
+                    "linear-gradient(90deg, rgba(247,247,245,1) 0%, rgba(247,247,245,0) 100%)",
+                  pointerEvents: "none",
+                }}
+              />
+              <div
+                aria-hidden="true"
+                style={{
+                  position: "absolute",
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  height: "35%",
+                  background:
+                    "linear-gradient(180deg, rgba(247,247,245,1) 0%, rgba(247,247,245,0.6) 40%, rgba(247,247,245,0) 100%)",
+                  pointerEvents: "none",
+                }}
+              />
+            </div>
+          </section>
+        </div>
       </div>
     </main>
   );
