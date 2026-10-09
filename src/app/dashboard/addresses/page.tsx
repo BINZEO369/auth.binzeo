@@ -35,6 +35,17 @@ const liquidGlass = {
     "inset 0 1px 0 0 rgba(255,255,255,0.85), inset 0 0 0 1px rgba(255,255,255,0.35), 0 2px 4px rgba(0,0,0,0.04), 0 18px 42px -22px rgba(0,0,0,0.28)",
 } as const;
 
+/* ================================================================== */
+/*  SHARED LAYOUT TOKENS — remember for future pages                  */
+/* ================================================================== */
+/*  - Page container:  max-w-6xl  (wider, better on small screens)     */
+/*  - Mobile padding:  px-3 sm:px-5                                    */
+/*  - Vertical padding: py-5 sm:py-8                                   */
+/*  - Content gap:     space-y-5 sm:space-y-6                          */
+/*  - Modal width:     sm:max-w-xl                                     */
+const containerCls =
+  "relative z-10 mx-auto max-w-6xl space-y-5 px-3 py-5 sm:space-y-6 sm:px-5 sm:py-8";
+
 const inputCls =
   "w-full px-4 py-3 rounded-xl border border-white/40 bg-white/40 backdrop-blur-md text-black/90 text-[15px] placeholder-black/35 focus:outline-none focus:border-white/60 focus:bg-white/60 focus:ring-4 focus:ring-white/30 transition-all duration-300";
 
@@ -117,10 +128,7 @@ function SkeletonCard({ delay = 0 }: { delay?: number }) {
       }}
     >
       <div className="mb-4 flex items-center gap-3">
-        <div
-          className="h-6 w-20 rounded-full"
-          style={{ ...shimmer }}
-        />
+        <div className="h-6 w-20 rounded-full" style={{ ...shimmer }} />
         <div
           className="h-6 w-16 rounded-full"
           style={{ ...shimmer, animationDelay: "0.1s" }}
@@ -250,7 +258,7 @@ export default function AddressesPage() {
             50%      { transform: scale(1.12) translate(-1%, -0.8%); }
           }
         `}</style>
-        <div className="relative z-10 mx-auto max-w-5xl space-y-4 px-4 py-6 sm:px-6 sm:py-8">
+        <div className={containerCls}>
           <SkeletonCard delay={0} />
           <SkeletonCard delay={80} />
           <SkeletonCard delay={160} />
@@ -307,15 +315,15 @@ export default function AddressesPage() {
       <PageBackground />
 
       {/* ============================================================ */}
-      {/*  CONTENT                                                      */}
+      {/*  CONTENT — wider container (max-w-6xl)                        */}
       {/* ============================================================ */}
-      <div className="relative z-10 mx-auto max-w-5xl space-y-6 px-4 py-6 sm:px-6 sm:py-8">
+      <div className={containerCls}>
         {/* ============================================================ */}
-        {/*  HERO BANNER — same as dashboard overview banner              */}
+        {/*  HERO BANNER                                                  */}
         {/* ============================================================ */}
         <div
           data-addr-anim
-          className="relative overflow-hidden rounded-3xl border border-white/[0.4] p-7 sm:p-9"
+          className="relative overflow-hidden rounded-3xl border border-white/[0.4] p-6 sm:p-9"
           style={{
             background:
               "radial-gradient(120% 120% at 30% 12%, rgba(255,255,255,0.58) 0%, rgba(255,255,255,0.42) 45%, rgba(255,255,255,0.30) 100%)",
@@ -742,12 +750,14 @@ export default function AddressesPage() {
         )}
 
         {/* ============================================================ */}
-        {/*  MODAL FORM — liquid glass                                    */}
+        {/*  MODAL FORM — liquid glass, wider panel                       */}
         {/* ============================================================ */}
         {showForm && (
           <div
             className="fixed inset-0 z-50 flex items-end justify-center p-0 sm:items-center sm:p-6"
-            style={{ animation: `addr-banner-in 0.3s cubic-bezier(0.22, 1, 0.36, 1) both` }}
+            style={{
+              animation: `addr-banner-in 0.3s cubic-bezier(0.22, 1, 0.36, 1) both`,
+            }}
           >
             {/* Backdrop */}
             <div
@@ -757,7 +767,7 @@ export default function AddressesPage() {
 
             {/* Panel */}
             <div
-              className="relative w-full max-h-[92vh] overflow-y-auto rounded-t-[28px] border border-white/[0.4] sm:max-w-lg sm:rounded-3xl"
+              className="relative w-full max-h-[92vh] overflow-y-auto rounded-t-[28px] border border-white/[0.4] sm:max-w-xl sm:rounded-3xl"
               style={{
                 background:
                   "radial-gradient(120% 120% at 30% 12%, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0.72) 45%, rgba(255,255,255,0.60) 100%)",
@@ -896,9 +906,7 @@ export default function AddressesPage() {
                 </div>
 
                 {/* Primary toggle — liquid glass card */}
-                <label
-                  className="flex cursor-pointer items-center justify-between gap-3 rounded-2xl border border-white/40 bg-white/40 p-4 backdrop-blur-md transition-colors duration-300 hover:border-white/60 hover:bg-white/60"
-                >
+                <label className="flex cursor-pointer items-center justify-between gap-3 rounded-2xl border border-white/40 bg-white/40 p-4 backdrop-blur-md transition-colors duration-300 hover:border-white/60 hover:bg-white/60">
                   <div>
                     <div className="text-[13.5px] font-semibold text-black/90">
                       Set as primary
