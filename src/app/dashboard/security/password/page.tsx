@@ -180,8 +180,25 @@ export default function ChangePasswordPage() {
       setLoading(false);
       return;
     }
-    setOtp(code);
-    setStep("password");
+    try {
+      const res = await apiFetch<{ verified: boolean; reason?: string }>(
+        "/api/user/password-change/verify",
+        {
+          method: "POST",
+          body: JSON.stringify({ challenge_id: challengeId, code }),
+        },
+      );
+      if (res.success && res.data.verified) {
+        setOtp(code);
+        setStep("password");
+      } else if (res.success) {
+        setError(`Verification failed: ${res.data.reason ?? "invalid_code"}`);
+      } else {
+        setError(res.error.message || "That code didn't work");
+      }
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Something went wrong");
+    }
     setLoading(false);
   };
 
@@ -197,25 +214,25 @@ export default function ChangePasswordPage() {
     setLoading(true);
     setError(null);
     try {
-      if (!challengeId || otp.length !== 6) {
-        setError("Enter the 6-digit verification code first.");
+      if (!challengeId) {
+        setError("Verify the 6-digit code before choosing a new password.");
         setLoading(false);
         return;
       }
-      const res = await apiFetch<{ verified: boolean; reason: string }>("/api/auth/password-reset/verify", {
+      const res = await apiFetch<{ changed: boolean }>("/api/user/password-change/complete", {
         method: "POST",
         body: JSON.stringify({
           challenge_id: challengeId,
-          code: otp,
           new_password: newPassword,
           confirm_password: confirmPassword,
-          purpose: "change",
         }),
       });
-      if (res.success && res.data.verified) {
-        setStep("done");
-      } else if (res.success) {
-        setError(`Verification failed: ${res.data.reason}`);
+      if (res.success) {
+        if (res.data.changed) {
+          setStep("done");
+        } else {
+          setError("Password was not changed. Please verify the code again.");
+        }
       } else {
         setError(res.error.message || "Couldn't update your password");
       }
