@@ -27,24 +27,6 @@ const featureCards = [
   },
 ];
 
-const useCases = [
-  {
-    label: "Personal identity",
-    title: "Your digital self, beautifully organised.",
-    image: "/images/img12.jpg",
-  },
-  {
-    label: "Secure access",
-    title: "A softer way to move through the internet.",
-    image: "/images/img11.jpg",
-  },
-  {
-    label: "Connected life",
-    title: "Share the right details with confidence.",
-    image: "/images/img20.jpg",
-  },
-];
-
 const partnerLogos = [
   { src: "/images/jabiyenlogo.png", alt: "Jabiyen" },
   { src: "/images/isyenlogo.png", alt: "Isyen" },
@@ -999,63 +981,6 @@ export default async function HomePage() {
             {trustItems.map((item) => (
               <span key={item}>{item}</span>
             ))}
-          </div>
-        </section>
-
-        {/* ============================================================ */}
-        {/*  USE CASES                                                    */}
-        {/* ============================================================ */}
-        <section className="reference-usecases">
-          <div className="reference-usecase-heading">
-            <div>
-              <p className="reference-kicker">BINZEO in action</p>
-              <h2>Use cases</h2>
-            </div>
-            <p>
-              One identity layer for people, teams and communities that value
-              clarity, privacy and connection.
-            </p>
-          </div>
-          <div className="reference-usecase-grid">
-            {useCases.map((item, index) => (
-              <article
-                key={item.label}
-                className={`reference-usecase-card reference-usecase-${index + 1}`}
-              >
-                <div className="reference-usecase-copy">
-                  <p className="reference-kicker">{item.label}</p>
-                  <h3>{item.title}</h3>
-                  <Link href={isLoggedIn ? "/dashboard" : "/signup"}>
-                    Learn more <span aria-hidden="true">→</span>
-                  </Link>
-                </div>
-                <img src={item.image} alt="" />
-              </article>
-            ))}
-          </div>
-        </section>
-
-        {/* ============================================================ */}
-        {/*  VIDEO BANNER                                                 */}
-        {/* ============================================================ */}
-        <section
-          className="reference-video-banner"
-          aria-label="BINZEO video showcase"
-        >
-          <video
-            autoPlay
-            muted
-            loop
-            playsInline
-            preload="metadata"
-            poster="/images/img19.jpg"
-          >
-            <source src="/videos/vid3.mp4" type="video/mp4" />
-          </video>
-          <div className="reference-video-overlay" />
-          <div className="reference-video-caption">
-            <p className="reference-kicker">BINZEO in motion</p>
-            <h2>Identity for the way you move.</h2>
           </div>
         </section>
 
