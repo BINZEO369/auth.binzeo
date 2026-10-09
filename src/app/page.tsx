@@ -46,7 +46,7 @@ const useCases = [
 ];
 
 /* ================================================================== */
-/*  Partner / Brand logos (small row under CTA)                        */
+/*  Partner / Brand logos (circular row under CTA)                     */
 /* ================================================================== */
 const partnerLogos = [
   { src: "/images/jabiyenlogo.png", alt: "Jabiyen" },
@@ -93,10 +93,6 @@ export default async function HomePage() {
         @keyframes bz-pulse-dot {
           0%, 100% { opacity: 0.6; transform: scale(1); }
           50%      { opacity: 1; transform: scale(1.25); }
-        }
-        @keyframes bz-logo-scroll {
-          from { transform: translateX(0); }
-          to   { transform: translateX(-50%); }
         }
       `}</style>
 
@@ -151,13 +147,13 @@ export default async function HomePage() {
             }}
           >
             {/* ============================================ */}
-            {/*  BIG BINZEO LOGO (replaces "Introducing")     */}
+            {/*  BIG BINZEO LOGO — with generous spacing     */}
             {/* ============================================ */}
             <div
               style={{
                 display: "flex",
                 justifyContent: "center",
-                marginBottom: "clamp(28px, 4vh, 48px)",
+                marginBottom: "clamp(48px, 7vh, 88px)",
                 animation:
                   "bz-logo-in 1.2s cubic-bezier(0.22, 1, 0.36, 1) 0.1s both",
               }}
@@ -166,7 +162,7 @@ export default async function HomePage() {
                 src="/logo.svg"
                 alt="BINZEO"
                 style={{
-                  height: "clamp(48px, 7vw, 92px)",
+                  height: "clamp(52px, 7.5vw, 100px)",
                   width: "auto",
                   maxWidth: "90vw",
                   filter:
@@ -178,7 +174,7 @@ export default async function HomePage() {
             {/* Small intro line */}
             <p
               style={{
-                margin: "0 0 clamp(8px, 1.2vh, 16px)",
+                margin: "0 0 clamp(12px, 1.8vh, 22px)",
                 fontSize: "clamp(16px, 1.6vw, 22px)",
                 fontWeight: 400,
                 color: "rgba(0,0,0,0.65)",
@@ -224,7 +220,7 @@ export default async function HomePage() {
             {/* Description text */}
             <p
               style={{
-                margin: "clamp(20px, 3vh, 32px) auto 0",
+                margin: "clamp(24px, 3.5vh, 40px) auto 0",
                 maxWidth: "520px",
                 fontSize: "clamp(13px, 1.15vw, 15px)",
                 lineHeight: 1.6,
@@ -241,7 +237,7 @@ export default async function HomePage() {
             {/* CTA Button — Black pill */}
             <div
               style={{
-                marginTop: "clamp(28px, 4vh, 44px)",
+                marginTop: "clamp(32px, 4.5vh, 52px)",
                 display: "flex",
                 justifyContent: "center",
                 gap: "12px",
@@ -257,12 +253,12 @@ export default async function HomePage() {
                   alignItems: "center",
                   justifyContent: "center",
                   gap: "8px",
-                  padding: "14px 28px",
+                  padding: "16px 32px",
                   borderRadius: "999px",
                   background:
                     "linear-gradient(180deg, #1a1a1a 0%, #0a0a0a 100%)",
                   color: "#ffffff",
-                  fontSize: "clamp(13px, 1.1vw, 14.5px)",
+                  fontSize: "clamp(13px, 1.15vw, 15px)",
                   fontWeight: 500,
                   letterSpacing: "-0.005em",
                   boxShadow:
@@ -277,36 +273,55 @@ export default async function HomePage() {
             </div>
 
             {/* ==================================================== */}
-            {/*  SMALL PARTNER LOGO ROW — below CTA button           */}
+            {/*  CIRCULAR PARTNER LOGO ROW — bigger & clearer         */}
             {/* ==================================================== */}
             <div
               style={{
-                marginTop: "clamp(40px, 6vh, 64px)",
+                marginTop: "clamp(56px, 8vh, 96px)",
                 display: "flex",
                 flexWrap: "wrap",
                 alignItems: "center",
                 justifyContent: "center",
-                gap: "clamp(20px, 3.5vw, 44px)",
+                gap: "clamp(16px, 2.5vw, 32px)",
                 animation:
                   "bz-fade-in 1.2s cubic-bezier(0.22, 1, 0.36, 1) 1.3s both",
               }}
             >
               {partnerLogos.map((logo) => (
-                <img
+                <div
                   key={logo.alt}
-                  src={logo.src}
-                  alt={logo.alt}
                   style={{
-                    height: "clamp(16px, 2vw, 26px)",
-                    width: "auto",
-                    maxWidth: "80px",
-                    objectFit: "contain",
-                    opacity: 0.7,
-                    filter: "grayscale(1) brightness(0.35)",
+                    width: "clamp(48px, 5vw, 68px)",
+                    height: "clamp(48px, 5vw, 68px)",
+                    borderRadius: "999px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    backgroundColor: "rgba(255,255,255,0.85)",
+                    backdropFilter: "blur(20px) saturate(180%)",
+                    WebkitBackdropFilter: "blur(20px) saturate(180%)",
+                    border: "1px solid rgba(0,0,0,0.06)",
+                    boxShadow:
+                      "inset 0 1px 0 0 rgba(255,255,255,1), 0 8px 24px -10px rgba(0,0,0,0.15)",
+                    padding: "clamp(8px, 0.9vw, 12px)",
                     transition:
-                      "opacity 0.35s cubic-bezier(0.22, 1, 0.36, 1), filter 0.35s cubic-bezier(0.22, 1, 0.36, 1)",
+                      "transform 0.4s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.4s cubic-bezier(0.22, 1, 0.36, 1)",
+                    flexShrink: 0,
                   }}
-                />
+                  title={logo.alt}
+                >
+                  <img
+                    src={logo.src}
+                    alt={logo.alt}
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      objectFit: "contain",
+                      display: "block",
+                      filter: "grayscale(0.4) brightness(0.4)",
+                    }}
+                  />
+                </div>
               ))}
             </div>
           </div>
