@@ -58,56 +58,39 @@ export default async function HomePage() {
       {/*  HERO ANIMATION KEYFRAMES                                     */}
       {/* ============================================================ */}
       <style>{`
-        @keyframes glass-rise {
-          from {
-            opacity: 0;
-            transform: translateY(48px) scale(0.96);
-            filter: blur(16px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0) scale(1);
-            filter: blur(0);
-          }
+        @keyframes bz-fade-up {
+          from { opacity: 0; transform: translateY(28px); filter: blur(10px); }
+          to   { opacity: 1; transform: translateY(0); filter: blur(0); }
         }
-        @keyframes glass-fade {
+        @keyframes bz-fade-in {
           from { opacity: 0; }
           to   { opacity: 1; }
         }
-        @keyframes word-rise {
-          from {
-            opacity: 0;
-            transform: translateY(36px);
-            filter: blur(12px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-            filter: blur(0);
-          }
+        @keyframes bz-title-in {
+          from { opacity: 0; transform: translateY(40px) scale(0.98); filter: blur(14px); }
+          to   { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
         }
-        @keyframes sheen-sweep {
-          0%   { transform: translateX(-120%) skewX(-25deg); opacity: 0; }
-          40%  { opacity: 1; }
-          100% { transform: translateX(220%) skewX(-25deg); opacity: 0; }
+        @keyframes bz-float-slow {
+          0%, 100% { transform: translate(0, 0) scale(1); }
+          50%      { transform: translate(30px, -20px) scale(1.06); }
         }
-        @keyframes soft-float {
-          0%, 100% { transform: translateY(0); }
-          50%      { transform: translateY(-8px); }
+        @keyframes bz-float-slower {
+          0%, 100% { transform: translate(0, 0) scale(1); }
+          50%      { transform: translate(-24px, 18px) scale(1.08); }
         }
-        @keyframes pulse-dot {
-          0%, 100% { opacity: 0.55; transform: scale(1); }
-          50%      { opacity: 1; transform: scale(1.3); }
+        @keyframes bz-pulse-dot {
+          0%, 100% { opacity: 0.6; transform: scale(1); }
+          50%      { opacity: 1; transform: scale(1.25); }
         }
-        @keyframes kenburns-slow {
-          0%, 100% { transform: scale(1.05) translate(0, 0); }
-          50%      { transform: scale(1.15) translate(-2%, -1%); }
+        @keyframes bz-logo-scroll {
+          from { transform: translateX(0); }
+          to   { transform: translateX(-50%); }
         }
       `}</style>
 
       <div className="reference-shell">
         {/* ============================================================ */}
-        {/*  HERO BANNER — Full-screen with Apple Liquid Glass Panel      */}
+        {/*  HERO BANNER — Centered, Minimal, Liquid Glass                */}
         {/* ============================================================ */}
         <section
           className="reference-hero-banner"
@@ -120,268 +103,270 @@ export default async function HomePage() {
             marginRight: "calc(-50vw + 50%)",
             overflow: "hidden",
             display: "flex",
-            alignItems: "flex-end",
-            justifyContent: "flex-start",
-            backgroundColor: "#0a0a0a",
+            alignItems: "center",
+            justifyContent: "center",
+            backgroundColor: "#f7f7f5",
           }}
         >
-          {/* Background image with Ken Burns effect */}
+          {/* ==================================================== */}
+          {/*  SOFT PASTEL GRADIENT GLOWS (bottom-left → bottom-right) */}
+          {/* ==================================================== */}
           <div
             aria-hidden="true"
             style={{
               position: "absolute",
               inset: 0,
-              backgroundImage: "url('/images/img20.jpg')",
-              backgroundSize: "cover",
-              backgroundPosition: "center",
-              animation: "kenburns-slow 26s ease-in-out infinite",
+              background:
+                "radial-gradient(ellipse 55% 45% at 15% 95%, rgba(255,200,140,0.55) 0%, transparent 60%), radial-gradient(ellipse 55% 45% at 45% 100%, rgba(255,170,200,0.45) 0%, transparent 60%), radial-gradient(ellipse 60% 50% at 78% 95%, rgba(140,190,255,0.55) 0%, transparent 60%), radial-gradient(ellipse 55% 45% at 100% 90%, rgba(150,240,230,0.45) 0%, transparent 60%)",
+              filter: "blur(20px)",
+            }}
+          />
+          {/* Soft animated glow 1 */}
+          <div
+            aria-hidden="true"
+            style={{
+              position: "absolute",
+              bottom: "-20%",
+              left: "20%",
+              width: "60%",
+              height: "60%",
+              background:
+                "radial-gradient(circle, rgba(255,180,140,0.35) 0%, transparent 65%)",
+              filter: "blur(80px)",
+              animation: "bz-float-slow 22s ease-in-out infinite",
+            }}
+          />
+          {/* Soft animated glow 2 */}
+          <div
+            aria-hidden="true"
+            style={{
+              position: "absolute",
+              bottom: "-25%",
+              right: "15%",
+              width: "55%",
+              height: "55%",
+              background:
+                "radial-gradient(circle, rgba(140,200,255,0.4) 0%, transparent 65%)",
+              filter: "blur(80px)",
+              animation: "bz-float-slower 26s ease-in-out infinite",
             }}
           />
 
-          {/* Multi-layer gradient overlay */}
+          {/* Subtle vignette top */}
           <div
             aria-hidden="true"
             style={{
               position: "absolute",
               inset: 0,
               background:
-                "linear-gradient(180deg, rgba(0,0,0,0.40) 0%, rgba(0,0,0,0.10) 35%, rgba(0,0,0,0.35) 70%, rgba(0,0,0,0.85) 100%)",
-            }}
-          />
-          {/* Radial vignette for depth */}
-          <div
-            aria-hidden="true"
-            style={{
-              position: "absolute",
-              inset: 0,
-              background:
-                "radial-gradient(ellipse 100% 80% at 50% 40%, transparent 0%, rgba(0,0,0,0.45) 100%)",
-            }}
-          />
-          {/* Ambient color glow */}
-          <div
-            aria-hidden="true"
-            style={{
-              position: "absolute",
-              inset: 0,
-              background:
-                "radial-gradient(ellipse 60% 50% at 30% 80%, rgba(160,150,255,0.18) 0%, transparent 65%)",
+                "linear-gradient(180deg, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0.3) 30%, transparent 60%)",
             }}
           />
 
           {/* ==================================================== */}
-          {/*  LIQUID GLASS PANEL WITH TEXT                        */}
+          {/*  CONTENT — Centered                                    */}
           {/* ==================================================== */}
           <div
             style={{
               position: "relative",
               zIndex: 2,
               width: "100%",
-              maxWidth: "1600px",
+              maxWidth: "1100px",
               margin: "0 auto",
-              padding:
-                "0 clamp(16px, 4vw, 64px) clamp(48px, 8vh, 96px)",
+              padding: "0 clamp(20px, 4vw, 48px)",
+              textAlign: "center",
             }}
           >
+            {/* Kicker — small pill */}
             <div
               style={{
-                position: "relative",
-                display: "inline-block",
-                maxWidth: "min(920px, 100%)",
-                borderRadius: "clamp(28px, 3vw, 40px)",
-                padding:
-                  "clamp(28px, 4vw, 56px) clamp(24px, 4vw, 56px) clamp(32px, 4.5vw, 60px)",
-                background:
-                  "linear-gradient(180deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.04) 100%)",
-                backdropFilter: "blur(48px) saturate(180%)",
-                WebkitBackdropFilter: "blur(48px) saturate(180%)",
-                border: "1px solid rgba(255,255,255,0.16)",
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "10px",
+                padding: "8px 16px",
+                borderRadius: "999px",
+                border: "1px solid rgba(0,0,0,0.06)",
+                background: "rgba(255,255,255,0.55)",
+                backdropFilter: "blur(20px) saturate(180%)",
+                WebkitBackdropFilter: "blur(20px) saturate(180%)",
                 boxShadow:
-                  "inset 0 1px 0 0 rgba(255,255,255,0.28), inset 0 -1px 0 0 rgba(255,255,255,0.05), 0 40px 120px -32px rgba(0,0,0,0.85), 0 12px 40px -12px rgba(0,0,0,0.55)",
-                animation:
-                  "glass-rise 1.2s cubic-bezier(0.22, 1, 0.36, 1) 0.2s both",
-                overflow: "hidden",
+                  "inset 0 1px 0 0 rgba(255,255,255,0.9), 0 4px 16px -8px rgba(0,0,0,0.08)",
+                color: "rgba(0,0,0,0.7)",
+                fontSize: "clamp(11px, 1.1vw, 13px)",
+                fontWeight: 500,
+                letterSpacing: "0.14em",
+                textTransform: "uppercase",
+                marginBottom: "clamp(24px, 3vh, 40px)",
+                animation: "bz-fade-up 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.1s both",
               }}
             >
-              {/* Sheen sweep animation */}
               <span
-                aria-hidden="true"
                 style={{
-                  position: "absolute",
-                  top: 0,
-                  left: 0,
-                  width: "40%",
-                  height: "100%",
-                  background:
-                    "linear-gradient(90deg, transparent, rgba(255,255,255,0.14), transparent)",
-                  animation:
-                    "sheen-sweep 3.2s cubic-bezier(0.22, 1, 0.36, 1) 1.4s infinite",
-                  pointerEvents: "none",
+                  width: "6px",
+                  height: "6px",
+                  borderRadius: "999px",
+                  backgroundColor: "#111",
+                  animation: "bz-pulse-dot 2.4s ease-in-out infinite",
                 }}
               />
+              Introducing BINZEO
+            </div>
 
-              {/* Top sheen line */}
-              <span
-                aria-hidden="true"
-                style={{
-                  position: "absolute",
-                  top: 0,
-                  left: "10%",
-                  right: "10%",
-                  height: "1px",
-                  background:
-                    "linear-gradient(90deg, transparent, rgba(255,255,255,0.7), transparent)",
-                  pointerEvents: "none",
-                }}
-              />
+            {/* Small intro line */}
+            <p
+              style={{
+                margin: "0 0 clamp(8px, 1.2vh, 16px)",
+                fontSize: "clamp(16px, 1.6vw, 22px)",
+                fontWeight: 400,
+                color: "rgba(0,0,0,0.55)",
+                letterSpacing: "-0.01em",
+                animation: "bz-fade-up 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.25s both",
+              }}
+            >
+              Own your
+            </p>
 
-              {/* Small pill badge */}
-              <div
+            {/* Main title — huge, minimal, Apple-style */}
+            <h1
+              style={{
+                margin: 0,
+                fontSize: "clamp(52px, 11vw, 168px)",
+                lineHeight: 0.94,
+                letterSpacing: "-0.06em",
+                fontWeight: 600,
+                color: "#0a0a0a",
+                animation: "bz-title-in 1.1s cubic-bezier(0.22, 1, 0.36, 1) 0.4s both",
+              }}
+            >
+              Identity
+            </h1>
+
+            {/* Subtitle below title */}
+            <p
+              style={{
+                margin: "clamp(12px, 1.6vh, 22px) 0 0",
+                fontSize: "clamp(18px, 2vw, 28px)",
+                fontWeight: 400,
+                color: "rgba(0,0,0,0.6)",
+                letterSpacing: "-0.015em",
+                animation: "bz-fade-up 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.6s both",
+              }}
+            >
+              that feels like home.
+            </p>
+
+            {/* Description text */}
+            <p
+              style={{
+                margin: "clamp(20px, 3vh, 32px) auto 0",
+                maxWidth: "520px",
+                fontSize: "clamp(13px, 1.15vw, 15px)",
+                lineHeight: 1.6,
+                color: "rgba(0,0,0,0.55)",
+                animation: "bz-fade-up 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.8s both",
+              }}
+            >
+              A quieter, safer way to hold your digital self. One secure identity
+              for every part of your online life — built to feel simple on the
+              surface.
+            </p>
+
+            {/* CTA Button — Black pill, glass sheen */}
+            <div
+              style={{
+                marginTop: "clamp(28px, 4vh, 44px)",
+                display: "flex",
+                justifyContent: "center",
+                gap: "12px",
+                animation: "bz-fade-up 0.9s cubic-bezier(0.22, 1, 0.36, 1) 1s both",
+              }}
+            >
+              <Link
+                href={isLoggedIn ? "/dashboard" : "/signup"}
                 style={{
+                  position: "relative",
                   display: "inline-flex",
                   alignItems: "center",
-                  gap: "10px",
-                  padding: "8px 16px",
+                  justifyContent: "center",
+                  gap: "8px",
+                  padding: "14px 28px",
                   borderRadius: "999px",
-                  border: "1px solid rgba(255,255,255,0.18)",
-                  background: "rgba(255,255,255,0.08)",
-                  backdropFilter: "blur(20px)",
-                  WebkitBackdropFilter: "blur(20px)",
-                  color: "rgba(255,255,255,0.92)",
-                  fontSize: "clamp(10.5px, 1.1vw, 12.5px)",
-                  fontWeight: 500,
-                  letterSpacing: "0.18em",
-                  textTransform: "uppercase",
-                  marginBottom: "clamp(20px, 2.5vh, 32px)",
-                  animation:
-                    "glass-fade 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.6s both",
-                }}
-              >
-                <span
-                  style={{
-                    width: "6px",
-                    height: "6px",
-                    borderRadius: "999px",
-                    backgroundColor: "#fff",
-                    boxShadow: "0 0 12px rgba(255,255,255,0.9)",
-                    animation: "pulse-dot 2.4s ease-in-out infinite",
-                  }}
-                />
-                BINZEO Digital Identity
-              </div>
-
-              {/* Main title — word by word reveal */}
-              <h1
-                style={{
-                  margin: 0,
+                  background:
+                    "linear-gradient(180deg, #1a1a1a 0%, #0a0a0a 100%)",
                   color: "#ffffff",
-                  fontSize: "clamp(34px, 6.4vw, 88px)",
-                  lineHeight: 1.02,
-                  letterSpacing: "-0.048em",
-                  fontWeight: 600,
-                  maxWidth: "18ch",
-                  textShadow:
-                    "0 2px 24px rgba(0,0,0,0.35), 0 1px 2px rgba(0,0,0,0.4)",
+                  fontSize: "clamp(13px, 1.1vw, 14.5px)",
+                  fontWeight: 500,
+                  letterSpacing: "-0.005em",
+                  boxShadow:
+                    "inset 0 1px 0 0 rgba(255,255,255,0.14), 0 1px 2px rgba(0,0,0,0.2), 0 10px 28px -10px rgba(0,0,0,0.45)",
+                  transition: "all 0.35s cubic-bezier(0.22, 1, 0.36, 1)",
+                  overflow: "hidden",
                 }}
               >
-                {["Where", "your", "identity"].map((word, i) => (
-                  <span
-                    key={word}
-                    style={{
-                      display: "inline-block",
-                      animation: `word-rise 1s cubic-bezier(0.22, 1, 0.36, 1) ${
-                        0.7 + i * 0.12
-                      }s both`,
-                    }}
-                  >
-                    {word}&nbsp;
-                  </span>
-                ))}
-                <br />
-                <span
-                  style={{
-                    display: "inline-block",
-                    background:
-                      "linear-gradient(180deg, #ffffff 0%, #ffffff 55%, rgba(255,255,255,0.65) 100%)",
-                    WebkitBackgroundClip: "text",
-                    backgroundClip: "text",
-                    color: "transparent",
-                    animation:
-                      "word-rise 1s cubic-bezier(0.22, 1, 0.36, 1) 1.06s both",
-                  }}
-                >
-                  feels at home.
-                </span>
-              </h1>
+                {isLoggedIn ? "Open dashboard" : "Create your ID"}
+                <span aria-hidden="true">→</span>
+              </Link>
+            </div>
 
-              {/* Bottom accent row */}
+            {/* ==================================================== */}
+            {/*  LOGO ROW — BINZEO logo repeated                      */}
+            {/* ==================================================== */}
+            <div
+              style={{
+                marginTop: "clamp(48px, 8vh, 88px)",
+                width: "100%",
+                overflow: "hidden",
+                animation: "bz-fade-in 1.2s cubic-bezier(0.22, 1, 0.36, 1) 1.3s both",
+                maskImage:
+                  "linear-gradient(90deg, transparent 0%, #000 12%, #000 88%, transparent 100%)",
+                WebkitMaskImage:
+                  "linear-gradient(90deg, transparent 0%, #000 12%, #000 88%, transparent 100%)",
+              }}
+            >
               <div
                 style={{
-                  marginTop: "clamp(24px, 3vh, 40px)",
                   display: "flex",
                   alignItems: "center",
-                  gap: "14px",
-                  animation:
-                    "glass-fade 0.9s cubic-bezier(0.22, 1, 0.36, 1) 1.4s both",
+                  gap: "clamp(40px, 6vw, 80px)",
+                  width: "max-content",
+                  animation: "bz-logo-scroll 30s linear infinite",
                 }}
               >
-                <span
-                  aria-hidden="true"
-                  style={{
-                    display: "inline-block",
-                    width: "56px",
-                    height: "2px",
-                    borderRadius: "999px",
-                    background:
-                      "linear-gradient(90deg, rgba(255,255,255,0.9), transparent)",
-                  }}
-                />
-                <span
-                  style={{
-                    color: "rgba(255,255,255,0.72)",
-                    fontSize: "clamp(12px, 1.2vw, 14px)",
-                    letterSpacing: "0.14em",
-                    textTransform: "uppercase",
-                    fontWeight: 500,
-                  }}
-                >
-                  Calm · Secure · Yours
-                </span>
+                {[
+                  ...Array(8),
+                ].map((_, i) => (
+                  <img
+                    key={i}
+                    src="/logo.svg"
+                    alt="BINZEO"
+                    style={{
+                      height: "clamp(18px, 2vw, 26px)",
+                      width: "auto",
+                      opacity: 0.55,
+                      filter: "grayscale(1)",
+                      transition: "opacity 0.3s ease",
+                      flexShrink: 0,
+                    }}
+                  />
+                ))}
               </div>
             </div>
           </div>
 
-          {/* Scroll indicator (bottom right) */}
+          {/* Bottom fade for smooth transition */}
           <div
             aria-hidden="true"
             style={{
               position: "absolute",
-              right: "clamp(16px, 4vw, 64px)",
-              bottom: "clamp(48px, 8vh, 96px)",
-              zIndex: 2,
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              gap: "10px",
-              color: "rgba(255,255,255,0.55)",
-              fontSize: "10.5px",
-              letterSpacing: "0.18em",
-              textTransform: "uppercase",
-              animation:
-                "glass-fade 1s cubic-bezier(0.22, 1, 0.36, 1) 1.6s both",
+              bottom: 0,
+              left: 0,
+              right: 0,
+              height: "120px",
+              background:
+                "linear-gradient(180deg, transparent 0%, rgba(247,247,245,0.6) 100%)",
+              pointerEvents: "none",
             }}
-          >
-            <span>Scroll</span>
-            <span
-              style={{
-                display: "inline-block",
-                width: "1.5px",
-                height: "40px",
-                background:
-                  "linear-gradient(180deg, rgba(255,255,255,0.6), transparent)",
-              }}
-            />
-          </div>
+          />
         </section>
 
         {/* ============================================================ */}
