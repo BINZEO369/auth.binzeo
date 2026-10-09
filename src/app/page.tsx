@@ -84,6 +84,113 @@ export default async function HomePage() {
           0%, 100% { transform: scale(1.05) translate(0, 0); }
           50%      { transform: scale(1.15) translate(-1.5%, -1%); }
         }
+
+        /* ============================================================ */
+        /*  PHONE CASE GRIDS — responsive side-by-side on ALL screens    */
+        /* ============================================================ */
+
+        /* Case 1: Image (left) + Text (right) — always side-by-side */
+        .phone-case-1-grid {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          height: 100vh;
+          min-height: 100dvh;
+        }
+
+        /* Case 2: Text (left) + Image (right) — always side-by-side */
+        .phone-case-2-grid {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          height: 100vh;
+          min-height: 100dvh;
+        }
+
+        /* Tablet / small desktop */
+        @media (max-width: 900px) {
+          .phone-case-1-grid,
+          .phone-case-2-grid {
+            grid-template-columns: 1fr 1fr;
+          }
+        }
+
+        /* Mobile — keep 40/60 split for better text readability */
+        @media (max-width: 640px) {
+          .phone-case-1-grid {
+            grid-template-columns: 42% 58%;
+            height: auto;
+            min-height: 100dvh;
+          }
+          .phone-case-2-grid {
+            grid-template-columns: 58% 42%;
+            height: auto;
+            min-height: 100dvh;
+          }
+          .phone-case-1-image,
+          .phone-case-2-image {
+            min-height: 100dvh !important;
+          }
+          .phone-case-text-content {
+            padding: 32px 18px !important;
+          }
+          .phone-case-kicker {
+            padding: 6px 12px !important;
+            font-size: 9.5px !important;
+            letter-spacing: 0.14em !important;
+            margin-bottom: 16px !important;
+          }
+          .phone-case-title {
+            font-size: 26px !important;
+            line-height: 1.05 !important;
+            margin-bottom: 12px !important;
+          }
+          .phone-case-desc {
+            font-size: 12px !important;
+            line-height: 1.6 !important;
+            margin-bottom: 18px !important;
+          }
+          .phone-case-list {
+            margin-bottom: 18px !important;
+            gap: 8px !important;
+          }
+          .phone-case-list li {
+            font-size: 11.5px !important;
+            gap: 8px !important;
+          }
+          .phone-case-list .phone-case-check {
+            width: 16px !important;
+            height: 16px !important;
+            font-size: 8px !important;
+          }
+          .phone-case-cta {
+            padding: 10px 18px !important;
+            font-size: 12px !important;
+          }
+          .phone-case-seam {
+            height: 40px !important;
+          }
+          .phone-case-seam-line {
+            width: 40px !important;
+          }
+        }
+
+        /* Very small mobile (iPhone SE etc) */
+        @media (max-width: 380px) {
+          .phone-case-1-grid {
+            grid-template-columns: 40% 60%;
+          }
+          .phone-case-2-grid {
+            grid-template-columns: 60% 40%;
+          }
+          .phone-case-text-content {
+            padding: 24px 14px !important;
+          }
+          .phone-case-title {
+            font-size: 22px !important;
+          }
+          .phone-case-desc {
+            font-size: 11px !important;
+          }
+        }
       `}</style>
 
       <div className="reference-shell">
@@ -304,7 +411,6 @@ export default async function HomePage() {
 
         {/* ============================================================ */}
         {/*  WRAPPER — Two Phone Cases as one connected composition       */}
-        {/*  Shared background ensures seamless top/bottom connection     */}
         {/* ============================================================ */}
         <div
           style={{
@@ -317,38 +423,9 @@ export default async function HomePage() {
           }}
         >
           {/* ============================================================ */}
-          {/*  PHONE CASE 1 — IMAGE LEFT + TEXT RIGHT                       */}
+          {/*  PHONE CASE 1 — IMAGE LEFT + TEXT RIGHT (all screens)         */}
           {/* ============================================================ */}
-          <section
-            style={{
-              position: "relative",
-              width: "100%",
-              height: "100vh",
-              minHeight: "100dvh",
-              overflow: "hidden",
-              backgroundColor: "#f7f7f5",
-              display: "grid",
-              gridTemplateColumns: "1fr 1fr",
-            }}
-            className="phone-case-1-grid"
-          >
-            <style>{`
-              @media (max-width: 900px) {
-                .phone-case-1-grid {
-                  grid-template-columns: 1fr !important;
-                  height: auto !important;
-                  min-height: 100dvh !important;
-                }
-                .phone-case-1-image {
-                  order: 1 !important;
-                  min-height: 60vh !important;
-                }
-                .phone-case-1-text {
-                  order: 2 !important;
-                }
-              }
-            `}</style>
-
+          <section className="phone-case-1-grid">
             {/* LEFT — IMAGE */}
             <div
               className="phone-case-1-image"
@@ -356,7 +433,6 @@ export default async function HomePage() {
                 position: "relative",
                 overflow: "hidden",
                 backgroundColor: "#0a0a0a",
-                minHeight: "clamp(400px, 60vh, 100dvh)",
                 animation:
                   "bz-fade-in 1.2s cubic-bezier(0.22, 1, 0.36, 1) 0.2s both",
               }}
@@ -378,20 +454,19 @@ export default async function HomePage() {
               {/* Right edge fade → blends with text side */}
               <div
                 aria-hidden="true"
-                className="phone-case-1-fade"
                 style={{
                   position: "absolute",
                   top: 0,
                   right: 0,
                   bottom: 0,
-                  width: "80px",
+                  width: "60px",
                   background:
                     "linear-gradient(270deg, rgba(247,247,245,1) 0%, rgba(247,247,245,0) 100%)",
                   pointerEvents: "none",
                 }}
               />
 
-              {/* ⭐ BOTTOM fade → smooths connection to Case 2 */}
+              {/* Bottom fade → smooths connection to Case 2 */}
               <div
                 aria-hidden="true"
                 style={{
@@ -405,31 +480,17 @@ export default async function HomePage() {
                   pointerEvents: "none",
                 }}
               />
-
-              <style>{`
-                @media (max-width: 900px) {
-                  .phone-case-1-fade {
-                    width: 100% !important;
-                    height: 60px !important;
-                    top: auto !important;
-                    bottom: 0 !important;
-                    left: 0 !important;
-                    right: 0 !important;
-                    background: linear-gradient(0deg, rgba(247,247,245,1) 0%, rgba(247,247,245,0) 100%) !important;
-                  }
-                }
-              `}</style>
             </div>
 
             {/* RIGHT — TEXT */}
             <div
-              className="phone-case-1-text"
+              className="phone-case-1-text phone-case-text-content"
               style={{
                 position: "relative",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                padding: "clamp(40px, 6vw, 96px) clamp(24px, 4vw, 72px)",
+                padding: "clamp(32px, 6vw, 96px) clamp(20px, 4vw, 72px)",
                 backgroundColor: "#f7f7f5",
                 zIndex: 2,
               }}
@@ -437,10 +498,11 @@ export default async function HomePage() {
               <div style={{ maxWidth: "560px", width: "100%" }}>
                 {/* Kicker */}
                 <div
+                  className="phone-case-kicker"
                   style={{
                     display: "inline-flex",
                     alignItems: "center",
-                    gap: "10px",
+                    gap: "8px",
                     padding: "8px 16px",
                     borderRadius: "999px",
                     border: "1px solid rgba(0,0,0,0.08)",
@@ -450,19 +512,19 @@ export default async function HomePage() {
                     boxShadow:
                       "inset 0 1px 0 0 rgba(255,255,255,0.9), 0 4px 16px -8px rgba(0,0,0,0.08)",
                     color: "rgba(0,0,0,0.7)",
-                    fontSize: "clamp(10.5px, 1vw, 12.5px)",
+                    fontSize: "clamp(10px, 1vw, 12.5px)",
                     fontWeight: 500,
                     letterSpacing: "0.16em",
                     textTransform: "uppercase",
-                    marginBottom: "clamp(20px, 3vh, 32px)",
+                    marginBottom: "clamp(16px, 3vh, 32px)",
                     animation:
                       "bz-fade-up 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.15s both",
                   }}
                 >
                   <span
                     style={{
-                      width: "6px",
-                      height: "6px",
+                      width: "5px",
+                      height: "5px",
                       borderRadius: "999px",
                       backgroundColor: "#111",
                     }}
@@ -472,9 +534,10 @@ export default async function HomePage() {
 
                 {/* Title */}
                 <h2
+                  className="phone-case-title"
                   style={{
-                    margin: "0 0 clamp(16px, 2.2vh, 26px)",
-                    fontSize: "clamp(34px, 4.5vw, 62px)",
+                    margin: "0 0 clamp(12px, 2.2vh, 26px)",
+                    fontSize: "clamp(24px, 4.5vw, 62px)",
                     lineHeight: 1.02,
                     letterSpacing: "-0.045em",
                     fontWeight: 600,
@@ -490,9 +553,10 @@ export default async function HomePage() {
 
                 {/* Subtitle */}
                 <p
+                  className="phone-case-desc"
                   style={{
-                    margin: "0 0 clamp(28px, 4vh, 40px)",
-                    fontSize: "clamp(14px, 1.25vw, 17px)",
+                    margin: "0 0 clamp(18px, 4vh, 40px)",
+                    fontSize: "clamp(12px, 1.25vw, 17px)",
                     lineHeight: 1.65,
                     color: "rgba(0,0,0,0.65)",
                     maxWidth: "480px",
@@ -507,13 +571,14 @@ export default async function HomePage() {
 
                 {/* Feature list */}
                 <ul
+                  className="phone-case-list"
                   style={{
                     listStyle: "none",
                     padding: 0,
-                    margin: "0 0 clamp(28px, 4vh, 40px)",
+                    margin: "0 0 clamp(18px, 4vh, 40px)",
                     display: "flex",
                     flexDirection: "column",
-                    gap: "clamp(10px, 1.4vh, 14px)",
+                    gap: "clamp(8px, 1.4vh, 14px)",
                     animation:
                       "bz-fade-up 1s cubic-bezier(0.22, 1, 0.36, 1) 0.6s both",
                   }}
@@ -528,23 +593,24 @@ export default async function HomePage() {
                       style={{
                         display: "flex",
                         alignItems: "center",
-                        gap: "12px",
-                        fontSize: "clamp(13px, 1.1vw, 15px)",
+                        gap: "10px",
+                        fontSize: "clamp(11.5px, 1.1vw, 15px)",
                         color: "rgba(0,0,0,0.7)",
                       }}
                     >
                       <span
+                        className="phone-case-check"
                         style={{
                           display: "inline-flex",
-                          width: "20px",
-                          height: "20px",
+                          width: "18px",
+                          height: "18px",
                           borderRadius: "999px",
                           backgroundColor: "#0a0a0a",
                           color: "#ffffff",
                           alignItems: "center",
                           justifyContent: "center",
                           flexShrink: 0,
-                          fontSize: "10px",
+                          fontSize: "9px",
                         }}
                       >
                         ✓
@@ -563,16 +629,17 @@ export default async function HomePage() {
                 >
                   <Link
                     href={isLoggedIn ? "/dashboard" : "/signup"}
+                    className="phone-case-cta"
                     style={{
                       display: "inline-flex",
                       alignItems: "center",
-                      gap: "8px",
-                      padding: "14px 28px",
+                      gap: "6px",
+                      padding: "12px 24px",
                       borderRadius: "999px",
                       background:
                         "linear-gradient(180deg, #1a1a1a 0%, #0a0a0a 100%)",
                       color: "#ffffff",
-                      fontSize: "clamp(13px, 1.1vw, 14.5px)",
+                      fontSize: "clamp(12px, 1.1vw, 14.5px)",
                       fontWeight: 500,
                       letterSpacing: "-0.005em",
                       boxShadow:
@@ -589,22 +656,22 @@ export default async function HomePage() {
           </section>
 
           {/* ============================================================ */}
-          {/*  ⭐ SEAM — soft bridge between the two cases                 */}
-          {/*  Taller gradient band that visually merges both sections      */}
+          {/*  SEAM — soft bridge between the two cases                     */}
           {/* ============================================================ */}
           <div
             aria-hidden="true"
+            className="phone-case-seam"
             style={{
               position: "relative",
               width: "100%",
-              height: "clamp(80px, 12vh, 160px)",
+              height: "clamp(60px, 12vh, 160px)",
               background: "#f7f7f5",
               pointerEvents: "none",
               zIndex: 3,
             }}
           >
-            {/* Center subtle divider line */}
             <div
+              className="phone-case-seam-line"
               style={{
                 position: "absolute",
                 top: "50%",
@@ -617,7 +684,6 @@ export default async function HomePage() {
               }}
             />
 
-            {/* Tiny center dot */}
             <div
               style={{
                 position: "absolute",
@@ -633,39 +699,18 @@ export default async function HomePage() {
           </div>
 
           {/* ============================================================ */}
-          {/*  PHONE CASE 2 — TEXT LEFT + IMAGE RIGHT                       */}
+          {/*  PHONE CASE 2 — TEXT LEFT + IMAGE RIGHT (all screens)         */}
           {/* ============================================================ */}
-          <section
-            style={{
-              position: "relative",
-              width: "100%",
-              height: "100vh",
-              minHeight: "100dvh",
-              overflow: "hidden",
-              backgroundColor: "#f7f7f5",
-              display: "grid",
-              gridTemplateColumns: "1fr 1fr",
-            }}
-            className="phone-case-2-grid"
-          >
-            <style>{`
-              @media (max-width: 900px) {
-                .phone-case-2-grid {
-                  grid-template-columns: 1fr !important;
-                  height: auto !important;
-                  min-height: 100dvh !important;
-                }
-              }
-            `}</style>
-
+          <section className="phone-case-2-grid">
             {/* LEFT — TEXT */}
             <div
+              className="phone-case-text-content"
               style={{
                 position: "relative",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                padding: "clamp(40px, 6vw, 96px) clamp(24px, 4vw, 72px)",
+                padding: "clamp(32px, 6vw, 96px) clamp(20px, 4vw, 72px)",
                 backgroundColor: "#f7f7f5",
                 zIndex: 2,
               }}
@@ -673,10 +718,11 @@ export default async function HomePage() {
               <div style={{ maxWidth: "560px", width: "100%" }}>
                 {/* Kicker */}
                 <div
+                  className="phone-case-kicker"
                   style={{
                     display: "inline-flex",
                     alignItems: "center",
-                    gap: "10px",
+                    gap: "8px",
                     padding: "8px 16px",
                     borderRadius: "999px",
                     border: "1px solid rgba(0,0,0,0.08)",
@@ -686,19 +732,19 @@ export default async function HomePage() {
                     boxShadow:
                       "inset 0 1px 0 0 rgba(255,255,255,0.9), 0 4px 16px -8px rgba(0,0,0,0.08)",
                     color: "rgba(0,0,0,0.7)",
-                    fontSize: "clamp(10.5px, 1vw, 12.5px)",
+                    fontSize: "clamp(10px, 1vw, 12.5px)",
                     fontWeight: 500,
                     letterSpacing: "0.16em",
                     textTransform: "uppercase",
-                    marginBottom: "clamp(20px, 3vh, 32px)",
+                    marginBottom: "clamp(16px, 3vh, 32px)",
                     animation:
                       "bz-fade-up 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.15s both",
                   }}
                 >
                   <span
                     style={{
-                      width: "6px",
-                      height: "6px",
+                      width: "5px",
+                      height: "5px",
                       borderRadius: "999px",
                       backgroundColor: "#111",
                     }}
@@ -708,9 +754,10 @@ export default async function HomePage() {
 
                 {/* Title */}
                 <h2
+                  className="phone-case-title"
                   style={{
-                    margin: "0 0 clamp(16px, 2.2vh, 26px)",
-                    fontSize: "clamp(34px, 4.5vw, 62px)",
+                    margin: "0 0 clamp(12px, 2.2vh, 26px)",
+                    fontSize: "clamp(24px, 4.5vw, 62px)",
                     lineHeight: 1.02,
                     letterSpacing: "-0.045em",
                     fontWeight: 600,
@@ -726,9 +773,10 @@ export default async function HomePage() {
 
                 {/* Subtitle */}
                 <p
+                  className="phone-case-desc"
                   style={{
-                    margin: "0 0 clamp(28px, 4vh, 40px)",
-                    fontSize: "clamp(14px, 1.25vw, 17px)",
+                    margin: "0 0 clamp(18px, 4vh, 40px)",
+                    fontSize: "clamp(12px, 1.25vw, 17px)",
                     lineHeight: 1.65,
                     color: "rgba(0,0,0,0.65)",
                     maxWidth: "480px",
@@ -744,13 +792,14 @@ export default async function HomePage() {
 
                 {/* Feature list */}
                 <ul
+                  className="phone-case-list"
                   style={{
                     listStyle: "none",
                     padding: 0,
-                    margin: "0 0 clamp(28px, 4vh, 40px)",
+                    margin: "0 0 clamp(18px, 4vh, 40px)",
                     display: "flex",
                     flexDirection: "column",
-                    gap: "clamp(10px, 1.4vh, 14px)",
+                    gap: "clamp(8px, 1.4vh, 14px)",
                     animation:
                       "bz-fade-up 1s cubic-bezier(0.22, 1, 0.36, 1) 0.6s both",
                   }}
@@ -765,23 +814,24 @@ export default async function HomePage() {
                       style={{
                         display: "flex",
                         alignItems: "center",
-                        gap: "12px",
-                        fontSize: "clamp(13px, 1.1vw, 15px)",
+                        gap: "10px",
+                        fontSize: "clamp(11.5px, 1.1vw, 15px)",
                         color: "rgba(0,0,0,0.7)",
                       }}
                     >
                       <span
+                        className="phone-case-check"
                         style={{
                           display: "inline-flex",
-                          width: "20px",
-                          height: "20px",
+                          width: "18px",
+                          height: "18px",
                           borderRadius: "999px",
                           backgroundColor: "#0a0a0a",
                           color: "#ffffff",
                           alignItems: "center",
                           justifyContent: "center",
                           flexShrink: 0,
-                          fontSize: "10px",
+                          fontSize: "9px",
                         }}
                       >
                         ✓
@@ -800,16 +850,17 @@ export default async function HomePage() {
                 >
                   <Link
                     href={isLoggedIn ? "/dashboard" : "/signup"}
+                    className="phone-case-cta"
                     style={{
                       display: "inline-flex",
                       alignItems: "center",
-                      gap: "8px",
-                      padding: "14px 28px",
+                      gap: "6px",
+                      padding: "12px 24px",
                       borderRadius: "999px",
                       background:
                         "linear-gradient(180deg, #1a1a1a 0%, #0a0a0a 100%)",
                       color: "#ffffff",
-                      fontSize: "clamp(13px, 1.1vw, 14.5px)",
+                      fontSize: "clamp(12px, 1.1vw, 14.5px)",
                       fontWeight: 500,
                       letterSpacing: "-0.005em",
                       boxShadow:
@@ -826,11 +877,11 @@ export default async function HomePage() {
 
             {/* RIGHT — IMAGE */}
             <div
+              className="phone-case-2-image"
               style={{
                 position: "relative",
                 overflow: "hidden",
                 backgroundColor: "#0a0a0a",
-                minHeight: "clamp(400px, 60vh, 100dvh)",
                 animation:
                   "bz-fade-in 1.2s cubic-bezier(0.22, 1, 0.36, 1) 0.2s both",
               }}
@@ -852,20 +903,19 @@ export default async function HomePage() {
               {/* Left edge fade → blends with text side */}
               <div
                 aria-hidden="true"
-                className="phone-case-2-fade"
                 style={{
                   position: "absolute",
                   top: 0,
                   left: 0,
                   bottom: 0,
-                  width: "80px",
+                  width: "60px",
                   background:
                     "linear-gradient(90deg, rgba(247,247,245,1) 0%, rgba(247,247,245,0) 100%)",
                   pointerEvents: "none",
                 }}
               />
 
-              {/* ⭐ TOP fade → smooths connection from Case 1 */}
+              {/* Top fade → smooths connection from Case 1 */}
               <div
                 aria-hidden="true"
                 style={{
@@ -879,20 +929,6 @@ export default async function HomePage() {
                   pointerEvents: "none",
                 }}
               />
-
-              <style>{`
-                @media (max-width: 900px) {
-                  .phone-case-2-fade {
-                    width: 100% !important;
-                    height: 60px !important;
-                    top: 0 !important;
-                    left: 0 !important;
-                    right: 0 !important;
-                    bottom: auto !important;
-                    background: linear-gradient(180deg, rgba(247,247,245,1) 0%, rgba(247,247,245,0) 100%) !important;
-                  }
-                }
-              `}</style>
             </div>
           </section>
         </div>
