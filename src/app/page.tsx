@@ -1,4 +1,4 @@
-import Link from "next/link";
+লimport Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 
 const trustItems = [
@@ -90,6 +90,18 @@ export default async function HomePage() {
           0%, 100% { transform: scale(1.05) translate(0, 0); }
           50%      { transform: scale(1.15) translate(-1.5%, -1%); }
         }
+        @keyframes bz-phone-float {
+          0%, 100% { transform: translateY(0); }
+          50%      { transform: translateY(-14px); }
+        }
+        @keyframes bz-badge-float {
+          0%, 100% { transform: translateY(0); }
+          50%      { transform: translateY(-8px); }
+        }
+        @keyframes bz-ring-pulse {
+          0%   { transform: scale(0.85); opacity: 0.6; }
+          100% { transform: scale(1.8); opacity: 0; }
+        }
       `}</style>
 
       <div className="reference-shell">
@@ -112,9 +124,6 @@ export default async function HomePage() {
             backgroundColor: "#0a0a0a",
           }}
         >
-          {/* ==================================================== */}
-          {/*  BACKGROUND IMAGE — img3.jpg only (Ken Burns slow)    */}
-          {/* ==================================================== */}
           <div
             aria-hidden="true"
             style={{
@@ -128,9 +137,6 @@ export default async function HomePage() {
             }}
           />
 
-          {/* ==================================================== */}
-          {/*  CONTENT — Centered                                    */}
-          {/* ==================================================== */}
           <div
             style={{
               position: "relative",
@@ -142,9 +148,6 @@ export default async function HomePage() {
               textAlign: "center",
             }}
           >
-            {/* ============================================ */}
-            {/*  BIG BINZEO LOGO — perfectly centered         */}
-            {/* ============================================ */}
             <div
               style={{
                 width: "100%",
@@ -171,7 +174,6 @@ export default async function HomePage() {
               />
             </div>
 
-            {/* Small intro line */}
             <p
               style={{
                 margin: "0 0 clamp(12px, 1.8vh, 22px)",
@@ -186,7 +188,6 @@ export default async function HomePage() {
               Own your
             </p>
 
-            {/* Main title — huge, minimal */}
             <h1
               style={{
                 margin: 0,
@@ -202,7 +203,6 @@ export default async function HomePage() {
               Identity
             </h1>
 
-            {/* Subtitle below title */}
             <p
               style={{
                 margin: "clamp(12px, 1.6vh, 22px) 0 0",
@@ -217,7 +217,6 @@ export default async function HomePage() {
               that feels like home.
             </p>
 
-            {/* Description text */}
             <p
               style={{
                 margin: "clamp(24px, 3.5vh, 40px) auto 0",
@@ -234,7 +233,6 @@ export default async function HomePage() {
               simple on the surface.
             </p>
 
-            {/* CTA Button — Black pill */}
             <div
               style={{
                 marginTop: "clamp(32px, 4.5vh, 52px)",
@@ -272,9 +270,6 @@ export default async function HomePage() {
               </Link>
             </div>
 
-            {/* ==================================================== */}
-            {/*  PARTNER LOGO ROW — smaller, all in one line          */}
-            {/* ==================================================== */}
             <div
               style={{
                 marginTop: "clamp(48px, 7vh, 80px)",
@@ -305,8 +300,6 @@ export default async function HomePage() {
                       "inset 0 1px 0 0 rgba(255,255,255,1), 0 6px 18px -8px rgba(0,0,0,0.15)",
                     padding: "clamp(5px, 0.6vw, 8px)",
                     flexShrink: 0,
-                    transition:
-                      "transform 0.4s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.4s cubic-bezier(0.22, 1, 0.36, 1)",
                   }}
                   title={logo.alt}
                 >
@@ -323,6 +316,318 @@ export default async function HomePage() {
                   />
                 </div>
               ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ============================================================ */}
+        {/*  PHONE SHOWCASE — Authentication in a phone case              */}
+        {/* ============================================================ */}
+        <section
+          className="reference-phone-showcase"
+          style={{
+            position: "relative",
+            width: "100vw",
+            minHeight: "100vh",
+            marginLeft: "calc(-50vw + 50%)",
+            marginRight: "calc(-50vw + 50%)",
+            padding: "clamp(64px, 10vh, 128px) 0",
+            backgroundColor: "#ffffff",
+            overflow: "hidden",
+          }}
+        >
+          {/* Subtle pastel background glow */}
+          <div
+            aria-hidden="true"
+            style={{
+              position: "absolute",
+              inset: 0,
+              background:
+                "radial-gradient(ellipse 60% 50% at 15% 20%, rgba(255,200,140,0.15) 0%, transparent 60%), radial-gradient(ellipse 60% 50% at 85% 80%, rgba(140,190,255,0.18) 0%, transparent 60%)",
+              pointerEvents: "none",
+            }}
+          />
+
+          <div
+            style={{
+              position: "relative",
+              maxWidth: "1400px",
+              margin: "0 auto",
+              padding: "0 clamp(20px, 4vw, 64px)",
+              display: "grid",
+              gridTemplateColumns: "minmax(0, 1fr)",
+              gap: "clamp(40px, 6vw, 80px)",
+              alignItems: "center",
+            }}
+            className="phone-showcase-grid"
+          >
+            {/* ---------- LEFT: Copy ---------- */}
+            <div style={{ maxWidth: "560px" }}>
+              <p
+                style={{
+                  margin: "0 0 20px",
+                  fontSize: "clamp(11px, 1.1vw, 13px)",
+                  fontWeight: 500,
+                  letterSpacing: "0.18em",
+                  textTransform: "uppercase",
+                  color: "rgba(0,0,0,0.5)",
+                }}
+              >
+                Authentication, reimagined
+              </p>
+
+              <h2
+                style={{
+                  margin: "0 0 24px",
+                  fontSize: "clamp(34px, 4.5vw, 64px)",
+                  lineHeight: 1.02,
+                  letterSpacing: "-0.04em",
+                  fontWeight: 600,
+                  color: "#0a0a0a",
+                  maxWidth: "14ch",
+                }}
+              >
+                Sign in from anywhere, safely.
+              </h2>
+
+              <p
+                style={{
+                  margin: "0 0 32px",
+                  fontSize: "clamp(14px, 1.2vw, 16px)",
+                  lineHeight: 1.65,
+                  color: "rgba(0,0,0,0.62)",
+                }}
+              >
+                One secure flow across every device. Passkey, biometric, or
+                password — BINZEO adapts to how you want to sign in, with
+                precise-location verification and encrypted sessions behind
+                the scenes.
+              </p>
+
+              {/* Feature ticks */}
+              <div
+                style={{
+                  display: "grid",
+                  gap: "14px",
+                  marginBottom: "36px",
+                }}
+              >
+                {[
+                  "One-tap sign-in with passkey",
+                  "Location-aware authentication",
+                  "Full session history and control",
+                ].map((item) => (
+                  <div
+                    key={item}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "12px",
+                      fontSize: "clamp(13px, 1.15vw, 15px)",
+                      color: "rgba(0,0,0,0.75)",
+                    }}
+                  >
+                    <span
+                      style={{
+                        display: "inline-flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        width: "20px",
+                        height: "20px",
+                        borderRadius: "999px",
+                        backgroundColor: "#0a0a0a",
+                        color: "#ffffff",
+                        flexShrink: 0,
+                      }}
+                    >
+                      <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="3"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        style={{ width: "10px", height: "10px" }}
+                      >
+                        <path d="M20 6 9 17l-5-5" />
+                      </svg>
+                    </span>
+                    {item}
+                  </div>
+                ))}
+              </div>
+
+              <Link
+                href={isLoggedIn ? "/dashboard/security" : "/signup"}
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "8px",
+                  padding: "14px 28px",
+                  borderRadius: "999px",
+                  background:
+                    "linear-gradient(180deg, #1a1a1a 0%, #0a0a0a 100%)",
+                  color: "#ffffff",
+                  fontSize: "clamp(13px, 1.1vw, 14.5px)",
+                  fontWeight: 500,
+                  boxShadow:
+                    "inset 0 1px 0 0 rgba(255,255,255,0.14), 0 1px 2px rgba(0,0,0,0.2), 0 10px 28px -10px rgba(0,0,0,0.45)",
+                  transition: "all 0.35s cubic-bezier(0.22, 1, 0.36, 1)",
+                }}
+              >
+                {isLoggedIn ? "Review security" : "Try the flow"}
+                <span aria-hidden="true">→</span>
+              </Link>
+            </div>
+
+            {/* ---------- RIGHT: Phone case image ---------- */}
+            <div
+              style={{
+                position: "relative",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                minHeight: "clamp(520px, 70vh, 800px)",
+              }}
+            >
+              {/* Ambient glow behind phone */}
+              <div
+                aria-hidden="true"
+                style={{
+                  position: "absolute",
+                  width: "min(560px, 90%)",
+                  aspectRatio: "1 / 1",
+                  borderRadius: "50%",
+                  background:
+                    "radial-gradient(circle, rgba(140,190,255,0.28) 0%, transparent 65%)",
+                  filter: "blur(60px)",
+                  animation: "bz-badge-float 8s ease-in-out infinite",
+                }}
+              />
+
+              {/* Phone case image — floats gently */}
+              <div
+                style={{
+                  position: "relative",
+                  width: "min(420px, 92%)",
+                  aspectRatio: "9 / 19.5",
+                  animation: "bz-phone-float 7s ease-in-out infinite",
+                  filter:
+                    "drop-shadow(0 40px 80px rgba(0,0,0,0.35)) drop-shadow(0 10px 20px rgba(0,0,0,0.2))",
+                }}
+              >
+                <img
+                  src="/images/phonecase1.jpg"
+                  alt="BINZEO authentication on phone"
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "contain",
+                    display: "block",
+                  }}
+                />
+
+                {/* Ring pulse around phone (subtle) */}
+                <span
+                  aria-hidden="true"
+                  style={{
+                    position: "absolute",
+                    inset: "-8%",
+                    borderRadius: "50%",
+                    border: "1px solid rgba(0,0,0,0.08)",
+                    animation: "bz-ring-pulse 4s ease-out infinite",
+                    pointerEvents: "none",
+                  }}
+                />
+              </div>
+
+              {/* Floating badge — Passkey ready */}
+              <div
+                style={{
+                  position: "absolute",
+                  top: "12%",
+                  left: "2%",
+                  padding: "12px 18px",
+                  borderRadius: "999px",
+                  backgroundColor: "rgba(255,255,255,0.85)",
+                  backdropFilter: "blur(24px) saturate(180%)",
+                  WebkitBackdropFilter: "blur(24px) saturate(180%)",
+                  border: "1px solid rgba(0,0,0,0.06)",
+                  boxShadow:
+                    "inset 0 1px 0 0 rgba(255,255,255,1), 0 10px 28px -12px rgba(0,0,0,0.2)",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "10px",
+                  fontSize: "clamp(11px, 1vw, 13px)",
+                  fontWeight: 500,
+                  color: "#0a0a0a",
+                  animation: "bz-badge-float 6s ease-in-out 0.5s infinite",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                <span
+                  style={{
+                    width: "8px",
+                    height: "8px",
+                    borderRadius: "999px",
+                    backgroundColor: "#22c55e",
+                    boxShadow: "0 0 12px rgba(34,197,94,0.8)",
+                  }}
+                />
+                Passkey ready
+              </div>
+
+              {/* Floating badge — Verified */}
+              <div
+                style={{
+                  position: "absolute",
+                  bottom: "16%",
+                  right: "2%",
+                  padding: "12px 18px",
+                  borderRadius: "999px",
+                  backgroundColor: "rgba(255,255,255,0.85)",
+                  backdropFilter: "blur(24px) saturate(180%)",
+                  WebkitBackdropFilter: "blur(24px) saturate(180%)",
+                  border: "1px solid rgba(0,0,0,0.06)",
+                  boxShadow:
+                    "inset 0 1px 0 0 rgba(255,255,255,1), 0 10px 28px -12px rgba(0,0,0,0.2)",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "10px",
+                  fontSize: "clamp(11px, 1vw, 13px)",
+                  fontWeight: 500,
+                  color: "#0a0a0a",
+                  animation: "bz-badge-float 6s ease-in-out 1.5s infinite",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                <span
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    width: "18px",
+                    height: "18px",
+                    borderRadius: "999px",
+                    backgroundColor: "#0a0a0a",
+                    color: "#ffffff",
+                    flexShrink: 0,
+                  }}
+                >
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="3"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    style={{ width: "9px", height: "9px" }}
+                  >
+                    <path d="M20 6 9 17l-5-5" />
+                  </svg>
+                </span>
+                Verified location
+              </div>
             </div>
           </div>
         </section>
