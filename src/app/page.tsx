@@ -79,9 +79,8 @@ export default async function HomePage() {
     <main className="reference-home" style={{ backgroundColor: "#f7f7f5" }}>
       <style>{`
         /* ============================================================ */
-        /*  CINEMATIC REVEAL SYSTEM — ফাস্টার টাইমিং                      */
+        /*  CINEMATIC REVEAL SYSTEM                                      */
         /* ============================================================ */
-
         [data-reveal] {
           opacity: 0;
           transform: translateY(28px) scale(0.99);
@@ -143,7 +142,7 @@ export default async function HomePage() {
         }
 
         /* ============================================================ */
-        /*  LIQUID MERGE — সব শ্যাডো সাদা                                */
+        /*  LIQUID MERGE — সাদা শ্যাডো                                   */
         /* ============================================================ */
         .liquid-section { position: relative; isolation: isolate; }
         .liquid-shadow-top {
@@ -156,6 +155,139 @@ export default async function HomePage() {
           box-shadow:
             inset 0 60px 80px -50px rgba(255,255,255,0.9),
             inset 0 -60px 80px -50px rgba(255,255,255,0.9);
+        }
+
+        /* ============================================================ */
+        /*  LIQUID GLASS SOUND BUTTON                                    */
+        /* ============================================================ */
+        .bz-sound-btn {
+          position: absolute;
+          bottom: clamp(20px, 4vh, 40px);
+          right: clamp(20px, 4vw, 40px);
+          z-index: 6;
+          width: clamp(34px, 3.4vw, 42px);
+          height: clamp(34px, 3.4vw, 42px);
+          padding: 0;
+          border: none;
+          border-radius: 999px;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          isolation: isolate;
+          overflow: hidden;
+          color: #0a0a0a;
+          background:
+            radial-gradient(
+              120% 120% at 30% 15%,
+              rgba(255,255,255,0.98) 0%,
+              rgba(255,255,255,0.78) 35%,
+              rgba(255,255,255,0.55) 65%,
+              rgba(255,255,255,0.42) 100%
+            );
+          backdrop-filter: blur(22px) saturate(190%);
+          -webkit-backdrop-filter: blur(22px) saturate(190%);
+          box-shadow:
+            inset 0 1px 0 0 rgba(255,255,255,1),
+            inset 0 -1px 0 0 rgba(255,255,255,0.5),
+            inset 0 0 0 1px rgba(255,255,255,0.35),
+            0 1px 2px rgba(0,0,0,0.06),
+            0 8px 22px -8px rgba(0,0,0,0.22),
+            0 2px 6px -2px rgba(0,0,0,0.08);
+          transition:
+            transform 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+            box-shadow 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+            background 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+          will-change: transform, box-shadow;
+        }
+
+        /* Shimmering specular highlight on top */
+        .bz-sound-btn::before {
+          content: "";
+          position: absolute;
+          top: 3px;
+          left: 12%;
+          right: 12%;
+          height: 42%;
+          border-radius: 999px;
+          background: linear-gradient(
+            180deg,
+            rgba(255,255,255,0.95) 0%,
+            rgba(255,255,255,0.15) 70%,
+            rgba(255,255,255,0) 100%
+          );
+          pointer-events: none;
+          filter: blur(0.5px);
+        }
+
+        /* Soft inner liquid blob */
+        .bz-sound-btn::after {
+          content: "";
+          position: absolute;
+          bottom: -8px;
+          left: 50%;
+          transform: translateX(-50%);
+          width: 82%;
+          height: 55%;
+          border-radius: 999px;
+          background: radial-gradient(
+            60% 100% at 50% 100%,
+            rgba(0,0,0,0.08) 0%,
+            rgba(0,0,0,0) 70%
+          );
+          pointer-events: none;
+        }
+
+        .bz-sound-btn:hover {
+          transform: translateY(-1.5px) scale(1.05);
+          box-shadow:
+            inset 0 1px 0 0 rgba(255,255,255,1),
+            inset 0 -1px 0 0 rgba(255,255,255,0.55),
+            inset 0 0 0 1px rgba(255,255,255,0.45),
+            0 2px 4px rgba(0,0,0,0.08),
+            0 14px 30px -10px rgba(0,0,0,0.28),
+            0 4px 10px -3px rgba(0,0,0,0.12);
+        }
+
+        .bz-sound-btn:active {
+          transform: translateY(0) scale(0.96);
+          box-shadow:
+            inset 0 2px 4px rgba(0,0,0,0.08),
+            inset 0 1px 0 0 rgba(255,255,255,0.85),
+            inset 0 0 0 1px rgba(255,255,255,0.3),
+            0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .bz-sound-btn:focus-visible {
+          outline: none;
+          box-shadow:
+            inset 0 1px 0 0 rgba(255,255,255,1),
+            inset 0 0 0 1px rgba(255,255,255,0.5),
+            0 0 0 3px rgba(10,10,10,0.18),
+            0 10px 26px -10px rgba(0,0,0,0.25);
+        }
+
+        .bz-sound-btn svg {
+          position: relative;
+          z-index: 2;
+          width: 42%;
+          height: 42%;
+          display: block;
+          transition: opacity 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+                      transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .bz-sound-btn .bz-icon-hidden {
+          opacity: 0;
+          transform: scale(0.7);
+          position: absolute;
+          inset: 0;
+          margin: auto;
+        }
+        .bz-sound-btn .bz-icon-shown {
+          opacity: 1;
+          transform: scale(1);
+          position: relative;
         }
 
         /* ============================================================ */
@@ -239,6 +371,7 @@ export default async function HomePage() {
             filter: none !important;
             transition: none !important;
           }
+          .bz-sound-btn { transition: none !important; }
         }
       `}</style>
 
@@ -287,7 +420,6 @@ export default async function HomePage() {
               perspective: "1200px",
             }}
           >
-            {/* Logo */}
             <div
               data-reveal
               style={{
@@ -314,7 +446,6 @@ export default async function HomePage() {
               />
             </div>
 
-            {/* "Own your" — was 0.35, now 0.18 */}
             <p
               data-reveal-group
               style={{
@@ -328,7 +459,6 @@ export default async function HomePage() {
               <Words words={["Own", "your"]} delayBase={0.18} stagger={0.1} />
             </p>
 
-            {/* "Identity" — was 0.55, now 0.3 */}
             <h1
               data-reveal-group
               style={{
@@ -344,7 +474,6 @@ export default async function HomePage() {
               <Letters text="Identity" delayBase={0.3} stagger={0.04} />
             </h1>
 
-            {/* "that feels like home." — was 1.25, now 0.7 */}
             <p
               data-reveal-group
               style={{
@@ -362,7 +491,6 @@ export default async function HomePage() {
               />
             </p>
 
-            {/* Description — was 1.85, now 1.0 */}
             <p
               data-reveal
               style={{
@@ -379,7 +507,6 @@ export default async function HomePage() {
               simple on the surface.
             </p>
 
-            {/* CTA — was 2.1, now 1.15 */}
             <div
               data-reveal
               style={{
@@ -417,7 +544,6 @@ export default async function HomePage() {
               </Link>
             </div>
 
-            {/* Partner logos — was 2.3, now 1.3 */}
             <div
               style={{
                 marginTop: "clamp(48px, 7vh, 80px)",
@@ -467,7 +593,6 @@ export default async function HomePage() {
             </div>
           </div>
 
-          {/* Bottom fade */}
           <div
             aria-hidden="true"
             style={{
@@ -615,17 +740,9 @@ export default async function HomePage() {
                     color: "#0a0a0a",
                   }}
                 >
-                  <Words
-                    words={["Your", "identity,"]}
-                    delayBase={0.15}
-                    stagger={0.1}
-                  />
+                  <Words words={["Your", "identity,"]} delayBase={0.15} stagger={0.1} />
                   <br />
-                  <Words
-                    words={["in", "your", "pocket."]}
-                    delayBase={0.35}
-                    stagger={0.09}
-                  />
+                  <Words words={["in", "your", "pocket."]} delayBase={0.35} stagger={0.09} />
                 </h2>
 
                 <p
@@ -817,17 +934,9 @@ export default async function HomePage() {
                     color: "#0a0a0a",
                   }}
                 >
-                  <Words
-                    words={["One", "identity."]}
-                    delayBase={0.15}
-                    stagger={0.1}
-                  />
+                  <Words words={["One", "identity."]} delayBase={0.15} stagger={0.1} />
                   <br />
-                  <Words
-                    words={["Every", "screen", "you", "own."]}
-                    delayBase={0.35}
-                    stagger={0.08}
-                  />
+                  <Words words={["Every", "screen", "you", "own."]} delayBase={0.35} stagger={0.08} />
                 </h2>
 
                 <p
@@ -980,7 +1089,6 @@ export default async function HomePage() {
             </div>
           </section>
 
-          {/* Bottom fade — সাদা */}
           <div
             aria-hidden="true"
             style={{
@@ -1057,6 +1165,7 @@ export default async function HomePage() {
         {/*  4. SETUP GUIDE VIDEO                                          */}
         {/* ============================================================ */}
         <section
+          id="binzeo-video-section"
           className="liquid-section liquid-shadow-top"
           style={{
             position: "relative",
@@ -1118,58 +1227,42 @@ export default async function HomePage() {
             }}
           />
 
+          {/* Liquid Glass Sound Toggle */}
           <button
             id="binzeo-video-sound-toggle"
+            className="bz-sound-btn"
             type="button"
             aria-label="Turn sound on"
             title="Toggle sound"
-            style={{
-              position: "absolute",
-              bottom: "clamp(24px, 5vh, 56px)",
-              right: "clamp(24px, 5vw, 56px)",
-              zIndex: 5,
-              display: "inline-flex",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: "8px",
-              width: "clamp(44px, 5vw, 56px)",
-              height: "clamp(44px, 5vw, 56px)",
-              padding: "0",
-              borderRadius: "999px",
-              border: "1px solid rgba(0,0,0,0.08)",
-              backgroundColor: "rgba(255,255,255,0.9)",
-              color: "#0a0a0a",
-              backdropFilter: "blur(24px) saturate(180%)",
-              WebkitBackdropFilter: "blur(24px) saturate(180%)",
-              boxShadow:
-                "inset 0 1px 0 0 rgba(255,255,255,1), 0 12px 32px -12px rgba(0,0,0,0.28)",
-              cursor: "pointer",
-              transition: "all 0.3s cubic-bezier(0.22, 1, 0.36, 1)",
-            }}
           >
+            {/* Sound OFF icon (muted) */}
             <svg
               id="binzeo-sound-off-icon"
+              className="bz-icon-shown"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
-              strokeWidth="1.8"
+              strokeWidth="1.9"
               strokeLinecap="round"
               strokeLinejoin="round"
-              style={{ width: "55%", height: "55%" }}
+              aria-hidden="true"
             >
               <path d="M11 5 6 9H2v6h4l5 4V5z" />
-              <line x1="23" y1="9" x2="17" y2="15" />
-              <line x1="17" y1="9" x2="23" y2="15" />
+              <line x1="22" y1="9" x2="16" y2="15" />
+              <line x1="16" y1="9" x2="22" y2="15" />
             </svg>
+
+            {/* Sound ON icon */}
             <svg
               id="binzeo-sound-on-icon"
+              className="bz-icon-hidden"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
-              strokeWidth="1.8"
+              strokeWidth="1.9"
               strokeLinecap="round"
               strokeLinejoin="round"
-              style={{ width: "55%", height: "55%", display: "none" }}
+              aria-hidden="true"
             >
               <path d="M11 5 6 9H2v6h4l5 4V5z" />
               <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
@@ -1310,17 +1403,9 @@ export default async function HomePage() {
                     color: "#0a0a0a",
                   }}
                 >
-                  <Words
-                    words={["Protection", "that"]}
-                    delayBase={0.15}
-                    stagger={0.1}
-                  />
+                  <Words words={["Protection", "that"]} delayBase={0.15} stagger={0.1} />
                   <br />
-                  <Words
-                    words={["feels", "personal."]}
-                    delayBase={0.35}
-                    stagger={0.1}
-                  />
+                  <Words words={["feels", "personal."]} delayBase={0.35} stagger={0.1} />
                 </h2>
 
                 <p
@@ -1512,17 +1597,9 @@ export default async function HomePage() {
                     color: "#0a0a0a",
                   }}
                 >
-                  <Words
-                    words={["A", "companion", "for"]}
-                    delayBase={0.15}
-                    stagger={0.09}
-                  />
+                  <Words words={["A", "companion", "for"]} delayBase={0.15} stagger={0.09} />
                   <br />
-                  <Words
-                    words={["every", "day."]}
-                    delayBase={0.38}
-                    stagger={0.1}
-                  />
+                  <Words words={["every", "day."]} delayBase={0.38} stagger={0.1} />
                 </h2>
 
                 <p
@@ -1672,26 +1749,68 @@ export default async function HomePage() {
         dangerouslySetInnerHTML={{
           __html: `
             (function() {
+
+              /* ---------- VIDEO SOUND TOGGLE + AUTO-MUTE ON SCROLL ---------- */
               var v = document.getElementById('binzeo-setup-video');
               var b = document.getElementById('binzeo-video-sound-toggle');
               var on = document.getElementById('binzeo-sound-on-icon');
               var off = document.getElementById('binzeo-sound-off-icon');
+              var videoSection = document.getElementById('binzeo-video-section');
+
+              function setMutedUI(muted) {
+                if (!on || !off) return;
+                if (muted) {
+                  on.classList.add('bz-icon-hidden');
+                  on.classList.remove('bz-icon-shown');
+                  off.classList.add('bz-icon-shown');
+                  off.classList.remove('bz-icon-hidden');
+                  b.setAttribute('aria-label', 'Turn sound on');
+                  b.setAttribute('title', 'Turn sound on');
+                } else {
+                  off.classList.add('bz-icon-hidden');
+                  off.classList.remove('bz-icon-shown');
+                  on.classList.add('bz-icon-shown');
+                  on.classList.remove('bz-icon-hidden');
+                  b.setAttribute('aria-label', 'Turn sound off');
+                  b.setAttribute('title', 'Turn sound off');
+                }
+              }
+
               if (v && b && on && off) {
                 v.muted = true;
+                setMutedUI(true);
+
                 b.addEventListener('click', function() {
                   v.muted = !v.muted;
-                  if (v.muted) {
-                    on.style.display = 'none';
-                    off.style.display = 'block';
-                    b.setAttribute('aria-label', 'Turn sound on');
-                  } else {
-                    on.style.display = 'block';
-                    off.style.display = 'none';
-                    b.setAttribute('aria-label', 'Turn sound off');
+                  setMutedUI(v.muted);
+                });
+
+                /* Auto-mute when video section leaves viewport */
+                if ('IntersectionObserver' in window && videoSection) {
+                  var vIO = new IntersectionObserver(
+                    function(entries) {
+                      entries.forEach(function(entry) {
+                        if (!entry.isIntersecting && !v.muted) {
+                          v.muted = true;
+                          setMutedUI(true);
+                        }
+                      });
+                    },
+                    { threshold: 0.35 }
+                  );
+                  vIO.observe(videoSection);
+                }
+
+                /* Fallback: also handle tab visibility */
+                document.addEventListener('visibilitychange', function() {
+                  if (document.hidden && !v.muted) {
+                    v.muted = true;
+                    setMutedUI(true);
                   }
                 });
               }
 
+              /* ---------- SCROLL-TRIGGERED CINEMATIC REVEALS ---------- */
               function revealAll() {
                 document
                   .querySelectorAll('[data-reveal], [data-reveal-group]')
