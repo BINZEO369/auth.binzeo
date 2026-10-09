@@ -10,6 +10,75 @@ const partnerLogos = [
   { src: "/images/bcloudlogo.png", alt: "Bcloud" },
 ];
 
+/* ================================================================== */
+/*  Cinematic text helper — splits text into letter spans             */
+/* ================================================================== */
+function Letters({
+  text,
+  delayBase = 0,
+  stagger = 0.035,
+  className = "",
+  letterClassName = "",
+}: {
+  text: string;
+  delayBase?: number;
+  stagger?: number;
+  className?: string;
+  letterClassName?: string;
+}) {
+  return (
+    <span className={className}>
+      {text.split("").map((ch, i) => (
+        <span
+          key={i}
+          className={`inline-block ${letterClassName}`}
+          style={{
+            animation: `bz-letter-in 0.9s cubic-bezier(0.22, 1, 0.36, 1) ${
+              delayBase + i * stagger
+            }s both`,
+            whiteSpace: ch === " " ? "pre" : undefined,
+          }}
+        >
+          {ch === " " ? "\u00A0" : ch}
+        </span>
+      ))}
+    </span>
+  );
+}
+
+/* ================================================================== */
+/*  Cinematic word reveal                                             */
+/* ================================================================== */
+function Words({
+  words,
+  delayBase = 0,
+  stagger = 0.08,
+  className = "",
+}: {
+  words: string[];
+  delayBase?: number;
+  stagger?: number;
+  className?: string;
+}) {
+  return (
+    <span className={className}>
+      {words.map((w, i) => (
+        <span
+          key={i}
+          className="inline-block"
+          style={{
+            animation: `bz-word-in 1s cubic-bezier(0.22, 1, 0.36, 1) ${
+              delayBase + i * stagger
+            }s both`,
+          }}
+        >
+          {w}&nbsp;
+        </span>
+      ))}
+    </span>
+  );
+}
+
 export default async function HomePage() {
   const supabase = await createClient();
   const {
@@ -18,8 +87,14 @@ export default async function HomePage() {
   const isLoggedIn = Boolean(user);
 
   return (
-    <main className="reference-home" style={{ backgroundColor: "#0a0a0a" }}>
+    <main
+      className="reference-home"
+      style={{ backgroundColor: "#f7f7f5" }}
+    >
       <style>{`
+        /* ============================================================ */
+        /*  CINEMATIC ANIMATIONS                                          */
+        /* ============================================================ */
         @keyframes bz-fade-up {
           from { opacity: 0; transform: translateY(28px); filter: blur(10px); }
           to   { opacity: 1; transform: translateY(0); filter: blur(0); }
@@ -28,21 +103,35 @@ export default async function HomePage() {
           from { opacity: 0; }
           to   { opacity: 1; }
         }
+        @keyframes bz-letter-in {
+          0%   { opacity: 0; transform: translateY(60%) rotateX(-45deg) scale(1.1); filter: blur(12px); }
+          55%  { opacity: 1; filter: blur(0); }
+          100% { opacity: 1; transform: translateY(0) rotateX(0deg) scale(1); filter: blur(0); }
+        }
+        @keyframes bz-word-in {
+          0%   { opacity: 0; transform: translateY(50%) scale(0.96); filter: blur(14px); }
+          60%  { opacity: 1; filter: blur(0); }
+          100% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+        }
         @keyframes bz-title-in {
-          from { opacity: 0; transform: translateY(40px) scale(0.98); filter: blur(14px); }
-          to   { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+          0%   { opacity: 0; transform: translateY(40px) scale(0.98); filter: blur(14px); }
+          100% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
         }
         @keyframes bz-logo-in {
-          from { opacity: 0; transform: scale(0.9) translateY(20px); filter: blur(12px); }
-          to   { opacity: 1; transform: scale(1) translateY(0); filter: blur(0); }
+          0%   { opacity: 0; transform: scale(0.9) translateY(20px); filter: blur(12px); }
+          100% { opacity: 1; transform: scale(1) translateY(0); filter: blur(0); }
         }
         @keyframes bz-kenburns {
           0%, 100% { transform: scale(1.05) translate(0, 0); }
           50%      { transform: scale(1.15) translate(-1.5%, -1%); }
         }
+        @keyframes bz-float-soft {
+          0%, 100% { transform: translateY(0); }
+          50%      { transform: translateY(-6px); }
+        }
 
         /* ============================================================ */
-        /*  LIQUID MERGE — Soft shadow between sections                  */
+        /*  LIQUID MERGE — Soft shadows & transitions                     */
         /* ============================================================ */
 
         .liquid-section {
@@ -50,21 +139,16 @@ export default async function HomePage() {
           isolation: isolate;
         }
 
-        /* Soft shadow at the TOP of a section — like the section is resting on the previous */
         .liquid-shadow-top {
-          box-shadow: inset 0 40px 60px -40px rgba(0, 0, 0, 0.18);
+          box-shadow: inset 0 60px 80px -50px rgba(0, 0, 0, 0.20);
         }
-
-        /* Soft shadow at the BOTTOM — section blends into the next */
         .liquid-shadow-bottom {
-          box-shadow: inset 0 -40px 60px -40px rgba(0, 0, 0, 0.18);
+          box-shadow: inset 0 -60px 80px -50px rgba(0, 0, 0, 0.20);
         }
-
-        /* Both top & bottom — for middle sections */
         .liquid-shadow-both {
           box-shadow:
-            inset 0 40px 60px -40px rgba(0, 0, 0, 0.15),
-            inset 0 -40px 60px -40px rgba(0, 0, 0, 0.15);
+            inset 0 60px 80px -50px rgba(0, 0, 0, 0.15),
+            inset 0 -60px 80px -50px rgba(0, 0, 0, 0.15);
         }
 
         /* ============================================================ */
@@ -148,9 +232,6 @@ export default async function HomePage() {
           .phone-case-seam {
             height: 40px !important;
           }
-          .phone-case-seam-line {
-            width: 40px !important;
-          }
           .liquid-shadow-top,
           .liquid-shadow-bottom,
           .liquid-shadow-both {
@@ -160,28 +241,18 @@ export default async function HomePage() {
 
         @media (max-width: 380px) {
           .phone-case-1-grid,
-          .phone-case-4-grid {
-            grid-template-columns: 40% 60%;
-          }
+          .phone-case-4-grid { grid-template-columns: 40% 60%; }
           .phone-case-2-grid,
-          .phone-case-5-grid {
-            grid-template-columns: 60% 40%;
-          }
-          .phone-case-text-content {
-            padding: 24px 14px !important;
-          }
-          .phone-case-title {
-            font-size: 22px !important;
-          }
-          .phone-case-desc {
-            font-size: 11px !important;
-          }
+          .phone-case-5-grid { grid-template-columns: 60% 40%; }
+          .phone-case-text-content { padding: 24px 14px !important; }
+          .phone-case-title { font-size: 22px !important; }
+          .phone-case-desc { font-size: 11px !important; }
         }
       `}</style>
 
       <div className="reference-shell">
         {/* ============================================================ */}
-        {/*  1. HERO BANNER — dark image, fades to light gray at bottom   */}
+        {/*  1. HERO BANNER                                                */}
         {/* ============================================================ */}
         <section
           className="liquid-section"
@@ -221,6 +292,7 @@ export default async function HomePage() {
               margin: "0 auto",
               padding: "clamp(20px, 4vw, 48px)",
               textAlign: "center",
+              perspective: "1000px",
             }}
           >
             <div
@@ -249,6 +321,7 @@ export default async function HomePage() {
               />
             </div>
 
+            {/* "Own your" — word by word */}
             <p
               style={{
                 margin: "0 0 clamp(12px, 1.8vh, 22px)",
@@ -256,13 +329,12 @@ export default async function HomePage() {
                 fontWeight: 400,
                 color: "rgba(0,0,0,0.65)",
                 letterSpacing: "-0.01em",
-                animation:
-                  "bz-fade-up 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.3s both",
               }}
             >
-              Own your
+              <Words words={["Own", "your"]} delayBase={0.35} stagger={0.12} />
             </p>
 
+            {/* "Identity" — letter by letter cinematic */}
             <h1
               style={{
                 margin: 0,
@@ -271,13 +343,17 @@ export default async function HomePage() {
                 letterSpacing: "-0.06em",
                 fontWeight: 600,
                 color: "#0a0a0a",
-                animation:
-                  "bz-title-in 1.1s cubic-bezier(0.22, 1, 0.36, 1) 0.45s both",
+                transformStyle: "preserve-3d",
               }}
             >
-              Identity
+              <Letters
+                text="Identity"
+                delayBase={0.55}
+                stagger={0.05}
+              />
             </h1>
 
+            {/* "that feels like home." — word by word */}
             <p
               style={{
                 margin: "clamp(12px, 1.6vh, 22px) 0 0",
@@ -285,11 +361,13 @@ export default async function HomePage() {
                 fontWeight: 400,
                 color: "rgba(0,0,0,0.7)",
                 letterSpacing: "-0.015em",
-                animation:
-                  "bz-fade-up 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.65s both",
               }}
             >
-              that feels like home.
+              <Words
+                words={["that", "feels", "like", "home."]}
+                delayBase={1.15}
+                stagger={0.09}
+              />
             </p>
 
             <p
@@ -300,7 +378,7 @@ export default async function HomePage() {
                 lineHeight: 1.6,
                 color: "rgba(0,0,0,0.65)",
                 animation:
-                  "bz-fade-up 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.85s both",
+                  "bz-fade-up 1.1s cubic-bezier(0.22, 1, 0.36, 1) 1.7s both",
               }}
             >
               A quieter, safer way to hold your digital self. One secure
@@ -315,7 +393,7 @@ export default async function HomePage() {
                 justifyContent: "center",
                 gap: "12px",
                 animation:
-                  "bz-fade-up 0.9s cubic-bezier(0.22, 1, 0.36, 1) 1.05s both",
+                  "bz-fade-up 0.9s cubic-bezier(0.22, 1, 0.36, 1) 1.95s both",
               }}
             >
               <Link
@@ -354,10 +432,10 @@ export default async function HomePage() {
                 justifyContent: "center",
                 gap: "clamp(10px, 1.6vw, 20px)",
                 animation:
-                  "bz-fade-in 1.2s cubic-bezier(0.22, 1, 0.36, 1) 1.3s both",
+                  "bz-fade-in 1.2s cubic-bezier(0.22, 1, 0.36, 1) 2.15s both",
               }}
             >
-              {partnerLogos.map((logo) => (
+              {partnerLogos.map((logo, i) => (
                 <div
                   key={logo.alt}
                   style={{
@@ -375,6 +453,9 @@ export default async function HomePage() {
                       "inset 0 1px 0 0 rgba(255,255,255,1), 0 6px 18px -8px rgba(0,0,0,0.15)",
                     padding: "clamp(5px, 0.6vw, 8px)",
                     flexShrink: 0,
+                    animation: `bz-logo-in 0.8s cubic-bezier(0.22, 1, 0.36, 1) ${
+                      2.15 + i * 0.08
+                    }s both`,
                   }}
                   title={logo.alt}
                 >
@@ -394,7 +475,7 @@ export default async function HomePage() {
             </div>
           </div>
 
-          {/* 🌊 Bottom fade — dark → light gray (liquid merge into Wrapper 1) */}
+          {/* 🌊 Bottom fade — dark → light gray */}
           <div
             aria-hidden="true"
             style={{
@@ -402,9 +483,9 @@ export default async function HomePage() {
               bottom: 0,
               left: 0,
               right: 0,
-              height: "180px",
+              height: "200px",
               background:
-                "linear-gradient(180deg, rgba(247,247,245,0) 0%, rgba(247,247,245,0.4) 45%, rgba(247,247,245,0.95) 85%, rgba(247,247,245,1) 100%)",
+                "linear-gradient(180deg, rgba(247,247,245,0) 0%, rgba(247,247,245,0.2) 30%, rgba(247,247,245,0.7) 65%, rgba(247,247,245,0.97) 90%, rgba(247,247,245,1) 100%)",
               pointerEvents: "none",
               zIndex: 3,
             }}
@@ -413,7 +494,6 @@ export default async function HomePage() {
 
         {/* ============================================================ */}
         {/*  2. WRAPPER 1 — Case 1 + Seam + Case 2                        */}
-        {/*  Shadow at top & bottom — liquid rest                          */}
         {/* ============================================================ */}
         <div
           className="liquid-section liquid-shadow-both"
@@ -426,21 +506,6 @@ export default async function HomePage() {
             overflow: "hidden",
           }}
         >
-          {/* 🌊 Top fade — dark from Hero smoothly blends */}
-          <div
-            aria-hidden="true"
-            style={{
-              position: "absolute",
-              top: 0,
-              left: 0,
-              right: 0,
-              height: "1px",
-              background: "rgba(247,247,245,1)",
-              pointerEvents: "none",
-              zIndex: 3,
-            }}
-          />
-
           {/* PHONE CASE 1 — IMAGE LEFT + TEXT RIGHT */}
           <section className="phone-case-1-grid">
             {/* LEFT — IMAGE */}
@@ -450,8 +515,6 @@ export default async function HomePage() {
                 position: "relative",
                 overflow: "hidden",
                 backgroundColor: "#0a0a0a",
-                animation:
-                  "bz-fade-in 1.2s cubic-bezier(0.22, 1, 0.36, 1) 0.2s both",
               }}
             >
               <img
@@ -474,9 +537,9 @@ export default async function HomePage() {
                   top: 0,
                   right: 0,
                   bottom: 0,
-                  width: "80px",
+                  width: "120px",
                   background:
-                    "linear-gradient(270deg, rgba(247,247,245,1) 0%, rgba(247,247,245,0) 100%)",
+                    "linear-gradient(270deg, rgba(247,247,245,1) 0%, rgba(247,247,245,0.7) 40%, rgba(247,247,245,0) 100%)",
                   pointerEvents: "none",
                 }}
               />
@@ -487,9 +550,22 @@ export default async function HomePage() {
                   bottom: 0,
                   left: 0,
                   right: 0,
-                  height: "35%",
+                  height: "45%",
                   background:
-                    "linear-gradient(0deg, rgba(247,247,245,1) 0%, rgba(247,247,245,0.6) 40%, rgba(247,247,245,0) 100%)",
+                    "linear-gradient(0deg, rgba(247,247,245,1) 0%, rgba(247,247,245,0.7) 35%, rgba(247,247,245,0) 100%)",
+                  pointerEvents: "none",
+                }}
+              />
+              <div
+                aria-hidden="true"
+                style={{
+                  position: "absolute",
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  height: "25%",
+                  background:
+                    "linear-gradient(180deg, rgba(247,247,245,0.9) 0%, rgba(247,247,245,0) 100%)",
                   pointerEvents: "none",
                 }}
               />
@@ -506,6 +582,7 @@ export default async function HomePage() {
                 padding: "clamp(32px, 6vw, 96px) clamp(20px, 4vw, 72px)",
                 backgroundColor: "#f7f7f5",
                 zIndex: 2,
+                perspective: "1000px",
               }}
             >
               <div style={{ maxWidth: "560px", width: "100%" }}>
@@ -539,11 +616,13 @@ export default async function HomePage() {
                       height: "5px",
                       borderRadius: "999px",
                       backgroundColor: "#111",
+                      animation: "bz-float-soft 2.4s ease-in-out infinite",
                     }}
                   />
                   Carry it with you
                 </div>
 
+                {/* Cinematic title — word reveal */}
                 <h2
                   className="phone-case-title"
                   style={{
@@ -553,13 +632,19 @@ export default async function HomePage() {
                     letterSpacing: "-0.045em",
                     fontWeight: 600,
                     color: "#0a0a0a",
-                    animation:
-                      "bz-fade-up 1s cubic-bezier(0.22, 1, 0.36, 1) 0.3s both",
                   }}
                 >
-                  Your identity,
+                  <Words
+                    words={["Your", "identity,"]}
+                    delayBase={0.3}
+                    stagger={0.12}
+                  />
                   <br />
-                  in your pocket.
+                  <Words
+                    words={["in", "your", "pocket."]}
+                    delayBase={0.55}
+                    stagger={0.12}
+                  />
                 </h2>
 
                 <p
@@ -571,7 +656,7 @@ export default async function HomePage() {
                     color: "rgba(0,0,0,0.65)",
                     maxWidth: "480px",
                     animation:
-                      "bz-fade-up 1s cubic-bezier(0.22, 1, 0.36, 1) 0.45s both",
+                      "bz-fade-up 1s cubic-bezier(0.22, 1, 0.36, 1) 0.95s both",
                   }}
                 >
                   BINZEO is designed to live where you do — a calm, secure
@@ -588,15 +673,13 @@ export default async function HomePage() {
                     display: "flex",
                     flexDirection: "column",
                     gap: "clamp(8px, 1.4vh, 14px)",
-                    animation:
-                      "bz-fade-up 1s cubic-bezier(0.22, 1, 0.36, 1) 0.6s both",
                   }}
                 >
                   {[
                     "One-tap access, always available",
                     "Designed for how you actually live",
                     "Smooth on every device you own",
-                  ].map((item) => (
+                  ].map((item, i) => (
                     <li
                       key={item}
                       style={{
@@ -605,6 +688,9 @@ export default async function HomePage() {
                         gap: "10px",
                         fontSize: "clamp(11.5px, 1.1vw, 15px)",
                         color: "rgba(0,0,0,0.7)",
+                        animation: `bz-fade-up 0.8s cubic-bezier(0.22, 1, 0.36, 1) ${
+                          1.1 + i * 0.1
+                        }s both`,
                       }}
                     >
                       <span
@@ -632,7 +718,7 @@ export default async function HomePage() {
                 <div
                   style={{
                     animation:
-                      "bz-fade-up 1s cubic-bezier(0.22, 1, 0.36, 1) 0.75s both",
+                      "bz-fade-up 1s cubic-bezier(0.22, 1, 0.36, 1) 1.5s both",
                   }}
                 >
                   <Link
@@ -663,7 +749,7 @@ export default async function HomePage() {
             </div>
           </section>
 
-          {/* SEAM between Case 1 & Case 2 — soft liquid divider */}
+          {/* SEAM */}
           <div
             aria-hidden="true"
             className="phone-case-seam"
@@ -676,7 +762,6 @@ export default async function HomePage() {
               zIndex: 3,
             }}
           >
-            {/* Soft center dot only — no harsh line */}
             <div
               style={{
                 position: "absolute",
@@ -706,6 +791,7 @@ export default async function HomePage() {
                 padding: "clamp(32px, 6vw, 96px) clamp(20px, 4vw, 72px)",
                 backgroundColor: "#f7f7f5",
                 zIndex: 2,
+                perspective: "1000px",
               }}
             >
               <div style={{ maxWidth: "560px", width: "100%" }}>
@@ -739,6 +825,7 @@ export default async function HomePage() {
                       height: "5px",
                       borderRadius: "999px",
                       backgroundColor: "#111",
+                      animation: "bz-float-soft 2.4s ease-in-out infinite",
                     }}
                   />
                   Built for every device
@@ -753,13 +840,19 @@ export default async function HomePage() {
                     letterSpacing: "-0.045em",
                     fontWeight: 600,
                     color: "#0a0a0a",
-                    animation:
-                      "bz-fade-up 1s cubic-bezier(0.22, 1, 0.36, 1) 0.3s both",
                   }}
                 >
-                  One identity.
+                  <Words
+                    words={["One", "identity."]}
+                    delayBase={0.3}
+                    stagger={0.12}
+                  />
                   <br />
-                  Every screen you own.
+                  <Words
+                    words={["Every", "screen", "you", "own."]}
+                    delayBase={0.55}
+                    stagger={0.1}
+                  />
                 </h2>
 
                 <p
@@ -771,7 +864,7 @@ export default async function HomePage() {
                     color: "rgba(0,0,0,0.65)",
                     maxWidth: "480px",
                     animation:
-                      "bz-fade-up 1s cubic-bezier(0.22, 1, 0.36, 1) 0.45s both",
+                      "bz-fade-up 1s cubic-bezier(0.22, 1, 0.36, 1) 1.05s both",
                   }}
                 >
                   Whether you&apos;re on your phone, tablet, laptop, or the web
@@ -789,15 +882,13 @@ export default async function HomePage() {
                     display: "flex",
                     flexDirection: "column",
                     gap: "clamp(8px, 1.4vh, 14px)",
-                    animation:
-                      "bz-fade-up 1s cubic-bezier(0.22, 1, 0.36, 1) 0.6s both",
                   }}
                 >
                   {[
                     "Instant sign-in with passkeys",
                     "Consistent across iOS, Android & web",
                     "Your data, always in sync",
-                  ].map((item) => (
+                  ].map((item, i) => (
                     <li
                       key={item}
                       style={{
@@ -806,6 +897,9 @@ export default async function HomePage() {
                         gap: "10px",
                         fontSize: "clamp(11.5px, 1.1vw, 15px)",
                         color: "rgba(0,0,0,0.7)",
+                        animation: `bz-fade-up 0.8s cubic-bezier(0.22, 1, 0.36, 1) ${
+                          1.2 + i * 0.1
+                        }s both`,
                       }}
                     >
                       <span
@@ -833,7 +927,7 @@ export default async function HomePage() {
                 <div
                   style={{
                     animation:
-                      "bz-fade-up 1s cubic-bezier(0.22, 1, 0.36, 1) 0.75s both",
+                      "bz-fade-up 1s cubic-bezier(0.22, 1, 0.36, 1) 1.6s both",
                   }}
                 >
                   <Link
@@ -870,8 +964,6 @@ export default async function HomePage() {
                 position: "relative",
                 overflow: "hidden",
                 backgroundColor: "#0a0a0a",
-                animation:
-                  "bz-fade-in 1.2s cubic-bezier(0.22, 1, 0.36, 1) 0.2s both",
               }}
             >
               <img
@@ -894,9 +986,9 @@ export default async function HomePage() {
                   top: 0,
                   left: 0,
                   bottom: 0,
-                  width: "80px",
+                  width: "120px",
                   background:
-                    "linear-gradient(90deg, rgba(247,247,245,1) 0%, rgba(247,247,245,0) 100%)",
+                    "linear-gradient(90deg, rgba(247,247,245,1) 0%, rgba(247,247,245,0.7) 40%, rgba(247,247,245,0) 100%)",
                   pointerEvents: "none",
                 }}
               />
@@ -929,7 +1021,7 @@ export default async function HomePage() {
             </div>
           </section>
 
-          {/* 🌊 Bottom fade — light gray → dark (liquid merge into Case 3) */}
+          {/* 🌊 Bottom fade — light gray → dark */}
           <div
             aria-hidden="true"
             style={{
@@ -937,9 +1029,9 @@ export default async function HomePage() {
               bottom: 0,
               left: 0,
               right: 0,
-              height: "180px",
+              height: "200px",
               background:
-                "linear-gradient(0deg, rgba(10,10,10,0) 0%, rgba(10,10,10,0.3) 45%, rgba(10,10,10,0.85) 85%, rgba(10,10,10,1) 100%)",
+                "linear-gradient(0deg, rgba(10,10,10,0.98) 0%, rgba(10,10,10,0.85) 25%, rgba(10,10,10,0.4) 55%, rgba(10,10,10,0) 100%)",
               pointerEvents: "none",
               zIndex: 5,
             }}
@@ -948,7 +1040,6 @@ export default async function HomePage() {
 
         {/* ============================================================ */}
         {/*  3. PHONE CASE 3 — full-screen image                           */}
-        {/*  Top shadow + liquid fade from above                           */}
         {/* ============================================================ */}
         <section
           className="liquid-section liquid-shadow-top"
@@ -979,8 +1070,6 @@ export default async function HomePage() {
               display: "block",
             }}
           />
-
-          {/* 🌊 Top fade — light gray from above smoothly blends */}
           <div
             aria-hidden="true"
             style={{
@@ -988,15 +1077,13 @@ export default async function HomePage() {
               top: 0,
               left: 0,
               right: 0,
-              height: "140px",
+              height: "150px",
               background:
-                "linear-gradient(180deg, rgba(247,247,245,0.9) 0%, rgba(247,247,245,0.5) 45%, rgba(247,247,245,0) 100%)",
+                "linear-gradient(180deg, rgba(247,247,245,0.85) 0%, rgba(247,247,245,0.4) 45%, rgba(247,247,245,0) 100%)",
               pointerEvents: "none",
               zIndex: 2,
             }}
           />
-
-          {/* 🌊 Bottom fade — dark → white (liquid merge into Video) */}
           <div
             aria-hidden="true"
             style={{
@@ -1004,7 +1091,7 @@ export default async function HomePage() {
               bottom: 0,
               left: 0,
               right: 0,
-              height: "180px",
+              height: "200px",
               background:
                 "linear-gradient(0deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.5) 45%, rgba(255,255,255,0) 100%)",
               pointerEvents: "none",
@@ -1014,8 +1101,7 @@ export default async function HomePage() {
         </section>
 
         {/* ============================================================ */}
-        {/*  4. SETUP GUIDE VIDEO — white background, muted autoplay       */}
-        {/*  Top shadow + liquid fades                                     */}
+        {/*  4. SETUP GUIDE VIDEO                                          */}
         {/* ============================================================ */}
         <section
           className="liquid-section liquid-shadow-top"
@@ -1056,7 +1142,6 @@ export default async function HomePage() {
             <source src="/videos/vid1.mp4" type="video/mp4" />
           </video>
 
-          {/* 🌊 Top fade — dark from Case 3 */}
           <div
             aria-hidden="true"
             style={{
@@ -1064,15 +1149,13 @@ export default async function HomePage() {
               top: 0,
               left: 0,
               right: 0,
-              height: "140px",
+              height: "150px",
               background:
                 "linear-gradient(180deg, rgba(10,10,10,0.75) 0%, rgba(10,10,10,0.35) 45%, rgba(10,10,10,0) 100%)",
               pointerEvents: "none",
               zIndex: 2,
             }}
           />
-
-          {/* 🌊 Bottom fade — white → light gray (into Case 4) */}
           <div
             aria-hidden="true"
             style={{
@@ -1080,15 +1163,14 @@ export default async function HomePage() {
               bottom: 0,
               left: 0,
               right: 0,
-              height: "180px",
+              height: "200px",
               background:
-                "linear-gradient(0deg, rgba(247,247,245,1) 0%, rgba(247,247,245,0.5) 45%, rgba(247,247,245,0) 100%)",
+                "linear-gradient(0deg, rgba(247,247,245,0.98) 0%, rgba(247,247,245,0.5) 45%, rgba(247,247,245,0) 100%)",
               pointerEvents: "none",
               zIndex: 2,
             }}
           />
 
-          {/* SOUND TOGGLE BUTTON */}
           <button
             id="binzeo-video-sound-toggle"
             type="button"
@@ -1180,7 +1262,7 @@ export default async function HomePage() {
         {/*  5. WRAPPER 2 — Case 4 + Seam + Case 5                        */}
         {/* ============================================================ */}
         <div
-          className="liquid-section liquid-shadow-top"
+          className="liquid-section"
           style={{
             position: "relative",
             width: "100vw",
@@ -1188,6 +1270,7 @@ export default async function HomePage() {
             marginRight: "calc(-50vw + 50%)",
             backgroundColor: "#f7f7f5",
             overflow: "hidden",
+            paddingBottom: 0,
           }}
         >
           {/* PHONE CASE 4 — IMAGE LEFT + TEXT RIGHT */}
@@ -1198,8 +1281,6 @@ export default async function HomePage() {
                 position: "relative",
                 overflow: "hidden",
                 backgroundColor: "#0a0a0a",
-                animation:
-                  "bz-fade-in 1.2s cubic-bezier(0.22, 1, 0.36, 1) 0.2s both",
               }}
             >
               <img
@@ -1222,9 +1303,9 @@ export default async function HomePage() {
                   top: 0,
                   right: 0,
                   bottom: 0,
-                  width: "80px",
+                  width: "120px",
                   background:
-                    "linear-gradient(270deg, rgba(247,247,245,1) 0%, rgba(247,247,245,0) 100%)",
+                    "linear-gradient(270deg, rgba(247,247,245,1) 0%, rgba(247,247,245,0.7) 40%, rgba(247,247,245,0) 100%)",
                   pointerEvents: "none",
                 }}
               />
@@ -1235,9 +1316,9 @@ export default async function HomePage() {
                   bottom: 0,
                   left: 0,
                   right: 0,
-                  height: "35%",
+                  height: "45%",
                   background:
-                    "linear-gradient(0deg, rgba(247,247,245,1) 0%, rgba(247,247,245,0.6) 40%, rgba(247,247,245,0) 100%)",
+                    "linear-gradient(0deg, rgba(247,247,245,1) 0%, rgba(247,247,245,0.7) 35%, rgba(247,247,245,0) 100%)",
                   pointerEvents: "none",
                 }}
               />
@@ -1248,9 +1329,9 @@ export default async function HomePage() {
                   top: 0,
                   left: 0,
                   right: 0,
-                  height: "20%",
+                  height: "25%",
                   background:
-                    "linear-gradient(180deg, rgba(247,247,245,0.95) 0%, rgba(247,247,245,0.4) 50%, rgba(247,247,245,0) 100%)",
+                    "linear-gradient(180deg, rgba(247,247,245,0.9) 0%, rgba(247,247,245,0) 100%)",
                   pointerEvents: "none",
                 }}
               />
@@ -1266,6 +1347,7 @@ export default async function HomePage() {
                 padding: "clamp(32px, 6vw, 96px) clamp(20px, 4vw, 72px)",
                 backgroundColor: "#f7f7f5",
                 zIndex: 2,
+                perspective: "1000px",
               }}
             >
               <div style={{ maxWidth: "560px", width: "100%" }}>
@@ -1299,6 +1381,7 @@ export default async function HomePage() {
                       height: "5px",
                       borderRadius: "999px",
                       backgroundColor: "#111",
+                      animation: "bz-float-soft 2.4s ease-in-out infinite",
                     }}
                   />
                   Crafted for you
@@ -1313,13 +1396,19 @@ export default async function HomePage() {
                     letterSpacing: "-0.045em",
                     fontWeight: 600,
                     color: "#0a0a0a",
-                    animation:
-                      "bz-fade-up 1s cubic-bezier(0.22, 1, 0.36, 1) 0.3s both",
                   }}
                 >
-                  Protection that
+                  <Words
+                    words={["Protection", "that"]}
+                    delayBase={0.3}
+                    stagger={0.12}
+                  />
                   <br />
-                  feels personal.
+                  <Words
+                    words={["feels", "personal."]}
+                    delayBase={0.55}
+                    stagger={0.12}
+                  />
                 </h2>
 
                 <p
@@ -1331,7 +1420,7 @@ export default async function HomePage() {
                     color: "rgba(0,0,0,0.65)",
                     maxWidth: "480px",
                     animation:
-                      "bz-fade-up 1s cubic-bezier(0.22, 1, 0.36, 1) 0.45s both",
+                      "bz-fade-up 1s cubic-bezier(0.22, 1, 0.36, 1) 0.95s both",
                   }}
                 >
                   Every BINZEO case is designed with the same care we bring to
@@ -1348,15 +1437,13 @@ export default async function HomePage() {
                     display: "flex",
                     flexDirection: "column",
                     gap: "clamp(8px, 1.4vh, 14px)",
-                    animation:
-                      "bz-fade-up 1s cubic-bezier(0.22, 1, 0.36, 1) 0.6s both",
                   }}
                 >
                   {[
                     "Premium materials, everyday durability",
                     "Precision-engineered for a perfect fit",
                     "Designed to feel as good as it looks",
-                  ].map((item) => (
+                  ].map((item, i) => (
                     <li
                       key={item}
                       style={{
@@ -1365,6 +1452,9 @@ export default async function HomePage() {
                         gap: "10px",
                         fontSize: "clamp(11.5px, 1.1vw, 15px)",
                         color: "rgba(0,0,0,0.7)",
+                        animation: `bz-fade-up 0.8s cubic-bezier(0.22, 1, 0.36, 1) ${
+                          1.1 + i * 0.1
+                        }s both`,
                       }}
                     >
                       <span
@@ -1392,7 +1482,7 @@ export default async function HomePage() {
                 <div
                   style={{
                     animation:
-                      "bz-fade-up 1s cubic-bezier(0.22, 1, 0.36, 1) 0.75s both",
+                      "bz-fade-up 1s cubic-bezier(0.22, 1, 0.36, 1) 1.5s both",
                   }}
                 >
                   <Link
@@ -1423,7 +1513,7 @@ export default async function HomePage() {
             </div>
           </section>
 
-          {/* SEAM between Case 4 & Case 5 — soft liquid divider */}
+          {/* SEAM */}
           <div
             aria-hidden="true"
             className="phone-case-seam"
@@ -1464,6 +1554,7 @@ export default async function HomePage() {
                 padding: "clamp(32px, 6vw, 96px) clamp(20px, 4vw, 72px)",
                 backgroundColor: "#f7f7f5",
                 zIndex: 2,
+                perspective: "1000px",
               }}
             >
               <div style={{ maxWidth: "560px", width: "100%" }}>
@@ -1497,6 +1588,7 @@ export default async function HomePage() {
                       height: "5px",
                       borderRadius: "999px",
                       backgroundColor: "#111",
+                      animation: "bz-float-soft 2.4s ease-in-out infinite",
                     }}
                   />
                   Made to last
@@ -1511,13 +1603,19 @@ export default async function HomePage() {
                     letterSpacing: "-0.045em",
                     fontWeight: 600,
                     color: "#0a0a0a",
-                    animation:
-                      "bz-fade-up 1s cubic-bezier(0.22, 1, 0.36, 1) 0.3s both",
                   }}
                 >
-                  A companion for
+                  <Words
+                    words={["A", "companion", "for"]}
+                    delayBase={0.3}
+                    stagger={0.12}
+                  />
                   <br />
-                  every day.
+                  <Words
+                    words={["every", "day."]}
+                    delayBase={0.65}
+                    stagger={0.12}
+                  />
                 </h2>
 
                 <p
@@ -1529,7 +1627,7 @@ export default async function HomePage() {
                     color: "rgba(0,0,0,0.65)",
                     maxWidth: "480px",
                     animation:
-                      "bz-fade-up 1s cubic-bezier(0.22, 1, 0.36, 1) 0.45s both",
+                      "bz-fade-up 1s cubic-bezier(0.22, 1, 0.36, 1) 1.05s both",
                   }}
                 >
                   Carry your identity with quiet confidence. BINZEO cases
@@ -1545,15 +1643,13 @@ export default async function HomePage() {
                     display: "flex",
                     flexDirection: "column",
                     gap: "clamp(8px, 1.4vh, 14px)",
-                    animation:
-                      "bz-fade-up 1s cubic-bezier(0.22, 1, 0.36, 1) 0.6s both",
                   }}
                 >
                   {[
                     "Slim profile, serious protection",
                     "Considered details you'll feel daily",
                     "Made for the way you actually live",
-                  ].map((item) => (
+                  ].map((item, i) => (
                     <li
                       key={item}
                       style={{
@@ -1562,6 +1658,9 @@ export default async function HomePage() {
                         gap: "10px",
                         fontSize: "clamp(11.5px, 1.1vw, 15px)",
                         color: "rgba(0,0,0,0.7)",
+                        animation: `bz-fade-up 0.8s cubic-bezier(0.22, 1, 0.36, 1) ${
+                          1.2 + i * 0.1
+                        }s both`,
                       }}
                     >
                       <span
@@ -1589,7 +1688,7 @@ export default async function HomePage() {
                 <div
                   style={{
                     animation:
-                      "bz-fade-up 1s cubic-bezier(0.22, 1, 0.36, 1) 0.75s both",
+                      "bz-fade-up 1s cubic-bezier(0.22, 1, 0.36, 1) 1.6s both",
                   }}
                 >
                   <Link
@@ -1625,8 +1724,6 @@ export default async function HomePage() {
                 position: "relative",
                 overflow: "hidden",
                 backgroundColor: "#0a0a0a",
-                animation:
-                  "bz-fade-in 1.2s cubic-bezier(0.22, 1, 0.36, 1) 0.2s both",
               }}
             >
               <img
@@ -1649,9 +1746,9 @@ export default async function HomePage() {
                   top: 0,
                   left: 0,
                   bottom: 0,
-                  width: "80px",
+                  width: "120px",
                   background:
-                    "linear-gradient(90deg, rgba(247,247,245,1) 0%, rgba(247,247,245,0) 100%)",
+                    "linear-gradient(90deg, rgba(247,247,245,1) 0%, rgba(247,247,245,0.7) 40%, rgba(247,247,245,0) 100%)",
                   pointerEvents: "none",
                 }}
               />
