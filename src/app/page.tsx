@@ -143,13 +143,14 @@ export default async function HomePage() {
             }}
           >
             {/* ============================================ */}
-            {/*  BIG BINZEO LOGO — centered, with spacing     */}
+            {/*  BIG BINZEO LOGO — perfectly centered         */}
             {/* ============================================ */}
             <div
               style={{
+                width: "100%",
                 display: "flex",
-                justifyContent: "center",
                 alignItems: "center",
+                justifyContent: "center",
                 marginBottom: "clamp(40px, 6vh, 72px)",
                 animation:
                   "bz-logo-in 1.2s cubic-bezier(0.22, 1, 0.36, 1) 0.1s both",
@@ -163,6 +164,7 @@ export default async function HomePage() {
                   width: "auto",
                   maxWidth: "70vw",
                   display: "block",
+                  margin: "0 auto",
                   filter:
                     "brightness(0) drop-shadow(0 4px 20px rgba(255,255,255,0.45))",
                 }}
