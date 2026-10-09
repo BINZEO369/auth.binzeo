@@ -30,6 +30,9 @@ const dashboardNavigation = [
   { href: "/dashboard/security", label: "Security", sub: "Activity & sessions", icon: "/icons/shield.svg" },
 ] as const;
 
+/* Menu dropdown-এ শুধু এই আইটেমগুলো দেখাবে */
+const menuNavigation = siteNavigation.filter((i) => i.href === "/");
+
 /* ================================================================== */
 /*  Icons                                                              */
 /* ================================================================== */
@@ -244,23 +247,27 @@ export default function Header({ isLoggedIn = false, onMenu }: HeaderProps) {
     <div ref={wrapperRef}>
       <header className="fixed inset-x-0 top-0 z-50">
         {/* ============================================================ */}
-        {/*  LIQUID GLASS HEADER BACKGROUND — WHITE                       */}
+        {/*  LIQUID GLASS HEADER — সম্পূর্ণ স্বচ্ছ                        */}
         {/* ============================================================ */}
         <div
           aria-hidden="true"
           className="absolute inset-0 border-b transition-all duration-500"
           style={{
             background: scrolled
-              ? "rgba(255,255,255,0.78)"
-              : "rgba(255,255,255,0.58)",
-            backdropFilter: "blur(28px) saturate(180%)",
-            WebkitBackdropFilter: "blur(28px) saturate(180%)",
+              ? "rgba(255,255,255,0.42)"
+              : "rgba(255,255,255,0.14)",
+            backdropFilter: scrolled
+              ? "blur(22px) saturate(160%)"
+              : "blur(14px) saturate(140%)",
+            WebkitBackdropFilter: scrolled
+              ? "blur(22px) saturate(160%)"
+              : "blur(14px) saturate(140%)",
             borderBottomColor: scrolled
-              ? "rgba(0,0,0,0.07)"
-              : "rgba(0,0,0,0.03)",
+              ? "rgba(0,0,0,0.05)"
+              : "rgba(0,0,0,0.015)",
             boxShadow: scrolled
-              ? "inset 0 -1px 0 0 rgba(255,255,255,0.9), 0 1px 2px rgba(0,0,0,0.03), 0 12px 40px -16px rgba(0,0,0,0.10)"
-              : "inset 0 -1px 0 0 rgba(255,255,255,0.6)",
+              ? "inset 0 -1px 0 0 rgba(255,255,255,0.5), 0 8px 32px -20px rgba(0,0,0,0.10)"
+              : "inset 0 -1px 0 0 rgba(255,255,255,0.35)",
           }}
         />
 
@@ -270,7 +277,7 @@ export default function Header({ isLoggedIn = false, onMenu }: HeaderProps) {
           className="pointer-events-none absolute inset-x-0 top-0 h-px"
           style={{
             background:
-              "linear-gradient(90deg, transparent, rgba(255,255,255,1), transparent)",
+              "linear-gradient(90deg, transparent, rgba(255,255,255,0.9), transparent)",
           }}
         />
 
@@ -326,16 +333,16 @@ export default function Header({ isLoggedIn = false, onMenu }: HeaderProps) {
             style={{
               background: open
                 ? "rgba(0,0,0,0.92)"
-                : "rgba(255,255,255,0.55)",
-              backdropFilter: "blur(20px) saturate(180%)",
-              WebkitBackdropFilter: "blur(20px) saturate(180%)",
+                : "rgba(255,255,255,0.38)",
+              backdropFilter: "blur(18px) saturate(180%)",
+              WebkitBackdropFilter: "blur(18px) saturate(180%)",
               border: open
                 ? "1px solid rgba(0,0,0,0.92)"
-                : "1px solid rgba(0,0,0,0.10)",
+                : "1px solid rgba(0,0,0,0.08)",
               color: open ? "#ffffff" : "#0a0a0a",
               boxShadow: open
                 ? "inset 0 1px 0 0 rgba(255,255,255,0.18), 0 12px 32px -10px rgba(0,0,0,0.35)"
-                : "inset 0 1px 0 0 rgba(255,255,255,0.9), 0 2px 6px rgba(0,0,0,0.06)",
+                : "inset 0 1px 0 0 rgba(255,255,255,0.85), 0 2px 6px rgba(0,0,0,0.05)",
             }}
           >
             <span
@@ -354,14 +361,14 @@ export default function Header({ isLoggedIn = false, onMenu }: HeaderProps) {
         </nav>
 
         {/* ============================================================ */}
-        {/*  DROPDOWN MENU — WHITE LIQUID GLASS                           */}
+        {/*  DROPDOWN MENU — শুধু Home + Account + Auth                   */}
         {/* ============================================================ */}
         {open && (
           <>
             {/* Mobile backdrop */}
             <div
               aria-hidden="true"
-              className="fixed inset-0 top-[68px] bg-black/20 backdrop-blur-sm md:hidden"
+              className="fixed inset-0 top-[68px] bg-black/10 backdrop-blur-sm md:hidden"
               onClick={closeMenu}
             />
 
@@ -370,9 +377,9 @@ export default function Header({ isLoggedIn = false, onMenu }: HeaderProps) {
               className="relative border-b"
               style={{
                 background:
-                  "linear-gradient(180deg, rgba(255,255,255,0.88) 0%, rgba(255,255,255,0.94) 100%)",
-                backdropFilter: "blur(32px) saturate(180%)",
-                WebkitBackdropFilter: "blur(32px) saturate(180%)",
+                  "linear-gradient(180deg, rgba(255,255,255,0.82) 0%, rgba(255,255,255,0.90) 100%)",
+                backdropFilter: "blur(28px) saturate(180%)",
+                WebkitBackdropFilter: "blur(28px) saturate(180%)",
                 borderBottomColor: "rgba(0,0,0,0.06)",
                 boxShadow:
                   "inset 0 1px 0 0 rgba(255,255,255,1), 0 32px 80px -24px rgba(0,0,0,0.18)",
@@ -383,7 +390,7 @@ export default function Header({ isLoggedIn = false, onMenu }: HeaderProps) {
               }}
             >
               <div className="mx-auto max-w-7xl px-5 py-6 sm:px-8 lg:px-10">
-                {/* ---------- NAVIGATION ---------- */}
+                {/* ---------- NAVIGATION — শুধু Home ---------- */}
                 <div className="mb-3 flex items-center gap-3">
                   <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-black/40 whitespace-nowrap">
                     Navigation
@@ -391,7 +398,7 @@ export default function Header({ isLoggedIn = false, onMenu }: HeaderProps) {
                   <div className="h-px flex-1 bg-black/[0.06]" />
                 </div>
                 <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
-                  {siteNavigation.map((item, i) => (
+                  {menuNavigation.map((item, i) => (
                     <MenuTile
                       key={item.href}
                       href={item.href}
