@@ -90,10 +90,6 @@ export default async function HomePage() {
           0%, 100% { transform: scale(1.05) translate(0, 0); }
           50%      { transform: scale(1.15) translate(-1.5%, -1%); }
         }
-        @keyframes bz-pulse-dot {
-          0%, 100% { opacity: 0.6; transform: scale(1); }
-          50%      { opacity: 1; transform: scale(1.25); }
-        }
       `}</style>
 
       <div className="reference-shell">
@@ -147,13 +143,14 @@ export default async function HomePage() {
             }}
           >
             {/* ============================================ */}
-            {/*  BIG BINZEO LOGO — with generous spacing     */}
+            {/*  BIG BINZEO LOGO — centered, with spacing     */}
             {/* ============================================ */}
             <div
               style={{
                 display: "flex",
                 justifyContent: "center",
-                marginBottom: "clamp(48px, 7vh, 88px)",
+                alignItems: "center",
+                marginBottom: "clamp(40px, 6vh, 72px)",
                 animation:
                   "bz-logo-in 1.2s cubic-bezier(0.22, 1, 0.36, 1) 0.1s both",
               }}
@@ -162,11 +159,12 @@ export default async function HomePage() {
                 src="/logo.svg"
                 alt="BINZEO"
                 style={{
-                  height: "clamp(52px, 7.5vw, 100px)",
+                  height: "clamp(40px, 5vw, 64px)",
                   width: "auto",
-                  maxWidth: "90vw",
+                  maxWidth: "70vw",
+                  display: "block",
                   filter:
-                    "brightness(0) drop-shadow(0 4px 24px rgba(255,255,255,0.5))",
+                    "brightness(0) drop-shadow(0 4px 20px rgba(255,255,255,0.45))",
                 }}
               />
             </div>
@@ -273,16 +271,16 @@ export default async function HomePage() {
             </div>
 
             {/* ==================================================== */}
-            {/*  CIRCULAR PARTNER LOGO ROW — bigger & clearer         */}
+            {/*  PARTNER LOGO ROW — smaller, all in one line          */}
             {/* ==================================================== */}
             <div
               style={{
-                marginTop: "clamp(56px, 8vh, 96px)",
+                marginTop: "clamp(48px, 7vh, 80px)",
                 display: "flex",
-                flexWrap: "wrap",
+                flexWrap: "nowrap",
                 alignItems: "center",
                 justifyContent: "center",
-                gap: "clamp(16px, 2.5vw, 32px)",
+                gap: "clamp(10px, 1.6vw, 20px)",
                 animation:
                   "bz-fade-in 1.2s cubic-bezier(0.22, 1, 0.36, 1) 1.3s both",
               }}
@@ -291,22 +289,22 @@ export default async function HomePage() {
                 <div
                   key={logo.alt}
                   style={{
-                    width: "clamp(48px, 5vw, 68px)",
-                    height: "clamp(48px, 5vw, 68px)",
+                    width: "clamp(30px, 3vw, 42px)",
+                    height: "clamp(30px, 3vw, 42px)",
                     borderRadius: "999px",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    backgroundColor: "rgba(255,255,255,0.85)",
-                    backdropFilter: "blur(20px) saturate(180%)",
-                    WebkitBackdropFilter: "blur(20px) saturate(180%)",
-                    border: "1px solid rgba(0,0,0,0.06)",
+                    backgroundColor: "rgba(255,255,255,0.9)",
+                    backdropFilter: "blur(16px) saturate(180%)",
+                    WebkitBackdropFilter: "blur(16px) saturate(180%)",
+                    border: "1px solid rgba(0,0,0,0.05)",
                     boxShadow:
-                      "inset 0 1px 0 0 rgba(255,255,255,1), 0 8px 24px -10px rgba(0,0,0,0.15)",
-                    padding: "clamp(8px, 0.9vw, 12px)",
+                      "inset 0 1px 0 0 rgba(255,255,255,1), 0 6px 18px -8px rgba(0,0,0,0.15)",
+                    padding: "clamp(5px, 0.6vw, 8px)",
+                    flexShrink: 0,
                     transition:
                       "transform 0.4s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.4s cubic-bezier(0.22, 1, 0.36, 1)",
-                    flexShrink: 0,
                   }}
                   title={logo.alt}
                 >
@@ -318,7 +316,7 @@ export default async function HomePage() {
                       height: "100%",
                       objectFit: "contain",
                       display: "block",
-                      filter: "grayscale(0.4) brightness(0.4)",
+                      filter: "grayscale(0.3) brightness(0.45)",
                     }}
                   />
                 </div>
