@@ -45,7 +45,7 @@ const liquidGlass = {
 } as const;
 
 /* ================================================================== */
-/*  SHARED LAYOUT TOKENS — remember for future pages                   */
+/*  SHARED LAYOUT TOKENS                                               */
 /* ================================================================== */
 const containerCls =
   "relative z-10 mx-auto max-w-6xl space-y-5 px-3 py-5 sm:space-y-6 sm:px-5 sm:py-8";
@@ -77,23 +77,22 @@ function PageBackground() {
 }
 
 /* ================================================================== */
-/*  Section heading (used inside cards)                                */
+/*  Chevron icon                                                       */
 /* ================================================================== */
-function SectionHeading({ children }: { children: React.ReactNode }) {
+function ChevronIcon() {
   return (
-    <div className="mb-4 flex items-center gap-3">
-      <span className="whitespace-nowrap text-[10px] font-semibold uppercase tracking-[0.18em] text-black/55">
-        {children}
-      </span>
-      <span
-        aria-hidden="true"
-        className="h-px flex-1"
-        style={{
-          background:
-            "linear-gradient(90deg, rgba(255,255,255,0.6), rgba(255,255,255,0))",
-        }}
-      />
-    </div>
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="h-3.5 w-3.5"
+      aria-hidden="true"
+    >
+      <path d="m6 9 6 6 6-6" />
+    </svg>
   );
 }
 
@@ -157,6 +156,101 @@ function ToggleRow({
 }
 
 /* ================================================================== */
+/*  Collapsible section — liquid glass card with animated header       */
+/* ================================================================== */
+function CollapsibleSection({
+  title,
+  isOpen,
+  onToggle,
+  delay = 0,
+  children,
+}: {
+  title: string;
+  isOpen: boolean;
+  onToggle: () => void;
+  delay?: number;
+  children: React.ReactNode;
+}) {
+  return (
+    <section
+      className="relative overflow-hidden rounded-3xl border border-white/[0.35] transition-all duration-500 hover:border-white/[0.5]"
+      style={{
+        ...liquidGlass,
+        animation: `prof-item-in 0.6s cubic-bezier(0.22, 1, 0.36, 1) ${delay}s both`,
+      }}
+    >
+      {/* Top sheen */}
+      <span
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-x-0 top-0 h-px z-10"
+        style={{
+          background:
+            "linear-gradient(90deg, transparent, rgba(255,255,255,1), transparent)",
+        }}
+      />
+
+      {/* Header — always visible, clickable */}
+      <button
+        type="button"
+        onClick={onToggle}
+        aria-expanded={isOpen}
+        aria-controls={`section-${title.replace(/\s+/g, "-").toLowerCase()}`}
+        className="group relative z-10 flex w-full items-center justify-between gap-3 px-6 py-5 text-left transition-colors duration-300 sm:px-7 sm:py-6"
+      >
+        {/* Hover sheen */}
+        <span
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+          style={{
+            background:
+              "radial-gradient(circle at 25% 15%, rgba(255,255,255,0.35), transparent 60%)",
+          }}
+        />
+
+        <div className="relative flex min-w-0 flex-1 items-center gap-3">
+          <span className="whitespace-nowrap text-[11px] font-semibold uppercase tracking-[0.18em] text-black/70">
+            {title}
+          </span>
+          <span
+            aria-hidden="true"
+            className="h-px min-w-6 flex-1"
+            style={{
+              background:
+                "linear-gradient(90deg, rgba(255,255,255,0.6), rgba(255,255,255,0))",
+            }}
+          />
+        </div>
+
+        {/* Chevron button (visual) */}
+        <span
+          className="relative flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-white/40 bg-white/40 text-black/70 backdrop-blur-md transition-all duration-500 group-hover:border-white/60 group-hover:bg-white/60 group-hover:text-black"
+          style={{
+            transform: isOpen ? "rotate(180deg)" : "rotate(0deg)",
+          }}
+        >
+          <ChevronIcon />
+        </span>
+      </button>
+
+      {/* Animated collapsible content */}
+      <div
+        id={`section-${title.replace(/\s+/g, "-").toLowerCase()}`}
+        className="grid transition-[grid-template-rows] duration-500 ease-out"
+        style={{
+          gridTemplateRows: isOpen ? "1fr" : "0fr",
+        }}
+      >
+        <div className="overflow-hidden">
+          <div className="px-6 pb-6 sm:px-7 sm:pb-7">
+            {children}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ================================================================== */
 /*  Page                                                               */
 /* ================================================================== */
 export default function ProfilePage() {
@@ -168,6 +262,18 @@ export default function ProfilePage() {
     type: "success" | "error";
     text: string;
   } | null>(null);
+
+  /* -------- Collapsible sections state (all collapsed by default) -------- */
+  const [openSections, setOpenSections] = useState<Record<string, boolean>>({
+    personal: false,
+    regional: false,
+    notifications: false,
+    recovery: false,
+  });
+
+  const toggleSection = (key: keyof typeof openSections) => {
+    setOpenSections((prev) => ({ ...prev, [key]: !prev[key] }));
+  };
 
   useEffect(() => {
     (async () => {
@@ -252,12 +358,9 @@ export default function ProfilePage() {
       <PageBackground />
 
       {/* ============================================================ */}
-      {/*  CONTENT — same width tokens as addresses                     */}
+      {/*  CONTENT                                                      */}
       {/* ============================================================ */}
-      <form
-        onSubmit={handleSubmit}
-        className={containerCls}
-      >
+      <form onSubmit={handleSubmit} className={containerCls}>
         {/* ============================================================ */}
         {/*  HERO BANNER                                                  */}
         {/* ============================================================ */}
@@ -275,7 +378,6 @@ export default function ProfilePage() {
               "prof-banner-in 0.85s cubic-bezier(0.22, 1, 0.36, 1) 0.05s both",
           }}
         >
-          {/* Top sheen */}
           <div
             aria-hidden="true"
             className="pointer-events-none absolute inset-x-0 top-0 h-px"
@@ -284,8 +386,6 @@ export default function ProfilePage() {
                 "linear-gradient(90deg, transparent, rgba(255,255,255,1), transparent)",
             }}
           />
-
-          {/* Floating light blobs */}
           <div
             aria-hidden="true"
             className="pointer-events-none absolute -left-16 -top-16 h-52 w-52 rounded-full opacity-70"
@@ -308,7 +408,6 @@ export default function ProfilePage() {
           />
 
           <div className="relative">
-            {/* Kicker */}
             <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-white/40 bg-white/40 px-3 py-1.5 backdrop-blur-md">
               <span
                 className="h-1.5 w-1.5 rounded-full bg-black/80"
@@ -335,7 +434,6 @@ export default function ProfilePage() {
                 </p>
               </div>
 
-              {/* Binzeo ID pill */}
               {data?.profile?.binzeo_user_id && (
                 <div
                   className="inline-flex items-center gap-3 rounded-xl border border-white/40 px-3 py-2 backdrop-blur-md"
@@ -417,307 +515,247 @@ export default function ProfilePage() {
         )}
 
         {/* ============================================================ */}
-        {/*  PERSONAL INFORMATION                                        */}
+        {/*  PERSONAL INFORMATION (collapsible)                          */}
         {/* ============================================================ */}
-        <section
-          className="relative overflow-hidden rounded-3xl border border-white/[0.35] p-6 transition-all duration-500 sm:p-7"
-          style={{
-            ...liquidGlass,
-            animation:
-              "prof-item-in 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.15s both",
-          }}
+        <CollapsibleSection
+          title="Personal Information"
+          isOpen={openSections.personal}
+          onToggle={() => toggleSection("personal")}
+          delay={0.15}
         >
-          <span
-            aria-hidden="true"
-            className="pointer-events-none absolute inset-x-0 top-0 h-px"
-            style={{
-              background:
-                "linear-gradient(90deg, transparent, rgba(255,255,255,1), transparent)",
-            }}
-          />
-
-          <div className="relative">
-            <SectionHeading>Personal Information</SectionHeading>
-
-            <div className="space-y-4">
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                <Field label="First name">
-                  <input
-                    type="text"
-                    value={form.first_name ?? ""}
-                    onChange={(e) => update("first_name", e.target.value)}
-                    className={inputCls}
-                  />
-                </Field>
-                <Field label="Last name">
-                  <input
-                    type="text"
-                    value={form.last_name ?? ""}
-                    onChange={(e) => update("last_name", e.target.value)}
-                    className={inputCls}
-                  />
-                </Field>
-              </div>
-
-              <Field label="Middle name">
+          <div className="space-y-4">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <Field label="First name">
                 <input
                   type="text"
-                  value={form.middle_name ?? ""}
-                  onChange={(e) => update("middle_name", e.target.value)}
+                  value={form.first_name ?? ""}
+                  onChange={(e) => update("first_name", e.target.value)}
                   className={inputCls}
                 />
               </Field>
-
-              <Field label="Display name">
+              <Field label="Last name">
                 <input
                   type="text"
-                  value={form.display_name ?? ""}
-                  onChange={(e) => update("display_name", e.target.value)}
+                  value={form.last_name ?? ""}
+                  onChange={(e) => update("last_name", e.target.value)}
                   className={inputCls}
-                  placeholder="How your name appears publicly"
                 />
-              </Field>
-
-              <Field
-                label="Username"
-                hint="Your username is permanent and cannot be changed."
-              >
-                <input
-                  type="text"
-                  value={form.username ?? ""}
-                  className={`${inputCls} opacity-70`}
-                  readOnly
-                  disabled
-                />
-                {form.username && (
-                  <a
-                    className="mt-1.5 inline-flex items-center gap-1 text-[12px] text-black/65 underline decoration-black/30 underline-offset-2 transition-colors hover:text-black"
-                    href={`/u/@${form.username}`}
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    binzeo.com/u/@{form.username}
-                  </a>
-                )}
-              </Field>
-
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                <Field label="Date of birth">
-                  <input
-                    type="date"
-                    value={form.date_of_birth ?? ""}
-                    onChange={(e) => update("date_of_birth", e.target.value)}
-                    className={inputCls}
-                  />
-                </Field>
-                <Field label="Current age">
-                  <div className={`${inputCls} opacity-70`}>
-                    {form.age ?? "Not available"}
-                  </div>
-                </Field>
-              </div>
-
-              <Field label="Gender">
-                <select
-                  value={form.gender ?? ""}
-                  onChange={(e) => update("gender", e.target.value || null)}
-                  className={inputCls}
-                >
-                  <option value="">Not specified</option>
-                  <option value="male">Male</option>
-                  <option value="female">Female</option>
-                  <option value="non_binary">Non-binary</option>
-                  <option value="prefer_not_to_say">Prefer not to say</option>
-                  <option value="other">Other</option>
-                </select>
               </Field>
             </div>
-          </div>
-        </section>
 
-        {/* ============================================================ */}
-        {/*  REGIONAL PREFERENCES                                        */}
-        {/* ============================================================ */}
-        <section
-          className="relative overflow-hidden rounded-3xl border border-white/[0.35] p-6 transition-all duration-500 sm:p-7"
-          style={{
-            ...liquidGlass,
-            animation:
-              "prof-item-in 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.22s both",
-          }}
-        >
-          <span
-            aria-hidden="true"
-            className="pointer-events-none absolute inset-x-0 top-0 h-px"
-            style={{
-              background:
-                "linear-gradient(90deg, transparent, rgba(255,255,255,1), transparent)",
-            }}
-          />
-
-          <div className="relative">
-            <SectionHeading>Regional Preferences</SectionHeading>
-
-            <div className="space-y-4">
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                <Field label="Country code">
-                  <input
-                    type="text"
-                    maxLength={2}
-                    value={form.country_code ?? ""}
-                    onChange={(e) =>
-                      update("country_code", e.target.value.toUpperCase())
-                    }
-                    className={inputCls}
-                    placeholder="US"
-                  />
-                </Field>
-                <Field label="Language">
-                  <input
-                    type="text"
-                    value={form.preferred_language ?? ""}
-                    onChange={(e) =>
-                      update("preferred_language", e.target.value)
-                    }
-                    className={inputCls}
-                    placeholder="en"
-                  />
-                </Field>
-              </div>
-
-              <Field label="Timezone">
-                <input
-                  type="text"
-                  value={form.timezone ?? ""}
-                  onChange={(e) => update("timezone", e.target.value)}
-                  className={inputCls}
-                  placeholder="UTC"
-                />
-              </Field>
-
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-                <Field label="Date format">
-                  <input
-                    type="text"
-                    value={form.date_format ?? ""}
-                    onChange={(e) => update("date_format", e.target.value)}
-                    className={inputCls}
-                    placeholder="YYYY-MM-DD"
-                  />
-                </Field>
-                <Field label="Time format">
-                  <select
-                    value={form.time_format ?? "24h"}
-                    onChange={(e) => update("time_format", e.target.value)}
-                    className={inputCls}
-                  >
-                    <option value="24h">24-hour</option>
-                    <option value="12h">12-hour</option>
-                  </select>
-                </Field>
-                <Field label="Currency">
-                  <input
-                    type="text"
-                    value={form.currency ?? ""}
-                    onChange={(e) => update("currency", e.target.value)}
-                    className={inputCls}
-                    placeholder="USD"
-                  />
-                </Field>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* ============================================================ */}
-        {/*  NOTIFICATIONS                                               */}
-        {/* ============================================================ */}
-        <section
-          className="relative overflow-hidden rounded-3xl border border-white/[0.35] p-6 transition-all duration-500 sm:p-7"
-          style={{
-            ...liquidGlass,
-            animation:
-              "prof-item-in 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.29s both",
-          }}
-        >
-          <span
-            aria-hidden="true"
-            className="pointer-events-none absolute inset-x-0 top-0 h-px"
-            style={{
-              background:
-                "linear-gradient(90deg, transparent, rgba(255,255,255,1), transparent)",
-            }}
-          />
-
-          <div className="relative">
-            <SectionHeading>Notifications</SectionHeading>
-
-            <div className="space-y-3">
-              <ToggleRow
-                label="Marketing emails"
-                description="Product updates, tips and offers"
-                checked={!!form.marketing_email}
-                onChange={(v) => update("marketing_email", v)}
-              />
-              <ToggleRow
-                label="Marketing SMS"
-                description="Occasional text messages from BINZEO"
-                checked={!!form.marketing_sms}
-                onChange={(v) => update("marketing_sms", v)}
-              />
-              <ToggleRow
-                label="Push notifications"
-                description="Alerts on the devices you're signed in on"
-                checked={!!form.push_notifications}
-                onChange={(v) => update("push_notifications", v)}
-              />
-              <ToggleRow
-                label="Security notifications"
-                description="Important alerts about your account"
-                checked={!!form.security_notifications}
-                onChange={(v) => update("security_notifications", v)}
-              />
-            </div>
-          </div>
-        </section>
-
-        {/* ============================================================ */}
-        {/*  ACCOUNT RECOVERY                                            */}
-        {/* ============================================================ */}
-        <section
-          className="relative overflow-hidden rounded-3xl border border-white/[0.35] p-6 transition-all duration-500 sm:p-7"
-          style={{
-            ...liquidGlass,
-            animation:
-              "prof-item-in 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.36s both",
-          }}
-        >
-          <span
-            aria-hidden="true"
-            className="pointer-events-none absolute inset-x-0 top-0 h-px"
-            style={{
-              background:
-                "linear-gradient(90deg, transparent, rgba(255,255,255,1), transparent)",
-            }}
-          />
-
-          <div className="relative">
-            <SectionHeading>Account Recovery</SectionHeading>
-
-            <Field
-              label="Recovery email"
-              hint="Used to help you back into your account if you lose access."
-            >
+            <Field label="Middle name">
               <input
-                type="email"
-                value={form.recovery_email ?? ""}
-                onChange={(e) => update("recovery_email", e.target.value)}
+                type="text"
+                value={form.middle_name ?? ""}
+                onChange={(e) => update("middle_name", e.target.value)}
                 className={inputCls}
-                placeholder="backup@example.com"
               />
             </Field>
+
+            <Field label="Display name">
+              <input
+                type="text"
+                value={form.display_name ?? ""}
+                onChange={(e) => update("display_name", e.target.value)}
+                className={inputCls}
+                placeholder="How your name appears publicly"
+              />
+            </Field>
+
+            <Field
+              label="Username"
+              hint="Your username is permanent and cannot be changed."
+            >
+              <input
+                type="text"
+                value={form.username ?? ""}
+                className={`${inputCls} opacity-70`}
+                readOnly
+                disabled
+              />
+              {form.username && (
+                <a
+                  className="mt-1.5 inline-flex items-center gap-1 text-[12px] text-black/65 underline decoration-black/30 underline-offset-2 transition-colors hover:text-black"
+                  href={`/u/@${form.username}`}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  binzeo.com/u/@{form.username}
+                </a>
+              )}
+            </Field>
+
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <Field label="Date of birth">
+                <input
+                  type="date"
+                  value={form.date_of_birth ?? ""}
+                  onChange={(e) => update("date_of_birth", e.target.value)}
+                  className={inputCls}
+                />
+              </Field>
+              <Field label="Current age">
+                <div className={`${inputCls} opacity-70`}>
+                  {form.age ?? "Not available"}
+                </div>
+              </Field>
+            </div>
+
+            <Field label="Gender">
+              <select
+                value={form.gender ?? ""}
+                onChange={(e) => update("gender", e.target.value || null)}
+                className={inputCls}
+              >
+                <option value="">Not specified</option>
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+                <option value="non_binary">Non-binary</option>
+                <option value="prefer_not_to_say">Prefer not to say</option>
+                <option value="other">Other</option>
+              </select>
+            </Field>
           </div>
-        </section>
+        </CollapsibleSection>
+
+        {/* ============================================================ */}
+        {/*  REGIONAL PREFERENCES (collapsible)                          */}
+        {/* ============================================================ */}
+        <CollapsibleSection
+          title="Regional Preferences"
+          isOpen={openSections.regional}
+          onToggle={() => toggleSection("regional")}
+          delay={0.22}
+        >
+          <div className="space-y-4">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <Field label="Country code">
+                <input
+                  type="text"
+                  maxLength={2}
+                  value={form.country_code ?? ""}
+                  onChange={(e) =>
+                    update("country_code", e.target.value.toUpperCase())
+                  }
+                  className={inputCls}
+                  placeholder="US"
+                />
+              </Field>
+              <Field label="Language">
+                <input
+                  type="text"
+                  value={form.preferred_language ?? ""}
+                  onChange={(e) =>
+                    update("preferred_language", e.target.value)
+                  }
+                  className={inputCls}
+                  placeholder="en"
+                />
+              </Field>
+            </div>
+
+            <Field label="Timezone">
+              <input
+                type="text"
+                value={form.timezone ?? ""}
+                onChange={(e) => update("timezone", e.target.value)}
+                className={inputCls}
+                placeholder="UTC"
+              />
+            </Field>
+
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+              <Field label="Date format">
+                <input
+                  type="text"
+                  value={form.date_format ?? ""}
+                  onChange={(e) => update("date_format", e.target.value)}
+                  className={inputCls}
+                  placeholder="YYYY-MM-DD"
+                />
+              </Field>
+              <Field label="Time format">
+                <select
+                  value={form.time_format ?? "24h"}
+                  onChange={(e) => update("time_format", e.target.value)}
+                  className={inputCls}
+                >
+                  <option value="24h">24-hour</option>
+                  <option value="12h">12-hour</option>
+                </select>
+              </Field>
+              <Field label="Currency">
+                <input
+                  type="text"
+                  value={form.currency ?? ""}
+                  onChange={(e) => update("currency", e.target.value)}
+                  className={inputCls}
+                  placeholder="USD"
+                />
+              </Field>
+            </div>
+          </div>
+        </CollapsibleSection>
+
+        {/* ============================================================ */}
+        {/*  NOTIFICATIONS (collapsible)                                 */}
+        {/* ============================================================ */}
+        <CollapsibleSection
+          title="Notifications"
+          isOpen={openSections.notifications}
+          onToggle={() => toggleSection("notifications")}
+          delay={0.29}
+        >
+          <div className="space-y-3">
+            <ToggleRow
+              label="Marketing emails"
+              description="Product updates, tips and offers"
+              checked={!!form.marketing_email}
+              onChange={(v) => update("marketing_email", v)}
+            />
+            <ToggleRow
+              label="Marketing SMS"
+              description="Occasional text messages from BINZEO"
+              checked={!!form.marketing_sms}
+              onChange={(v) => update("marketing_sms", v)}
+            />
+            <ToggleRow
+              label="Push notifications"
+              description="Alerts on the devices you're signed in on"
+              checked={!!form.push_notifications}
+              onChange={(v) => update("push_notifications", v)}
+            />
+            <ToggleRow
+              label="Security notifications"
+              description="Important alerts about your account"
+              checked={!!form.security_notifications}
+              onChange={(v) => update("security_notifications", v)}
+            />
+          </div>
+        </CollapsibleSection>
+
+        {/* ============================================================ */}
+        {/*  ACCOUNT RECOVERY (collapsible)                              */}
+        {/* ============================================================ */}
+        <CollapsibleSection
+          title="Account Recovery"
+          isOpen={openSections.recovery}
+          onToggle={() => toggleSection("recovery")}
+          delay={0.36}
+        >
+          <Field
+            label="Recovery email"
+            hint="Used to help you back into your account if you lose access."
+          >
+            <input
+              type="email"
+              value={form.recovery_email ?? ""}
+              onChange={(e) => update("recovery_email", e.target.value)}
+              className={inputCls}
+              placeholder="backup@example.com"
+            />
+          </Field>
+        </CollapsibleSection>
 
         {/* ============================================================ */}
         {/*  SAVE BAR                                                    */}
