@@ -52,7 +52,7 @@ export default async function HomePage() {
           display: grid;
           grid-template-columns: 1fr 1fr;
           height: 100vh;
-          min-height: 100dvh;
+          min-height: 100vh;
         }
 
         @media (max-width: 900px) {
@@ -69,19 +69,19 @@ export default async function HomePage() {
           .phone-case-4-grid {
             grid-template-columns: 42% 58%;
             height: auto;
-            min-height: 100dvh;
+            min-height: 100vh;
           }
           .phone-case-2-grid,
           .phone-case-5-grid {
             grid-template-columns: 58% 42%;
             height: auto;
-            min-height: 100dvh;
+            min-height: 100vh;
           }
           .phone-case-1-image,
           .phone-case-2-image,
           .phone-case-4-image,
           .phone-case-5-image {
-            min-height: 100dvh !important;
+            min-height: 100vh !important;
           }
           .phone-case-text-content {
             padding: 32px 18px !important;
@@ -158,7 +158,7 @@ export default async function HomePage() {
             position: "relative",
             width: "100vw",
             height: "100vh",
-            minHeight: "100dvh",
+            minHeight: "100vh",
             marginLeft: "calc(-50vw + 50%)",
             marginRight: "calc(-50vw + 50%)",
             overflow: "hidden",
@@ -859,23 +859,41 @@ export default async function HomePage() {
                   pointerEvents: "none",
                 }}
               />
+
+              {/* ⭐ Bottom fade — smooths transition into Case 3 */}
+              <div
+                aria-hidden="true"
+                style={{
+                  position: "absolute",
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  height: "25%",
+                  background:
+                    "linear-gradient(0deg, rgba(247,247,245,1) 0%, rgba(247,247,245,0.5) 50%, rgba(247,247,245,0) 100%)",
+                  pointerEvents: "none",
+                }}
+              />
             </div>
           </section>
         </div>
 
         {/* ============================================================ */}
-        {/*  PHONE CASE 3 — PURE FULL-SCREEN IMAGE                        */}
+        {/*  PHONE CASE 3 — PURE FULL-SCREEN IMAGE (stable, no jump)      */}
         {/* ============================================================ */}
         <section
           style={{
             position: "relative",
             width: "100vw",
             height: "100vh",
-            minHeight: "100dvh",
+            minHeight: "100vh",
             marginLeft: "calc(-50vw + 50%)",
             marginRight: "calc(-50vw + 50%)",
             overflow: "hidden",
             backgroundColor: "#0a0a0a",
+            display: "block",
+            padding: 0,
+            margin: 0,
           }}
         >
           <img
@@ -891,17 +909,49 @@ export default async function HomePage() {
               display: "block",
             }}
           />
+
+          {/* ⭐ Top fade — softens entry from Case 2's light gray */}
+          <div
+            aria-hidden="true"
+            style={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              right: 0,
+              height: "80px",
+              background:
+                "linear-gradient(180deg, rgba(247,247,245,0.95) 0%, rgba(247,247,245,0) 100%)",
+              pointerEvents: "none",
+              zIndex: 2,
+            }}
+          />
+
+          {/* ⭐ Bottom fade — softens exit into Video's white */}
+          <div
+            aria-hidden="true"
+            style={{
+              position: "absolute",
+              bottom: 0,
+              left: 0,
+              right: 0,
+              height: "80px",
+              background:
+                "linear-gradient(0deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0) 100%)",
+              pointerEvents: "none",
+              zIndex: 2,
+            }}
+          />
         </section>
 
         {/* ============================================================ */}
-        {/*  SETUP GUIDE VIDEO — Full-screen (with sound toggle)           */}
+        {/*  SETUP GUIDE VIDEO — Stable full-screen                        */}
         {/* ============================================================ */}
         <section
           style={{
             position: "relative",
             width: "100vw",
             height: "100vh",
-            minHeight: "100dvh",
+            minHeight: "100vh",
             marginLeft: "calc(-50vw + 50%)",
             marginRight: "calc(-50vw + 50%)",
             overflow: "hidden",
@@ -909,6 +959,8 @@ export default async function HomePage() {
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
+            padding: 0,
+            margin: 0,
           }}
         >
           {/* VIDEO — auto-plays, muted by default */}
@@ -932,6 +984,38 @@ export default async function HomePage() {
           >
             <source src="/videos/vid1.mp4" type="video/mp4" />
           </video>
+
+          {/* ⭐ Top fade — softens entry from Case 3's dark */}
+          <div
+            aria-hidden="true"
+            style={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              right: 0,
+              height: "80px",
+              background:
+                "linear-gradient(180deg, rgba(10,10,10,0.85) 0%, rgba(10,10,10,0) 100%)",
+              pointerEvents: "none",
+              zIndex: 2,
+            }}
+          />
+
+          {/* ⭐ Bottom fade — softens exit into Case 4's light gray */}
+          <div
+            aria-hidden="true"
+            style={{
+              position: "absolute",
+              bottom: 0,
+              left: 0,
+              right: 0,
+              height: "80px",
+              background:
+                "linear-gradient(0deg, rgba(247,247,245,0.95) 0%, rgba(247,247,245,0) 100%)",
+              pointerEvents: "none",
+              zIndex: 2,
+            }}
+          />
 
           {/* SOUND TOGGLE BUTTON — bottom-right */}
           <button
@@ -1090,6 +1174,19 @@ export default async function HomePage() {
                   height: "35%",
                   background:
                     "linear-gradient(0deg, rgba(247,247,245,1) 0%, rgba(247,247,245,0.6) 40%, rgba(247,247,245,0) 100%)",
+                  pointerEvents: "none",
+                }}
+              />
+              <div
+                aria-hidden="true"
+                style={{
+                  position: "absolute",
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  height: "15%",
+                  background:
+                    "linear-gradient(180deg, rgba(247,247,245,0.85) 0%, rgba(247,247,245,0) 100%)",
                   pointerEvents: "none",
                 }}
               />
