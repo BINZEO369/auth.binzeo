@@ -62,7 +62,7 @@ type Verification = {
 };
 
 /* ================================================================== */
-/*  Liquid glass — same as dashboard / addresses / profile             */
+/*  Liquid glass                                                       */
 /* ================================================================== */
 const liquidGlass = {
   background:
@@ -73,14 +73,11 @@ const liquidGlass = {
     "inset 0 1px 0 0 rgba(255,255,255,0.85), inset 0 0 0 1px rgba(255,255,255,0.35), 0 2px 4px rgba(0,0,0,0.04), 0 18px 42px -22px rgba(0,0,0,0.28)",
 } as const;
 
-/* ================================================================== */
-/*  SHARED LAYOUT TOKENS                                               */
-/* ================================================================== */
 const containerCls =
   "relative z-10 mx-auto max-w-6xl space-y-5 px-3 py-5 sm:space-y-6 sm:px-5 sm:py-8";
 
 /* ================================================================== */
-/*  Background layer — full viewport, no gaps                          */
+/*  Background                                                         */
 /* ================================================================== */
 function PageBackground() {
   return (
@@ -103,7 +100,7 @@ function PageBackground() {
 }
 
 /* ================================================================== */
-/*  Chevron icon                                                       */
+/*  Icons                                                              */
 /* ================================================================== */
 function ChevronIcon() {
   return (
@@ -122,8 +119,26 @@ function ChevronIcon() {
   );
 }
 
+function LockIcon({ className = "h-4 w-4" }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+      aria-hidden="true"
+    >
+      <rect x="3" y="11" width="18" height="11" rx="2" />
+      <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+    </svg>
+  );
+}
+
 /* ================================================================== */
-/*  Time helpers                                                       */
+/*  Time helper                                                        */
 /* ================================================================== */
 function timeAgo(iso: string | null) {
   if (!iso) return "—";
@@ -139,7 +154,7 @@ function timeAgo(iso: string | null) {
 }
 
 /* ================================================================== */
-/*  Section heading (used inside cards)                                */
+/*  Section heading                                                    */
 /* ================================================================== */
 function SectionHeading({ children }: { children: React.ReactNode }) {
   return (
@@ -160,19 +175,18 @@ function SectionHeading({ children }: { children: React.ReactNode }) {
 }
 
 /* ================================================================== */
-/*  Status pill                                                        */
+/*  Status pill — semantic color per status                            */
 /* ================================================================== */
 function StatusPill({ status }: { status: string }) {
   const map: Record<string, string> = {
-    success: "border-emerald-300/60 bg-emerald-100/50 text-emerald-800",
-    verified: "border-emerald-300/60 bg-emerald-100/50 text-emerald-800",
-    failed: "border-red-300/60 bg-red-100/50 text-red-800",
-    blocked: "border-amber-300/60 bg-amber-100/50 text-amber-800",
-    pending: "border-amber-300/60 bg-amber-100/50 text-amber-800",
+    success: "border-emerald-300/70 bg-emerald-100/60 text-emerald-800",
+    verified: "border-emerald-300/70 bg-emerald-100/60 text-emerald-800",
+    failed: "border-red-300/70 bg-red-100/60 text-red-800",
+    blocked: "border-amber-300/70 bg-amber-100/60 text-amber-800",
+    pending: "border-amber-300/70 bg-amber-100/60 text-amber-800",
   };
   const cls =
-    map[status] ??
-    "border-white/40 bg-white/40 text-black/70";
+    map[status] ?? "border-white/40 bg-white/40 text-black/70";
   return (
     <span
       className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] backdrop-blur-md ${cls}`}
@@ -183,12 +197,62 @@ function StatusPill({ status }: { status: string }) {
 }
 
 /* ================================================================== */
+/*  PRIMARY BUTTON — always white text, forced                        */
+/* ================================================================== */
+function PrimaryButton({
+  href,
+  children,
+  icon,
+}: {
+  href?: string;
+  children: React.ReactNode;
+  icon?: React.ReactNode;
+}) {
+  const cls =
+    "group relative inline-flex items-center gap-2 overflow-hidden rounded-full border border-black px-4 py-2.5 text-[12.5px] font-medium transition-all duration-500 hover:-translate-y-0.5";
+  const style: React.CSSProperties = {
+    background: "#0a0a0a",
+    color: "#ffffff",
+    boxShadow:
+      "inset 0 1px 0 0 rgba(255,255,255,0.14), 0 2px 4px rgba(0,0,0,0.08), 0 12px 28px -12px rgba(0,0,0,0.5)",
+  };
+  const inner = (
+    <>
+      <span
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+        style={{
+          background:
+            "radial-gradient(circle at 30% 30%, rgba(255,255,255,0.2), transparent 60%)",
+        }}
+      />
+      {icon && <span className="relative flex items-center">{icon}</span>}
+      <span className="relative" style={{ color: "#ffffff" }}>
+        {children}
+      </span>
+    </>
+  );
+  if (href) {
+    return (
+      <Link href={href} className={cls} style={style}>
+        {inner}
+      </Link>
+    );
+  }
+  return (
+    <button type="button" className={cls} style={style}>
+      {inner}
+    </button>
+  );
+}
+
+/* ================================================================== */
 /*  Empty state                                                        */
 /* ================================================================== */
 function EmptyState({ icon, text }: { icon: string; text: string }) {
   return (
     <div
-      className="relative overflow-hidden rounded-3xl border border-white/[0.4] p-12 text-center"
+      className="relative overflow-hidden rounded-3xl border border-white/[0.4] p-10 text-center"
       style={{
         background:
           "radial-gradient(120% 120% at 30% 12%, rgba(255,255,255,0.58) 0%, rgba(255,255,255,0.42) 45%, rgba(255,255,255,0.30) 100%)",
@@ -199,7 +263,7 @@ function EmptyState({ icon, text }: { icon: string; text: string }) {
       }}
     >
       <div
-        className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl border border-white/40"
+        className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl border border-white/40"
         style={{
           background:
             "radial-gradient(120% 120% at 30% 15%, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0.5) 100%)",
@@ -213,99 +277,13 @@ function EmptyState({ icon, text }: { icon: string; text: string }) {
         <Image
           src={icon}
           alt=""
-          width={28}
-          height={28}
+          width={24}
+          height={24}
           className="opacity-70"
         />
       </div>
       <p className="text-[13px] text-black/65">{text}</p>
     </div>
-  );
-}
-
-/* ================================================================== */
-/*  Collapsible section — liquid glass                                 */
-/* ================================================================== */
-function CollapsibleSection({
-  title,
-  isOpen,
-  onToggle,
-  delay = 0,
-  children,
-}: {
-  title: string;
-  isOpen: boolean;
-  onToggle: () => void;
-  delay?: number;
-  children: React.ReactNode;
-}) {
-  return (
-    <section
-      className="relative overflow-hidden rounded-3xl border border-white/[0.35] transition-all duration-500 hover:border-white/[0.5]"
-      style={{
-        ...liquidGlass,
-        animation: `sec-item-in 0.6s cubic-bezier(0.22, 1, 0.36, 1) ${delay}s both`,
-      }}
-    >
-      <span
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-x-0 top-0 z-10 h-px"
-        style={{
-          background:
-            "linear-gradient(90deg, transparent, rgba(255,255,255,1), transparent)",
-        }}
-      />
-
-      <button
-        type="button"
-        onClick={onToggle}
-        aria-expanded={isOpen}
-        className="group relative z-10 flex w-full items-center justify-between gap-3 px-6 py-5 text-left transition-colors duration-300 sm:px-7 sm:py-6"
-      >
-        <span
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
-          style={{
-            background:
-              "radial-gradient(circle at 25% 15%, rgba(255,255,255,0.35), transparent 60%)",
-          }}
-        />
-
-        <div className="relative flex min-w-0 flex-1 items-center gap-3">
-          <span className="whitespace-nowrap text-[11px] font-semibold uppercase tracking-[0.18em] text-black/70">
-            {title}
-          </span>
-          <span
-            aria-hidden="true"
-            className="h-px min-w-6 flex-1"
-            style={{
-              background:
-                "linear-gradient(90deg, rgba(255,255,255,0.6), rgba(255,255,255,0))",
-            }}
-          />
-        </div>
-
-        <span
-          className="relative flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-white/40 bg-white/40 text-black/70 backdrop-blur-md transition-all duration-500 group-hover:border-white/60 group-hover:bg-white/60 group-hover:text-black"
-          style={{
-            transform: isOpen ? "rotate(180deg)" : "rotate(0deg)",
-          }}
-        >
-          <ChevronIcon />
-        </span>
-      </button>
-
-      <div
-        className="grid transition-[grid-template-rows] duration-500 ease-out"
-        style={{
-          gridTemplateRows: isOpen ? "1fr" : "0fr",
-        }}
-      >
-        <div className="overflow-hidden">
-          <div className="px-6 pb-6 sm:px-7 sm:pb-7">{children}</div>
-        </div>
-      </div>
-    </section>
   );
 }
 
@@ -352,7 +330,6 @@ export default function SecurityPage() {
     })();
   }, []);
 
-  /* ---------------- loading state ---------------- */
   if (loading) {
     return (
       <div className="relative isolate flex min-h-[80vh] items-center justify-center">
@@ -364,9 +341,7 @@ export default function SecurityPage() {
 
   return (
     <div className="relative isolate min-h-[80vh]">
-      {/* ============================================================ */}
-      {/*  KEYFRAMES                                                    */}
-      {/* ============================================================ */}
+      {/* KEYFRAMES */}
       <style jsx global>{`
         @keyframes sec-item-in {
           from { opacity: 0; transform: translateY(20px) scale(0.99); filter: blur(8px); }
@@ -394,12 +369,8 @@ export default function SecurityPage() {
         }
       `}</style>
 
-      {/* Background */}
       <PageBackground />
 
-      {/* ============================================================ */}
-      {/*  CONTENT                                                      */}
-      {/* ============================================================ */}
       <div className={containerCls}>
         {/* ============================================================ */}
         {/*  HERO BANNER                                                  */}
@@ -474,36 +445,12 @@ export default function SecurityPage() {
                 </p>
               </div>
 
-              <Link
+              <PrimaryButton
                 href="/dashboard/security/password"
-                className="group relative inline-flex items-center gap-2 overflow-hidden rounded-full border border-black bg-black px-4 py-2.5 text-[12.5px] font-medium text-white transition-all duration-500 hover:-translate-y-0.5"
-                style={{
-                  boxShadow:
-                    "inset 0 1px 0 0 rgba(255,255,255,0.14), 0 2px 4px rgba(0,0,0,0.08), 0 12px 28px -12px rgba(0,0,0,0.5)",
-                }}
+                icon={<LockIcon className="h-4 w-4" />}
               >
-                <span
-                  aria-hidden="true"
-                  className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
-                  style={{
-                    background:
-                      "radial-gradient(circle at 30% 30%, rgba(255,255,255,0.2), transparent 60%)",
-                  }}
-                />
-                <svg
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="relative h-4 w-4"
-                >
-                  <rect x="3" y="11" width="18" height="11" rx="2" />
-                  <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-                </svg>
-                <span className="relative">Change password</span>
-              </Link>
+                Change password
+              </PrimaryButton>
             </div>
           </div>
         </div>
@@ -514,7 +461,8 @@ export default function SecurityPage() {
         <div
           className="space-y-5 sm:space-y-6"
           style={{
-            animation: "sec-item-in 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.15s both",
+            animation:
+              "sec-item-in 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.15s both",
           }}
         >
           <TemporaryLoginTokens />
@@ -526,7 +474,7 @@ export default function SecurityPage() {
         {/*  AUDIT LOGS — tabs inside liquid glass card                   */}
         {/* ============================================================ */}
         <section
-          className="relative overflow-hidden rounded-3xl border border-white/[0.35] p-6 sm:p-7"
+          className="relative overflow-hidden rounded-3xl border border-white/[0.35] p-5 sm:p-7"
           style={{
             ...liquidGlass,
             animation:
@@ -556,12 +504,14 @@ export default function SecurityPage() {
                     onClick={() => setTab(t.id)}
                     className={`group relative inline-flex items-center gap-2 overflow-hidden rounded-full border px-3.5 py-2 text-[12px] font-medium transition-all duration-500 ${
                       active
-                        ? "border-black bg-black text-white"
+                        ? "border-black"
                         : "border-white/40 bg-white/40 text-black/70 backdrop-blur-md hover:-translate-y-0.5 hover:border-white/60 hover:bg-white/60 hover:text-black"
                     }`}
                     style={
                       active
                         ? {
+                            background: "#0a0a0a",
+                            color: "#ffffff",
                             boxShadow:
                               "inset 0 1px 0 0 rgba(255,255,255,0.14), 0 2px 4px rgba(0,0,0,0.08), 0 12px 28px -12px rgba(0,0,0,0.5)",
                           }
@@ -578,7 +528,12 @@ export default function SecurityPage() {
                         }}
                       />
                     )}
-                    <span className="relative">{t.label}</span>
+                    <span
+                      className="relative"
+                      style={active ? { color: "#ffffff" } : undefined}
+                    >
+                      {t.label}
+                    </span>
                   </button>
                 );
               })}
@@ -594,9 +549,9 @@ export default function SecurityPage() {
                   />
                 ) : (
                   logins.map((l, i) => (
-                    <div
+                    <article
                       key={l.id}
-                      className="group relative overflow-hidden rounded-2xl border border-white/[0.35] p-4 transition-all duration-500 hover:-translate-y-0.5 hover:border-white/[0.5] hover:shadow-[0_18px_40px_-22px_rgba(0,0,0,0.28)]"
+                      className="group relative overflow-hidden rounded-2xl border border-white/[0.35] p-4 transition-all duration-500 hover:-translate-y-0.5 hover:border-white/[0.5] hover:shadow-[0_18px_40px_-22px_rgba(0,0,0,0.28)] sm:p-5"
                       style={{
                         ...liquidGlass,
                         animation: `sec-item-in 0.55s cubic-bezier(0.22, 1, 0.36, 1) ${
@@ -615,17 +570,22 @@ export default function SecurityPage() {
 
                       <div className="relative flex items-start justify-between gap-3">
                         <div className="min-w-0 flex-1">
+                          {/* Top row — status + method */}
                           <div className="mb-2 flex flex-wrap items-center gap-2">
                             <StatusPill status={l.login_status} />
-                            <span className="text-[11px] capitalize text-black/55">
+                            <span className="rounded-full border border-white/40 bg-white/40 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-black/65 backdrop-blur-md">
                               {l.login_method ?? "password"}
                             </span>
                           </div>
+
+                          {/* Location */}
                           <div className="truncate text-[12.5px] text-black/70">
                             {l.ip_address ?? "No IP"} ·{" "}
                             {[l.city, l.country].filter(Boolean).join(", ") ||
                               "Unknown location"}
                           </div>
+
+                          {/* Coordinates */}
                           {l.latitude !== null && l.longitude !== null && (
                             <div className="mt-0.5 text-[11px] text-black/50">
                               {Number(l.latitude).toFixed(6)},{" "}
@@ -638,6 +598,8 @@ export default function SecurityPage() {
                                 ` · ${l.location_source.replace(/_/g, " ")}`}
                             </div>
                           )}
+
+                          {/* Device */}
                           {l.user_devices && (
                             <div className="mt-1 text-[11.5px] text-black/55">
                               {l.user_devices.device_name ??
@@ -657,20 +619,23 @@ export default function SecurityPage() {
                                 }`}
                             </div>
                           )}
+
+                          {/* User agent */}
                           {l.user_agent && (
                             <div
-                              className="mt-0.5 truncate text-[10.5px] text-black/40"
+                              className="mt-1 truncate text-[10.5px] text-black/40"
                               title={l.user_agent}
                             >
                               {l.user_agent}
                             </div>
                           )}
                         </div>
-                        <div className="shrink-0 text-[11px] text-black/55">
+
+                        <div className="shrink-0 text-[11px] font-medium text-black/55">
                           {timeAgo(l.login_at)}
                         </div>
                       </div>
-                    </div>
+                    </article>
                   ))
                 )}
               </div>
@@ -686,9 +651,9 @@ export default function SecurityPage() {
                   />
                 ) : (
                   activities.map((a, i) => (
-                    <div
+                    <article
                       key={a.id}
-                      className="group relative overflow-hidden rounded-2xl border border-white/[0.35] p-4 transition-all duration-500 hover:-translate-y-0.5 hover:border-white/[0.5] hover:shadow-[0_18px_40px_-22px_rgba(0,0,0,0.28)]"
+                      className="group relative overflow-hidden rounded-2xl border border-white/[0.35] p-4 transition-all duration-500 hover:-translate-y-0.5 hover:border-white/[0.5] hover:shadow-[0_18px_40px_-22px_rgba(0,0,0,0.28)] sm:p-5"
                       style={{
                         ...liquidGlass,
                         animation: `sec-item-in 0.55s cubic-bezier(0.22, 1, 0.36, 1) ${
@@ -706,7 +671,7 @@ export default function SecurityPage() {
                       />
 
                       <div className="relative flex items-start justify-between gap-3">
-                        <div className="min-w-0">
+                        <div className="min-w-0 flex-1">
                           <div className="mb-0.5 text-[13px] font-semibold capitalize text-black/90">
                             {a.activity_type.replace(/_/g, " ")}
                           </div>
@@ -721,11 +686,11 @@ export default function SecurityPage() {
                             </div>
                           )}
                         </div>
-                        <div className="shrink-0 text-[11px] text-black/55">
+                        <div className="shrink-0 text-[11px] font-medium text-black/55">
                           {timeAgo(a.created_at)}
                         </div>
                       </div>
-                    </div>
+                    </article>
                   ))
                 )}
               </div>
@@ -741,9 +706,9 @@ export default function SecurityPage() {
                   />
                 ) : (
                   methods.map((m, i) => (
-                    <div
+                    <article
                       key={m.id}
-                      className="group relative overflow-hidden rounded-2xl border border-white/[0.35] p-4 transition-all duration-500 hover:-translate-y-0.5 hover:border-white/[0.5] hover:shadow-[0_18px_40px_-22px_rgba(0,0,0,0.28)]"
+                      className="group relative overflow-hidden rounded-2xl border border-white/[0.35] p-4 transition-all duration-500 hover:-translate-y-0.5 hover:border-white/[0.5] hover:shadow-[0_18px_40px_-22px_rgba(0,0,0,0.28)] sm:p-5"
                       style={{
                         ...liquidGlass,
                         animation: `sec-item-in 0.55s cubic-bezier(0.22, 1, 0.36, 1) ${
@@ -761,7 +726,7 @@ export default function SecurityPage() {
                       />
 
                       <div className="relative flex items-start justify-between gap-3">
-                        <div className="min-w-0">
+                        <div className="min-w-0 flex-1">
                           <div className="mb-1 flex flex-wrap items-center gap-2">
                             <span className="text-[13px] font-semibold capitalize text-black/90">
                               {m.auth_method.replace(/_/g, " ")}
@@ -786,7 +751,7 @@ export default function SecurityPage() {
                           {m.last_event ?? "linked"}
                         </span>
                       </div>
-                    </div>
+                    </article>
                   ))
                 )}
               </div>
@@ -802,9 +767,9 @@ export default function SecurityPage() {
                   />
                 ) : (
                   verifications.map((v, i) => (
-                    <div
+                    <article
                       key={v.id}
-                      className="group relative overflow-hidden rounded-2xl border border-white/[0.35] p-4 transition-all duration-500 hover:-translate-y-0.5 hover:border-white/[0.5] hover:shadow-[0_18px_40px_-22px_rgba(0,0,0,0.28)]"
+                      className="group relative overflow-hidden rounded-2xl border border-white/[0.35] p-4 transition-all duration-500 hover:-translate-y-0.5 hover:border-white/[0.5] hover:shadow-[0_18px_40px_-22px_rgba(0,0,0,0.28)] sm:p-5"
                       style={{
                         ...liquidGlass,
                         animation: `sec-item-in 0.55s cubic-bezier(0.22, 1, 0.36, 1) ${
@@ -822,7 +787,7 @@ export default function SecurityPage() {
                       />
 
                       <div className="relative flex items-start justify-between gap-3">
-                        <div className="min-w-0">
+                        <div className="min-w-0 flex-1">
                           <div className="mb-1 flex flex-wrap items-center gap-2">
                             <span className="text-[13px] font-semibold capitalize text-black/90">
                               {v.verification_type}
@@ -841,7 +806,7 @@ export default function SecurityPage() {
                           </div>
                         </div>
                       </div>
-                    </div>
+                    </article>
                   ))
                 )}
               </div>
