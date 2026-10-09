@@ -10,7 +10,6 @@ const ALLOWED_FIELDS = [
   "display_name",
   "date_of_birth",
   "gender",
-  "profile_photo_url",
   "country_code",
   "preferred_language",
   "timezone",

@@ -14,6 +14,8 @@ type Profile = {
   date_of_birth: string | null;
   age?: number | null;
   gender: string | null;
+  profile_photo_url: string | null;
+  profile_photo_public_id?: string | null;
   country_code: string | null;
   preferred_language: string | null;
   timezone: string | null;
@@ -258,6 +260,7 @@ export default function ProfilePage() {
   const [form, setForm] = useState<Partial<Profile>>({});
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [photoUploading, setPhotoUploading] = useState(false);
   const [message, setMessage] = useState<{
     type: "success" | "error";
     text: string;
@@ -288,6 +291,27 @@ export default function ProfilePage() {
 
   const update = <K extends keyof Profile>(key: K, value: Profile[K]) => {
     setForm((f) => ({ ...f, [key]: value }));
+  };
+
+  const handlePhotoUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    event.target.value = "";
+    if (!file) return;
+    setPhotoUploading(true);
+    setMessage(null);
+    const body = new FormData();
+    body.append("file", file);
+    const res = await apiFetch<{ profile: Pick<Profile, "profile_photo_url" | "profile_photo_public_id"> }>(
+      "/api/user/profile/photo",
+      { method: "POST", body },
+    );
+    if (res.success) {
+      setForm((current) => ({ ...current, ...res.data.profile }));
+      setMessage({ type: "success", text: "Profile photo updated successfully" });
+    } else {
+      setMessage({ type: "error", text: res.error.message });
+    }
+    setPhotoUploading(false);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -524,6 +548,25 @@ export default function ProfilePage() {
           delay={0.15}
         >
           <div className="space-y-4">
+            <div className="flex flex-wrap items-center gap-4 rounded-2xl border border-white/40 bg-white/35 p-4 backdrop-blur-md">
+              <div className="h-20 w-20 shrink-0 overflow-hidden rounded-full border-2 border-white/70 bg-white/60 shadow-inner">
+                {form.profile_photo_url ? (
+                  <img src={form.profile_photo_url} alt="Profile" className="h-full w-full object-cover" />
+                ) : (
+                  <div className="flex h-full w-full items-center justify-center text-xl font-semibold text-black/40">
+                    {(form.display_name || form.first_name || "B").charAt(0).toUpperCase()}
+                  </div>
+                )}
+              </div>
+              <div className="min-w-[220px] flex-1">
+                <div className="text-[13.5px] font-semibold text-black/90">Profile photo</div>
+                <div className="mt-0.5 text-[11.5px] text-black/55">JPEG, PNG, WebP or AVIF · maximum 5 MB</div>
+                <label className="mt-3 inline-flex cursor-pointer items-center rounded-full border border-black/15 bg-white/65 px-3.5 py-2 text-[12px] font-medium text-black/75 transition hover:bg-white">
+                  {photoUploading ? "Uploading…" : "Choose image"}
+                  <input type="file" accept="image/jpeg,image/png,image/webp,image/avif" onChange={handlePhotoUpload} disabled={photoUploading} className="sr-only" />
+                </label>
+              </div>
+            </div>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <Field label="First name">
                 <input

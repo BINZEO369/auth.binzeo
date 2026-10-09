@@ -17,12 +17,13 @@ export async function apiFetch<T>(
   options: RequestInit = {},
 ): Promise<ApiResponse<T>> {
   let response: Response;
+  const isFormData = typeof FormData !== "undefined" && options.body instanceof FormData;
 
   try {
     response = await fetch(path, {
       ...options,
       headers: {
-        "Content-Type": "application/json",
+        ...(isFormData ? {} : { "Content-Type": "application/json" }),
         ...(options.headers ?? {}),
       },
       credentials: "include",
