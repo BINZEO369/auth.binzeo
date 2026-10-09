@@ -58,28 +58,27 @@ function CheckIcon() {
 }
 
 /* ================================================================== */
-/*  Liquid glass — stronger because no overlay behind it              */
+/*  Liquid glass — truly transparent (visible image behind it)         */
 /* ================================================================== */
 const liquidGlass = {
   background:
-    "radial-gradient(120% 120% at 30% 12%, rgba(255,255,255,0.98) 0%, rgba(255,255,255,0.85) 45%, rgba(255,255,255,0.72) 100%)",
-  backdropFilter: "blur(24px) saturate(180%)",
-  WebkitBackdropFilter: "blur(24px) saturate(180%)",
+    "radial-gradient(120% 120% at 30% 12%, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0.40) 45%, rgba(255,255,255,0.28) 100%)",
+  backdropFilter: "blur(26px) saturate(180%)",
+  WebkitBackdropFilter: "blur(26px) saturate(180%)",
   boxShadow:
-    "inset 0 1px 0 0 rgba(255,255,255,1), inset 0 0 0 1px rgba(255,255,255,0.5), 0 2px 4px rgba(0,0,0,0.04), 0 16px 40px -22px rgba(0,0,0,0.22)",
+    "inset 0 1px 0 0 rgba(255,255,255,0.85), inset 0 0 0 1px rgba(255,255,255,0.35), 0 2px 4px rgba(0,0,0,0.04), 0 18px 42px -22px rgba(0,0,0,0.28)",
 } as const;
 
 /* ================================================================== */
-/*  Background layer — image only, no overlay                         */
+/*  Background layer — full viewport, no side gaps                    */
 /* ================================================================== */
 function PageBackground() {
   return (
     <div
       aria-hidden="true"
-      className="pointer-events-none absolute inset-0 overflow-hidden"
-      style={{ zIndex: 0 }}
+      className="pointer-events-none fixed inset-0 z-0 overflow-hidden"
     >
-      {/* Image — full bleed */}
+      {/* Image — full bleed, slightly oversized for Ken Burns */}
       <div
         className="absolute -inset-[6%]"
         style={{
@@ -88,14 +87,6 @@ function PageBackground() {
           backgroundPosition: "center",
           backgroundRepeat: "no-repeat",
           animation: "db-kenburns 32s ease-in-out infinite",
-        }}
-      />
-      {/* Very soft bottom fade so page bottom blends nicely (NOT covering content) */}
-      <div
-        className="absolute inset-x-0 bottom-0 h-32"
-        style={{
-          background:
-            "linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.35) 100%)",
         }}
       />
     </div>
@@ -120,7 +111,7 @@ function StatCard({
 }) {
   const inner = (
     <div
-      className="group relative h-full overflow-hidden rounded-2xl border border-black/[0.06] p-5 transition-all duration-500 hover:-translate-y-0.5 hover:border-black/[0.10] hover:shadow-[0_20px_44px_-22px_rgba(0,0,0,0.28)]"
+      className="group relative h-full overflow-hidden rounded-2xl border border-white/[0.35] p-5 transition-all duration-500 hover:-translate-y-0.5 hover:border-white/[0.5] hover:shadow-[0_22px_48px_-22px_rgba(0,0,0,0.32)]"
       style={{
         ...liquidGlass,
         animation: `db-item-in 0.6s cubic-bezier(0.22, 1, 0.36, 1) ${delay}s both`,
@@ -131,18 +122,18 @@ function StatCard({
         className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
         style={{
           background:
-            "radial-gradient(circle at 25% 15%, rgba(0,0,0,0.04), transparent 60%)",
+            "radial-gradient(circle at 25% 15%, rgba(255,255,255,0.35), transparent 60%)",
         }}
       />
 
-      <div className="relative text-[10px] font-semibold uppercase tracking-[0.16em] text-black/45">
+      <div className="relative text-[10px] font-semibold uppercase tracking-[0.16em] text-black/55">
         {title}
       </div>
       <div className="relative mt-2 truncate text-[17px] font-semibold text-black/90">
         {value}
       </div>
       {hint && (
-        <div className="relative mt-1 truncate text-[11.5px] text-black/50">
+        <div className="relative mt-1 truncate text-[11.5px] text-black/60">
           {hint}
         </div>
       )}
@@ -175,7 +166,7 @@ function ManageTile({
   return (
     <Link
       href={href}
-      className="group relative flex flex-col overflow-hidden rounded-2xl border border-black/[0.06] p-5 transition-all duration-500 hover:-translate-y-0.5 hover:border-black/[0.10] hover:shadow-[0_20px_44px_-22px_rgba(0,0,0,0.28)]"
+      className="group relative flex flex-col overflow-hidden rounded-2xl border border-white/[0.35] p-5 transition-all duration-500 hover:-translate-y-0.5 hover:border-white/[0.5] hover:shadow-[0_22px_48px_-22px_rgba(0,0,0,0.32)]"
       style={{
         ...liquidGlass,
         animation: `db-item-in 0.6s cubic-bezier(0.22, 1, 0.36, 1) ${delay}s both`,
@@ -186,7 +177,7 @@ function ManageTile({
         className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
         style={{
           background:
-            "radial-gradient(circle at 25% 15%, rgba(0,0,0,0.04), transparent 60%)",
+            "radial-gradient(circle at 25% 15%, rgba(255,255,255,0.35), transparent 60%)",
         }}
       />
 
@@ -194,11 +185,11 @@ function ManageTile({
         <div className="text-[14px] font-semibold text-black/90 transition-colors group-hover:text-black">
           {title}
         </div>
-        <span className="text-black/30 transition-all duration-500 group-hover:translate-x-0.5 group-hover:text-black/80">
+        <span className="text-black/40 transition-all duration-500 group-hover:translate-x-0.5 group-hover:text-black/80">
           <ArrowIcon />
         </span>
       </div>
-      <div className="relative text-[12px] leading-5 text-black/55">{desc}</div>
+      <div className="relative text-[12px] leading-5 text-black/65">{desc}</div>
     </Link>
   );
 }
@@ -222,7 +213,7 @@ export default function DashboardOverviewPage() {
     return (
       <div className="relative isolate flex min-h-[80vh] items-center justify-center">
         <PageBackground />
-        <div className="relative z-10 h-6 w-6 animate-spin rounded-full border-2 border-black/25 border-t-black/80" />
+        <div className="relative z-10 h-6 w-6 animate-spin rounded-full border-2 border-white/60 border-t-black/70" />
       </div>
     );
   }
@@ -281,12 +272,12 @@ export default function DashboardOverviewPage() {
       `}</style>
 
       {/* ============================================================ */}
-      {/*  BACKGROUND IMAGE — no overlay, just the image                */}
+      {/*  FIXED FULL-VIEWPORT BACKGROUND — no side gaps                */}
       {/* ============================================================ */}
       <PageBackground />
 
       {/* ============================================================ */}
-      {/*  CONTENT                                                      */}
+      {/*  CONTENT — centered, max-width for readability                */}
       {/* ============================================================ */}
       <div className="relative z-10 mx-auto max-w-5xl space-y-6 px-4 py-6 sm:px-6 sm:py-8">
         {/* ============================================================ */}
@@ -294,14 +285,14 @@ export default function DashboardOverviewPage() {
         {/* ============================================================ */}
         <div
           data-db-anim
-          className="relative overflow-hidden rounded-3xl border border-black/[0.06] p-7 sm:p-9"
+          className="relative overflow-hidden rounded-3xl border border-white/[0.4] p-7 sm:p-9"
           style={{
             background:
-              "radial-gradient(120% 120% at 30% 12%, rgba(255,255,255,0.98) 0%, rgba(255,255,255,0.88) 45%, rgba(255,255,255,0.78) 100%)",
+              "radial-gradient(120% 120% at 30% 12%, rgba(255,255,255,0.58) 0%, rgba(255,255,255,0.42) 45%, rgba(255,255,255,0.30) 100%)",
             backdropFilter: "blur(32px) saturate(180%)",
             WebkitBackdropFilter: "blur(32px) saturate(180%)",
             boxShadow:
-              "inset 0 1px 0 0 rgba(255,255,255,1), inset 0 0 0 1px rgba(255,255,255,0.5), 0 2px 4px rgba(0,0,0,0.04), 0 28px 60px -28px rgba(0,0,0,0.30)",
+              "inset 0 1px 0 0 rgba(255,255,255,0.9), inset 0 0 0 1px rgba(255,255,255,0.35), 0 2px 4px rgba(0,0,0,0.04), 0 30px 64px -28px rgba(0,0,0,0.34)",
             animation:
               "db-banner-in 0.85s cubic-bezier(0.22, 1, 0.36, 1) 0.05s both",
           }}
@@ -317,54 +308,61 @@ export default function DashboardOverviewPage() {
 
           <div
             aria-hidden="true"
-            className="pointer-events-none absolute -left-16 -top-16 h-52 w-52 rounded-full opacity-60"
+            className="pointer-events-none absolute -left-16 -top-16 h-52 w-52 rounded-full opacity-70"
             style={{
               background:
-                "radial-gradient(circle, rgba(180,200,255,0.4) 0%, rgba(180,200,255,0) 70%)",
+                "radial-gradient(circle, rgba(180,200,255,0.5) 0%, rgba(180,200,255,0) 70%)",
               filter: "blur(36px)",
               animation: "db-float-soft 7s ease-in-out infinite",
             }}
           />
           <div
             aria-hidden="true"
-            className="pointer-events-none absolute -right-16 -bottom-16 h-52 w-52 rounded-full opacity-60"
+            className="pointer-events-none absolute -right-16 -bottom-16 h-52 w-52 rounded-full opacity-70"
             style={{
               background:
-                "radial-gradient(circle, rgba(255,200,180,0.35) 0%, rgba(255,200,180,0) 70%)",
+                "radial-gradient(circle, rgba(255,200,180,0.45) 0%, rgba(255,200,180,0) 70%)",
               filter: "blur(36px)",
               animation: "db-float-soft 7s ease-in-out 1.4s infinite",
             }}
           />
 
           <div className="relative">
-            <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-black/[0.06] bg-white/80 px-3 py-1.5 backdrop-blur-md">
+            <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-white/40 bg-white/40 px-3 py-1.5 backdrop-blur-md">
               <span
-                className="h-1.5 w-1.5 rounded-full bg-black"
+                className="h-1.5 w-1.5 rounded-full bg-black/80"
                 style={{ animation: "db-float-soft 2.4s ease-in-out infinite" }}
               />
-              <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-black/60">
+              <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-black/70">
                 Welcome back
               </span>
             </div>
 
-            <h1 className="mb-4 text-2xl font-semibold tracking-[-0.02em] text-black/90 sm:text-3xl">
+            <h1
+              className="mb-4 text-2xl font-semibold tracking-[-0.02em] text-black"
+              style={{
+                textShadow: "0 1px 12px rgba(255,255,255,0.85), 0 1px 2px rgba(255,255,255,0.6)",
+              }}
+            >
               {name}
             </h1>
 
             {profile?.binzeo_user_id && (
               <div
-                className="inline-flex items-center gap-2 rounded-xl border border-black/[0.06] px-3 py-2"
+                className="inline-flex items-center gap-2 rounded-xl border border-white/40 px-3 py-2"
                 style={{
                   background:
-                    "radial-gradient(120% 120% at 30% 15%, rgba(255,255,255,1) 0%, rgba(255,255,255,0.75) 100%)",
+                    "radial-gradient(120% 120% at 30% 15%, rgba(255,255,255,0.65) 0%, rgba(255,255,255,0.35) 100%)",
                   boxShadow:
-                    "inset 0 1px 0 0 rgba(255,255,255,1), 0 2px 8px -4px rgba(0,0,0,0.08)",
+                    "inset 0 1px 0 0 rgba(255,255,255,0.85), 0 2px 8px -4px rgba(0,0,0,0.10)",
+                  backdropFilter: "blur(14px)",
+                  WebkitBackdropFilter: "blur(14px)",
                 }}
               >
-                <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-black/45">
+                <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-black/55">
                   Your ID
                 </span>
-                <span className="font-mono text-[12.5px] font-medium text-black/80">
+                <span className="font-mono text-[12.5px] font-medium text-black/85">
                   {profile.binzeo_user_id}
                 </span>
               </div>
@@ -374,8 +372,8 @@ export default function DashboardOverviewPage() {
               <span
                 className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-[11px] font-medium backdrop-blur-md ${
                   isActive
-                    ? "border-emerald-200/80 bg-emerald-50/80 text-emerald-700"
-                    : "border-amber-200/80 bg-amber-50/80 text-amber-700"
+                    ? "border-emerald-300/60 bg-emerald-100/50 text-emerald-800"
+                    : "border-amber-300/60 bg-amber-100/50 text-amber-800"
                 }`}
               >
                 <span className="flex h-3.5 w-3.5 items-center justify-center">
@@ -386,7 +384,7 @@ export default function DashboardOverviewPage() {
 
               <Link
                 href="/dashboard/profile"
-                className="group inline-flex items-center gap-1.5 rounded-full border border-black/[0.08] bg-white/75 px-3 py-1.5 text-[11px] font-medium text-black/75 backdrop-blur-md transition-all duration-500 hover:-translate-y-0.5 hover:border-black/[0.14] hover:text-black hover:shadow-[0_10px_24px_-12px_rgba(0,0,0,0.24)]"
+                className="group inline-flex items-center gap-1.5 rounded-full border border-white/40 bg-white/40 px-3 py-1.5 text-[11px] font-medium text-black/80 backdrop-blur-md transition-all duration-500 hover:-translate-y-0.5 hover:border-white/60 hover:bg-white/60 hover:text-black hover:shadow-[0_10px_24px_-12px_rgba(0,0,0,0.28)]"
               >
                 Edit profile
                 <span className="transition-transform duration-500 group-hover:translate-x-0.5">
@@ -445,7 +443,12 @@ export default function DashboardOverviewPage() {
                 "db-item-in 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.35s both",
             }}
           >
-            <span className="whitespace-nowrap text-[10px] font-semibold uppercase tracking-[0.18em] text-black/60">
+            <span
+              className="whitespace-nowrap text-[10px] font-semibold uppercase tracking-[0.18em] text-black/75"
+              style={{
+                textShadow: "0 1px 8px rgba(255,255,255,0.9)",
+              }}
+            >
               Manage
             </span>
             <span
@@ -453,7 +456,7 @@ export default function DashboardOverviewPage() {
               className="h-px flex-1"
               style={{
                 background:
-                  "linear-gradient(90deg, rgba(0,0,0,0.18), rgba(0,0,0,0))",
+                  "linear-gradient(90deg, rgba(0,0,0,0.28), rgba(0,0,0,0))",
               }}
             />
           </div>
