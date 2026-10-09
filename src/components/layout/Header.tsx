@@ -500,7 +500,6 @@ export default function Header({ isLoggedIn = false, onMenu }: HeaderProps) {
                         icon="/icons/id-card.svg"
                         delay={0.19}
                         onClick={closeMenu}
-                        variant="dark"
                       />
                     </div>
                   </>
