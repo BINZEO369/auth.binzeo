@@ -45,9 +45,6 @@ const useCases = [
   },
 ];
 
-/* ================================================================== */
-/*  Partner / Brand logos (circular row under CTA)                     */
-/* ================================================================== */
 const partnerLogos = [
   { src: "/images/jabiyenlogo.png", alt: "Jabiyen" },
   { src: "/images/isyenlogo.png", alt: "Isyen" },
@@ -66,9 +63,6 @@ export default async function HomePage() {
 
   return (
     <main className="reference-home">
-      {/* ============================================================ */}
-      {/*  HERO ANIMATION KEYFRAMES                                     */}
-      {/* ============================================================ */}
       <style>{`
         @keyframes bz-fade-up {
           from { opacity: 0; transform: translateY(28px); filter: blur(10px); }
@@ -90,15 +84,11 @@ export default async function HomePage() {
           0%, 100% { transform: scale(1.05) translate(0, 0); }
           50%      { transform: scale(1.15) translate(-1.5%, -1%); }
         }
-        @keyframes bz-float {
-          0%, 100% { transform: translateY(0); }
-          50%      { transform: translateY(-14px); }
-        }
       `}</style>
 
       <div className="reference-shell">
         {/* ============================================================ */}
-        {/*  HERO BANNER — Pure img3.jpg + Text + Logos                   */}
+        {/*  HERO BANNER                                                  */}
         {/* ============================================================ */}
         <section
           className="reference-hero-banner"
@@ -140,7 +130,6 @@ export default async function HomePage() {
               textAlign: "center",
             }}
           >
-            {/* BIG BINZEO LOGO — centered */}
             <div
               style={{
                 width: "100%",
@@ -263,7 +252,6 @@ export default async function HomePage() {
               </Link>
             </div>
 
-            {/* PARTNER LOGO ROW */}
             <div
               style={{
                 marginTop: "clamp(48px, 7vh, 80px)",
@@ -315,161 +303,33 @@ export default async function HomePage() {
         </section>
 
         {/* ============================================================ */}
-        {/*  PHONE CASE SHOWCASE — Mobile authentication display          */}
+        {/*  PHONE CASE — PURE FULL-SCREEN IMAGE (NO TEXT, NO ANIMATION)  */}
         {/* ============================================================ */}
         <section
           style={{
             position: "relative",
             width: "100vw",
+            height: "100vh",
+            minHeight: "100dvh",
             marginLeft: "calc(-50vw + 50%)",
             marginRight: "calc(-50vw + 50%)",
-            backgroundColor: "#f7f7f5",
             overflow: "hidden",
-            padding: "clamp(60px, 10vh, 120px) clamp(20px, 4vw, 48px)",
+            backgroundColor: "#000",
           }}
         >
-          {/* Subtle radial glow behind phone */}
-          <div
-            aria-hidden="true"
+          <img
+            src="/images/phonecase1.jpg"
+            alt=""
             style={{
               position: "absolute",
-              top: "50%",
-              left: "50%",
-              transform: "translate(-50%, -50%)",
-              width: "min(90vw, 900px)",
-              height: "min(90vw, 900px)",
-              background:
-                "radial-gradient(circle, rgba(140,190,255,0.18) 0%, rgba(255,200,140,0.12) 40%, transparent 70%)",
-              filter: "blur(60px)",
-              pointerEvents: "none",
+              inset: 0,
+              width: "100%",
+              height: "100%",
+              objectFit: "cover",
+              objectPosition: "center",
+              display: "block",
             }}
           />
-
-          <div
-            style={{
-              position: "relative",
-              zIndex: 2,
-              maxWidth: "1100px",
-              margin: "0 auto",
-              textAlign: "center",
-            }}
-          >
-            {/* Kicker pill */}
-            <div
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "10px",
-                padding: "8px 16px",
-                borderRadius: "999px",
-                border: "1px solid rgba(0,0,0,0.06)",
-                background: "rgba(255,255,255,0.7)",
-                backdropFilter: "blur(20px) saturate(180%)",
-                WebkitBackdropFilter: "blur(20px) saturate(180%)",
-                boxShadow:
-                  "inset 0 1px 0 0 rgba(255,255,255,0.9), 0 4px 16px -8px rgba(0,0,0,0.08)",
-                color: "rgba(0,0,0,0.7)",
-                fontSize: "clamp(11px, 1.1vw, 13px)",
-                fontWeight: 500,
-                letterSpacing: "0.14em",
-                textTransform: "uppercase",
-                marginBottom: "clamp(20px, 3vh, 32px)",
-                animation:
-                  "bz-fade-up 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.1s both",
-              }}
-            >
-              <span
-                style={{
-                  width: "6px",
-                  height: "6px",
-                  borderRadius: "999px",
-                  backgroundColor: "#111",
-                }}
-              />
-              BINZEO in your pocket
-            </div>
-
-            {/* Headline */}
-            <h2
-              style={{
-                margin: "0 auto clamp(16px, 2vh, 24px)",
-                maxWidth: "820px",
-                fontSize: "clamp(30px, 5vw, 64px)",
-                lineHeight: 1.05,
-                letterSpacing: "-0.04em",
-                fontWeight: 600,
-                color: "#0a0a0a",
-                animation:
-                  "bz-fade-up 1s cubic-bezier(0.22, 1, 0.36, 1) 0.25s both",
-              }}
-            >
-              Authentication that feels effortless.
-            </h2>
-
-            {/* Description */}
-            <p
-              style={{
-                margin: "0 auto clamp(40px, 6vh, 72px)",
-                maxWidth: "620px",
-                fontSize: "clamp(14px, 1.3vw, 17px)",
-                lineHeight: 1.65,
-                color: "rgba(0,0,0,0.65)",
-                animation:
-                  "bz-fade-up 1s cubic-bezier(0.22, 1, 0.36, 1) 0.4s both",
-              }}
-            >
-              Sign in with a glance, a touch, or a tap. BINZEO runs smoothly on
-              every device — your identity, always ready in the palm of your
-              hand.
-            </p>
-
-            {/* ==================================================== */}
-            {/*  PHONE CASE IMAGE — Big, floating                     */}
-            {/* ==================================================== */}
-            <div
-              style={{
-                position: "relative",
-                display: "flex",
-                justifyContent: "center",
-                animation:
-                  "bz-fade-up 1.2s cubic-bezier(0.22, 1, 0.36, 1) 0.55s both",
-              }}
-            >
-              {/* Soft glow behind phone */}
-              <div
-                aria-hidden="true"
-                style={{
-                  position: "absolute",
-                  top: "50%",
-                  left: "50%",
-                  transform: "translate(-50%, -50%)",
-                  width: "min(80vw, 720px)",
-                  height: "min(80vw, 720px)",
-                  background:
-                    "radial-gradient(circle, rgba(0,0,0,0.10) 0%, transparent 65%)",
-                  filter: "blur(50px)",
-                  pointerEvents: "none",
-                }}
-              />
-
-              {/* The phone case image */}
-              <img
-                src="/images/phonecase1.jpg"
-                alt="BINZEO authentication shown on a mobile device"
-                style={{
-                  position: "relative",
-                  width: "min(80vw, 640px)",
-                  height: "auto",
-                  maxWidth: "100%",
-                  display: "block",
-                  borderRadius: "clamp(20px, 3vw, 36px)",
-                  boxShadow:
-                    "0 40px 100px -32px rgba(0,0,0,0.35), 0 20px 50px -20px rgba(0,0,0,0.25), 0 0 0 1px rgba(0,0,0,0.04)",
-                  animation: "bz-float 7s ease-in-out infinite",
-                }}
-              />
-            </div>
-          </div>
         </section>
 
         {/* ============================================================ */}
