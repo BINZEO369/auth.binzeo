@@ -1,5 +1,6 @@
 "use client";
 
+import Loader from "@/components/ui/Loader";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 
@@ -72,7 +73,7 @@ export default function PublicProfilePage({ params }: { params: Promise<{ userna
   );
 
   if (loading) {
-    return null;
+    return <Loader variant="public-profile" />;
   }
 
   if (!profile) {

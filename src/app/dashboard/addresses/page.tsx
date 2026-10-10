@@ -1,4 +1,5 @@
 "use client";
+import Loader from "@/components/ui/Loader";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { apiFetch } from "@/lib/api/client";
@@ -202,24 +203,7 @@ export default function AddressesPage() {
   };
 
   /* ---------------- loading state ---------------- */
-  if (loading) {
-    return (
-      <div className="relative isolate min-h-[80vh]">
-        <PageBackground />
-        <style jsx global>{`
-          @keyframes addr-item-in {
-            from { opacity: 0; transform: translateY(20px) scale(0.99); filter: blur(8px); }
-            to   { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
-          }
-          @keyframes addr-kenburns {
-            0%, 100% { transform: scale(1.04) translate(0, 0); }
-            50%      { transform: scale(1.12) translate(-1%, -0.8%); }
-          }
-        `}</style>
-        <div className={containerCls}><span aria-hidden="true" /></div>
-      </div>
-    );
-  }
+  if (loading) return <Loader variant="addresses" />;
 
   return (
     <div className="relative isolate min-h-[80vh]">

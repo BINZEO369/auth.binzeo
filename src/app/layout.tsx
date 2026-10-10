@@ -3,7 +3,6 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
-import { GlobalLoadingOverlay } from "@/components/ui/Loader";
 import { createClient } from "@/lib/supabase/server";
 
 const inter = Inter({
@@ -47,7 +46,6 @@ export default async function RootLayout({
         <Header isLoggedIn={Boolean(user)} />
         <div className="flex min-h-[calc(100dvh-72px)] min-w-0 flex-none flex-col pt-[72px]">{children}</div>
         <Footer isLoggedIn={Boolean(user)} />
-        <GlobalLoadingOverlay />
       </body>
     </html>
   );

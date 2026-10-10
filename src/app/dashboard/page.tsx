@@ -1,4 +1,5 @@
 "use client";
+import Loader from "@/components/ui/Loader";
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
@@ -521,24 +522,7 @@ export default function DashboardOverviewPage() {
     ? profile.country_code.toUpperCase()
     : null;
 
-  if (loading) {
-    return (
-      <div className="relative isolate flex min-h-screen items-center justify-center">
-        <div
-          className="pointer-events-none fixed inset-0 z-0"
-          style={{
-            backgroundImage: "url('/images/img3.jpg')",
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-            filter: `blur(${Math.min(blur + 2, BLUR_MAX)}px) saturate(115%)`,
-            transform: "scale(1.06)",
-          }}
-        />
-        <div className="absolute inset-0 z-0 bg-black/25 backdrop-blur-md" />
-        <span aria-hidden="true" />
-      </div>
-    );
-  }
+  if (loading) return <Loader variant="dashboard" />;
 
   return (
     <div className="relative isolate min-h-screen w-full">

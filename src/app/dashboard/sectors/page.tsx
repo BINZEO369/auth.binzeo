@@ -1,4 +1,5 @@
 "use client";
+import Loader from "@/components/ui/Loader";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { apiFetch } from "@/lib/api/client";
@@ -93,13 +94,7 @@ export default function SectorsPage() {
     setBusyId(null);
   };
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center py-20">
-        <span aria-hidden="true" />
-      </div>
-    );
-  }
+  if (loading) return <Loader variant="sectors" />;
 
   return (
     <div className="max-w-3xl mx-auto space-y-6">

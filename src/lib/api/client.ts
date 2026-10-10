@@ -12,19 +12,12 @@ function isApiResponse<T>(value: unknown): value is ApiResponse<T> {
   return false;
 }
 
-function notifyLoading(type: "start" | "end") {
-  if (typeof window !== "undefined") {
-    window.dispatchEvent(new Event(`binzeo:loading:${type}`));
-  }
-}
-
 export async function apiFetch<T>(
   path: string,
   options: RequestInit = {},
 ): Promise<ApiResponse<T>> {
   let response: Response;
   const isFormData = typeof FormData !== "undefined" && options.body instanceof FormData;
-  notifyLoading("start");
 
   try {
     response = await fetch(path, {
@@ -44,8 +37,6 @@ export async function apiFetch<T>(
         code: "NETWORK_ERROR",
       },
     };
-  } finally {
-    notifyLoading("end");
   }
 
   const raw = await response.text();

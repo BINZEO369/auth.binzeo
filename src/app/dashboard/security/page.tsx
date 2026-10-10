@@ -1,4 +1,5 @@
 "use client";
+import Loader from "@/components/ui/Loader";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -311,14 +312,7 @@ export default function SecurityPage() {
     })();
   }, []);
 
-  if (loading) {
-    return (
-      <div className="relative isolate flex min-h-[80vh] items-center justify-center">
-        <PageBackground />
-        <span aria-hidden="true" />
-      </div>
-    );
-  }
+  if (loading) return <Loader variant="security" />;
 
   return (
     <div className="relative isolate min-h-[80vh] w-full overflow-x-hidden">

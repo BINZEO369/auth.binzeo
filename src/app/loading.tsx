@@ -1,3 +1,5 @@
+import Loader from "@/components/ui/Loader";
+
 export default function Loading() {
-  return null;
+  return <Loader variant="auto" />;
 }

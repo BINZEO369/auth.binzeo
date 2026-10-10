@@ -1,4 +1,5 @@
 "use client";
+import Loader from "@/components/ui/Loader";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { apiFetch } from "@/lib/api/client";
@@ -216,14 +217,7 @@ export default function ContactsPage() {
   };
 
   /* ---------------- loading state ---------------- */
-  if (loading) {
-    return (
-      <div className="relative isolate flex min-h-[80vh] items-center justify-center">
-        <PageBackground />
-        <span aria-hidden="true" />
-      </div>
-    );
-  }
+  if (loading) return <Loader variant="contacts" />;
 
   return (
     <div className="relative isolate min-h-[80vh]">
