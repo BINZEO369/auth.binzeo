@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { apiFetch } from "@/lib/api/client";
 
 type Profile = {
@@ -47,16 +48,7 @@ function readStoredBlur(): number {
 /* ================================================================== */
 function ArrowIcon() {
   return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2.2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className="h-3.5 w-3.5"
-      aria-hidden="true"
-    >
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className="h-3.5 w-3.5" aria-hidden="true">
       <path d="m9 18 6-6-6-6" />
     </svg>
   );
@@ -64,16 +56,7 @@ function ArrowIcon() {
 
 function CheckIcon() {
   return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2.6"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className="h-3 w-3"
-      aria-hidden="true"
-    >
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" className="h-3 w-3" aria-hidden="true">
       <path d="M20 6 9 17l-5-5" />
     </svg>
   );
@@ -81,16 +64,7 @@ function CheckIcon() {
 
 function SlidersIcon({ className = "h-3.5 w-3.5" }: { className?: string }) {
   return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className={className}
-      aria-hidden="true"
-    >
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden="true">
       <line x1="4" y1="7" x2="20" y2="7" />
       <circle cx="9" cy="7" r="2" />
       <line x1="4" y1="17" x2="20" y2="17" />
@@ -112,7 +86,7 @@ const liquidGlass = {
 } as const;
 
 /* ================================================================== */
-/*  Blur control — fixed-position popover always inside viewport       */
+/*  Blur control — portal-rendered popover (escapes ALL stacking)      */
 /* ================================================================== */
 function BlurControl({
   value,
@@ -122,36 +96,46 @@ function BlurControl({
   onChange: (n: number) => void;
 }) {
   const [open, setOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const [coords, setCoords] = useState<{ top: number; left: number } | null>(
     null
   );
-  const wrapperRef = useRef<HTMLDivElement | null>(null);
+
   const btnRef = useRef<HTMLButtonElement | null>(null);
+  const popRef = useRef<HTMLDivElement | null>(null);
 
   const POPOVER_W = 248;
   const POPOVER_H = 190;
 
-  /* ---- compute safe position ---- */
+  /* ---- enable portal only after hydration ---- */
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  /* ---- compute safe position relative to viewport ---- */
   const recalc = useCallback(() => {
     if (!btnRef.current) return;
     const rect = btnRef.current.getBoundingClientRect();
     const pad = 12;
 
-    /* Horizontal — right-align with button but keep inside viewport */
+    /* Horizontal — right-align with button, but stay inside viewport */
     let left = rect.right - POPOVER_W;
     if (left < pad) left = pad;
     if (left + POPOVER_W > window.innerWidth - pad) {
       left = window.innerWidth - POPOVER_W - pad;
     }
 
-    /* Vertical — prefer above; fall back below if no room */
+    /* Vertical — prefer above; fall back below */
     let top = rect.top - POPOVER_H - 12;
     if (top < pad) top = rect.bottom + 12;
+    if (top + POPOVER_H > window.innerHeight - pad) {
+      top = window.innerHeight - POPOVER_H - pad;
+    }
 
     setCoords({ top, left });
   }, []);
 
-  /* ---- on open: compute + listen to scroll/resize ---- */
+  /* ---- open: compute + track scroll/resize ---- */
   useEffect(() => {
     if (!open) return;
     recalc();
@@ -165,15 +149,13 @@ function BlurControl({
     };
   }, [open, recalc]);
 
-  /* ---- close on outside click + ESC ---- */
+  /* ---- outside click + ESC ---- */
   useEffect(() => {
     if (!open) return;
     const onDocClick = (e: MouseEvent) => {
       const t = e.target as Node;
-      if (wrapperRef.current?.contains(t)) return;
-      /* also ignore clicks inside the popover itself */
-      const pop = document.getElementById("bz-blur-popover");
-      if (pop && pop.contains(t)) return;
+      if (btnRef.current?.contains(t)) return;
+      if (popRef.current?.contains(t)) return;
       setOpen(false);
     };
     const onKey = (e: KeyboardEvent) => {
@@ -189,57 +171,21 @@ function BlurControl({
 
   const pct = ((value - BLUR_MIN) / (BLUR_MAX - BLUR_MIN)) * 100;
 
-  return (
-    <div ref={wrapperRef} className="relative inline-flex">
-      {/* Trigger — compact pill matching sibling status pill */}
-      <button
-        ref={btnRef}
-        type="button"
-        onClick={() => setOpen((v) => !v)}
-        aria-label="Adjust background blur"
-        title="Adjust background blur"
-        aria-expanded={open}
-        aria-controls="bz-blur-popover"
-        className="group inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-[11px] font-medium backdrop-blur-md transition-all duration-500 hover:-translate-y-0.5"
-        style={{
-          borderColor: open ? "rgba(255,255,255,0.75)" : "rgba(255,255,255,0.5)",
-          background: open
-            ? "radial-gradient(120% 120% at 30% 15%, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0.55) 100%)"
-            : "radial-gradient(120% 120% at 30% 15%, rgba(255,255,255,0.65) 0%, rgba(255,255,255,0.35) 100%)",
-          boxShadow: open
-            ? "inset 0 1px 0 0 rgba(255,255,255,1), inset 0 0 0 1px rgba(255,255,255,0.55), 0 10px 26px -12px rgba(0,0,0,0.4)"
-            : "inset 0 1px 0 0 rgba(255,255,255,0.9), inset 0 0 0 1px rgba(255,255,255,0.4), 0 8px 22px -10px rgba(0,0,0,0.3)",
-          color: "rgba(0,0,0,0.8)",
-        }}
-      >
-        <span
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-0 rounded-full opacity-0 transition-opacity duration-500 group-hover:opacity-100"
-          style={{
-            background:
-              "radial-gradient(circle at 30% 30%, rgba(255,255,255,0.55), transparent 60%)",
-          }}
-        />
-        <span className="relative flex items-center">
-          <SlidersIcon />
-        </span>
-        <span className="relative font-mono text-[10.5px] tabular-nums text-black/70">
-          {value}
-        </span>
-      </button>
-
-      {/* Popover — position: fixed → always inside viewport, never clipped */}
-      {open && coords && (
+  /* ---------- popover JSX (rendered into <body> via portal) ---------- */
+  const popover = coords
+    ? createPortal(
         <div
+          ref={popRef}
           id="bz-blur-popover"
           role="dialog"
           aria-label="Background blur settings"
-          className="w-[248px] rounded-2xl border border-white/50 p-4"
+          className="rounded-2xl border border-white/50 p-4"
           style={{
             position: "fixed",
             top: coords.top,
             left: coords.left,
-            zIndex: 9999,
+            width: POPOVER_W,
+            zIndex: 2147483647, /* max — above every stacking context */
             background:
               "radial-gradient(140% 120% at 20% 0%, rgba(255,255,255,0.96) 0%, rgba(255,255,255,0.88) 45%, rgba(255,255,255,0.78) 100%)",
             backdropFilter: "blur(32px) saturate(180%)",
@@ -293,7 +239,7 @@ function BlurControl({
             </span>
           </div>
 
-          {/* Slider — thumb is a perfect circle centered on the track */}
+          {/* Slider */}
           <div className="bz-blur-wrap relative flex h-4 w-full items-center">
             <input
               type="range"
@@ -320,14 +266,12 @@ function BlurControl({
           </div>
 
           <style jsx>{`
-            /* ---- WebKit / Chromium ---- */
             .bz-blur-range::-webkit-slider-thumb {
               -webkit-appearance: none;
               appearance: none;
               width: 16px;
               height: 16px;
               border-radius: 999px;
-              /* center 16px thumb on 6px track → (16-6)/2 = 5 */
               margin-top: -5px;
               background: radial-gradient(
                 120% 120% at 30% 20%,
@@ -356,7 +300,6 @@ function BlurControl({
               background: transparent;
             }
 
-            /* ---- Firefox ---- */
             .bz-blur-range::-moz-range-thumb {
               width: 16px;
               height: 16px;
@@ -389,9 +332,53 @@ function BlurControl({
               box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.6);
             }
           `}</style>
-        </div>
-      )}
-    </div>
+        </div>,
+        document.body
+      )
+    : null;
+
+  return (
+    <>
+      {/* Trigger — compact pill */}
+      <button
+        ref={btnRef}
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        aria-label="Adjust background blur"
+        title="Adjust background blur"
+        aria-expanded={open}
+        aria-controls="bz-blur-popover"
+        className="group relative inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-[11px] font-medium backdrop-blur-md transition-all duration-500 hover:-translate-y-0.5"
+        style={{
+          borderColor: open ? "rgba(255,255,255,0.75)" : "rgba(255,255,255,0.5)",
+          background: open
+            ? "radial-gradient(120% 120% at 30% 15%, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0.55) 100%)"
+            : "radial-gradient(120% 120% at 30% 15%, rgba(255,255,255,0.65) 0%, rgba(255,255,255,0.35) 100%)",
+          boxShadow: open
+            ? "inset 0 1px 0 0 rgba(255,255,255,1), inset 0 0 0 1px rgba(255,255,255,0.55), 0 10px 26px -12px rgba(0,0,0,0.4)"
+            : "inset 0 1px 0 0 rgba(255,255,255,0.9), inset 0 0 0 1px rgba(255,255,255,0.4), 0 8px 22px -10px rgba(0,0,0,0.3)",
+          color: "rgba(0,0,0,0.8)",
+        }}
+      >
+        <span
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 rounded-full opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+          style={{
+            background:
+              "radial-gradient(circle at 30% 30%, rgba(255,255,255,0.55), transparent 60%)",
+          }}
+        />
+        <span className="relative flex items-center">
+          <SlidersIcon />
+        </span>
+        <span className="relative font-mono text-[10.5px] tabular-nums text-black/70">
+          {value}
+        </span>
+      </button>
+
+      {/* Portal — rendered into <body>, escapes every parent stacking context */}
+      {mounted && open && popover}
+    </>
   );
 }
 
@@ -775,13 +762,7 @@ export default function DashboardOverviewPage() {
         <div className="h-[46vh] sm:h-[44vh]" aria-hidden="true" />
 
         {/* ID + Verified + Blur control */}
-        <div
-          className="mb-4 flex flex-wrap items-center gap-2"
-          style={{
-            animation:
-              "db-item-in 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.15s both",
-          }}
-        >
+        <div className="mb-4 flex flex-wrap items-center gap-2">
           {profile?.binzeo_user_id && (
             <div
               className="inline-flex items-center gap-2 rounded-full border border-white/50 px-3 py-1.5 backdrop-blur-md"
@@ -854,13 +835,7 @@ export default function DashboardOverviewPage() {
 
         {/* MANAGE */}
         <div className="mt-6 sm:mt-8">
-          <div
-            className="mb-4 flex items-center gap-3"
-            style={{
-              animation:
-                "db-item-in 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.4s both",
-            }}
-          >
+          <div className="mb-4 flex items-center gap-3">
             <span className="whitespace-nowrap text-[10px] font-semibold uppercase tracking-[0.18em] text-black/60">
               Manage
             </span>
