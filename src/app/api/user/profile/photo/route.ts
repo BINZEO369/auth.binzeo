@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { ok, fail } from "@/lib/api/response";
-import { uploadProfileImage } from "@/lib/cloudinary";
+import { uploadProfileImage } from "@/lib/imagekit";
 
 const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
 const ALLOWED_TYPES = new Set(["image/jpeg", "image/png", "image/webp", "image/avif"]);
@@ -22,7 +22,7 @@ export async function POST(req: NextRequest) {
     const uploaded = await uploadProfileImage(buffer, user.id);
     const { data: profile, error: updateError } = await supabase
       .from("profiles")
-      .update({ profile_photo_url: uploaded.secure_url, profile_photo_public_id: uploaded.public_id })
+      .update({ profile_photo_url: uploaded.url, profile_photo_public_id: uploaded.fileId })
       .eq("id", user.id)
       .select("profile_photo_url, profile_photo_public_id")
       .single();
@@ -34,16 +34,16 @@ export async function POST(req: NextRequest) {
 
     return ok({ profile });
   } catch (error) {
-    const uploadError = error as Error & { http_code?: number; cloudinary_name?: string };
+    const uploadError = error as Error & { status?: number; statusCode?: number };
     console.error("[PROFILE_PHOTO_UPLOAD_ERROR]", {
       message: uploadError.message,
-      http_code: uploadError.http_code,
-      cloudinary_name: uploadError.cloudinary_name,
+      status: uploadError.status,
+      statusCode: uploadError.statusCode,
     });
-    const message = error instanceof Error && error.message.startsWith("Cloudinary is not configured")
+    const message = error instanceof Error && error.message.startsWith("ImageKit is not configured")
       ? "Profile image storage is not configured yet."
-      : uploadError.http_code === 401 || uploadError.http_code === 403
-        ? "Cloudinary rejected the upload credentials or permissions. Verify the Production Cloudinary API key, API secret, and cloud name."
+      : uploadError.status === 401 || uploadError.status === 403 || uploadError.statusCode === 401 || uploadError.statusCode === 403
+        ? "ImageKit rejected the upload credentials or permissions. Verify the Production ImageKit private key."
       : "Unable to upload profile image. Please try again.";
     return fail(message, 500, "PROFILE_PHOTO_UPLOAD_FAILED");
   }
