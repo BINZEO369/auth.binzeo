@@ -20,6 +20,11 @@ export const metadata: Metadata = {
     "Create, manage, and share your secure digital identity with Binzeo ID.",
   keywords: ["Binzeo", "Digital ID", "Identity", "BZ-U"],
   authors: [{ name: "Binzeo Labs" }],
+  icons: {
+    icon: [{ url: "/logo.svg", type: "image/svg+xml" }],
+    shortcut: ["/logo.svg"],
+    apple: [{ url: "/logo.svg", type: "image/svg+xml" }],
+  },
   openGraph: {
     title: "Binzeo ID — Your Digital Identity",
     description: "Create, manage, and share your secure digital identity.",
