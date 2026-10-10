@@ -1,6 +1,4 @@
 "use client";
-import Loader from "@/components/ui/Loader";
-
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { apiFetch } from "@/lib/api/client";
@@ -98,7 +96,7 @@ export default function SectorsPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <Loader size="md" className="text-[#777777]" />
+        <span aria-hidden="true" />
       </div>
     );
   }

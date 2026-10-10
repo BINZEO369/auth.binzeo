@@ -1,6 +1,4 @@
 "use client";
-import Loader from "@/components/ui/Loader";
-
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { apiFetch } from "@/lib/api/client";
@@ -218,7 +216,7 @@ export default function AddressesPage() {
             50%      { transform: scale(1.12) translate(-1%, -0.8%); }
           }
         `}</style>
-        <div className={containerCls}><Loader size="lg" label="Loading addresses…" className="text-black/60" /></div>
+        <div className={containerCls}><span aria-hidden="true" /></div>
       </div>
     );
   }
@@ -591,7 +589,7 @@ export default function AddressesPage() {
                       className="flex h-9 w-9 items-center justify-center rounded-full border border-white/40 bg-white/40 text-black/65 backdrop-blur-md transition-all duration-300 hover:-translate-y-0.5 hover:border-red-300/60 hover:bg-red-100/50 hover:text-red-700 disabled:opacity-40"
                     >
                       {deleting === a.id ? (
-                        <Loader size="sm" className="h-4 w-4" />
+                        <span aria-hidden="true" />
                       ) : (
                         <svg
                           viewBox="0 0 24 24"
@@ -893,7 +891,7 @@ export default function AddressesPage() {
                     />
                     {saving ? (
                       <>
-                        <Loader size="sm" className="relative h-4 w-4" />
+                        <span aria-hidden="true" />
                         <span className="relative">Saving...</span>
                       </>
                     ) : (

@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 
 type Profile = {
@@ -71,7 +72,7 @@ export default function PublicProfilePage({ params }: { params: Promise<{ userna
   );
 
   if (loading) {
-    return <main className="min-h-screen bg-[#f5f5f5] px-6 py-16 text-center text-[#555]">Loading profile…</main>;
+    return null;
   }
 
   if (!profile) {
@@ -81,7 +82,7 @@ export default function PublicProfilePage({ params }: { params: Promise<{ userna
           <p className="mb-3 text-sm font-semibold uppercase tracking-[0.18em] text-[#888]">Binzeo profile</p>
           <h1 className="text-2xl font-semibold text-[#202020]">Profile not found</h1>
           <p className="mt-3 text-[#666]">The public profile <strong>@{rawUsername}</strong> does not exist or is not active.</p>
-          <a className="mt-7 inline-block rounded-full bg-[#202020] px-6 py-3 text-sm font-medium text-white" href="/">Go to Binzeo</a>
+          <Link className="mt-7 inline-block rounded-full bg-[#202020] px-6 py-3 text-sm font-medium text-white" href="/">Go to Binzeo</Link>
         </section>
       </main>
     );

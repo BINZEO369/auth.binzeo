@@ -1,6 +1,4 @@
 "use client";
-import Loader from "@/components/ui/Loader";
-
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { apiFetch } from "@/lib/api/client";
@@ -339,7 +337,7 @@ export default function ProfilePage() {
     return (
       <div className="relative isolate flex min-h-[80vh] items-center justify-center">
         <PageBackground />
-        <Loader size="md" className="relative z-10 text-black/70" />
+        <span aria-hidden="true" />
       </div>
     );
   }
@@ -831,7 +829,7 @@ export default function ProfilePage() {
             />
             {saving ? (
               <>
-                <Loader size="sm" className="relative h-4 w-4" />
+                <span aria-hidden="true" />
                 <span className="relative">Saving...</span>
               </>
             ) : (

@@ -1,6 +1,4 @@
 "use client";
-import Loader from "@/components/ui/Loader";
-
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { apiFetch } from "@/lib/api/client";
@@ -222,7 +220,7 @@ export default function ContactsPage() {
     return (
       <div className="relative isolate flex min-h-[80vh] items-center justify-center">
         <PageBackground />
-        <Loader size="md" className="relative z-10 text-black/70" />
+        <span aria-hidden="true" />
       </div>
     );
   }
@@ -546,7 +544,7 @@ export default function ContactsPage() {
                     />
                     {saving ? (
                       <>
-                        <Loader size="sm" className="relative h-4 w-4" />
+                        <span aria-hidden="true" />
                         <span className="relative">Saving...</span>
                       </>
                     ) : (
@@ -788,7 +786,7 @@ export default function ContactsPage() {
                         className="inline-flex items-center gap-1.5 rounded-full border border-white/40 bg-white/40 px-3.5 py-1.5 text-[11.5px] font-medium text-black/75 backdrop-blur-md transition-all duration-500 hover:-translate-y-0.5 hover:border-red-300/60 hover:bg-red-100/50 hover:text-red-700 disabled:opacity-40"
                       >
                         {deleting === c.id ? (
-                          <Loader size="sm" className="h-3.5 w-3.5" />
+                          <span aria-hidden="true" />
                         ) : (
                           <svg
                             viewBox="0 0 24 24"

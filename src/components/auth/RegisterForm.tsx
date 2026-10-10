@@ -1,6 +1,4 @@
 "use client";
-import Loader from "@/components/ui/Loader";
-
 import Image from "next/image";
 import { useCallback, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -1519,7 +1517,7 @@ export default function RegisterForm() {
                       onClick={handleSubmit}
                       className="w-full rounded-full bg-white py-3.5 text-sm font-semibold text-black transition-all duration-300 hover:bg-white/90 hover:shadow-[0_16px_40px_-10px_rgba(255,255,255,0.4)] hover:-translate-y-px disabled:cursor-not-allowed disabled:opacity-40 inline-flex items-center justify-center gap-2"
                     >
-                      {loading ? <Loader size="sm" label="Creating your BINZEO ID…" /> : "Create my BINZEO ID"}
+                      {loading ? "Creating your BINZEO ID..." : "Create my BINZEO ID"}
                     </button>
                   </div>
                 </div>

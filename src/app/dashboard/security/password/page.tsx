@@ -1,6 +1,4 @@
 "use client";
-import Loader from "@/components/ui/Loader";
-
 import Link from "next/link";
 import { useState } from "react";
 import { apiFetch } from "@/lib/api/client";
@@ -41,7 +39,7 @@ function PrimaryButton({
       />
       {loading && (
         <span className="relative flex items-center" style={{ color: "#ffffff" }}>
-          <Loader size="sm" />
+          <span aria-hidden="true" />
         </span>
       )}
       <span className="relative" style={{ color: "#ffffff" }}>

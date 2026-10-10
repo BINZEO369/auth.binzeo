@@ -1,6 +1,4 @@
 "use client";
-import Loader from "@/components/ui/Loader";
-
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
@@ -537,7 +535,7 @@ export default function DashboardOverviewPage() {
           }}
         />
         <div className="absolute inset-0 z-0 bg-black/25 backdrop-blur-md" />
-        <Loader size="md" className="relative z-10 text-white" />
+        <span aria-hidden="true" />
       </div>
     );
   }
