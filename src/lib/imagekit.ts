@@ -78,3 +78,8 @@ export async function uploadProfileImage(
     fileName,
   };
 }
+
+export async function deleteProfileImage(fileId: string) {
+  if (!fileId.trim()) return;
+  await getImageKit().files.delete(fileId);
+}

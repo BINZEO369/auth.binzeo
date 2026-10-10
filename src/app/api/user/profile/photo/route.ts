@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { ok, fail } from "@/lib/api/response";
-import { uploadProfileImage } from "@/lib/imagekit";
+import { deleteProfileImage, uploadProfileImage } from "@/lib/imagekit";
 
 const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
 const ALLOWED_TYPES = new Set(["image/jpeg", "image/png", "image/webp", "image/avif"]);
@@ -36,20 +36,46 @@ export async function POST(req: NextRequest) {
       username: profile.username,
     });
 
-    const { data: savedProfile, error: updateError } = await supabase
-      .from("profiles")
-      .update({ profile_photo_url: uploaded.url, profile_photo_public_id: uploaded.fileId })
-      .eq("id", user.id)
-      .select("profile_photo_url, profile_photo_public_id")
-      .single();
+    const { data: replacement, error: replaceError } = await supabase.rpc("replace_current_profile_image", {
+      p_image_url: uploaded.url,
+      p_image_public_id: uploaded.fileId,
+    });
 
-    if (updateError) {
-      console.error("[PROFILE_PHOTO_DB_UPDATE_ERROR]", updateError);
-      return fail("Image uploaded, but the profile could not be updated.", 500, "PROFILE_PHOTO_SAVE_FAILED");
+    if (replaceError) {
+      // The database is the authority. If it rejects the replacement, do not leave
+      // an unowned asset in ImageKit.
+      try {
+        await deleteProfileImage(uploaded.fileId);
+      } catch (cleanupError) {
+        console.error("[PROFILE_PHOTO_ROLLBACK_DELETE_ERROR]", cleanupError);
+      }
+
+      console.error("[PROFILE_PHOTO_REPLACE_ERROR]", replaceError);
+      if (replaceError.code === "42501") {
+        return fail("Only verified active users can change profile images.", 403, "PROFILE_PHOTO_VERIFICATION_REQUIRED");
+      }
+      return fail("The profile image could not be saved securely.", 500, "PROFILE_PHOTO_SAVE_FAILED");
+    }
+
+    const previousImagePublicId = Array.isArray(replacement)
+      ? replacement[0]?.previous_image_public_id
+      : null;
+
+    if (previousImagePublicId && previousImagePublicId !== uploaded.fileId) {
+      try {
+        await deleteProfileImage(previousImagePublicId);
+      } catch (cleanupError) {
+        // The old URL is already archived and is no longer current. Keep the new
+        // image active even if the provider cleanup needs a later retry.
+        console.error("[PROFILE_PHOTO_OLD_ASSET_DELETE_ERROR]", cleanupError);
+      }
     }
 
     return ok({
-      profile: savedProfile,
+      profile: {
+        profile_photo_url: uploaded.url,
+        profile_photo_public_id: uploaded.fileId,
+      },
       image: {
         folder: uploaded.folder,
         fileName: uploaded.fileName,
