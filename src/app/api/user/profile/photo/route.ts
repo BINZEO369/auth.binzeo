@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { ok, fail } from "@/lib/api/response";
+import { getPublicSiteUrl } from "@/lib/email/transporter";
 import { uploadProfileImage } from "@/lib/imagekit";
 
 const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
@@ -18,9 +19,31 @@ export async function POST(req: NextRequest) {
     if (!ALLOWED_TYPES.has(file.type)) return fail("Only JPEG, PNG, WebP, and AVIF images are supported.", 422, "IMAGE_TYPE_NOT_ALLOWED");
     if (file.size <= 0 || file.size > MAX_IMAGE_BYTES) return fail("Profile images must be smaller than 5 MB.", 422, "IMAGE_TOO_LARGE");
 
+    const { data: profile, error: profileError } = await supabase
+      .from("profiles")
+      .select("binzeo_user_id, username, display_name, first_name, last_name")
+      .eq("id", user.id)
+      .maybeSingle();
+
+    if (profileError || !profile?.binzeo_user_id) {
+      console.error("[PROFILE_PHOTO_OWNER_LOOKUP_ERROR]", profileError);
+      return fail("Your BINZEO profile is not ready for image upload.", 409, "PROFILE_NOT_READY");
+    }
+
+    const websiteUrl = getPublicSiteUrl(req.headers).replace(/\/+$/, "");
+    const profileName = profile.display_name || [profile.first_name, profile.last_name].filter(Boolean).join(" ") || "BINZEO user";
+    const profileUrl = profile.username ? `${websiteUrl}/u/${encodeURIComponent(profile.username)}` : null;
     const buffer = Buffer.from(await file.arrayBuffer());
-    const uploaded = await uploadProfileImage(buffer, user.id);
-    const { data: profile, error: updateError } = await supabase
+    const uploaded = await uploadProfileImage(buffer, file.type, {
+      userId: user.id,
+      binzeoId: profile.binzeo_user_id,
+      username: profile.username,
+      displayName: profileName,
+      websiteUrl,
+      profileUrl,
+    });
+
+    const { data: savedProfile, error: updateError } = await supabase
       .from("profiles")
       .update({ profile_photo_url: uploaded.url, profile_photo_public_id: uploaded.fileId })
       .eq("id", user.id)
@@ -32,7 +55,7 @@ export async function POST(req: NextRequest) {
       return fail("Image uploaded, but the profile could not be updated.", 500, "PROFILE_PHOTO_SAVE_FAILED");
     }
 
-    return ok({ profile });
+    return ok({ profile: savedProfile, image: { folder: uploaded.folder, fileName: uploaded.fileName } });
   } catch (error) {
     const uploadError = error as Error & { status?: number; statusCode?: number };
     console.error("[PROFILE_PHOTO_UPLOAD_ERROR]", {
