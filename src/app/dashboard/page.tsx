@@ -47,7 +47,7 @@ function CheckIcon() {
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
-      strokeWidth="2.4"
+      strokeWidth="2.6"
       strokeLinecap="round"
       strokeLinejoin="round"
       className="h-3 w-3"
@@ -58,76 +58,36 @@ function CheckIcon() {
   );
 }
 
+function MenuIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="h-[18px] w-[18px]"
+      aria-hidden="true"
+    >
+      <line x1="4" y1="7" x2="20" y2="7" />
+      <line x1="4" y1="12" x2="20" y2="12" />
+      <line x1="4" y1="17" x2="20" y2="17" />
+    </svg>
+  );
+}
+
 /* ================================================================== */
 /*  Liquid glass                                                       */
 /* ================================================================== */
 const liquidGlass = {
   background:
-    "radial-gradient(120% 120% at 30% 12%, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0.40) 45%, rgba(255,255,255,0.28) 100%)",
-  backdropFilter: "blur(26px) saturate(180%)",
-  WebkitBackdropFilter: "blur(26px) saturate(180%)",
+    "radial-gradient(120% 120% at 30% 12%, rgba(255,255,255,0.62) 0%, rgba(255,255,255,0.48) 45%, rgba(255,255,255,0.36) 100%)",
+  backdropFilter: "blur(28px) saturate(180%)",
+  WebkitBackdropFilter: "blur(28px) saturate(180%)",
   boxShadow:
-    "inset 0 1px 0 0 rgba(255,255,255,0.85), inset 0 0 0 1px rgba(255,255,255,0.35), 0 2px 4px rgba(0,0,0,0.04), 0 18px 42px -22px rgba(0,0,0,0.28)",
+    "inset 0 1px 0 0 rgba(255,255,255,0.9), inset 0 0 0 1px rgba(255,255,255,0.4), 0 2px 4px rgba(0,0,0,0.04), 0 20px 48px -24px rgba(0,0,0,0.3)",
 } as const;
-
-/* ================================================================== */
-/*  Background layer — user's profile photo (fallback: img3.jpg)       */
-/* ================================================================== */
-function PageBackground({ url }: { url?: string | null }) {
-  const bg = url && url.trim().length > 0 ? url : "/images/img3.jpg";
-  const usingProfilePhoto = Boolean(url && url.trim().length > 0);
-
-  return (
-    <div
-      aria-hidden="true"
-      className="pointer-events-none fixed inset-0 z-0 overflow-hidden"
-    >
-      {/* Image — full bleed, oversized for Ken Burns */}
-      <div
-        key={bg}
-        className="absolute -inset-[6%]"
-        style={{
-          backgroundImage: `url('${bg}')`,
-          backgroundSize: "cover",
-          backgroundPosition: "center top",
-          backgroundRepeat: "no-repeat",
-          animation: "db-kenburns 32s ease-in-out infinite",
-        }}
-      />
-
-      {/* Readability overlay — stronger when the user's own photo is used */}
-      <div
-        className="absolute inset-0"
-        style={{
-          background: usingProfilePhoto
-            ? "linear-gradient(180deg, rgba(0,0,0,0.42) 0%, rgba(0,0,0,0.32) 30%, rgba(0,0,0,0.24) 55%, rgba(0,0,0,0.30) 100%)"
-            : "linear-gradient(180deg, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0.10) 45%, rgba(255,255,255,0.14) 100%)",
-        }}
-      />
-
-      {/* Soft blur veil so the photo doesn't overpower the cards */}
-      <div
-        className="absolute inset-0"
-        style={{
-          backdropFilter: usingProfilePhoto ? "blur(6px) saturate(120%)" : "blur(2px) saturate(120%)",
-          WebkitBackdropFilter: usingProfilePhoto
-            ? "blur(6px) saturate(120%)"
-            : "blur(2px) saturate(120%)",
-        }}
-      />
-
-      {/* Bottom fade into the page so cards read clearly */}
-      <div
-        className="absolute inset-x-0 bottom-0 h-[60vh]"
-        style={{
-          background: usingProfilePhoto
-            ? "linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.10) 40%, rgba(0,0,0,0.28) 100%)"
-            : "linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.05) 60%, rgba(0,0,0,0.15) 100%)",
-        }}
-      />
-    </div>
-  );
-}
 
 /* ================================================================== */
 /*  Stat Card                                                          */
@@ -147,10 +107,10 @@ function StatCard({
 }) {
   const inner = (
     <div
-      className="group relative h-full overflow-hidden rounded-2xl border border-white/[0.35] p-5 transition-all duration-500 hover:-translate-y-0.5 hover:border-white/[0.5] hover:shadow-[0_22px_48px_-22px_rgba(0,0,0,0.42)]"
+      className="group relative h-full overflow-hidden rounded-3xl border border-white/[0.4] p-5 transition-all duration-500 hover:-translate-y-0.5 hover:border-white/[0.6] hover:shadow-[0_24px_52px_-22px_rgba(0,0,0,0.42)]"
       style={{
         ...liquidGlass,
-        animation: `db-item-in 0.6s cubic-bezier(0.22, 1, 0.36, 1) ${delay}s both`,
+        animation: `db-item-in 0.7s cubic-bezier(0.22, 1, 0.36, 1) ${delay}s both`,
       }}
     >
       <span
@@ -158,11 +118,10 @@ function StatCard({
         className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
         style={{
           background:
-            "radial-gradient(circle at 25% 15%, rgba(255,255,255,0.4), transparent 60%)",
+            "radial-gradient(circle at 25% 15%, rgba(255,255,255,0.55), transparent 60%)",
         }}
       />
-
-      <div className="relative text-[10px] font-semibold uppercase tracking-[0.16em] text-black/60">
+      <div className="relative text-[10px] font-semibold uppercase tracking-[0.18em] text-black/55">
         {title}
       </div>
       <div className="relative mt-2 truncate text-[17px] font-semibold text-black/90">
@@ -202,10 +161,10 @@ function ManageTile({
   return (
     <Link
       href={href}
-      className="group relative flex flex-col overflow-hidden rounded-2xl border border-white/[0.35] p-5 transition-all duration-500 hover:-translate-y-0.5 hover:border-white/[0.5] hover:shadow-[0_22px_48px_-22px_rgba(0,0,0,0.42)]"
+      className="group relative flex flex-col overflow-hidden rounded-3xl border border-white/[0.4] p-5 transition-all duration-500 hover:-translate-y-0.5 hover:border-white/[0.6] hover:shadow-[0_24px_52px_-22px_rgba(0,0,0,0.42)]"
       style={{
         ...liquidGlass,
-        animation: `db-item-in 0.6s cubic-bezier(0.22, 1, 0.36, 1) ${delay}s both`,
+        animation: `db-item-in 0.7s cubic-bezier(0.22, 1, 0.36, 1) ${delay}s both`,
       }}
     >
       <span
@@ -213,11 +172,10 @@ function ManageTile({
         className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
         style={{
           background:
-            "radial-gradient(circle at 25% 15%, rgba(255,255,255,0.4), transparent 60%)",
+            "radial-gradient(circle at 25% 15%, rgba(255,255,255,0.55), transparent 60%)",
         }}
       />
-
-      <div className="relative flex items-center justify-between mb-2">
+      <div className="relative mb-2 flex items-center justify-between">
         <div className="text-[14px] font-semibold text-black/90 transition-colors group-hover:text-black">
           {title}
         </div>
@@ -246,17 +204,25 @@ export default function DashboardOverviewPage() {
   }, []);
 
   const profile = data?.profile;
-  const name = profile?.display_name || profile?.first_name || "User";
+  const name = profile?.display_name || profile?.first_name || "there";
   const isActive = profile?.account_status === "active";
   const photo = profile?.profile_photo_url ?? null;
   const hasPhoto = Boolean(photo && photo.trim().length > 0);
+  const bg = hasPhoto ? photo! : "/images/img3.jpg";
 
-  /* ---------------- loading state ---------------- */
   if (loading) {
     return (
-      <div className="relative isolate flex min-h-[80vh] items-center justify-center">
-        <PageBackground url={null} />
-        <div className="relative z-10 h-6 w-6 animate-spin rounded-full border-2 border-white/60 border-t-black/70" />
+      <div className="relative isolate flex min-h-screen items-center justify-center">
+        <div
+          className="pointer-events-none fixed inset-0 z-0"
+          style={{
+            backgroundImage: "url('/images/img3.jpg')",
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+          }}
+        />
+        <div className="absolute inset-0 z-0 bg-black/25 backdrop-blur-md" />
+        <div className="relative z-10 h-6 w-6 animate-spin rounded-full border-2 border-white/60 border-t-white" />
       </div>
     );
   }
@@ -268,20 +234,24 @@ export default function DashboardOverviewPage() {
       {/* ============================================================ */}
       <style jsx global>{`
         @keyframes db-item-in {
-          from { opacity: 0; transform: translateY(20px) scale(0.99); filter: blur(8px); }
-          to   { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
-        }
-        @keyframes db-banner-in {
-          from { opacity: 0; transform: translateY(24px); filter: blur(10px); }
-          to   { opacity: 1; transform: translateY(0); filter: blur(0); }
+          from {
+            opacity: 0;
+            transform: translateY(24px) scale(0.99);
+            filter: blur(10px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+            filter: blur(0);
+          }
         }
         @keyframes db-float-soft {
           0%, 100% { transform: translateY(0); }
-          50%      { transform: translateY(-5px); }
+          50%      { transform: translateY(-4px); }
         }
         @keyframes db-kenburns {
-          0%, 100% { transform: scale(1.05) translate(0, 0); }
-          50%      { transform: scale(1.12) translate(-1%, -0.8%); }
+          0%, 100% { transform: scale(1.04) translate(0, 0); }
+          50%      { transform: scale(1.1) translate(-1%, -0.6%); }
         }
         @media (prefers-reduced-motion: reduce) {
           [data-db-anim] {
@@ -294,232 +264,234 @@ export default function DashboardOverviewPage() {
       `}</style>
 
       {/* ============================================================ */}
-      {/*  BACKGROUND — user's profile photo (fallback: img3.jpg)       */}
+      {/*  BACKGROUND — top ~62vh, the user's profile photo             */}
       {/* ============================================================ */}
-      <PageBackground url={photo} />
+      <div
+        aria-hidden="true"
+        className="pointer-events-none fixed inset-x-0 top-0 z-0 h-[62vh] overflow-hidden sm:h-[58vh]"
+      >
+        {/* Photo */}
+        <div
+          key={bg}
+          className="absolute -inset-[6%]"
+          style={{
+            backgroundImage: `url('${bg}')`,
+            backgroundSize: "cover",
+            backgroundPosition: "center top",
+            backgroundRepeat: "no-repeat",
+            animation: "db-kenburns 32s ease-in-out infinite",
+          }}
+        />
+
+        {/* Readability gradient — darker at top for the greeting */}
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              "linear-gradient(180deg, rgba(0,0,0,0.42) 0%, rgba(0,0,0,0.18) 30%, rgba(0,0,0,0.10) 60%, rgba(0,0,0,0.24) 100%)",
+          }}
+        />
+
+        {/* Bottom fade — photo dissolves into the cards area */}
+        <div
+          className="absolute inset-x-0 bottom-0 h-[38%]"
+          style={{
+            background:
+              "linear-gradient(180deg, rgba(247,247,245,0) 0%, rgba(247,247,245,0.35) 45%, rgba(247,247,245,0.75) 80%, rgba(247,247,245,0.95) 100%)",
+          }}
+        />
+      </div>
 
       {/* ============================================================ */}
-      {/*  CONTENT                                                      */}
+      {/*  TOP BAR — greeting + menu over the photo                     */}
       {/* ============================================================ */}
-      <div className="relative z-10 mx-auto w-full max-w-6xl px-3 sm:px-5">
-        {/* ============================================================ */}
-        {/*  HERO IDENTITY — takes ~40vh so cards start lower             */}
-        {/* ============================================================ */}
-        <section
-          className="relative flex min-h-[42vh] flex-col items-center justify-center pt-16 pb-10 text-center sm:min-h-[46vh] sm:pt-20 sm:pb-14"
+      <header className="relative z-20 mx-auto flex w-full max-w-6xl items-center justify-between px-4 pt-6 sm:px-6 sm:pt-8">
+        {/* Greeting */}
+        <div
+          className="flex flex-col"
           style={{
             animation:
-              "db-banner-in 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.05s both",
+              "db-item-in 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.05s both",
           }}
         >
-          {/* Avatar — big, prominent, floating over background */}
-          <div className="relative mb-5" data-db-anim>
-            <div
-              className="relative h-28 w-28 overflow-hidden rounded-full border border-white/50 p-1 shadow-[0_24px_60px_-24px_rgba(0,0,0,0.55)] sm:h-36 sm:w-36"
-              style={{
-                background:
-                  "radial-gradient(120% 120% at 30% 15%, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.55) 100%)",
-                backdropFilter: "blur(18px) saturate(180%)",
-                WebkitBackdropFilter: "blur(18px) saturate(180%)",
-              }}
-            >
-              <div className="flex h-full w-full items-center justify-center overflow-hidden rounded-full bg-white/25 text-4xl font-semibold text-white/95 sm:text-5xl">
-                {hasPhoto ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    src={photo!}
-                    alt={`${name}'s profile`}
-                    className="h-full w-full object-cover"
-                  />
-                ) : (
-                  <span
-                    style={{
-                      textShadow: "0 2px 12px rgba(0,0,0,0.35)",
-                    }}
-                  >
-                    {name.charAt(0).toUpperCase()}
-                  </span>
-                )}
-              </div>
-            </div>
-
-            {/* Online / verified dot */}
-            {isActive && (
-              <span
-                className="absolute bottom-1 right-1 flex h-6 w-6 items-center justify-center rounded-full border-2 border-white text-emerald-600 shadow-[0_6px_18px_-6px_rgba(16,185,129,0.6)]"
-                style={{
-                  background: "rgba(255,255,255,0.95)",
-                  animation: "db-float-soft 3s ease-in-out infinite",
-                }}
-                aria-hidden="true"
-              >
-                <CheckIcon />
-              </span>
-            )}
-          </div>
-
-          {/* Kicker */}
-          <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-white/40 bg-white/25 px-3 py-1.5 backdrop-blur-md">
-            <span
-              className="h-1.5 w-1.5 rounded-full bg-white/90"
-              style={{ animation: "db-float-soft 2.4s ease-in-out infinite" }}
-            />
-            <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-white/95">
-              Welcome back
-            </span>
-          </div>
-
-          {/* Name */}
+          <span
+            className="text-[11px] font-medium uppercase tracking-[0.22em] text-white/85"
+            style={{ textShadow: "0 1px 10px rgba(0,0,0,0.45)" }}
+          >
+            Welcome back
+          </span>
           <h1
-            className="mb-2 max-w-3xl text-3xl font-semibold tracking-[-0.02em] text-white sm:text-4xl"
+            className="mt-1 text-[26px] font-semibold leading-tight tracking-[-0.02em] text-white sm:text-[30px]"
             style={{
               textShadow:
-                "0 2px 20px rgba(0,0,0,0.45), 0 1px 3px rgba(0,0,0,0.35)",
+                "0 2px 16px rgba(0,0,0,0.5), 0 1px 3px rgba(0,0,0,0.4)",
             }}
           >
-            {name}
+            Hi, {name}
           </h1>
+        </div>
 
-          {/* Username */}
-          {profile?.username && (
-            <p
-              className="mb-4 text-[13.5px] font-medium text-white/85"
-              style={{ textShadow: "0 1px 12px rgba(0,0,0,0.4)" }}
-            >
-              @{profile.username}
-            </p>
-          )}
+        {/* Menu button */}
+        <button
+          type="button"
+          aria-label="Menu"
+          className="group relative flex h-11 w-11 items-center justify-center overflow-hidden rounded-full border border-white/40 text-black/85 transition-all duration-500 hover:-translate-y-0.5 sm:h-12 sm:w-12"
+          style={{
+            background:
+              "radial-gradient(120% 120% at 30% 15%, rgba(255,255,255,0.75) 0%, rgba(255,255,255,0.4) 100%)",
+            backdropFilter: "blur(20px) saturate(180%)",
+            WebkitBackdropFilter: "blur(20px) saturate(180%)",
+            boxShadow:
+              "inset 0 1px 0 0 rgba(255,255,255,0.9), inset 0 0 0 1px rgba(255,255,255,0.4), 0 8px 24px -10px rgba(0,0,0,0.35)",
+            animation:
+              "db-item-in 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.1s both",
+          }}
+        >
+          <span
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0 rounded-full opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+            style={{
+              background:
+                "radial-gradient(circle at 30% 30%, rgba(255,255,255,0.5), transparent 60%)",
+            }}
+          />
+          <span className="relative">
+            <MenuIcon />
+          </span>
+        </button>
+      </header>
 
-          {/* ID + status pills */}
-          <div className="flex flex-wrap items-center justify-center gap-2">
-            {profile?.binzeo_user_id && (
-              <div
-                className="inline-flex items-center gap-2 rounded-xl border border-white/40 px-3 py-2"
-                style={{
-                  background:
-                    "radial-gradient(120% 120% at 30% 15%, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0.25) 100%)",
-                  boxShadow:
-                    "inset 0 1px 0 0 rgba(255,255,255,0.7), 0 6px 20px -10px rgba(0,0,0,0.35)",
-                  backdropFilter: "blur(18px) saturate(180%)",
-                  WebkitBackdropFilter: "blur(18px) saturate(180%)",
-                }}
-              >
-                <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-black/60">
-                  ID
-                </span>
-                <span className="font-mono text-[12.5px] font-medium text-black/90">
-                  {profile.binzeo_user_id}
-                </span>
-              </div>
-            )}
+      {/* ============================================================ */}
+      {/*  CONTENT — cards start ~40vh, overlapping the lower photo      */}
+      {/* ============================================================ */}
+      <main className="relative z-10 mx-auto w-full max-w-6xl px-3 sm:px-5">
+        {/* Spacer — reserves the visible portion of the profile photo */}
+        <div className="h-[36vh] sm:h-[34vh]" aria-hidden="true" />
 
-            <Link
-              href="/dashboard/profile"
-              className="group inline-flex items-center gap-1.5 rounded-xl border border-white/40 px-3 py-2 text-[11.5px] font-medium text-black/85 transition-all duration-500 hover:-translate-y-0.5 hover:border-white/60"
+        {/* Small ID + status pills floating above cards */}
+        <div
+          className="mb-4 flex flex-wrap items-center gap-2"
+          style={{
+            animation:
+              "db-item-in 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.15s both",
+          }}
+        >
+          {profile?.binzeo_user_id && (
+            <div
+              className="inline-flex items-center gap-2 rounded-full border border-white/40 px-3 py-1.5 backdrop-blur-md"
               style={{
                 background:
-                  "radial-gradient(120% 120% at 30% 15%, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0.25) 100%)",
+                  "radial-gradient(120% 120% at 30% 15%, rgba(255,255,255,0.6) 0%, rgba(255,255,255,0.3) 100%)",
                 boxShadow:
-                  "inset 0 1px 0 0 rgba(255,255,255,0.7), 0 6px 20px -10px rgba(0,0,0,0.35)",
-                backdropFilter: "blur(18px) saturate(180%)",
-                WebkitBackdropFilter: "blur(18px) saturate(180%)",
+                  "inset 0 1px 0 0 rgba(255,255,255,0.85), 0 6px 18px -8px rgba(0,0,0,0.28)",
               }}
             >
-              Edit profile
-              <span className="transition-transform duration-500 group-hover:translate-x-0.5">
-                <ArrowIcon />
+              <span className="text-[9.5px] font-semibold uppercase tracking-[0.16em] text-black/55">
+                ID
               </span>
-            </Link>
-          </div>
-        </section>
+              <span className="font-mono text-[11.5px] font-medium text-black/85">
+                {profile.binzeo_user_id}
+              </span>
+            </div>
+          )}
 
-        {/* ============================================================ */}
-        {/*  CARDS — start below the identity section                     */}
-        {/* ============================================================ */}
-        <div className="space-y-6 pb-10 sm:pb-14">
-          {/* ---------- QUICK STATS ---------- */}
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-            <StatCard
-              title="Account Status"
-              value={profile?.account_status ?? "—"}
-              hint={isActive ? "Verified" : "Action needed"}
-              delay={0.15}
-            />
-            <StatCard
-              title="Country"
-              value={profile?.country_code ?? "Not set"}
-              hint="Your region"
-              href="/dashboard/profile"
-              delay={0.2}
-            />
-            <StatCard
-              title="Member Since"
-              value={
-                profile?.created_at
-                  ? new Date(profile.created_at).toLocaleDateString("en-US", {
-                      month: "short",
-                      year: "numeric",
-                    })
-                  : "—"
-              }
-              delay={0.25}
-            />
-            <StatCard
-              title="Email"
-              value={data?.user.email ? "Set" : "—"}
-              hint={data?.user.email ?? ""}
-              delay={0.3}
-            />
-          </div>
+          <span
+            className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-[11px] font-medium backdrop-blur-md ${
+              isActive
+                ? "border-emerald-300/60 bg-emerald-100/55 text-emerald-800"
+                : "border-amber-300/60 bg-amber-100/55 text-amber-800"
+            }`}
+          >
+            <span className="flex h-3.5 w-3.5 items-center justify-center">
+              <CheckIcon />
+            </span>
+            {isActive ? "Verified" : "Action needed"}
+          </span>
+        </div>
 
-          {/* ---------- MANAGE ---------- */}
-          <div>
-            <div
-              className="mb-4 flex items-center gap-3"
+        {/* ---------- QUICK STATS ---------- */}
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+          <StatCard
+            title="Account Status"
+            value={profile?.account_status ?? "—"}
+            hint={isActive ? "Verified" : "Action needed"}
+            delay={0.2}
+          />
+          <StatCard
+            title="Country"
+            value={profile?.country_code ?? "Not set"}
+            hint="Your region"
+            href="/dashboard/profile"
+            delay={0.25}
+          />
+          <StatCard
+            title="Member Since"
+            value={
+              profile?.created_at
+                ? new Date(profile.created_at).toLocaleDateString("en-US", {
+                    month: "short",
+                    year: "numeric",
+                  })
+                : "—"
+            }
+            delay={0.3}
+          />
+          <StatCard
+            title="Email"
+            value={data?.user.email ? "Set" : "—"}
+            hint={data?.user.email ?? ""}
+            delay={0.35}
+          />
+        </div>
+
+        {/* ---------- MANAGE ---------- */}
+        <div className="mt-6 sm:mt-8">
+          <div
+            className="mb-4 flex items-center gap-3"
+            style={{
+              animation:
+                "db-item-in 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.4s both",
+            }}
+          >
+            <span
+              className="whitespace-nowrap text-[10px] font-semibold uppercase tracking-[0.18em] text-black/60"
+              style={{ textShadow: "0 1px 8px rgba(255,255,255,0.9)" }}
+            >
+              Manage
+            </span>
+            <span
+              aria-hidden="true"
+              className="h-px flex-1"
               style={{
-                animation:
-                  "db-item-in 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.35s both",
+                background:
+                  "linear-gradient(90deg, rgba(0,0,0,0.22), rgba(0,0,0,0))",
               }}
-            >
-              <span
-                className="whitespace-nowrap text-[10px] font-semibold uppercase tracking-[0.18em] text-white/90"
-                style={{
-                  textShadow: "0 1px 12px rgba(0,0,0,0.5)",
-                }}
-              >
-                Manage
-              </span>
-              <span
-                aria-hidden="true"
-                className="h-px flex-1"
-                style={{
-                  background:
-                    "linear-gradient(90deg, rgba(255,255,255,0.5), rgba(255,255,255,0))",
-                }}
-              />
-            </div>
+            />
+          </div>
 
-            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-              {[
-                { href: "/dashboard/profile", title: "Profile", desc: "Personal info, photo, preferences" },
-                { href: "/dashboard/addresses", title: "Addresses", desc: "Home, work, billing addresses" },
-                { href: "/dashboard/contacts", title: "Contacts", desc: "Website, social, messenger" },
-                { href: "/dashboard/sectors", title: "Sectors", desc: "Join industry sectors" },
-                { href: "/dashboard/devices", title: "Devices", desc: "Logged-in devices" },
-                { href: "/dashboard/security", title: "Security", desc: "Login history, activity log" },
-              ].map((item, i) => (
-                <ManageTile
-                  key={item.href}
-                  href={item.href}
-                  title={item.title}
-                  desc={item.desc}
-                  delay={0.4 + i * 0.05}
-                />
-              ))}
-            </div>
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {[
+              { href: "/dashboard/profile", title: "Profile", desc: "Personal info, photo, preferences" },
+              { href: "/dashboard/addresses", title: "Addresses", desc: "Home, work, billing addresses" },
+              { href: "/dashboard/contacts", title: "Contacts", desc: "Website, social, messenger" },
+              { href: "/dashboard/sectors", title: "Sectors", desc: "Join industry sectors" },
+              { href: "/dashboard/devices", title: "Devices", desc: "Logged-in devices" },
+              { href: "/dashboard/security", title: "Security", desc: "Login history, activity log" },
+            ].map((item, i) => (
+              <ManageTile
+                key={item.href}
+                href={item.href}
+                title={item.title}
+                desc={item.desc}
+                delay={0.45 + i * 0.05}
+              />
+            ))}
           </div>
         </div>
-      </div>
+
+        {/* Bottom padding */}
+        <div className="h-10 sm:h-14" aria-hidden="true" />
+      </main>
     </div>
   );
 }
