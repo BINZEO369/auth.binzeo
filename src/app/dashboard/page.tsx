@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { apiFetch } from "@/lib/api/client";
 
 type Profile = {
@@ -112,7 +112,7 @@ const liquidGlass = {
 } as const;
 
 /* ================================================================== */
-/*  Blur control — small icon in pills row, popover above it           */
+/*  Blur control — fixed-position popover always inside viewport       */
 /* ================================================================== */
 function BlurControl({
   value,
@@ -122,16 +122,59 @@ function BlurControl({
   onChange: (n: number) => void;
 }) {
   const [open, setOpen] = useState(false);
+  const [coords, setCoords] = useState<{ top: number; left: number } | null>(
+    null
+  );
   const wrapperRef = useRef<HTMLDivElement | null>(null);
+  const btnRef = useRef<HTMLButtonElement | null>(null);
 
-  /* close on outside click */
+  const POPOVER_W = 248;
+  const POPOVER_H = 190;
+
+  /* ---- compute safe position ---- */
+  const recalc = useCallback(() => {
+    if (!btnRef.current) return;
+    const rect = btnRef.current.getBoundingClientRect();
+    const pad = 12;
+
+    /* Horizontal — right-align with button but keep inside viewport */
+    let left = rect.right - POPOVER_W;
+    if (left < pad) left = pad;
+    if (left + POPOVER_W > window.innerWidth - pad) {
+      left = window.innerWidth - POPOVER_W - pad;
+    }
+
+    /* Vertical — prefer above; fall back below if no room */
+    let top = rect.top - POPOVER_H - 12;
+    if (top < pad) top = rect.bottom + 12;
+
+    setCoords({ top, left });
+  }, []);
+
+  /* ---- on open: compute + listen to scroll/resize ---- */
+  useEffect(() => {
+    if (!open) return;
+    recalc();
+    const onScroll = () => recalc();
+    const onResize = () => recalc();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onResize);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onResize);
+    };
+  }, [open, recalc]);
+
+  /* ---- close on outside click + ESC ---- */
   useEffect(() => {
     if (!open) return;
     const onDocClick = (e: MouseEvent) => {
-      if (!wrapperRef.current) return;
-      if (!wrapperRef.current.contains(e.target as Node)) {
-        setOpen(false);
-      }
+      const t = e.target as Node;
+      if (wrapperRef.current?.contains(t)) return;
+      /* also ignore clicks inside the popover itself */
+      const pop = document.getElementById("bz-blur-popover");
+      if (pop && pop.contains(t)) return;
+      setOpen(false);
     };
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") setOpen(false);
@@ -148,13 +191,15 @@ function BlurControl({
 
   return (
     <div ref={wrapperRef} className="relative inline-flex">
-      {/* Trigger — compact pill matching the sibling status pill */}
+      {/* Trigger — compact pill matching sibling status pill */}
       <button
+        ref={btnRef}
         type="button"
         onClick={() => setOpen((v) => !v)}
         aria-label="Adjust background blur"
         title="Adjust background blur"
         aria-expanded={open}
+        aria-controls="bz-blur-popover"
         className="group inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-[11px] font-medium backdrop-blur-md transition-all duration-500 hover:-translate-y-0.5"
         style={{
           borderColor: open ? "rgba(255,255,255,0.75)" : "rgba(255,255,255,0.5)",
@@ -183,22 +228,28 @@ function BlurControl({
         </span>
       </button>
 
-      {/* Popover — opens ABOVE the pill */}
-      {open && (
+      {/* Popover — position: fixed → always inside viewport, never clipped */}
+      {open && coords && (
         <div
-          className="absolute bottom-full left-1/2 mb-3 w-[248px] -translate-x-1/2 rounded-2xl border border-white/45 p-4"
+          id="bz-blur-popover"
+          role="dialog"
+          aria-label="Background blur settings"
+          className="w-[248px] rounded-2xl border border-white/50 p-4"
           style={{
+            position: "fixed",
+            top: coords.top,
+            left: coords.left,
+            zIndex: 9999,
             background:
-              "radial-gradient(140% 120% at 20% 0%, rgba(255,255,255,0.94) 0%, rgba(255,255,255,0.85) 45%, rgba(255,255,255,0.75) 100%)",
+              "radial-gradient(140% 120% at 20% 0%, rgba(255,255,255,0.96) 0%, rgba(255,255,255,0.88) 45%, rgba(255,255,255,0.78) 100%)",
             backdropFilter: "blur(32px) saturate(180%)",
             WebkitBackdropFilter: "blur(32px) saturate(180%)",
             boxShadow:
               "inset 0 1px 0 0 rgba(255,255,255,1), inset 0 0 0 1px rgba(255,255,255,0.55), 0 28px 60px -20px rgba(0,0,0,0.5), 0 12px 30px -12px rgba(0,0,0,0.25)",
-            animation: "blur-pop-in 0.32s cubic-bezier(0.22, 1, 0.36, 1) both",
-            zIndex: 60,
+            animation:
+              "blur-pop-in 0.28s cubic-bezier(0.22, 1, 0.36, 1) both",
+            transformOrigin: "center bottom",
           }}
-          role="dialog"
-          aria-label="Background blur settings"
         >
           {/* Top sheen */}
           <span
@@ -242,8 +293,8 @@ function BlurControl({
             </span>
           </div>
 
-          {/* Slider */}
-          <div className="relative">
+          {/* Slider — thumb is a perfect circle centered on the track */}
+          <div className="bz-blur-wrap relative flex h-4 w-full items-center">
             <input
               type="range"
               min={BLUR_MIN}
@@ -252,9 +303,12 @@ function BlurControl({
               value={value}
               onChange={(e) => onChange(Number(e.target.value))}
               aria-label="Background blur"
-              className="bz-blur-range relative z-10 h-1.5 w-full cursor-pointer appearance-none rounded-full outline-none"
+              className="bz-blur-range relative z-10 m-0 h-1.5 w-full cursor-pointer appearance-none rounded-full bg-transparent p-0 outline-none"
               style={{
                 background: `linear-gradient(90deg, #0a0a0a 0%, #0a0a0a ${pct}%, rgba(0,0,0,0.14) ${pct}%, rgba(0,0,0,0.14) 100%)`,
+                backgroundSize: "100% 6px",
+                backgroundPosition: "center",
+                backgroundRepeat: "no-repeat",
               }}
             />
           </div>
@@ -266,12 +320,15 @@ function BlurControl({
           </div>
 
           <style jsx>{`
+            /* ---- WebKit / Chromium ---- */
             .bz-blur-range::-webkit-slider-thumb {
               -webkit-appearance: none;
               appearance: none;
               width: 16px;
               height: 16px;
               border-radius: 999px;
+              /* center 16px thumb on 6px track → (16-6)/2 = 5 */
+              margin-top: -5px;
               background: radial-gradient(
                 120% 120% at 30% 20%,
                 rgba(255, 255, 255, 1) 0%,
@@ -293,6 +350,13 @@ function BlurControl({
               cursor: grabbing;
               transform: scale(1.02);
             }
+            .bz-blur-range::-webkit-slider-runnable-track {
+              height: 6px;
+              border-radius: 999px;
+              background: transparent;
+            }
+
+            /* ---- Firefox ---- */
             .bz-blur-range::-moz-range-thumb {
               width: 16px;
               height: 16px;
@@ -314,16 +378,12 @@ function BlurControl({
             .bz-blur-range:hover::-moz-range-thumb {
               transform: scale(1.12);
             }
-            .bz-blur-range::-webkit-slider-runnable-track {
-              height: 6px;
-              border-radius: 999px;
-              background: transparent;
-            }
             .bz-blur-range::-moz-range-track {
               height: 6px;
               border-radius: 999px;
               background: transparent;
             }
+
             .bz-blur-range:focus-visible {
               outline: none;
               box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.6);
@@ -540,12 +600,12 @@ export default function DashboardOverviewPage() {
         @keyframes blur-pop-in {
           from {
             opacity: 0;
-            transform: translate(-50%, 8px) scale(0.96);
+            transform: translateY(6px) scale(0.96);
             filter: blur(6px);
           }
           to {
             opacity: 1;
-            transform: translate(-50%, 0) scale(1);
+            transform: translateY(0) scale(1);
             filter: blur(0);
           }
         }
@@ -653,11 +713,10 @@ export default function DashboardOverviewPage() {
       </div>
 
       {/* ============================================================ */}
-      {/*  HEADER — greeting only (blur control moved to pills row)     */}
+      {/*  HEADER                                                       */}
       {/* ============================================================ */}
       <header className="relative z-20 mx-auto w-full max-w-6xl px-4 pt-10 sm:px-6 sm:pt-12">
         <div className="min-w-0">
-          {/* Welcome */}
           <p
             className="text-[13px] font-medium uppercase tracking-[0.28em] text-white/85 sm:text-[14px]"
             style={{
@@ -669,7 +728,6 @@ export default function DashboardOverviewPage() {
             Welcome
           </p>
 
-          {/* Name — big */}
           <h1
             key={name}
             className="mt-2 text-[34px] font-semibold leading-[1.05] tracking-[-0.03em] text-white sm:text-[42px]"
@@ -683,7 +741,6 @@ export default function DashboardOverviewPage() {
             {name}
           </h1>
 
-          {/* Email · Country */}
           <div
             className="mt-3 flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[12.5px] font-medium text-white/85"
             style={{
@@ -715,10 +772,9 @@ export default function DashboardOverviewPage() {
       {/*  CONTENT                                                      */}
       {/* ============================================================ */}
       <main className="relative z-10 mx-auto w-full max-w-6xl px-3 sm:px-5">
-        {/* Spacer */}
         <div className="h-[46vh] sm:h-[44vh]" aria-hidden="true" />
 
-        {/* ID + Verified + Blur control — same row */}
+        {/* ID + Verified + Blur control */}
         <div
           className="mb-4 flex flex-wrap items-center gap-2"
           style={{
@@ -758,11 +814,10 @@ export default function DashboardOverviewPage() {
             {isActive ? "Verified" : "Action needed"}
           </span>
 
-          {/* Blur control — sits right after the Verified pill */}
           <BlurControl value={blur} onChange={setBlur} />
         </div>
 
-        {/* ---------- QUICK STATS ---------- */}
+        {/* QUICK STATS */}
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
           <StatCard
             title="Account Status"
@@ -797,7 +852,7 @@ export default function DashboardOverviewPage() {
           />
         </div>
 
-        {/* ---------- MANAGE ---------- */}
+        {/* MANAGE */}
         <div className="mt-6 sm:mt-8">
           <div
             className="mb-4 flex items-center gap-3"
@@ -839,7 +894,6 @@ export default function DashboardOverviewPage() {
           </div>
         </div>
 
-        {/* Bottom padding */}
         <div className="h-10 sm:h-14" aria-hidden="true" />
       </main>
     </div>
