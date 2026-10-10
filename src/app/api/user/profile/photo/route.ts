@@ -55,7 +55,14 @@ export async function POST(req: NextRequest) {
       return fail("Image uploaded, but the profile could not be updated.", 500, "PROFILE_PHOTO_SAVE_FAILED");
     }
 
-    return ok({ profile: savedProfile, image: { folder: uploaded.folder, fileName: uploaded.fileName } });
+    return ok({
+      profile: savedProfile,
+      image: {
+        folder: uploaded.folder,
+        fileName: uploaded.fileName,
+        metadataReady: uploaded.metadataReady,
+      },
+    });
   } catch (error) {
     const uploadError = error as Error & { status?: number; statusCode?: number };
     console.error("[PROFILE_PHOTO_UPLOAD_ERROR]", {
@@ -67,6 +74,8 @@ export async function POST(req: NextRequest) {
       ? "Profile image storage is not configured yet."
       : uploadError.status === 401 || uploadError.status === 403 || uploadError.statusCode === 401 || uploadError.statusCode === 403
         ? "ImageKit rejected the upload credentials or permissions. Verify the Production ImageKit private key."
+      : uploadError.status === 400 || uploadError.statusCode === 400
+        ? "ImageKit rejected the profile image details. Check the ImageKit folder or metadata configuration."
       : "Unable to upload profile image. Please try again.";
     return fail(message, 500, "PROFILE_PHOTO_UPLOAD_FAILED");
   }
