@@ -82,14 +82,7 @@ export default async function HomePage() {
         /*  CINEMATIC REVEAL SYSTEM                                      */
         /* ============================================================ */
         [data-reveal] {
-          opacity: 0;
-          transform: translateY(28px) scale(0.99);
-          filter: blur(10px);
-          transition:
-            opacity 0.85s cubic-bezier(0.22, 1, 0.36, 1),
-            transform 0.85s cubic-bezier(0.22, 1, 0.36, 1),
-            filter 0.85s cubic-bezier(0.22, 1, 0.36, 1);
-          transition-delay: var(--rd, 0s);
+          animation: bz-reveal-in 0.85s cubic-bezier(0.22, 1, 0.36, 1) var(--rd, 0s) both;
           will-change: opacity, transform, filter;
         }
         [data-reveal].is-visible {
@@ -100,28 +93,14 @@ export default async function HomePage() {
 
         .bz-letter {
           display: inline-block;
-          opacity: 0;
-          transform: translateY(60%) rotateX(-50deg) scale(1.05);
-          filter: blur(12px);
           transform-origin: 50% 100%;
-          transition:
-            opacity 0.9s cubic-bezier(0.22, 1, 0.36, 1),
-            transform 0.9s cubic-bezier(0.22, 1, 0.36, 1),
-            filter 0.9s cubic-bezier(0.22, 1, 0.36, 1);
-          transition-delay: var(--rd, 0s);
+          animation: bz-letter-in 0.9s cubic-bezier(0.22, 1, 0.36, 1) var(--rd, 0s) both;
           will-change: opacity, transform, filter;
         }
 
         .bz-word {
           display: inline-block;
-          opacity: 0;
-          transform: translateY(48%) scale(0.97);
-          filter: blur(13px);
-          transition:
-            opacity 0.85s cubic-bezier(0.22, 1, 0.36, 1),
-            transform 0.85s cubic-bezier(0.22, 1, 0.36, 1),
-            filter 0.85s cubic-bezier(0.22, 1, 0.36, 1);
-          transition-delay: var(--rd, 0s);
+          animation: bz-word-in 0.85s cubic-bezier(0.22, 1, 0.36, 1) var(--rd, 0s) both;
           will-change: opacity, transform, filter;
         }
 
@@ -130,6 +109,19 @@ export default async function HomePage() {
           opacity: 1;
           transform: none;
           filter: none;
+        }
+
+        @keyframes bz-reveal-in {
+          from { opacity: 0; transform: translateY(28px) scale(0.99); filter: blur(10px); }
+          to   { opacity: 1; transform: none; filter: none; }
+        }
+        @keyframes bz-letter-in {
+          from { opacity: 0; transform: translateY(60%) rotateX(-50deg) scale(1.05); filter: blur(12px); }
+          to   { opacity: 1; transform: none; filter: none; }
+        }
+        @keyframes bz-word-in {
+          from { opacity: 0; transform: translateY(48%) scale(0.97); filter: blur(13px); }
+          to   { opacity: 1; transform: none; filter: none; }
         }
 
         @keyframes bz-kenburns {
@@ -380,6 +372,7 @@ export default async function HomePage() {
             opacity: 1 !important;
             transform: none !important;
             filter: none !important;
+            animation: none !important;
             transition: none !important;
           }
           .bz-sound-btn { transition: none !important; }
