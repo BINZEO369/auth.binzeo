@@ -170,12 +170,14 @@ function ToggleRow({
 /* ================================================================== */
 function CollapsibleSection({
   title,
+  id,
   isOpen,
   onToggle,
   delay = 0,
   children,
 }: {
   title: string;
+  id?: string;
   isOpen: boolean;
   onToggle: () => void;
   delay?: number;
@@ -183,6 +185,7 @@ function CollapsibleSection({
 }) {
   return (
     <section
+      id={id}
       className="relative overflow-hidden rounded-3xl border border-white/[0.35] transition-all duration-500 hover:border-white/[0.5]"
       style={{
         ...liquidGlass,
@@ -302,6 +305,12 @@ export default function ProfilePage() {
       }
       setLoading(false);
     })();
+  }, []);
+
+  useEffect(() => {
+    if (window.location.hash === "#notifications") {
+      setOpenSections((prev) => ({ ...prev, notifications: true }));
+    }
   }, []);
 
   useEffect(() => {
@@ -828,6 +837,7 @@ export default function ProfilePage() {
         {/* ============================================================ */}
         <CollapsibleSection
           title="Notifications"
+          id="notifications"
           isOpen={openSections.notifications}
           onToggle={() => toggleSection("notifications")}
           delay={0.29}
