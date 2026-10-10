@@ -36,6 +36,7 @@ export function renderEmailLayout({
   description,
   body,
   context,
+  showSecurityDetails = true,
   footerNote = "This is an automated security message from BINZEO.",
 }: {
   siteUrl: string;
@@ -44,6 +45,7 @@ export function renderEmailLayout({
   description?: string;
   body: string;
   context?: EmailSecurityContext;
+  showSecurityDetails?: boolean;
   footerNote?: string;
 }) {
   const logoUrl = `${siteUrl.replace(/\/+$/, "")}/email-logo-white.png`;
@@ -60,7 +62,7 @@ export function renderEmailLayout({
             <h1 style="margin:0;color:#ffffff;font-size:27px;line-height:1.2;font-weight:750;letter-spacing:-0.035em;">${title}</h1>
             ${description ? `<p style="margin:14px 0 0;color:#ffffff;font-size:14px;line-height:1.7;">${description}</p>` : ""}
           </div>
-          <div style="padding:28px 0 0;">${emailSecurityDetails(context)}</div>
+          ${showSecurityDetails ? `<div style="padding:28px 0 0;">${emailSecurityDetails(context)}</div>` : ""}
           <div style="padding:0 0 34px;">${body}</div>
           <div style="padding:22px 0 0;border-top:1px solid #ffffff;text-align:left;">
             <p style="margin:0;color:#ffffff;font-size:11px;line-height:1.65;">${footerNote}</p>
