@@ -1,7 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextRequest } from "next/server";
-import { readFile } from "node:fs/promises";
-import { join } from "node:path";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { ok, fail } from "@/lib/api/response";
 import { EMAIL_FROM, transporter } from "@/lib/email/transporter";
@@ -15,12 +13,6 @@ async function prepareInlineImage(imageUrl: string, cid: string, filename: strin
   const buffer = Buffer.from(await response.arrayBuffer());
   if (!buffer.length || buffer.length > 5 * 1024 * 1024) throw new Error("Each email image must be between 1 byte and 5 MB.");
   return { html: (html: string) => html.replaceAll(escape(imageUrl), `cid:${cid}`), attachment: { filename, content: buffer, cid, contentType } };
-}
-async function prepareLocalLogo(siteUrl: string) {
-  const content = await readFile(join(process.cwd(), "public", "email-logo-white.png"));
-  const logoUrl = `${siteUrl}/email-logo-white.png`;
-  const cid = "binzeo-logo@binzeo";
-  return { html: (html: string) => html.replaceAll(escape(logoUrl), `cid:${cid}`), attachment: { filename: "binzeo-logo.png", content, cid, contentType: "image/png" } };
 }
 type MarketingImage = { url: string; position: string };
 type MarketingTheme = "dark" | "light";
@@ -105,8 +97,6 @@ export async function POST(request: NextRequest) {
   if (body.action !== "send") return fail("Choose preview or send", 422, "VALIDATION_ERROR");
   const inlineImages: Awaited<ReturnType<typeof prepareInlineImage>>[] = [];
   try { for (const [index, image] of images.entries()) inlineImages.push(await prepareInlineImage(image.url, `marketing-image-${index}@binzeo`, `marketing-image-${index + 1}`)); } catch (error) { return fail(error instanceof Error ? error.message : "The email image could not be embedded", 422, "IMAGE_EMBED_FAILED"); }
-  let inlineLogo: Awaited<ReturnType<typeof prepareLocalLogo>>;
-  try { inlineLogo = await prepareLocalLogo(siteUrl); } catch (error) { return fail(error instanceof Error ? error.message : "The BINZEO logo could not be embedded", 500, "LOGO_EMBED_FAILED"); }
   const { data: campaign, error: campaignError } = await (context.admin.from("marketing_email_campaigns") as any).insert({ subject, preview_text: preheader, html_body: previewHtml, created_by: context.user.id, status: "sending", recipient_count: recipients.length, started_at: new Date().toISOString(), theme, target_team_ids: teamIds }).select("id").single();
   if (campaignError || !campaign) return fail(campaignError?.message ?? "Campaign could not be created", 500, "CAMPAIGN_CREATE_FAILED");
   const { error: deliveryError } = await (context.admin.from("marketing_email_deliveries") as any).insert(recipients.map((recipient) => ({ campaign_id: campaign.id, user_id: recipient.user_id, email: recipient.email, consent_snapshot: true, status: "pending" })));
@@ -115,8 +105,8 @@ export async function POST(request: NextRequest) {
   for (const recipient of recipients) {
     try {
       const recipientHtml = buildEmail({ preheader, headline, message, recipient_name: recipient.display_name ?? "there", button_label, button_url, images, unsubscribe_url, theme });
-      const sendHtml = inlineLogo.html(inlineImages.reduce((html, image) => image.html(html), recipientHtml));
-      const info = await transporter.sendMail({ from: EMAIL_FROM, to: recipient.email, subject, html: sendHtml, attachments: [inlineLogo.attachment, ...inlineImages.map((image) => image.attachment)] });
+      const sendHtml = inlineImages.reduce((html, image) => image.html(html), recipientHtml);
+      const info = await transporter.sendMail({ from: EMAIL_FROM, to: recipient.email, subject, html: sendHtml, attachments: inlineImages.map((image) => image.attachment) });
       sent += 1;
       await (context.admin.from("marketing_email_deliveries") as any).update({ status: "sent", sent_at: new Date().toISOString(), provider_message_id: info.messageId ?? null }).eq("campaign_id", campaign.id).eq("email", recipient.email);
     } catch (error) {
