@@ -37,6 +37,7 @@ export function renderEmailLayout({
   body,
   context,
   showSecurityDetails = true,
+  theme = "midnight",
   footerNote = "This is an automated security message from BINZEO.",
 }: {
   siteUrl: string;
@@ -46,27 +47,35 @@ export function renderEmailLayout({
   body: string;
   context?: EmailSecurityContext;
   showSecurityDetails?: boolean;
+  theme?: string;
   footerNote?: string;
 }) {
   const logoUrl = `${siteUrl.replace(/\/+$/, "")}/email-logo-white.png`;
+  const themeStyles: Record<string, { background: string; accent: string }> = {
+    midnight: { background: "#000000", accent: "#ffffff" },
+    graphite: { background: "#171717", accent: "#f5f5f5" },
+    ocean: { background: "#061826", accent: "#d8f3ff" },
+    rose: { background: "#1b0b14", accent: "#ffe0ec" },
+  };
+  const selectedTheme = themeStyles[theme] ?? themeStyles.midnight;
   const year = new Date().getFullYear();
   return `
-    <div style="margin:0;padding:36px 22px;background:#000000;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:#ffffff;">
+    <div style="margin:0;padding:36px 22px;background:${selectedTheme.background};font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:${selectedTheme.accent};">
       <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="max-width:560px;margin:0 auto;">
         <tr><td style="padding:0;">
           <div style="padding:4px 0 34px;text-align:center;">
             <img src="${logoUrl}" width="180" alt="BINZEO" style="display:block;width:180px;max-width:76%;height:auto;margin:0 auto;" />
-            ${eyebrow ? `<div style="margin-top:19px;color:#ffffff;font-size:9px;font-weight:700;letter-spacing:1.8px;text-transform:uppercase;">${eyebrow}</div>` : ""}
+            ${eyebrow ? `<div style="margin-top:19px;color:${selectedTheme.accent};font-size:9px;font-weight:700;letter-spacing:1.8px;text-transform:uppercase;">${eyebrow}</div>` : ""}
           </div>
           <div style="padding:0;text-align:left;">
-            <h1 style="margin:0;color:#ffffff;font-size:27px;line-height:1.2;font-weight:750;letter-spacing:-0.035em;">${title}</h1>
-            ${description ? `<p style="margin:14px 0 0;color:#ffffff;font-size:14px;line-height:1.7;">${description}</p>` : ""}
+            <h1 style="margin:0;color:${selectedTheme.accent};font-size:27px;line-height:1.2;font-weight:750;letter-spacing:-0.035em;">${title}</h1>
+            ${description ? `<p style="margin:14px 0 0;color:${selectedTheme.accent};font-size:14px;line-height:1.7;">${description}</p>` : ""}
           </div>
           ${showSecurityDetails ? `<div style="padding:28px 0 0;">${emailSecurityDetails(context)}</div>` : ""}
           <div style="padding:0 0 34px;">${body}</div>
-          <div style="padding:22px 0 0;border-top:1px solid #ffffff;text-align:left;">
-            <p style="margin:0;color:#ffffff;font-size:11px;line-height:1.65;">${footerNote}</p>
-            <p style="margin:9px 0 0;color:#ffffff;font-size:10px;line-height:1.5;">© ${year} BINZEO Inc. All rights reserved.</p>
+          <div style="padding:22px 0 0;border-top:1px solid ${selectedTheme.accent};text-align:left;">
+            <p style="margin:0;color:${selectedTheme.accent};font-size:11px;line-height:1.65;">${footerNote}</p>
+            <p style="margin:9px 0 0;color:${selectedTheme.accent};font-size:10px;line-height:1.5;">© ${year} BINZEO Inc. All rights reserved.</p>
           </div>
         </td></tr>
       </table>
