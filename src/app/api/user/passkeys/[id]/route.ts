@@ -1,5 +1,6 @@
 import { NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { ok, fail } from "@/lib/api/response";
 import { z } from "zod";
 
@@ -18,16 +19,22 @@ export async function DELETE(
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return fail("Unauthorized", 401, "UNAUTHORIZED");
 
-    const { data, error } = await supabase.rpc("revoke_my_passkey", {
-      passkey_id: parsed.data,
-    });
+    // The session check above establishes ownership. Delete the row completely
+    // so the credential cannot remain as a revoked/stale passkey record.
+    const { data, error } = await getSupabaseAdmin()
+      .from("user_passkeys")
+      .delete()
+      .eq("id", parsed.data)
+      .eq("user_id", user.id)
+      .select("id")
+      .maybeSingle();
 
-    if (error) return fail(error.message, 400, "PASSKEY_REVOKE_FAILED");
-    if (!data) return fail("Passkey not found or already revoked", 404, "PASSKEY_NOT_FOUND");
+    if (error) return fail(error.message, 400, "PASSKEY_DELETE_FAILED");
+    if (!data) return fail("Passkey not found or already deleted", 404, "PASSKEY_NOT_FOUND");
 
-    return ok({ message: "Passkey revoked" });
+    return ok({ message: "Passkey deleted", deleted_id: data.id });
   } catch (err) {
-    console.error("[PASSKEY_REVOKE_ERROR]", err);
+    console.error("[PASSKEY_DELETE_ERROR]", err);
     return fail("Internal server error", 500, "INTERNAL_ERROR");
   }
 }
