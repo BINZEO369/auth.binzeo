@@ -34,6 +34,14 @@ type Data = {
   user: { id: string; email: string | null };
 };
 
+type UsernameCheck = {
+  checking: boolean;
+  available: boolean;
+  checked: string;
+  message: string;
+  suggestions: string[];
+};
+
 /* ================================================================== */
 /*  Liquid glass — same as dashboard / addresses                       */
 /* ================================================================== */
@@ -265,6 +273,13 @@ export default function ProfilePage() {
     type: "success" | "error";
     text: string;
   } | null>(null);
+  const [usernameCheck, setUsernameCheck] = useState<UsernameCheck>({
+    checking: false,
+    available: false,
+    checked: "",
+    message: "",
+    suggestions: [],
+  });
 
   /* -------- Collapsible sections state (all collapsed by default) -------- */
   const [openSections, setOpenSections] = useState<Record<string, boolean>>({
@@ -288,6 +303,48 @@ export default function ProfilePage() {
       setLoading(false);
     })();
   }, []);
+
+  useEffect(() => {
+    const normalized = String(form.username ?? "").trim().toLowerCase().replace(/^@/, "");
+    const currentUsername = String(data?.profile?.username ?? "").trim().toLowerCase().replace(/^@/, "");
+
+    if (!normalized) {
+      setUsernameCheck({ checking: false, available: false, checked: "", message: "Choose a username to continue.", suggestions: [] });
+      return;
+    }
+
+    if (normalized === currentUsername) {
+      setUsernameCheck({ checking: false, available: true, checked: normalized, message: "Your current username is available to keep.", suggestions: [] });
+      return;
+    }
+
+    setUsernameCheck((current) => ({ ...current, checking: true, available: false, checked: "", message: "Checking availability…", suggestions: [] }));
+    const timer = setTimeout(async () => {
+      const res = await apiFetch<{
+        available: boolean;
+        username: string;
+        suggestions?: string[];
+        message?: string;
+      }>("/api/auth/check-username", {
+        method: "POST",
+        body: JSON.stringify({ username: normalized }),
+      });
+
+      if (res.success) {
+        setUsernameCheck({
+          checking: false,
+          available: res.data.available,
+          checked: res.data.username,
+          message: res.data.message ?? (res.data.available ? "Username is available." : "Username is not available."),
+          suggestions: res.data.suggestions ?? [],
+        });
+      } else {
+        setUsernameCheck({ checking: false, available: false, checked: "", message: res.error.message, suggestions: [] });
+      }
+    }, 450);
+
+    return () => clearTimeout(timer);
+  }, [data?.profile?.username, form.username]);
 
   const update = <K extends keyof Profile>(key: K, value: Profile[K]) => {
     setForm((f) => ({ ...f, [key]: value }));
@@ -316,6 +373,12 @@ export default function ProfilePage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    const normalizedUsername = String(form.username ?? "").trim().toLowerCase().replace(/^@/, "");
+    const currentUsername = String(data?.profile?.username ?? "").trim().toLowerCase().replace(/^@/, "");
+    if (normalizedUsername !== currentUsername && (!usernameCheck.available || usernameCheck.checked !== normalizedUsername)) {
+      setMessage({ type: "error", text: usernameCheck.checking ? "Please wait until username availability is confirmed." : usernameCheck.message || "Choose an available username before saving." });
+      return;
+    }
     setSaving(true);
     setMessage(null);
 
@@ -597,23 +660,53 @@ export default function ProfilePage() {
 
             <Field
               label="Username"
-              hint="Your username is permanent and cannot be changed."
+              hint="Change it anytime. Use 3–30 lowercase letters, numbers, or underscores; start with a letter."
             >
-              <input
-                type="text"
-                value={form.username ?? ""}
-                className={`${inputCls} opacity-70`}
-                readOnly
-                disabled
-              />
-              {form.username && (
+              <div className="relative">
+                <input
+                  type="text"
+                  value={form.username ?? ""}
+                  onChange={(e) => update("username", e.target.value)}
+                  className={`${inputCls} pr-12`}
+                  placeholder="your_username"
+                  autoComplete="username"
+                  spellCheck={false}
+                  aria-describedby="username-status"
+                />
+                <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-sm" aria-hidden="true">
+                  {usernameCheck.checking ? "…" : usernameCheck.available ? "✓" : usernameCheck.checked ? "×" : ""}
+                </span>
+              </div>
+              <div
+                id="username-status"
+                className={`mt-1.5 text-[12px] ${usernameCheck.available ? "text-emerald-700" : usernameCheck.checking ? "text-black/55" : "text-rose-700"}`}
+                aria-live="polite"
+              >
+                {usernameCheck.message}
+              </div>
+              {usernameCheck.suggestions.length > 0 && (
+                <div className="mt-2 flex flex-wrap items-center gap-1.5">
+                  <span className="text-[11px] text-black/50">Try:</span>
+                  {usernameCheck.suggestions.map((suggestion) => (
+                    <button
+                      key={suggestion}
+                      type="button"
+                      onClick={() => update("username", suggestion)}
+                      className="rounded-full border border-black/10 bg-white/60 px-2.5 py-1 text-[11px] font-medium text-black/70 transition hover:bg-white"
+                    >
+                      @{suggestion}
+                    </button>
+                  ))}
+                </div>
+              )}
+              {form.username && usernameCheck.available && (
                 <a
                   className="mt-1.5 inline-flex items-center gap-1 text-[12px] text-black/65 underline decoration-black/30 underline-offset-2 transition-colors hover:text-black"
-                  href={`/u/@${form.username}`}
+                  href={`/u/@${String(form.username).replace(/^@/, "")}`}
                   target="_blank"
                   rel="noreferrer"
                 >
-                  binzeo.com/u/@{form.username}
+                  binzeo.com/u/@{String(form.username).replace(/^@/, "")}
                 </a>
               )}
             </Field>

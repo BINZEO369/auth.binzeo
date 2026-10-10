@@ -2,12 +2,15 @@ import { NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { ok, fail } from "@/lib/api/response";
 import { calculateAge, upsertUserBirthday, validateBirthDate } from "@/lib/birthday";
+import { getSupabaseAdmin } from "@/lib/supabase/admin";
+import { isValidUsername, normalizeUsername } from "@/lib/username";
 
 const ALLOWED_FIELDS = [
   "first_name",
   "middle_name",
   "last_name",
   "display_name",
+  "username",
   "date_of_birth",
   "gender",
   "country_code",
@@ -104,9 +107,6 @@ export async function PATCH(req: NextRequest) {
     }
 
     const body = await req.json();
-    if ("username" in body) {
-      return fail("Username cannot be changed after registration", 409, "USERNAME_IMMUTABLE");
-    }
     const patch: Record<string, unknown> = {};
 
     for (const key of ALLOWED_FIELDS) {
@@ -115,6 +115,33 @@ export async function PATCH(req: NextRequest) {
 
     if (Object.keys(patch).length === 0) {
       return fail("No valid fields to update", 422, "NO_UPDATE_FIELDS");
+    }
+
+    if ("username" in patch) {
+      const username = normalizeUsername(String(patch.username ?? ""));
+      if (!isValidUsername(username)) {
+        return fail(
+          "Use 3–30 lowercase letters, numbers, or underscores; start with a letter.",
+          422,
+          "INVALID_USERNAME",
+        );
+      }
+
+      const { data: takenProfile, error: usernameError } = await getSupabaseAdmin()
+        .from("profiles")
+        .select("id")
+        .eq("username", username)
+        .neq("id", user.id)
+        .maybeSingle();
+
+      if (usernameError) {
+        console.error("[USERNAME_CHECK_ERROR]", usernameError);
+        return fail("We could not verify this username right now. Please try again.", 503, "USERNAME_CHECK_UNAVAILABLE");
+      }
+      if (takenProfile) {
+        return fail(`@${username} is already taken.`, 409, "USERNAME_TAKEN");
+      }
+      patch.username = username;
     }
 
     if ("date_of_birth" in patch) {
@@ -138,6 +165,9 @@ export async function PATCH(req: NextRequest) {
       .single();
 
     if (error) {
+      if (error.code === "23505" && String(error.message).toLowerCase().includes("username")) {
+        return fail("That username was just taken. Please choose another one.", 409, "USERNAME_TAKEN");
+      }
       return fail(error.message, 400, "PROFILE_UPDATE_FAILED");
     }
 
