@@ -68,10 +68,10 @@ function CheckIcon() {
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
-      strokeWidth="2.8"
+      strokeWidth="2.6"
       strokeLinecap="round"
       strokeLinejoin="round"
-      className="h-3.5 w-3.5"
+      className="h-3 w-3"
       aria-hidden="true"
     >
       <path d="M20 6 9 17l-5-5" />
@@ -79,7 +79,7 @@ function CheckIcon() {
   );
 }
 
-function SlidersIcon() {
+function SlidersIcon({ className = "h-3.5 w-3.5" }: { className?: string }) {
   return (
     <svg
       viewBox="0 0 24 24"
@@ -88,13 +88,13 @@ function SlidersIcon() {
       strokeWidth="2"
       strokeLinecap="round"
       strokeLinejoin="round"
-      className="h-[15px] w-[15px]"
+      className={className}
       aria-hidden="true"
     >
-      <line x1="4" y1="8" x2="20" y2="8" />
-      <circle cx="14" cy="8" r="2.4" />
-      <line x1="4" y1="16" x2="20" y2="16" />
-      <circle cx="8" cy="16" r="2.4" />
+      <line x1="4" y1="7" x2="20" y2="7" />
+      <circle cx="9" cy="7" r="2" />
+      <line x1="4" y1="17" x2="20" y2="17" />
+      <circle cx="15" cy="17" r="2" />
     </svg>
   );
 }
@@ -112,9 +112,9 @@ const liquidGlass = {
 } as const;
 
 /* ================================================================== */
-/*  Blur popover — small icon button (sits inline with the pills)      */
+/*  Blur control — small icon in pills row, popover above it           */
 /* ================================================================== */
-function BlurPopover({
+function BlurControl({
   value,
   onChange,
 }: {
@@ -124,11 +124,14 @@ function BlurPopover({
   const [open, setOpen] = useState(false);
   const wrapperRef = useRef<HTMLDivElement | null>(null);
 
+  /* close on outside click */
   useEffect(() => {
     if (!open) return;
     const onDocClick = (e: MouseEvent) => {
       if (!wrapperRef.current) return;
-      if (!wrapperRef.current.contains(e.target as Node)) setOpen(false);
+      if (!wrapperRef.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
     };
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") setOpen(false);
@@ -141,29 +144,27 @@ function BlurPopover({
     };
   }, [open]);
 
+  const pct = ((value - BLUR_MIN) / (BLUR_MAX - BLUR_MIN)) * 100;
+
   return (
-    <div ref={wrapperRef} className="relative">
-      {/* Trigger — small circular glass icon, sized to match the pills */}
+    <div ref={wrapperRef} className="relative inline-flex">
+      {/* Trigger — compact pill matching the sibling status pill */}
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
         aria-label="Adjust background blur"
         title="Adjust background blur"
         aria-expanded={open}
-        className="group relative flex h-10 w-10 items-center justify-center overflow-hidden rounded-full border transition-all duration-500 hover:-translate-y-0.5"
+        className="group inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-[11px] font-medium backdrop-blur-md transition-all duration-500 hover:-translate-y-0.5"
         style={{
+          borderColor: open ? "rgba(255,255,255,0.75)" : "rgba(255,255,255,0.5)",
           background: open
-            ? "radial-gradient(120% 120% at 30% 15%, rgba(255,255,255,0.92) 0%, rgba(255,255,255,0.7) 100%)"
+            ? "radial-gradient(120% 120% at 30% 15%, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0.55) 100%)"
             : "radial-gradient(120% 120% at 30% 15%, rgba(255,255,255,0.65) 0%, rgba(255,255,255,0.35) 100%)",
-          borderColor: open
-            ? "rgba(255,255,255,0.8)"
-            : "rgba(255,255,255,0.5)",
-          backdropFilter: "blur(22px) saturate(180%)",
-          WebkitBackdropFilter: "blur(22px) saturate(180%)",
           boxShadow: open
-            ? "inset 0 1px 0 0 rgba(255,255,255,1), inset 0 0 0 1px rgba(255,255,255,0.55), 0 12px 30px -12px rgba(0,0,0,0.45)"
-            : "inset 0 1px 0 0 rgba(255,255,255,0.9), inset 0 0 0 1px rgba(255,255,255,0.4), 0 8px 22px -10px rgba(0,0,0,0.32)",
-          color: "rgba(0,0,0,0.82)",
+            ? "inset 0 1px 0 0 rgba(255,255,255,1), inset 0 0 0 1px rgba(255,255,255,0.55), 0 10px 26px -12px rgba(0,0,0,0.4)"
+            : "inset 0 1px 0 0 rgba(255,255,255,0.9), inset 0 0 0 1px rgba(255,255,255,0.4), 0 8px 22px -10px rgba(0,0,0,0.3)",
+          color: "rgba(0,0,0,0.8)",
         }}
       >
         <span
@@ -171,61 +172,78 @@ function BlurPopover({
           className="pointer-events-none absolute inset-0 rounded-full opacity-0 transition-opacity duration-500 group-hover:opacity-100"
           style={{
             background:
-              "radial-gradient(circle at 30% 30%, rgba(255,255,255,0.6), transparent 60%)",
+              "radial-gradient(circle at 30% 30%, rgba(255,255,255,0.55), transparent 60%)",
           }}
         />
-        <span className="relative">
+        <span className="relative flex items-center">
           <SlidersIcon />
+        </span>
+        <span className="relative font-mono text-[10.5px] tabular-nums text-black/70">
+          {value}
         </span>
       </button>
 
-      {/* Popover */}
+      {/* Popover — opens ABOVE the pill */}
       {open && (
         <div
-          className="absolute left-0 top-full z-[60] mt-2 w-[260px] origin-top-left rounded-2xl border border-white/50 p-4"
+          className="absolute bottom-full left-1/2 mb-3 w-[248px] -translate-x-1/2 rounded-2xl border border-white/45 p-4"
           style={{
             background:
-              "radial-gradient(140% 120% at 20% 0%, rgba(255,255,255,0.92) 0%, rgba(255,255,255,0.78) 45%, rgba(255,255,255,0.68) 100%)",
+              "radial-gradient(140% 120% at 20% 0%, rgba(255,255,255,0.94) 0%, rgba(255,255,255,0.85) 45%, rgba(255,255,255,0.75) 100%)",
             backdropFilter: "blur(32px) saturate(180%)",
             WebkitBackdropFilter: "blur(32px) saturate(180%)",
             boxShadow:
-              "inset 0 1px 0 0 rgba(255,255,255,1), inset 0 0 0 1px rgba(255,255,255,0.55), 0 28px 64px -22px rgba(0,0,0,0.5)",
+              "inset 0 1px 0 0 rgba(255,255,255,1), inset 0 0 0 1px rgba(255,255,255,0.55), 0 28px 60px -20px rgba(0,0,0,0.5), 0 12px 30px -12px rgba(0,0,0,0.25)",
             animation: "blur-pop-in 0.32s cubic-bezier(0.22, 1, 0.36, 1) both",
+            zIndex: 60,
           }}
+          role="dialog"
+          aria-label="Background blur settings"
         >
           {/* Top sheen */}
           <span
             aria-hidden="true"
-            className="pointer-events-none absolute inset-x-3 top-0 h-px rounded-t-2xl"
+            className="pointer-events-none absolute inset-x-0 top-0 h-px rounded-t-2xl"
             style={{
               background:
                 "linear-gradient(90deg, transparent, rgba(255,255,255,1), transparent)",
             }}
           />
+          {/* Bottom sheen */}
+          <span
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-x-0 bottom-0 h-px rounded-b-2xl"
+            style={{
+              background:
+                "linear-gradient(90deg, transparent, rgba(255,255,255,0.6), transparent)",
+            }}
+          />
 
-          {/* Header row */}
+          {/* Header */}
           <div className="mb-3.5 flex items-center justify-between">
             <div className="flex items-center gap-2">
               <span
-                className="flex h-6 w-6 items-center justify-center rounded-lg border border-black/[0.06]"
+                className="flex h-6 w-6 items-center justify-center rounded-lg border border-white/60 text-black/70"
                 style={{
                   background:
-                    "radial-gradient(120% 120% at 30% 15%, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.55) 100%)",
+                    "radial-gradient(120% 120% at 30% 15%, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.5) 100%)",
+                  boxShadow:
+                    "inset 0 1px 0 0 rgba(255,255,255,1), 0 2px 6px -2px rgba(0,0,0,0.12)",
                 }}
               >
-                <SlidersIcon />
+                <SlidersIcon className="h-3 w-3" />
               </span>
-              <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-black/65">
-                Background
+              <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-black/70">
+                Blur
               </span>
             </div>
-            <span className="font-mono text-[12px] font-semibold tabular-nums text-black/80">
+            <span className="font-mono text-[11px] font-semibold tabular-nums text-black/80">
               {value}px
             </span>
           </div>
 
           {/* Slider */}
-          <div className="px-0.5">
+          <div className="relative">
             <input
               type="range"
               min={BLUR_MIN}
@@ -234,80 +252,67 @@ function BlurPopover({
               value={value}
               onChange={(e) => onChange(Number(e.target.value))}
               aria-label="Background blur"
-              className="bz-blur-range relative h-1.5 w-full cursor-pointer appearance-none rounded-full outline-none"
+              className="bz-blur-range relative z-10 h-1.5 w-full cursor-pointer appearance-none rounded-full outline-none"
               style={{
-                background: `linear-gradient(90deg,
-                  rgba(10,10,10,0.85) 0%,
-                  rgba(10,10,10,0.85) ${
-                    ((value - BLUR_MIN) / (BLUR_MAX - BLUR_MIN)) * 100
-                  }%,
-                  rgba(0,0,0,0.14) ${
-                    ((value - BLUR_MIN) / (BLUR_MAX - BLUR_MIN)) * 100
-                  }%,
-                  rgba(0,0,0,0.14) 100%)`,
+                background: `linear-gradient(90deg, #0a0a0a 0%, #0a0a0a ${pct}%, rgba(0,0,0,0.14) ${pct}%, rgba(0,0,0,0.14) 100%)`,
               }}
             />
+          </div>
 
-            {/* Scale */}
-            <div className="mt-2 flex items-center justify-between text-[10px] font-medium tabular-nums text-black/40">
-              <span>0</span>
-              <span>5</span>
-              <span>10</span>
-              <span>15</span>
-              <span>20</span>
-            </div>
+          {/* Min / Max labels */}
+          <div className="mt-2.5 flex items-center justify-between text-[9.5px] font-semibold uppercase tracking-[0.14em] text-black/40">
+            <span>Sharp</span>
+            <span>Soft</span>
           </div>
 
           <style jsx>{`
             .bz-blur-range::-webkit-slider-thumb {
               -webkit-appearance: none;
               appearance: none;
-              width: 18px;
-              height: 18px;
+              width: 16px;
+              height: 16px;
               border-radius: 999px;
               background: radial-gradient(
-                130% 130% at 30% 20%,
+                120% 120% at 30% 20%,
                 rgba(255, 255, 255, 1) 0%,
-                rgba(252, 252, 252, 1) 55%,
-                rgba(238, 238, 238, 1) 100%
+                rgba(250, 250, 250, 0.98) 55%,
+                rgba(235, 235, 235, 1) 100%
               );
-              border: 1px solid rgba(0, 0, 0, 0.14);
+              border: 1px solid rgba(0, 0, 0, 0.15);
               box-shadow:
                 0 1px 0 0 rgba(255, 255, 255, 1) inset,
-                0 8px 18px -6px rgba(0, 0, 0, 0.5),
-                0 2px 4px rgba(0, 0, 0, 0.2);
+                0 4px 10px -2px rgba(0, 0, 0, 0.35),
+                0 1px 2px rgba(0, 0, 0, 0.15);
               cursor: grab;
-              transition:
-                transform 0.22s cubic-bezier(0.22, 1, 0.36, 1),
-                box-shadow 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+              transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1);
             }
             .bz-blur-range:hover::-webkit-slider-thumb {
-              transform: scale(1.08);
-              box-shadow:
-                0 1px 0 0 rgba(255, 255, 255, 1) inset,
-                0 10px 22px -6px rgba(0, 0, 0, 0.55),
-                0 2px 6px rgba(0, 0, 0, 0.22);
+              transform: scale(1.12);
             }
             .bz-blur-range:active::-webkit-slider-thumb {
               cursor: grabbing;
               transform: scale(1.02);
             }
             .bz-blur-range::-moz-range-thumb {
-              width: 18px;
-              height: 18px;
+              width: 16px;
+              height: 16px;
               border-radius: 999px;
               background: radial-gradient(
-                130% 130% at 30% 20%,
+                120% 120% at 30% 20%,
                 rgba(255, 255, 255, 1) 0%,
-                rgba(252, 252, 252, 1) 55%,
-                rgba(238, 238, 238, 1) 100%
+                rgba(250, 250, 250, 0.98) 55%,
+                rgba(235, 235, 235, 1) 100%
               );
-              border: 1px solid rgba(0, 0, 0, 0.14);
+              border: 1px solid rgba(0, 0, 0, 0.15);
               box-shadow:
                 0 1px 0 0 rgba(255, 255, 255, 1) inset,
-                0 8px 18px -6px rgba(0, 0, 0, 0.5),
-                0 2px 4px rgba(0, 0, 0, 0.2);
+                0 4px 10px -2px rgba(0, 0, 0, 0.35),
+                0 1px 2px rgba(0, 0, 0, 0.15);
               cursor: grab;
+              transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+            }
+            .bz-blur-range:hover::-moz-range-thumb {
+              transform: scale(1.12);
             }
             .bz-blur-range::-webkit-slider-runnable-track {
               height: 6px;
@@ -321,7 +326,7 @@ function BlurPopover({
             }
             .bz-blur-range:focus-visible {
               outline: none;
-              box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.55);
+              box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.6);
             }
           `}</style>
         </div>
@@ -437,12 +442,10 @@ export default function DashboardOverviewPage() {
   const [loading, setLoading] = useState(true);
   const [blur, setBlur] = useState<number>(BLUR_DEFAULT);
 
-  /* -------- Load blur preference -------- */
   useEffect(() => {
     setBlur(readStoredBlur());
   }, []);
 
-  /* -------- Persist blur preference -------- */
   useEffect(() => {
     if (typeof window === "undefined") return;
     try {
@@ -537,12 +540,12 @@ export default function DashboardOverviewPage() {
         @keyframes blur-pop-in {
           from {
             opacity: 0;
-            transform: translateY(-6px) scale(0.96);
+            transform: translate(-50%, 8px) scale(0.96);
             filter: blur(6px);
           }
           to {
             opacity: 1;
-            transform: translateY(0) scale(1);
+            transform: translate(-50%, 0) scale(1);
             filter: blur(0);
           }
         }
@@ -562,10 +565,9 @@ export default function DashboardOverviewPage() {
       {/* ============================================================ */}
       <div
         aria-hidden="true"
-        className="pointer-events-none fixed inset-x-0 z-0 h-[80vh] overflow-hidden sm:h-[78vh]"
+        className="pointer-events-none fixed inset-x-0 z-0 h-[76vh] overflow-hidden sm:h-[74vh]"
         style={{ top: "60px" }}
       >
-        {/* Photo */}
         <div
           key={bg}
           className="absolute -inset-[6%]"
@@ -580,7 +582,6 @@ export default function DashboardOverviewPage() {
           }}
         />
 
-        {/* Liquid glass sheens */}
         <div
           className="absolute inset-0"
           style={{
@@ -594,7 +595,6 @@ export default function DashboardOverviewPage() {
           }}
         />
 
-        {/* Shimmer */}
         <div
           aria-hidden="true"
           className="absolute inset-y-0 -left-1/4 w-[150%] opacity-40 mix-blend-soft-light"
@@ -605,7 +605,6 @@ export default function DashboardOverviewPage() {
           }}
         />
 
-        {/* Depth */}
         <div
           className="absolute inset-0"
           style={{
@@ -614,7 +613,6 @@ export default function DashboardOverviewPage() {
           }}
         />
 
-        {/* Bottom blur veil */}
         <div
           className="absolute inset-x-0 bottom-0 h-[58%]"
           style={{
@@ -627,7 +625,6 @@ export default function DashboardOverviewPage() {
           }}
         />
 
-        {/* White liquid fade */}
         <div
           className="absolute inset-x-0 bottom-0 h-[58%]"
           style={{
@@ -642,7 +639,6 @@ export default function DashboardOverviewPage() {
           }}
         />
 
-        {/* Wet edge */}
         <div
           className="absolute inset-x-0 bottom-0 h-[26%]"
           style={{
@@ -657,88 +653,31 @@ export default function DashboardOverviewPage() {
       </div>
 
       {/* ============================================================ */}
-      {/*  HEADER                                                       */}
+      {/*  HEADER — greeting only (blur control moved to pills row)     */}
       {/* ============================================================ */}
-      <header className="relative z-20 mx-auto w-full max-w-6xl px-4 pt-6 sm:px-6 sm:pt-8">
-        {/* ---------- PILLS ROW at the TOP ---------- */}
-        <div
-          className="flex flex-wrap items-center gap-2.5"
-          style={{
-            animation:
-              "db-item-in 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.02s both",
-          }}
-        >
-          {/* ID pill — bigger */}
-          {profile?.binzeo_user_id && (
-            <div
-              className="inline-flex items-center gap-2.5 rounded-full border border-white/55 px-4 py-2"
-              style={{
-                background:
-                  "radial-gradient(120% 120% at 30% 15%, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0.5) 100%)",
-                backdropFilter: "blur(20px) saturate(180%)",
-                WebkitBackdropFilter: "blur(20px) saturate(180%)",
-                boxShadow:
-                  "inset 0 1px 0 0 rgba(255,255,255,0.95), inset 0 0 0 1px rgba(255,255,255,0.45), 0 10px 26px -12px rgba(0,0,0,0.35)",
-              }}
-            >
-              <span className="text-[10.5px] font-semibold uppercase tracking-[0.16em] text-black/60">
-                ID
-              </span>
-              <span className="font-mono text-[13px] font-semibold tracking-tight text-black/90">
-                {profile.binzeo_user_id}
-              </span>
-            </div>
-          )}
-
-          {/* Verified pill — bigger */}
-          <span
-            className={`inline-flex items-center gap-2 rounded-full border px-4 py-2 text-[12px] font-semibold backdrop-blur-md ${
-              isActive
-                ? "border-emerald-300/70 bg-emerald-100/70 text-emerald-800"
-                : "border-amber-300/70 bg-amber-100/70 text-amber-800"
-            }`}
-            style={{
-              boxShadow:
-                "inset 0 1px 0 0 rgba(255,255,255,0.85), 0 10px 26px -12px rgba(0,0,0,0.28)",
-            }}
-          >
-            <span
-              className={`flex h-4 w-4 items-center justify-center rounded-full ${
-                isActive ? "bg-emerald-500" : "bg-amber-500"
-              } text-white`}
-            >
-              <CheckIcon />
-            </span>
-            {isActive ? "Verified" : "Action needed"}
-          </span>
-
-          {/* Blur icon — to the right of verified */}
-          <BlurPopover value={blur} onChange={setBlur} />
-        </div>
-
-        {/* ---------- WELCOME / NAME / EMAIL — lower now ---------- */}
-        <div className="mt-10 sm:mt-12">
+      <header className="relative z-20 mx-auto w-full max-w-6xl px-4 pt-10 sm:px-6 sm:pt-12">
+        <div className="min-w-0">
           {/* Welcome */}
           <p
             className="text-[13px] font-medium uppercase tracking-[0.28em] text-white/85 sm:text-[14px]"
             style={{
               textShadow: "0 1px 14px rgba(0,0,0,0.55)",
               animation:
-                "db-item-in 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.15s both",
+                "db-item-in 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.05s both",
             }}
           >
             Welcome
           </p>
 
-          {/* Name — big, slides down */}
+          {/* Name — big */}
           <h1
             key={name}
-            className="mt-2 text-[36px] font-semibold leading-[1.05] tracking-[-0.03em] text-white sm:text-[44px]"
+            className="mt-2 text-[34px] font-semibold leading-[1.05] tracking-[-0.03em] text-white sm:text-[42px]"
             style={{
               textShadow:
                 "0 3px 24px rgba(0,0,0,0.6), 0 1px 4px rgba(0,0,0,0.45)",
               animation:
-                "db-sub-in 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.3s both",
+                "db-sub-in 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.22s both",
             }}
           >
             {name}
@@ -746,16 +685,16 @@ export default function DashboardOverviewPage() {
 
           {/* Email · Country */}
           <div
-            className="mt-3 flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[13px] font-medium text-white/85"
+            className="mt-3 flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[12.5px] font-medium text-white/85"
             style={{
               textShadow: "0 1px 12px rgba(0,0,0,0.5)",
               animation:
-                "db-sub-in 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.48s both",
+                "db-sub-in 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.4s both",
             }}
           >
             <span className="inline-flex items-center gap-1.5">
-              <span className="opacity-65">✉</span>
-              <span className="max-w-[210px] truncate sm:max-w-none">
+              <span className="opacity-60">✉</span>
+              <span className="truncate max-w-[210px] sm:max-w-none">
                 {email ?? "Unknown"}
               </span>
             </span>
@@ -765,7 +704,7 @@ export default function DashboardOverviewPage() {
             </span>
 
             <span className="inline-flex items-center gap-1.5">
-              <span className="opacity-65">◍</span>
+              <span className="opacity-60">◍</span>
               <span>{country ?? "Unknown"}</span>
             </span>
           </div>
@@ -777,7 +716,51 @@ export default function DashboardOverviewPage() {
       {/* ============================================================ */}
       <main className="relative z-10 mx-auto w-full max-w-6xl px-3 sm:px-5">
         {/* Spacer */}
-        <div className="h-[40vh] sm:h-[38vh]" aria-hidden="true" />
+        <div className="h-[46vh] sm:h-[44vh]" aria-hidden="true" />
+
+        {/* ID + Verified + Blur control — same row */}
+        <div
+          className="mb-4 flex flex-wrap items-center gap-2"
+          style={{
+            animation:
+              "db-item-in 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.15s both",
+          }}
+        >
+          {profile?.binzeo_user_id && (
+            <div
+              className="inline-flex items-center gap-2 rounded-full border border-white/50 px-3 py-1.5 backdrop-blur-md"
+              style={{
+                background:
+                  "radial-gradient(120% 120% at 30% 15%, rgba(255,255,255,0.75) 0%, rgba(255,255,255,0.45) 100%)",
+                boxShadow:
+                  "inset 0 1px 0 0 rgba(255,255,255,0.9), 0 8px 22px -10px rgba(0,0,0,0.28)",
+              }}
+            >
+              <span className="text-[9.5px] font-semibold uppercase tracking-[0.16em] text-black/55">
+                ID
+              </span>
+              <span className="font-mono text-[11.5px] font-medium text-black/85">
+                {profile.binzeo_user_id}
+              </span>
+            </div>
+          )}
+
+          <span
+            className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-[11px] font-medium backdrop-blur-md ${
+              isActive
+                ? "border-emerald-300/70 bg-emerald-100/65 text-emerald-800"
+                : "border-amber-300/70 bg-amber-100/65 text-amber-800"
+            }`}
+          >
+            <span className="flex h-3.5 w-3.5 items-center justify-center">
+              <CheckIcon />
+            </span>
+            {isActive ? "Verified" : "Action needed"}
+          </span>
+
+          {/* Blur control — sits right after the Verified pill */}
+          <BlurControl value={blur} onChange={setBlur} />
+        </div>
 
         {/* ---------- QUICK STATS ---------- */}
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
