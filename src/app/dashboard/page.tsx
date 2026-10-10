@@ -22,6 +22,27 @@ type Data = {
 };
 
 /* ================================================================== */
+/*  Blur preference storage                                            */
+/* ================================================================== */
+const BLUR_STORAGE_KEY = "binzeo_dashboard_blur";
+const BLUR_DEFAULT = 5;
+const BLUR_MIN = 0;
+const BLUR_MAX = 20;
+
+function readStoredBlur(): number {
+  if (typeof window === "undefined") return BLUR_DEFAULT;
+  try {
+    const raw = window.localStorage.getItem(BLUR_STORAGE_KEY);
+    if (raw === null) return BLUR_DEFAULT;
+    const n = Number(raw);
+    if (!Number.isFinite(n)) return BLUR_DEFAULT;
+    return Math.min(BLUR_MAX, Math.max(BLUR_MIN, n));
+  } catch {
+    return BLUR_DEFAULT;
+  }
+}
+
+/* ================================================================== */
 /*  Icons                                                              */
 /* ================================================================== */
 function ArrowIcon() {
@@ -58,6 +79,25 @@ function CheckIcon() {
   );
 }
 
+function BlurIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.9"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="h-4 w-4"
+      aria-hidden="true"
+    >
+      <circle cx="12" cy="12" r="3" />
+      <circle cx="12" cy="12" r="6" opacity="0.55" />
+      <circle cx="12" cy="12" r="9" opacity="0.25" />
+    </svg>
+  );
+}
+
 /* ================================================================== */
 /*  Liquid glass                                                       */
 /* ================================================================== */
@@ -69,6 +109,138 @@ const liquidGlass = {
   boxShadow:
     "inset 0 1px 0 0 rgba(255,255,255,0.95), inset 0 0 0 1px rgba(255,255,255,0.5), 0 2px 4px rgba(0,0,0,0.04), 0 22px 52px -24px rgba(0,0,0,0.35)",
 } as const;
+
+/* ================================================================== */
+/*  Blur slider — liquid glass control                                 */
+/* ================================================================== */
+function BlurControl({
+  value,
+  onChange,
+}: {
+  value: number;
+  onChange: (n: number) => void;
+}) {
+  return (
+    <div
+      className="group relative flex items-center gap-2.5 overflow-hidden rounded-full border border-white/45 px-3 py-2 text-black/85 transition-all duration-500 hover:border-white/70 sm:gap-3 sm:px-3.5"
+      style={{
+        background:
+          "radial-gradient(120% 120% at 30% 15%, rgba(255,255,255,0.65) 0%, rgba(255,255,255,0.35) 100%)",
+        backdropFilter: "blur(22px) saturate(180%)",
+        WebkitBackdropFilter: "blur(22px) saturate(180%)",
+        boxShadow:
+          "inset 0 1px 0 0 rgba(255,255,255,0.9), inset 0 0 0 1px rgba(255,255,255,0.4), 0 10px 26px -12px rgba(0,0,0,0.4)",
+        animation:
+          "db-item-in 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.1s both",
+      }}
+      title="Background blur"
+    >
+      {/* Sheen */}
+      <span
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 rounded-full opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+        style={{
+          background:
+            "radial-gradient(circle at 30% 30%, rgba(255,255,255,0.5), transparent 60%)",
+        }}
+      />
+
+      {/* Icon */}
+      <span className="relative flex items-center text-black/70">
+        <BlurIcon />
+      </span>
+
+      {/* Range slider */}
+      <input
+        type="range"
+        min={BLUR_MIN}
+        max={BLUR_MAX}
+        step={1}
+        value={value}
+        onChange={(e) => onChange(Number(e.target.value))}
+        aria-label="Background blur"
+        className="bz-blur-range relative h-1 w-20 cursor-pointer appearance-none rounded-full outline-none sm:w-28"
+        style={{
+          background: `linear-gradient(90deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.55) ${
+            ((value - BLUR_MIN) / (BLUR_MAX - BLUR_MIN)) * 100
+          }%, rgba(255,255,255,0.55) ${
+            ((value - BLUR_MIN) / (BLUR_MAX - BLUR_MIN)) * 100
+          }%, rgba(255,255,255,0.55) 100%)`,
+        }}
+      />
+
+      {/* Value */}
+      <span className="relative min-w-[34px] text-right font-mono text-[11px] font-medium tabular-nums text-black/75">
+        {value}px
+      </span>
+
+      {/* Custom thumb + track styling */}
+      <style jsx>{`
+        .bz-blur-range::-webkit-slider-thumb {
+          -webkit-appearance: none;
+          appearance: none;
+          width: 14px;
+          height: 14px;
+          border-radius: 999px;
+          background: radial-gradient(
+            120% 120% at 30% 20%,
+            rgba(255, 255, 255, 1) 0%,
+            rgba(255, 255, 255, 0.85) 60%,
+            rgba(240, 240, 240, 0.9) 100%
+          );
+          border: 1px solid rgba(0, 0, 0, 0.15);
+          box-shadow:
+            0 1px 0 0 rgba(255, 255, 255, 0.9) inset,
+            0 4px 10px -3px rgba(0, 0, 0, 0.4),
+            0 1px 2px rgba(0, 0, 0, 0.2);
+          cursor: pointer;
+          transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        .bz-blur-range:hover::-webkit-slider-thumb {
+          transform: scale(1.12);
+        }
+        .bz-blur-range:active::-webkit-slider-thumb {
+          transform: scale(1.05);
+        }
+        .bz-blur-range::-moz-range-thumb {
+          width: 14px;
+          height: 14px;
+          border-radius: 999px;
+          background: radial-gradient(
+            120% 120% at 30% 20%,
+            rgba(255, 255, 255, 1) 0%,
+            rgba(255, 255, 255, 0.85) 60%,
+            rgba(240, 240, 240, 0.9) 100%
+          );
+          border: 1px solid rgba(0, 0, 0, 0.15);
+          box-shadow:
+            0 1px 0 0 rgba(255, 255, 255, 0.9) inset,
+            0 4px 10px -3px rgba(0, 0, 0, 0.4),
+            0 1px 2px rgba(0, 0, 0, 0.2);
+          cursor: pointer;
+          transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        .bz-blur-range:hover::-moz-range-thumb {
+          transform: scale(1.12);
+        }
+        .bz-blur-range::-webkit-slider-runnable-track {
+          height: 4px;
+          border-radius: 999px;
+          background: transparent;
+        }
+        .bz-blur-range::-moz-range-track {
+          height: 4px;
+          border-radius: 999px;
+          background: transparent;
+        }
+        .bz-blur-range:focus-visible {
+          outline: none;
+          box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.5);
+        }
+      `}</style>
+    </div>
+  );
+}
 
 /* ================================================================== */
 /*  Stat Card                                                          */
@@ -175,6 +347,22 @@ function ManageTile({
 export default function DashboardOverviewPage() {
   const [data, setData] = useState<Data | null>(null);
   const [loading, setLoading] = useState(true);
+  const [blur, setBlur] = useState<number>(BLUR_DEFAULT);
+
+  /* -------- Load blur preference from localStorage -------- */
+  useEffect(() => {
+    setBlur(readStoredBlur());
+  }, []);
+
+  /* -------- Persist blur preference on change -------- */
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    try {
+      window.localStorage.setItem(BLUR_STORAGE_KEY, String(blur));
+    } catch {
+      /* ignore quota / privacy errors */
+    }
+  }, [blur]);
 
   useEffect(() => {
     (async () => {
@@ -200,7 +388,7 @@ export default function DashboardOverviewPage() {
             backgroundImage: "url('/images/img3.jpg')",
             backgroundSize: "cover",
             backgroundPosition: "center",
-            filter: "blur(5px) saturate(115%)",
+            filter: `blur(${Math.min(blur + 2, BLUR_MAX)}px) saturate(115%)`,
             transform: "scale(1.06)",
           }}
         />
@@ -253,14 +441,13 @@ export default function DashboardOverviewPage() {
 
       {/* ============================================================ */}
       {/*  BACKGROUND — starts right below the fixed app header         */}
-      {/*  (top-[64px] matches the header's bottom edge → no gap)        */}
       {/* ============================================================ */}
       <div
         aria-hidden="true"
         className="pointer-events-none fixed inset-x-0 z-0 h-[74vh] overflow-hidden sm:h-[72vh]"
         style={{ top: "60px" }}
       >
-        {/* --- Photo layer: less blur, more visible --- */}
+        {/* --- Photo layer: uses user blur preference --- */}
         <div
           key={bg}
           className="absolute -inset-[6%]"
@@ -269,8 +456,9 @@ export default function DashboardOverviewPage() {
             backgroundSize: "cover",
             backgroundPosition: "center top",
             backgroundRepeat: "no-repeat",
-            filter: "blur(4px) saturate(125%) brightness(0.96)",
+            filter: `blur(${blur}px) saturate(125%) brightness(0.96)`,
             animation: "db-kenburns 32s ease-in-out infinite",
+            transition: "filter 0.25s cubic-bezier(0.22, 1, 0.36, 1)",
           }}
         />
 
@@ -308,7 +496,7 @@ export default function DashboardOverviewPage() {
           }}
         />
 
-        {/* --- Bottom: soft blur veil so white transition feels wet --- */}
+        {/* --- Bottom: soft blur veil --- */}
         <div
           className="absolute inset-x-0 bottom-0 h-[58%]"
           style={{
@@ -351,9 +539,10 @@ export default function DashboardOverviewPage() {
       </div>
 
       {/* ============================================================ */}
-      {/*  HEADER — greeting only (no menu button)                      */}
+      {/*  HEADER — greeting left, blur control right                   */}
       {/* ============================================================ */}
-      <header className="relative z-20 mx-auto w-full max-w-6xl px-4 pt-8 sm:px-6 sm:pt-10">
+      <header className="relative z-20 mx-auto flex w-full max-w-6xl items-start justify-between gap-4 px-4 pt-8 sm:px-6 sm:pt-10">
+        {/* Greeting */}
         <div
           className="flex flex-col"
           style={{
@@ -377,6 +566,9 @@ export default function DashboardOverviewPage() {
             Hi, {name}
           </h1>
         </div>
+
+        {/* Blur control */}
+        <BlurControl value={blur} onChange={setBlur} />
       </header>
 
       {/* ============================================================ */}
