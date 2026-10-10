@@ -21,9 +21,9 @@ export const metadata: Metadata = {
   keywords: ["Binzeo", "Digital ID", "Identity", "BZ-U"],
   authors: [{ name: "Binzeo Labs" }],
   icons: {
-    icon: [{ url: "/logo.svg", type: "image/svg+xml" }],
-    shortcut: ["/logo.svg"],
-    apple: [{ url: "/logo.svg", type: "image/svg+xml" }],
+    icon: [{ url: "/favicon.ico", type: "image/x-icon" }],
+    shortcut: ["/favicon.ico"],
+    apple: [{ url: "/favicon.ico", type: "image/x-icon" }],
   },
   openGraph: {
     title: "Binzeo ID — Your Digital Identity",
