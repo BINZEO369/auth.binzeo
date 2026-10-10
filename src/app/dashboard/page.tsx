@@ -68,10 +68,10 @@ function CheckIcon() {
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
-      strokeWidth="2.6"
+      strokeWidth="2.8"
       strokeLinecap="round"
       strokeLinejoin="round"
-      className="h-3 w-3"
+      className="h-3.5 w-3.5"
       aria-hidden="true"
     >
       <path d="M20 6 9 17l-5-5" />
@@ -85,18 +85,16 @@ function SlidersIcon() {
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
-      strokeWidth="1.9"
+      strokeWidth="2"
       strokeLinecap="round"
       strokeLinejoin="round"
       className="h-[15px] w-[15px]"
       aria-hidden="true"
     >
-      <line x1="4" y1="6" x2="20" y2="6" />
-      <circle cx="9" cy="6" r="2" />
-      <line x1="4" y1="12" x2="20" y2="12" />
-      <circle cx="15" cy="12" r="2" />
-      <line x1="4" y1="18" x2="20" y2="18" />
-      <circle cx="11" cy="18" r="2" />
+      <line x1="4" y1="8" x2="20" y2="8" />
+      <circle cx="14" cy="8" r="2.4" />
+      <line x1="4" y1="16" x2="20" y2="16" />
+      <circle cx="8" cy="16" r="2.4" />
     </svg>
   );
 }
@@ -114,7 +112,7 @@ const liquidGlass = {
 } as const;
 
 /* ================================================================== */
-/*  Blur popover — small icon button → expands to professional slider  */
+/*  Blur popover — small icon button (sits inline with the pills)      */
 /* ================================================================== */
 function BlurPopover({
   value,
@@ -126,14 +124,11 @@ function BlurPopover({
   const [open, setOpen] = useState(false);
   const wrapperRef = useRef<HTMLDivElement | null>(null);
 
-  /* close on outside click */
   useEffect(() => {
     if (!open) return;
     const onDocClick = (e: MouseEvent) => {
       if (!wrapperRef.current) return;
-      if (!wrapperRef.current.contains(e.target as Node)) {
-        setOpen(false);
-      }
+      if (!wrapperRef.current.contains(e.target as Node)) setOpen(false);
     };
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") setOpen(false);
@@ -148,24 +143,27 @@ function BlurPopover({
 
   return (
     <div ref={wrapperRef} className="relative">
-      {/* Trigger — small circular glass icon */}
+      {/* Trigger — small circular glass icon, sized to match the pills */}
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
         aria-label="Adjust background blur"
         title="Adjust background blur"
-        className="group relative flex h-10 w-10 items-center justify-center overflow-hidden rounded-full border transition-all duration-500 hover:-translate-y-0.5 sm:h-11 sm:w-11"
+        aria-expanded={open}
+        className="group relative flex h-10 w-10 items-center justify-center overflow-hidden rounded-full border transition-all duration-500 hover:-translate-y-0.5"
         style={{
           background: open
-            ? "radial-gradient(120% 120% at 30% 15%, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.6) 100%)"
-            : "radial-gradient(120% 120% at 30% 15%, rgba(255,255,255,0.6) 0%, rgba(255,255,255,0.3) 100%)",
-          borderColor: open ? "rgba(255,255,255,0.75)" : "rgba(255,255,255,0.45)",
-          backdropFilter: "blur(20px) saturate(180%)",
-          WebkitBackdropFilter: "blur(20px) saturate(180%)",
+            ? "radial-gradient(120% 120% at 30% 15%, rgba(255,255,255,0.92) 0%, rgba(255,255,255,0.7) 100%)"
+            : "radial-gradient(120% 120% at 30% 15%, rgba(255,255,255,0.65) 0%, rgba(255,255,255,0.35) 100%)",
+          borderColor: open
+            ? "rgba(255,255,255,0.8)"
+            : "rgba(255,255,255,0.5)",
+          backdropFilter: "blur(22px) saturate(180%)",
+          WebkitBackdropFilter: "blur(22px) saturate(180%)",
           boxShadow: open
-            ? "inset 0 1px 0 0 rgba(255,255,255,1), inset 0 0 0 1px rgba(255,255,255,0.5), 0 12px 28px -12px rgba(0,0,0,0.45)"
-            : "inset 0 1px 0 0 rgba(255,255,255,0.85), inset 0 0 0 1px rgba(255,255,255,0.35), 0 8px 22px -10px rgba(0,0,0,0.35)",
-          color: "rgba(0,0,0,0.8)",
+            ? "inset 0 1px 0 0 rgba(255,255,255,1), inset 0 0 0 1px rgba(255,255,255,0.55), 0 12px 30px -12px rgba(0,0,0,0.45)"
+            : "inset 0 1px 0 0 rgba(255,255,255,0.9), inset 0 0 0 1px rgba(255,255,255,0.4), 0 8px 22px -10px rgba(0,0,0,0.32)",
+          color: "rgba(0,0,0,0.82)",
         }}
       >
         <span
@@ -173,7 +171,7 @@ function BlurPopover({
           className="pointer-events-none absolute inset-0 rounded-full opacity-0 transition-opacity duration-500 group-hover:opacity-100"
           style={{
             background:
-              "radial-gradient(circle at 30% 30%, rgba(255,255,255,0.55), transparent 60%)",
+              "radial-gradient(circle at 30% 30%, rgba(255,255,255,0.6), transparent 60%)",
           }}
         />
         <span className="relative">
@@ -181,65 +179,83 @@ function BlurPopover({
         </span>
       </button>
 
-      {/* Popover — appears below the icon */}
+      {/* Popover */}
       {open && (
         <div
-          className="absolute right-0 top-full mt-2 w-[230px] origin-top-right rounded-2xl border border-white/45 p-3.5 sm:w-[250px]"
+          className="absolute left-0 top-full z-[60] mt-2 w-[260px] origin-top-left rounded-2xl border border-white/50 p-4"
           style={{
             background:
-              "radial-gradient(140% 120% at 20% 0%, rgba(255,255,255,0.88) 0%, rgba(255,255,255,0.72) 45%, rgba(255,255,255,0.6) 100%)",
-            backdropFilter: "blur(30px) saturate(180%)",
-            WebkitBackdropFilter: "blur(30px) saturate(180%)",
+              "radial-gradient(140% 120% at 20% 0%, rgba(255,255,255,0.92) 0%, rgba(255,255,255,0.78) 45%, rgba(255,255,255,0.68) 100%)",
+            backdropFilter: "blur(32px) saturate(180%)",
+            WebkitBackdropFilter: "blur(32px) saturate(180%)",
             boxShadow:
-              "inset 0 1px 0 0 rgba(255,255,255,1), inset 0 0 0 1px rgba(255,255,255,0.5), 0 24px 56px -20px rgba(0,0,0,0.45)",
-            animation:
-              "blur-pop-in 0.32s cubic-bezier(0.22, 1, 0.36, 1) both",
-            zIndex: 60,
+              "inset 0 1px 0 0 rgba(255,255,255,1), inset 0 0 0 1px rgba(255,255,255,0.55), 0 28px 64px -22px rgba(0,0,0,0.5)",
+            animation: "blur-pop-in 0.32s cubic-bezier(0.22, 1, 0.36, 1) both",
           }}
         >
-          {/* Sheen */}
+          {/* Top sheen */}
           <span
             aria-hidden="true"
-            className="pointer-events-none absolute inset-x-0 top-0 h-px rounded-t-2xl"
+            className="pointer-events-none absolute inset-x-3 top-0 h-px rounded-t-2xl"
             style={{
               background:
                 "linear-gradient(90deg, transparent, rgba(255,255,255,1), transparent)",
             }}
           />
 
-          {/* Header */}
-          <div className="mb-3 flex items-center justify-between">
-            <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-black/60">
-              Background
-            </span>
-            <span className="font-mono text-[11.5px] font-medium tabular-nums text-black/75">
+          {/* Header row */}
+          <div className="mb-3.5 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <span
+                className="flex h-6 w-6 items-center justify-center rounded-lg border border-black/[0.06]"
+                style={{
+                  background:
+                    "radial-gradient(120% 120% at 30% 15%, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.55) 100%)",
+                }}
+              >
+                <SlidersIcon />
+              </span>
+              <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-black/65">
+                Background
+              </span>
+            </div>
+            <span className="font-mono text-[12px] font-semibold tabular-nums text-black/80">
               {value}px
             </span>
           </div>
 
           {/* Slider */}
-          <input
-            type="range"
-            min={BLUR_MIN}
-            max={BLUR_MAX}
-            step={1}
-            value={value}
-            onChange={(e) => onChange(Number(e.target.value))}
-            aria-label="Background blur"
-            className="bz-blur-range relative h-1.5 w-full cursor-pointer appearance-none rounded-full outline-none"
-            style={{
-              background: `linear-gradient(90deg, rgba(10,10,10,0.75) 0%, rgba(10,10,10,0.75) ${
-                ((value - BLUR_MIN) / (BLUR_MAX - BLUR_MIN)) * 100
-              }%, rgba(0,0,0,0.12) ${
-                ((value - BLUR_MIN) / (BLUR_MAX - BLUR_MIN)) * 100
-              }%, rgba(0,0,0,0.12) 100%)`,
-            }}
-          />
+          <div className="px-0.5">
+            <input
+              type="range"
+              min={BLUR_MIN}
+              max={BLUR_MAX}
+              step={1}
+              value={value}
+              onChange={(e) => onChange(Number(e.target.value))}
+              aria-label="Background blur"
+              className="bz-blur-range relative h-1.5 w-full cursor-pointer appearance-none rounded-full outline-none"
+              style={{
+                background: `linear-gradient(90deg,
+                  rgba(10,10,10,0.85) 0%,
+                  rgba(10,10,10,0.85) ${
+                    ((value - BLUR_MIN) / (BLUR_MAX - BLUR_MIN)) * 100
+                  }%,
+                  rgba(0,0,0,0.14) ${
+                    ((value - BLUR_MIN) / (BLUR_MAX - BLUR_MIN)) * 100
+                  }%,
+                  rgba(0,0,0,0.14) 100%)`,
+              }}
+            />
 
-          {/* Min / Max labels */}
-          <div className="mt-2 flex items-center justify-between text-[10px] font-medium text-black/45">
-            <span>Sharp</span>
-            <span>Soft</span>
+            {/* Scale */}
+            <div className="mt-2 flex items-center justify-between text-[10px] font-medium tabular-nums text-black/40">
+              <span>0</span>
+              <span>5</span>
+              <span>10</span>
+              <span>15</span>
+              <span>20</span>
+            </div>
           </div>
 
           <style jsx>{`
@@ -250,52 +266,48 @@ function BlurPopover({
               height: 18px;
               border-radius: 999px;
               background: radial-gradient(
-                120% 120% at 30% 20%,
+                130% 130% at 30% 20%,
                 rgba(255, 255, 255, 1) 0%,
-                rgba(250, 250, 250, 0.98) 55%,
-                rgba(235, 235, 235, 1) 100%
+                rgba(252, 252, 252, 1) 55%,
+                rgba(238, 238, 238, 1) 100%
               );
-              border: 1px solid rgba(0, 0, 0, 0.12);
+              border: 1px solid rgba(0, 0, 0, 0.14);
               box-shadow:
                 0 1px 0 0 rgba(255, 255, 255, 1) inset,
-                0 6px 14px -4px rgba(0, 0, 0, 0.45),
-                0 2px 4px rgba(0, 0, 0, 0.18);
+                0 8px 18px -6px rgba(0, 0, 0, 0.5),
+                0 2px 4px rgba(0, 0, 0, 0.2);
               cursor: grab;
               transition:
-                transform 0.2s cubic-bezier(0.22, 1, 0.36, 1),
-                box-shadow 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+                transform 0.22s cubic-bezier(0.22, 1, 0.36, 1),
+                box-shadow 0.22s cubic-bezier(0.22, 1, 0.36, 1);
             }
             .bz-blur-range:hover::-webkit-slider-thumb {
-              transform: scale(1.1);
+              transform: scale(1.08);
               box-shadow:
                 0 1px 0 0 rgba(255, 255, 255, 1) inset,
-                0 8px 18px -4px rgba(0, 0, 0, 0.5),
-                0 2px 6px rgba(0, 0, 0, 0.2);
+                0 10px 22px -6px rgba(0, 0, 0, 0.55),
+                0 2px 6px rgba(0, 0, 0, 0.22);
             }
             .bz-blur-range:active::-webkit-slider-thumb {
               cursor: grabbing;
-              transform: scale(1.05);
+              transform: scale(1.02);
             }
             .bz-blur-range::-moz-range-thumb {
               width: 18px;
               height: 18px;
               border-radius: 999px;
               background: radial-gradient(
-                120% 120% at 30% 20%,
+                130% 130% at 30% 20%,
                 rgba(255, 255, 255, 1) 0%,
-                rgba(250, 250, 250, 0.98) 55%,
-                rgba(235, 235, 235, 1) 100%
+                rgba(252, 252, 252, 1) 55%,
+                rgba(238, 238, 238, 1) 100%
               );
-              border: 1px solid rgba(0, 0, 0, 0.12);
+              border: 1px solid rgba(0, 0, 0, 0.14);
               box-shadow:
                 0 1px 0 0 rgba(255, 255, 255, 1) inset,
-                0 6px 14px -4px rgba(0, 0, 0, 0.45),
-                0 2px 4px rgba(0, 0, 0, 0.18);
+                0 8px 18px -6px rgba(0, 0, 0, 0.5),
+                0 2px 4px rgba(0, 0, 0, 0.2);
               cursor: grab;
-              transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1);
-            }
-            .bz-blur-range:hover::-moz-range-thumb {
-              transform: scale(1.1);
             }
             .bz-blur-range::-webkit-slider-runnable-track {
               height: 6px;
@@ -309,7 +321,7 @@ function BlurPopover({
             }
             .bz-blur-range:focus-visible {
               outline: none;
-              box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.6);
+              box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.55);
             }
           `}</style>
         </div>
@@ -425,12 +437,12 @@ export default function DashboardOverviewPage() {
   const [loading, setLoading] = useState(true);
   const [blur, setBlur] = useState<number>(BLUR_DEFAULT);
 
-  /* -------- Load blur preference from localStorage -------- */
+  /* -------- Load blur preference -------- */
   useEffect(() => {
     setBlur(readStoredBlur());
   }, []);
 
-  /* -------- Persist blur preference on change -------- */
+  /* -------- Persist blur preference -------- */
   useEffect(() => {
     if (typeof window === "undefined") return;
     try {
@@ -550,7 +562,7 @@ export default function DashboardOverviewPage() {
       {/* ============================================================ */}
       <div
         aria-hidden="true"
-        className="pointer-events-none fixed inset-x-0 z-0 h-[76vh] overflow-hidden sm:h-[74vh]"
+        className="pointer-events-none fixed inset-x-0 z-0 h-[80vh] overflow-hidden sm:h-[78vh]"
         style={{ top: "60px" }}
       >
         {/* Photo */}
@@ -647,30 +659,86 @@ export default function DashboardOverviewPage() {
       {/* ============================================================ */}
       {/*  HEADER                                                       */}
       {/* ============================================================ */}
-      <header className="relative z-20 mx-auto flex w-full max-w-6xl items-start justify-between gap-4 px-4 pt-10 sm:px-6 sm:pt-12">
-        {/* Greeting block */}
-        <div className="min-w-0 flex-1">
-          {/* Welcome — big */}
+      <header className="relative z-20 mx-auto w-full max-w-6xl px-4 pt-6 sm:px-6 sm:pt-8">
+        {/* ---------- PILLS ROW at the TOP ---------- */}
+        <div
+          className="flex flex-wrap items-center gap-2.5"
+          style={{
+            animation:
+              "db-item-in 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.02s both",
+          }}
+        >
+          {/* ID pill — bigger */}
+          {profile?.binzeo_user_id && (
+            <div
+              className="inline-flex items-center gap-2.5 rounded-full border border-white/55 px-4 py-2"
+              style={{
+                background:
+                  "radial-gradient(120% 120% at 30% 15%, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0.5) 100%)",
+                backdropFilter: "blur(20px) saturate(180%)",
+                WebkitBackdropFilter: "blur(20px) saturate(180%)",
+                boxShadow:
+                  "inset 0 1px 0 0 rgba(255,255,255,0.95), inset 0 0 0 1px rgba(255,255,255,0.45), 0 10px 26px -12px rgba(0,0,0,0.35)",
+              }}
+            >
+              <span className="text-[10.5px] font-semibold uppercase tracking-[0.16em] text-black/60">
+                ID
+              </span>
+              <span className="font-mono text-[13px] font-semibold tracking-tight text-black/90">
+                {profile.binzeo_user_id}
+              </span>
+            </div>
+          )}
+
+          {/* Verified pill — bigger */}
+          <span
+            className={`inline-flex items-center gap-2 rounded-full border px-4 py-2 text-[12px] font-semibold backdrop-blur-md ${
+              isActive
+                ? "border-emerald-300/70 bg-emerald-100/70 text-emerald-800"
+                : "border-amber-300/70 bg-amber-100/70 text-amber-800"
+            }`}
+            style={{
+              boxShadow:
+                "inset 0 1px 0 0 rgba(255,255,255,0.85), 0 10px 26px -12px rgba(0,0,0,0.28)",
+            }}
+          >
+            <span
+              className={`flex h-4 w-4 items-center justify-center rounded-full ${
+                isActive ? "bg-emerald-500" : "bg-amber-500"
+              } text-white`}
+            >
+              <CheckIcon />
+            </span>
+            {isActive ? "Verified" : "Action needed"}
+          </span>
+
+          {/* Blur icon — to the right of verified */}
+          <BlurPopover value={blur} onChange={setBlur} />
+        </div>
+
+        {/* ---------- WELCOME / NAME / EMAIL — lower now ---------- */}
+        <div className="mt-10 sm:mt-12">
+          {/* Welcome */}
           <p
             className="text-[13px] font-medium uppercase tracking-[0.28em] text-white/85 sm:text-[14px]"
             style={{
               textShadow: "0 1px 14px rgba(0,0,0,0.55)",
               animation:
-                "db-item-in 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.05s both",
+                "db-item-in 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.15s both",
             }}
           >
             Welcome
           </p>
 
-          {/* Name — slides down as subtitle, big */}
+          {/* Name — big, slides down */}
           <h1
             key={name}
-            className="mt-2 text-[34px] font-semibold leading-[1.05] tracking-[-0.03em] text-white sm:text-[42px]"
+            className="mt-2 text-[36px] font-semibold leading-[1.05] tracking-[-0.03em] text-white sm:text-[44px]"
             style={{
               textShadow:
                 "0 3px 24px rgba(0,0,0,0.6), 0 1px 4px rgba(0,0,0,0.45)",
               animation:
-                "db-sub-in 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.22s both",
+                "db-sub-in 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.3s both",
             }}
           >
             {name}
@@ -678,16 +746,16 @@ export default function DashboardOverviewPage() {
 
           {/* Email · Country */}
           <div
-            className="mt-3 flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[12.5px] font-medium text-white/85"
+            className="mt-3 flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[13px] font-medium text-white/85"
             style={{
               textShadow: "0 1px 12px rgba(0,0,0,0.5)",
               animation:
-                "db-sub-in 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.4s both",
+                "db-sub-in 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.48s both",
             }}
           >
             <span className="inline-flex items-center gap-1.5">
-              <span className="opacity-60">✉</span>
-              <span className="truncate max-w-[210px] sm:max-w-none">
+              <span className="opacity-65">✉</span>
+              <span className="max-w-[210px] truncate sm:max-w-none">
                 {email ?? "Unknown"}
               </span>
             </span>
@@ -697,15 +765,10 @@ export default function DashboardOverviewPage() {
             </span>
 
             <span className="inline-flex items-center gap-1.5">
-              <span className="opacity-60">◍</span>
+              <span className="opacity-65">◍</span>
               <span>{country ?? "Unknown"}</span>
             </span>
           </div>
-        </div>
-
-        {/* Blur popover trigger */}
-        <div className="shrink-0">
-          <BlurPopover value={blur} onChange={setBlur} />
         </div>
       </header>
 
@@ -714,48 +777,7 @@ export default function DashboardOverviewPage() {
       {/* ============================================================ */}
       <main className="relative z-10 mx-auto w-full max-w-6xl px-3 sm:px-5">
         {/* Spacer */}
-        <div className="h-[46vh] sm:h-[44vh]" aria-hidden="true" />
-
-        {/* ID + status pills */}
-        <div
-          className="mb-4 flex flex-wrap items-center gap-2"
-          style={{
-            animation:
-              "db-item-in 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.15s both",
-          }}
-        >
-          {profile?.binzeo_user_id && (
-            <div
-              className="inline-flex items-center gap-2 rounded-full border border-white/50 px-3 py-1.5 backdrop-blur-md"
-              style={{
-                background:
-                  "radial-gradient(120% 120% at 30% 15%, rgba(255,255,255,0.75) 0%, rgba(255,255,255,0.45) 100%)",
-                boxShadow:
-                  "inset 0 1px 0 0 rgba(255,255,255,0.9), 0 8px 22px -10px rgba(0,0,0,0.28)",
-              }}
-            >
-              <span className="text-[9.5px] font-semibold uppercase tracking-[0.16em] text-black/55">
-                ID
-              </span>
-              <span className="font-mono text-[11.5px] font-medium text-black/85">
-                {profile.binzeo_user_id}
-              </span>
-            </div>
-          )}
-
-          <span
-            className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-[11px] font-medium backdrop-blur-md ${
-              isActive
-                ? "border-emerald-300/70 bg-emerald-100/65 text-emerald-800"
-                : "border-amber-300/70 bg-amber-100/65 text-amber-800"
-            }`}
-          >
-            <span className="flex h-3.5 w-3.5 items-center justify-center">
-              <CheckIcon />
-            </span>
-            {isActive ? "Verified" : "Action needed"}
-          </span>
-        </div>
+        <div className="h-[40vh] sm:h-[38vh]" aria-hidden="true" />
 
         {/* ---------- QUICK STATS ---------- */}
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
