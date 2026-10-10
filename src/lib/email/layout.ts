@@ -55,7 +55,7 @@ export function renderEmailLayout({
     dark: { background: "#000000", accent: "#ffffff" },
     light: { background: "#ffffff", accent: "#000000" },
   };
-  const selectedTheme = themeStyles[theme] ?? themeStyles.midnight;
+  const selectedTheme = themeStyles[theme] ?? themeStyles.dark;
   const logoStyle = theme === "light" ? "display:block;width:180px;max-width:76%;height:auto;margin:0 auto;filter:invert(1);" : "display:block;width:180px;max-width:76%;height:auto;margin:0 auto;";
   const year = new Date().getFullYear();
   return `
