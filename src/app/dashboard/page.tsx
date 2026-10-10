@@ -1,4 +1,5 @@
 "use client";
+import Loader from "@/components/ui/Loader";
 
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -535,8 +536,8 @@ export default function DashboardOverviewPage() {
             transform: "scale(1.06)",
           }}
         />
-        <div className="absolute inset-0 z-0 bg-black/25 backdrop-blur-sm" />
-        <div className="relative z-10 h-6 w-6 animate-spin rounded-full border-2 border-white/60 border-t-white" />
+        <div className="absolute inset-0 z-0 bg-black/25 backdrop-blur-md" />
+        <Loader size="md" className="relative z-10 text-white" />
       </div>
     );
   }

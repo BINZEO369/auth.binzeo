@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import { Metadata } from "next";
 import LoginForm from "@/components/auth/LoginForm";
+import Loader from "@/components/ui/Loader";
 
 export const metadata: Metadata = {
   title: "Sign in",
@@ -9,7 +10,7 @@ export const metadata: Metadata = {
 
 export default function SignInPage() {
   return (
-    <Suspense fallback={<div className="text-center text-[#666666]">Loading...</div>}>
+    <Suspense fallback={<Loader size="sm" label="Loading…" className="text-[#666666]" />}>
       <LoginForm />
     </Suspense>
   );

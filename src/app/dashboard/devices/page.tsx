@@ -1,4 +1,5 @@
 "use client";
+import Loader from "@/components/ui/Loader";
 
 import Image from "next/image";
 import { useEffect, useState } from "react";
@@ -116,7 +117,7 @@ export default function DevicesPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <div className="w-6 h-6 border-2 border-[#777777] border-t-transparent rounded-full animate-spin" />
+        <Loader size="md" className="text-[#777777]" />
       </div>
     );
   }

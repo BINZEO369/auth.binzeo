@@ -1,4 +1,5 @@
 "use client";
+import Loader from "@/components/ui/Loader";
 
 import Image from "next/image";
 import { useEffect, useState } from "react";
@@ -108,43 +109,6 @@ function Field({
   );
 }
 
-/* ================================================================== */
-/*  Skeleton card                                                      */
-/* ================================================================== */
-function SkeletonCard({ delay = 0 }: { delay?: number }) {
-  const shimmer: React.CSSProperties = {
-    background:
-      "linear-gradient(90deg, rgba(255,255,255,0.25) 0%, rgba(255,255,255,0.5) 50%, rgba(255,255,255,0.25) 100%)",
-    backgroundSize: "400px 100%",
-    animation: "addr-shimmer 1.4s linear infinite",
-  };
-
-  return (
-    <div
-      className="rounded-3xl border border-white/[0.35] p-6"
-      style={{
-        ...liquidGlass,
-        animation: `addr-item-in 0.6s cubic-bezier(0.22, 1, 0.36, 1) ${delay}ms both`,
-      }}
-    >
-      <div className="mb-4 flex items-center gap-3">
-        <div className="h-6 w-20 rounded-full" style={{ ...shimmer }} />
-        <div
-          className="h-6 w-16 rounded-full"
-          style={{ ...shimmer, animationDelay: "0.1s" }}
-        />
-      </div>
-      <div
-        className="mb-3 h-4 w-3/4 rounded-md"
-        style={{ ...shimmer, animationDelay: "0.2s" }}
-      />
-      <div
-        className="h-3 w-1/2 rounded-md"
-        style={{ ...shimmer, animationDelay: "0.3s" }}
-      />
-    </div>
-  );
-}
 
 /* ================================================================== */
 /*  Main component                                                     */
@@ -249,20 +213,12 @@ export default function AddressesPage() {
             from { opacity: 0; transform: translateY(20px) scale(0.99); filter: blur(8px); }
             to   { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
           }
-          @keyframes addr-shimmer {
-            0%   { background-position: -400px 0; }
-            100% { background-position: 400px 0; }
-          }
           @keyframes addr-kenburns {
             0%, 100% { transform: scale(1.04) translate(0, 0); }
             50%      { transform: scale(1.12) translate(-1%, -0.8%); }
           }
         `}</style>
-        <div className={containerCls}>
-          <SkeletonCard delay={0} />
-          <SkeletonCard delay={80} />
-          <SkeletonCard delay={160} />
-        </div>
+        <div className={containerCls}><Loader size="lg" label="Loading addresses…" className="text-black/60" /></div>
       </div>
     );
   }
@@ -289,17 +245,10 @@ export default function AddressesPage() {
           0%, 100% { transform: scale(1.04) translate(0, 0); }
           50%      { transform: scale(1.12) translate(-1%, -0.8%); }
         }
-        @keyframes addr-shimmer {
-          0%   { background-position: -400px 0; }
-          100% { background-position: 400px 0; }
-        }
         @keyframes addr-pulse-ring {
           0%   { transform: scale(0.9); opacity: 0.7; }
           70%  { transform: scale(1.6); opacity: 0; }
           100% { transform: scale(1.6); opacity: 0; }
-        }
-        @keyframes addr-spin {
-          to { transform: rotate(360deg); }
         }
         @media (prefers-reduced-motion: reduce) {
           [data-addr-anim] {
@@ -642,17 +591,7 @@ export default function AddressesPage() {
                       className="flex h-9 w-9 items-center justify-center rounded-full border border-white/40 bg-white/40 text-black/65 backdrop-blur-md transition-all duration-300 hover:-translate-y-0.5 hover:border-red-300/60 hover:bg-red-100/50 hover:text-red-700 disabled:opacity-40"
                     >
                       {deleting === a.id ? (
-                        <svg
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          className="h-4 w-4"
-                          style={{ animation: "addr-spin 0.8s linear infinite" }}
-                        >
-                          <path d="M21 12a9 9 0 1 1-6.219-8.56" />
-                        </svg>
+                        <Loader size="sm" className="h-4 w-4" />
                       ) : (
                         <svg
                           viewBox="0 0 24 24"
@@ -954,17 +893,7 @@ export default function AddressesPage() {
                     />
                     {saving ? (
                       <>
-                        <svg
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2.4"
-                          strokeLinecap="round"
-                          className="relative h-4 w-4"
-                          style={{ animation: "addr-spin 0.8s linear infinite" }}
-                        >
-                          <path d="M21 12a9 9 0 1 1-6.219-8.56" />
-                        </svg>
+                        <Loader size="sm" className="relative h-4 w-4" />
                         <span className="relative">Saving...</span>
                       </>
                     ) : (

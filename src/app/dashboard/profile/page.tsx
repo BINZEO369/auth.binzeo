@@ -1,4 +1,5 @@
 "use client";
+import Loader from "@/components/ui/Loader";
 
 import Image from "next/image";
 import { useEffect, useState } from "react";
@@ -338,7 +339,7 @@ export default function ProfilePage() {
     return (
       <div className="relative isolate flex min-h-[80vh] items-center justify-center">
         <PageBackground />
-        <div className="relative z-10 h-6 w-6 animate-spin rounded-full border-2 border-white/60 border-t-black/70" />
+        <Loader size="md" className="relative z-10 text-black/70" />
       </div>
     );
   }
@@ -364,9 +365,6 @@ export default function ProfilePage() {
         @keyframes prof-kenburns {
           0%, 100% { transform: scale(1.04) translate(0, 0); }
           50%      { transform: scale(1.12) translate(-1%, -0.8%); }
-        }
-        @keyframes prof-spin {
-          to { transform: rotate(360deg); }
         }
         @media (prefers-reduced-motion: reduce) {
           [data-prof-anim] {
@@ -833,17 +831,7 @@ export default function ProfilePage() {
             />
             {saving ? (
               <>
-                <svg
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2.4"
-                  strokeLinecap="round"
-                  className="relative h-4 w-4"
-                  style={{ animation: "prof-spin 0.8s linear infinite" }}
-                >
-                  <path d="M21 12a9 9 0 1 1-6.219-8.56" />
-                </svg>
+                <Loader size="sm" className="relative h-4 w-4" />
                 <span className="relative">Saving...</span>
               </>
             ) : (

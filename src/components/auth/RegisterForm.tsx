@@ -1,4 +1,5 @@
 "use client";
+import Loader from "@/components/ui/Loader";
 
 import Image from "next/image";
 import { useCallback, useEffect, useState } from "react";
@@ -1518,27 +1519,7 @@ export default function RegisterForm() {
                       onClick={handleSubmit}
                       className="w-full rounded-full bg-white py-3.5 text-sm font-semibold text-black transition-all duration-300 hover:bg-white/90 hover:shadow-[0_16px_40px_-10px_rgba(255,255,255,0.4)] hover:-translate-y-px disabled:cursor-not-allowed disabled:opacity-40 inline-flex items-center justify-center gap-2"
                     >
-                      {loading ? (
-                        <>
-                          <svg
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2.4"
-                            strokeLinecap="round"
-                            className="w-4 h-4"
-                            style={{
-                              animation:
-                                "bn-halo-rotate 0.8s linear infinite",
-                            }}
-                          >
-                            <path d="M21 12a9 9 0 1 1-6.219-8.56" />
-                          </svg>
-                          Creating your BINZEO ID...
-                        </>
-                      ) : (
-                        "Create my BINZEO ID"
-                      )}
+                      {loading ? <Loader size="sm" label="Creating your BINZEO ID…" /> : "Create my BINZEO ID"}
                     </button>
                   </div>
                 </div>

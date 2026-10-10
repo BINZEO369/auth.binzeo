@@ -1,4 +1,5 @@
 "use client";
+import Loader from "@/components/ui/Loader";
 
 import Image from "next/image";
 import Link from "next/link";
@@ -316,7 +317,7 @@ export default function SecurityPage() {
     return (
       <div className="relative isolate flex min-h-[80vh] items-center justify-center">
         <PageBackground />
-        <div className="relative z-10 h-6 w-6 animate-spin rounded-full border-2 border-white/60 border-t-black/70" />
+        <Loader size="md" className="relative z-10 text-black/70" />
       </div>
     );
   }
