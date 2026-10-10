@@ -2,7 +2,7 @@
 import { NextRequest } from "next/server";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { ok, fail } from "@/lib/api/response";
-import { EMAIL_FROM, transporter } from "@/lib/email/transporter";
+import { EMAIL_FROM, getPublicSiteUrl, transporter } from "@/lib/email/transporter";
 import { renderEmailLayout } from "@/lib/email/layout";
 
 function escape(value: string) { return value.replace(/[&<>"']/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[char] ?? char)); }
@@ -18,13 +18,13 @@ type MarketingImage = { url: string; position: string };
 type MarketingTheme = "dark" | "light";
 const positions = ["top", "after_headline", "after_message", "before_button"];
 const themes: MarketingTheme[] = ["dark", "light"];
-function buildEmail(input: { preheader: string; headline: string; message: string; recipient_name?: string; button_label?: string; button_url?: string; images?: MarketingImage[]; unsubscribe_url: string; theme: MarketingTheme }) {
+function buildEmail(input: { siteUrl: string; preheader: string; headline: string; message: string; recipient_name?: string; button_label?: string; button_url?: string; images?: MarketingImage[]; unsubscribe_url: string; theme: MarketingTheme }) {
   const ink = input.theme === "light" ? "#000000" : "#ffffff";
   const button = input.button_label && input.button_url ? `<div style="padding:0 0 2px;text-align:left;"><a href="${escape(input.button_url)}" style="color:${ink};font-size:14px;font-weight:700;text-decoration:underline;text-underline-offset:4px;">${escape(input.button_label)} →</a></div>` : "";
   const renderImages = (position: string) => (input.images ?? []).filter((image) => image.position === position).map((image) => `<p style="margin:24px 0;text-align:center"><img src="${escape(image.url)}" alt="" style="display:block;width:100%;max-width:560px;height:auto;border:0;margin:0 auto" /></p>`).join("");
   const leadImage = renderImages("top") + renderImages("after_headline");
   const body = `<p style="margin:0 0 22px;color:${ink};font-size:16px;line-height:1.5;font-weight:700;">Hey ${escape(input.recipient_name?.trim() || "there")},</p>${leadImage}<div style="color:${ink};font-size:14px;line-height:1.7;white-space:pre-wrap">${escape(input.message).replace(/\n/g, "<br>")}</div>${renderImages("after_message")}${renderImages("before_button")}${button}`;
-  return renderEmailLayout({ siteUrl: (process.env.NEXT_PUBLIC_SITE_URL ?? "https://binzeo.com").replace(/\/+$/, ""), eyebrow: "BINZEO · NEWS", title: escape(input.headline), description: escape(input.preheader), body, showSecurityDetails: false, theme: input.theme, footerNote: `You are receiving this marketing email because you allowed Marketing emails in your BINZEO notification preferences. <a href="${escape(input.unsubscribe_url)}" style="color:${ink};text-decoration:underline;">Unsubscribe from marketing emails</a>` });
+  return renderEmailLayout({ siteUrl: input.siteUrl, eyebrow: "BINZEO · NEWS", title: escape(input.headline), description: escape(input.preheader), body, showSecurityDetails: false, theme: input.theme, footerNote: `You are receiving this marketing email because you allowed Marketing emails in your BINZEO notification preferences. <a href="${escape(input.unsubscribe_url)}" style="color:${ink};text-decoration:underline;">Unsubscribe from marketing emails</a>` });
 }
 async function getContext(request: NextRequest) {
   const token = request.headers.get("authorization")?.replace(/^Bearer\s+/i, "");
@@ -88,10 +88,10 @@ export async function POST(request: NextRequest) {
     return url ? [{ url, position }] : [];
   }) : [];
   if (!images.length && typeof body.image_url === "string" && /^https:\/\//i.test(body.image_url)) images.push({ url: body.image_url.trim().slice(0, 1000), position: "after_headline" });
-  const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://binzeo.com").replace(/\/+$/, "");
+  const siteUrl = getPublicSiteUrl(request.headers);
   const unsubscribe_url = `${siteUrl}/dashboard/profile#notifications`;
   if (!subject || !headline || !message) return fail("Subject, headline and message are required", 422, "VALIDATION_ERROR");
-  const previewHtml = buildEmail({ preheader, headline, message, recipient_name: "there", button_label, button_url, images, unsubscribe_url, theme });
+  const previewHtml = buildEmail({ siteUrl, preheader, headline, message, recipient_name: "there", button_label, button_url, images, unsubscribe_url, theme });
   const recipients = await getRecipients(context.admin, teamIds);
   if (body.action === "preview") return ok({ subject, html: previewHtml, recipient_count: recipients.length, smtp_source: "auth.binzeo" });
   if (body.action !== "send") return fail("Choose preview or send", 422, "VALIDATION_ERROR");
@@ -104,7 +104,7 @@ export async function POST(request: NextRequest) {
   let sent = 0; let failed = 0;
   for (const recipient of recipients) {
     try {
-      const recipientHtml = buildEmail({ preheader, headline, message, recipient_name: recipient.display_name ?? "there", button_label, button_url, images, unsubscribe_url, theme });
+      const recipientHtml = buildEmail({ siteUrl, preheader, headline, message, recipient_name: recipient.display_name ?? "there", button_label, button_url, images, unsubscribe_url, theme });
       const sendHtml = inlineImages.reduce((html, image) => image.html(html), recipientHtml);
       const info = await transporter.sendMail({ from: EMAIL_FROM, to: recipient.email, subject, html: sendHtml, attachments: inlineImages.map((image) => image.attachment) });
       sent += 1;

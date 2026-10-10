@@ -1,5 +1,3 @@
-import { BINZEO_EMAIL_LOGO_DATA_URI } from "@/lib/email/logo-data";
-
 export type EmailSecurityContext = {
   name?: string | null;
   time?: string | null;
@@ -52,6 +50,7 @@ export function renderEmailLayout({
   theme?: string;
   footerNote?: string;
 }) {
+  const logoUrl = `${siteUrl.replace(/\/+$/, "")}/email-logo-white.png`;
   const themeStyles: Record<string, { background: string; accent: string }> = {
     dark: { background: "#000000", accent: "#ffffff" },
     light: { background: "#ffffff", accent: "#000000" },
@@ -64,7 +63,7 @@ export function renderEmailLayout({
       <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="max-width:560px;margin:0 auto;">
         <tr><td style="padding:0;">
           <div style="padding:4px 0 34px;text-align:center;">
-            <img src="${BINZEO_EMAIL_LOGO_DATA_URI}" width="180" alt="BINZEO" style="${logoStyle}" />
+            <img src="${logoUrl}" width="180" alt="BINZEO" style="${logoStyle}" />
             ${eyebrow ? `<div style="margin-top:19px;color:${selectedTheme.accent};font-size:9px;font-weight:700;letter-spacing:1.8px;text-transform:uppercase;">${eyebrow}</div>` : ""}
           </div>
           <div style="padding:0;text-align:left;">

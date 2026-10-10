@@ -17,15 +17,14 @@ export const transporter = nodemailer.createTransport({
 export const EMAIL_FROM = `"BINZEO" <${process.env.SMTP_USER}>`;
 
 export function getPublicSiteUrl(headers?: { get(name: string): string | null }) {
+  const forwardedHost = headers?.get("x-forwarded-host") ?? headers?.get("host");
+  if (forwardedHost) {
+    const forwardedProto = headers?.get("x-forwarded-proto") ?? "https";
+    return `${forwardedProto.split(",")[0].trim()}://${forwardedHost.split(",")[0].trim()}`.replace(/\/+$/, "");
+  }
   const configuredUrl = process.env.NEXT_PUBLIC_SITE_URL?.trim();
   if (configuredUrl) return configuredUrl.replace(/\/+$/, "");
-
-  const forwardedHost = headers?.get("x-forwarded-host") ?? headers?.get("host");
-  if (!forwardedHost) {
-    throw new Error("NEXT_PUBLIC_SITE_URL or a public request host is required for email images");
-  }
-  const forwardedProto = headers?.get("x-forwarded-proto") ?? "https";
-  return `${forwardedProto.split(",")[0].trim()}://${forwardedHost.split(",")[0].trim()}`.replace(/\/+$/, "");
+  throw new Error("NEXT_PUBLIC_SITE_URL or a public request host is required for email images");
 }
 
 export function buildOtpEmail(code: string, expiresInSeconds = 30, siteUrl: string, context?: EmailSecurityContext) {
