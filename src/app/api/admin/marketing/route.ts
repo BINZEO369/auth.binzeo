@@ -3,11 +3,17 @@ import { NextRequest } from "next/server";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { ok, fail } from "@/lib/api/response";
 import { EMAIL_FROM, transporter } from "@/lib/email/transporter";
+import { uploadMarketingImage } from "@/lib/imagekit";
 
 function escape(value: string) { return value.replace(/[&<>"']/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[char] ?? char)); }
-function buildEmail(input: { preheader: string; headline: string; message: string; button_label?: string; button_url?: string }) {
+function buildEmail(input: { preheader: string; headline: string; message: string; button_label?: string; button_url?: string; image_url?: string; image_position?: string }) {
   const button = input.button_label && input.button_url ? `<p><a href="${escape(input.button_url)}" style="color:#fff;font-weight:700;text-decoration:underline;">${escape(input.button_label)} →</a></p>` : "";
-  return `<div style="background:#000;color:#fff;font-family:Arial,sans-serif;padding:36px 22px;line-height:1.7"><div style="max-width:560px;margin:auto"><p style="font-size:10px;letter-spacing:2px;text-transform:uppercase">BINZEO · NEWS</p><p style="color:#aaa;font-size:12px">${escape(input.preheader)}</p><h1 style="font-size:28px;line-height:1.2">${escape(input.headline)}</h1><div style="font-size:15px;white-space:pre-wrap">${escape(input.message).replace(/\n/g, "<br>")}</div>${button}<hr style="border:0;border-top:1px solid #444;margin:28px 0"><p style="font-size:11px;color:#aaa">You are receiving this marketing email because you allowed Marketing emails in your BINZEO notification preferences.</p><p style="font-size:10px;color:#777">© ${new Date().getFullYear()} BINZEO Inc. All rights reserved.</p></div></div>`;
+  const image = input.image_url ? `<p style="margin:24px 0;text-align:center"><img src="${escape(input.image_url)}" alt="" style="display:block;width:100%;max-width:560px;height:auto;border:0;margin:0 auto" /></p>` : "";
+  const beforeHeadline = input.image_position === "top" ? image : "";
+  const afterHeadline = input.image_position === "after_headline" ? image : "";
+  const afterMessage = input.image_position === "after_message" ? image : "";
+  const beforeButton = input.image_position === "before_button" ? image : "";
+  return `<div style="background:#000;color:#fff;font-family:Arial,sans-serif;padding:36px 22px;line-height:1.7"><div style="max-width:560px;margin:auto"><p style="font-size:10px;letter-spacing:2px;text-transform:uppercase">BINZEO · NEWS</p><p style="color:#aaa;font-size:12px">${escape(input.preheader)}</p>${beforeHeadline}<h1 style="font-size:28px;line-height:1.2">${escape(input.headline)}</h1>${afterHeadline}<div style="font-size:15px;white-space:pre-wrap">${escape(input.message).replace(/\n/g, "<br>")}</div>${afterMessage}${beforeButton}${button}<hr style="border:0;border-top:1px solid #444;margin:28px 0"><p style="font-size:11px;color:#aaa">You are receiving this marketing email because you allowed Marketing emails in your BINZEO notification preferences.</p><p style="font-size:10px;color:#777">© ${new Date().getFullYear()} BINZEO Inc. All rights reserved.</p></div></div>`;
 }
 async function getContext(request: NextRequest) {
   const token = request.headers.get("authorization")?.replace(/^Bearer\s+/i, "");
@@ -47,8 +53,10 @@ export async function POST(request: NextRequest) {
   const message = typeof body.message === "string" ? body.message.trim().slice(0, 10000) : "";
   const button_label = typeof body.button_label === "string" ? body.button_label.trim().slice(0, 80) : "";
   const button_url = typeof body.button_url === "string" ? body.button_url.trim().slice(0, 500) : "";
+  const image_url = typeof body.image_url === "string" && /^https:\/\//i.test(body.image_url) ? body.image_url.trim().slice(0, 1000) : "";
+  const image_position = ["top", "after_headline", "after_message", "before_button"].includes(String(body.image_position)) ? String(body.image_position) : "after_headline";
   if (!subject || !headline || !message) return fail("Subject, headline and message are required", 422, "VALIDATION_ERROR");
-  const html = buildEmail({ preheader, headline, message, button_label, button_url });
+  const html = buildEmail({ preheader, headline, message, button_label, button_url, image_url, image_position });
   const recipients = await getRecipients(context.admin);
   if (body.action === "preview") return ok({ subject, html, recipient_count: recipients.length, smtp_source: "auth.binzeo" });
   if (body.action !== "send") return fail("Choose preview or send", 422, "VALIDATION_ERROR");

@@ -83,3 +83,13 @@ export async function deleteProfileImage(fileId: string) {
   if (!fileId.trim()) return;
   await getImageKit().files.delete(fileId);
 }
+
+export async function uploadMarketingImage(buffer: Buffer, mimeType: string) {
+  const imagekit = getImageKit();
+  const extension = extensionForMimeType(mimeType);
+  const fileName = `marketing-${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${extension}`;
+  const file = await toFile(buffer, fileName);
+  const uploaded = await imagekit.files.upload({ file, fileName, folder: "/binzeo/marketing", useUniqueFileName: true, isPrivateFile: false, tags: ["binzeo-marketing"] });
+  if (!uploaded.url || !uploaded.fileId) throw new Error("ImageKit did not return a marketing image URL.");
+  return { url: uploaded.url, fileId: uploaded.fileId, fileName };
+}
