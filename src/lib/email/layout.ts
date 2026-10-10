@@ -52,19 +52,18 @@ export function renderEmailLayout({
 }) {
   const logoUrl = `${siteUrl.replace(/\/+$/, "")}/email-logo-white.png`;
   const themeStyles: Record<string, { background: string; accent: string }> = {
-    midnight: { background: "#000000", accent: "#ffffff" },
-    graphite: { background: "#171717", accent: "#f5f5f5" },
-    ocean: { background: "#061826", accent: "#d8f3ff" },
-    rose: { background: "#1b0b14", accent: "#ffe0ec" },
+    dark: { background: "#000000", accent: "#ffffff" },
+    light: { background: "#ffffff", accent: "#000000" },
   };
   const selectedTheme = themeStyles[theme] ?? themeStyles.midnight;
+  const logoStyle = theme === "light" ? "display:block;width:180px;max-width:76%;height:auto;margin:0 auto;filter:invert(1);" : "display:block;width:180px;max-width:76%;height:auto;margin:0 auto;";
   const year = new Date().getFullYear();
   return `
     <div style="margin:0;padding:36px 22px;background:${selectedTheme.background};font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:${selectedTheme.accent};">
       <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="max-width:560px;margin:0 auto;">
         <tr><td style="padding:0;">
           <div style="padding:4px 0 34px;text-align:center;">
-            <img src="${logoUrl}" width="180" alt="BINZEO" style="display:block;width:180px;max-width:76%;height:auto;margin:0 auto;" />
+            <img src="${logoUrl}" width="180" alt="BINZEO" style="${logoStyle}" />
             ${eyebrow ? `<div style="margin-top:19px;color:${selectedTheme.accent};font-size:9px;font-weight:700;letter-spacing:1.8px;text-transform:uppercase;">${eyebrow}</div>` : ""}
           </div>
           <div style="padding:0;text-align:left;">
