@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, type CSSProperties } from "react";
+import { usePathname } from "next/navigation";
 
 type LoaderSize = "sm" | "md" | "lg";
 
@@ -60,19 +61,43 @@ export default function Loader({
 
 export function GlobalLoadingOverlay() {
   const [activeRequests, setActiveRequests] = useState(0);
+  const [loadingPath, setLoadingPath] = useState<string | null>(null);
+  const pathname = usePathname();
+  const routeLoading = loadingPath !== null && loadingPath !== pathname;
 
   useEffect(() => {
     const start = () => setActiveRequests((count) => count + 1);
     const end = () => setActiveRequests((count) => Math.max(0, count - 1));
+    const handleNavigation = (event: MouseEvent) => {
+      const target = event.target as Element | null;
+      const anchor = target?.closest("a");
+      if (!anchor || event.defaultPrevented || event.button !== 0) return;
+      if (anchor.target === "_blank" || anchor.hasAttribute("download")) return;
+
+      const href = anchor.getAttribute("href");
+      if (!href || href.startsWith("#") || href.startsWith("mailto:") || href.startsWith("tel:")) return;
+
+      try {
+        const destination = new URL(href, window.location.href);
+        if (destination.origin === window.location.origin && destination.pathname !== window.location.pathname) {
+          setLoadingPath(destination.pathname);
+        }
+      } catch {
+        // Ignore malformed or non-navigation href values.
+      }
+    };
+
     window.addEventListener("binzeo:loading:start", start);
     window.addEventListener("binzeo:loading:end", end);
+    document.addEventListener("click", handleNavigation, true);
     return () => {
       window.removeEventListener("binzeo:loading:start", start);
       window.removeEventListener("binzeo:loading:end", end);
+      document.removeEventListener("click", handleNavigation, true);
     };
   }, []);
 
-  if (activeRequests === 0) return null;
+  if (activeRequests === 0 && !routeLoading) return null;
 
   return (
     <div
