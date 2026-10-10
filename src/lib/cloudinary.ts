@@ -8,25 +8,12 @@ function getCloudinary() {
   const apiKey = process.env.CLOUDINARY_API_KEY?.trim();
   const apiSecret = process.env.CLOUDINARY_API_SECRET?.trim();
   if (cloudinaryUrl) {
-    try {
-      const parsed = new URL(cloudinaryUrl);
-      if (parsed.protocol !== "cloudinary:" || !parsed.hostname || !parsed.username || !parsed.password) {
-        throw new Error("Invalid CLOUDINARY_URL format.");
-      }
-      if (!configured) {
-        cloudinary.config({
-          cloud_name: parsed.hostname,
-          api_key: decodeURIComponent(parsed.username),
-          api_secret: decodeURIComponent(parsed.password),
-          secure: true,
-        });
-        configured = true;
-      }
-      return cloudinary;
-    } catch (error) {
-      if (error instanceof Error && error.message === "Invalid CLOUDINARY_URL format.") throw error;
-      throw new Error("Invalid CLOUDINARY_URL format.");
+    if (!configured) {
+      // The SDK natively parses CLOUDINARY_URL, including encoded secrets.
+      cloudinary.config(true);
+      configured = true;
     }
+    return cloudinary;
   }
   if (!cloudName || !apiKey || !apiSecret) {
     throw new Error("Cloudinary is not configured. Set CLOUDINARY_URL or the three CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, and CLOUDINARY_API_SECRET variables.");
