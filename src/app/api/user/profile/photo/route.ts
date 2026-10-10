@@ -1,7 +1,6 @@
 import { NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { ok, fail } from "@/lib/api/response";
-import { getPublicSiteUrl } from "@/lib/email/transporter";
 import { uploadProfileImage } from "@/lib/imagekit";
 
 const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
@@ -21,7 +20,7 @@ export async function POST(req: NextRequest) {
 
     const { data: profile, error: profileError } = await supabase
       .from("profiles")
-      .select("binzeo_user_id, username, display_name, first_name, last_name")
+      .select("binzeo_user_id, username")
       .eq("id", user.id)
       .maybeSingle();
 
@@ -30,17 +29,11 @@ export async function POST(req: NextRequest) {
       return fail("Your BINZEO profile is not ready for image upload.", 409, "PROFILE_NOT_READY");
     }
 
-    const websiteUrl = getPublicSiteUrl(req.headers).replace(/\/+$/, "");
-    const profileName = profile.display_name || [profile.first_name, profile.last_name].filter(Boolean).join(" ") || "BINZEO user";
-    const profileUrl = profile.username ? `${websiteUrl}/u/${encodeURIComponent(profile.username)}` : null;
     const buffer = Buffer.from(await file.arrayBuffer());
     const uploaded = await uploadProfileImage(buffer, file.type, {
       userId: user.id,
       binzeoId: profile.binzeo_user_id,
       username: profile.username,
-      displayName: profileName,
-      websiteUrl,
-      profileUrl,
     });
 
     const { data: savedProfile, error: updateError } = await supabase
@@ -60,7 +53,6 @@ export async function POST(req: NextRequest) {
       image: {
         folder: uploaded.folder,
         fileName: uploaded.fileName,
-        metadataReady: uploaded.metadataReady,
       },
     });
   } catch (error) {
@@ -74,8 +66,6 @@ export async function POST(req: NextRequest) {
       ? "Profile image storage is not configured yet."
       : uploadError.status === 401 || uploadError.status === 403 || uploadError.statusCode === 401 || uploadError.statusCode === 403
         ? "ImageKit rejected the upload credentials or permissions. Verify the Production ImageKit private key."
-      : uploadError.status === 400 || uploadError.statusCode === 400
-        ? "ImageKit rejected the profile image details. Check the ImageKit folder or metadata configuration."
       : "Unable to upload profile image. Please try again.";
     return fail(message, 500, "PROFILE_PHOTO_UPLOAD_FAILED");
   }
