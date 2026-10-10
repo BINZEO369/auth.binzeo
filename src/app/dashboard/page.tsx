@@ -9,6 +9,7 @@ type Profile = {
   first_name: string | null;
   last_name: string | null;
   display_name: string | null;
+  username: string | null;
   country_code: string | null;
   account_status: string | null;
   profile_photo_url: string | null;
@@ -328,6 +329,34 @@ export default function DashboardOverviewPage() {
           />
 
           <div className="relative">
+            <div className="mb-5 flex items-center gap-4">
+              <div
+                className="h-[76px] w-[76px] shrink-0 overflow-hidden rounded-[24px] border border-white/60 bg-white/45 p-1 shadow-[0_14px_30px_-18px_rgba(0,0,0,0.45)]"
+                style={{ backdropFilter: "blur(14px)", WebkitBackdropFilter: "blur(14px)" }}
+              >
+                <div className="flex h-full w-full items-center justify-center overflow-hidden rounded-[19px] bg-black/10 text-2xl font-semibold text-black/70">
+                  {profile?.profile_photo_url ? (
+                    <img
+                      src={profile.profile_photo_url}
+                      alt={`${name}'s profile`}
+                      className="h-full w-full object-cover"
+                    />
+                  ) : (
+                    name.charAt(0).toUpperCase()
+                  )}
+                </div>
+              </div>
+              <div className="min-w-0">
+                <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-black/50">
+                  Your profile
+                </div>
+                <div className="mt-1 truncate text-lg font-semibold text-black/90">{name}</div>
+                {profile?.username && (
+                  <div className="mt-0.5 truncate text-[12px] text-black/60">@{profile.username}</div>
+                )}
+              </div>
+            </div>
+
             <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-white/40 bg-white/40 px-3 py-1.5 backdrop-blur-md">
               <span
                 className="h-1.5 w-1.5 rounded-full bg-black/80"
