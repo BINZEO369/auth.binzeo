@@ -48,7 +48,7 @@ function normalizeImages(value: unknown): ImageItem[] {
 export async function GET(request: NextRequest) {
   const context = await getContext(request);
   if (!context) return fail("Birthday template permission required", 403, "BIRTHDAY_TEMPLATE_FORBIDDEN");
-  const { data, error } = await context.admin.from("marketing_email_templates").select("id,name,template_type,theme,subject,preview_text,headline,message,button_label,button_url,images,is_active,created_by,created_at,updated_at").eq("template_type", "birthday").eq("is_active", true).order("updated_at", { ascending: false }).limit(1).maybeSingle();
+  const { data, error } = await context.admin.from("email_templates").select("id,name,template_type,theme,subject,preview_text,headline,message,button_label,button_url,images,is_active,created_by,created_at,updated_at").eq("template_type", "birthday").eq("is_active", true).order("updated_at", { ascending: false }).limit(1).maybeSingle();
   if (error) return fail(error.message, 500, "BIRTHDAY_TEMPLATE_LOAD_FAILED");
   return ok({ template: data ? { ...defaults, ...data, is_default: false, images: normalizeImages(data.images) } : defaults, saved: Boolean(data) });
 }
@@ -71,11 +71,11 @@ export async function PUT(request: NextRequest) {
     is_active: true,
     created_by: context.user.id,
   };
-  const { data: existing, error: existingError } = await context.admin.from("marketing_email_templates").select("id").eq("template_type", "birthday").eq("is_active", true).limit(1).maybeSingle();
+  const { data: existing, error: existingError } = await context.admin.from("email_templates").select("id").eq("template_type", "birthday").eq("is_active", true).limit(1).maybeSingle();
   if (existingError) return fail(existingError.message, 500, "BIRTHDAY_TEMPLATE_LOOKUP_FAILED");
   const query = existing
-    ? context.admin.from("marketing_email_templates").update(template).eq("id", existing.id).select("id,name,template_type,theme,subject,preview_text,headline,message,button_label,button_url,images,is_active,created_by,created_at,updated_at").single()
-    : context.admin.from("marketing_email_templates").insert(template).select("id,name,template_type,theme,subject,preview_text,headline,message,button_label,button_url,images,is_active,created_by,created_at,updated_at").single();
+    ? context.admin.from("email_templates").update(template).eq("id", existing.id).select("id,name,template_type,theme,subject,preview_text,headline,message,button_label,button_url,images,is_active,created_by,created_at,updated_at").single()
+    : context.admin.from("email_templates").insert(template).select("id,name,template_type,theme,subject,preview_text,headline,message,button_label,button_url,images,is_active,created_by,created_at,updated_at").single();
   const { data, error } = await query;
   if (error) return fail(error.message, 500, "BIRTHDAY_TEMPLATE_SAVE_FAILED");
   return ok({ template: { ...defaults, ...data, is_default: false, images: normalizeImages(data.images) }, saved: true });

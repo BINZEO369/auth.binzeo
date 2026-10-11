@@ -105,9 +105,9 @@ export async function POST(request: NextRequest) {
   const birthdayYear = new Date().getUTCFullYear();
   const unsubscribe_url = `${siteUrl}/dashboard/profile#notifications`;
   const { data: selectedSavedTemplate } = templateId
-    ? await (context.admin.from("marketing_email_templates") as any).select("id,template_type,subject,preview_text,headline,message,button_label,button_url,buttons,theme,images").eq("id", templateId).eq("is_active", true).maybeSingle()
+    ? await (context.admin.from("email_templates") as any).select("id,template_type,subject,preview_text,headline,message,button_label,button_url,buttons,theme,images").eq("id", templateId).eq("is_active", true).maybeSingle()
     : template === "birthday"
-      ? await (context.admin.from("marketing_email_templates") as any).select("id,template_type,subject,preview_text,headline,message,button_label,button_url,buttons,theme,images").eq("template_type", "birthday").eq("is_active", true).order("updated_at", { ascending: false }).limit(1).maybeSingle()
+      ? await (context.admin.from("email_templates") as any).select("id,template_type,subject,preview_text,headline,message,button_label,button_url,buttons,theme,images").eq("template_type", "birthday").eq("is_active", true).order("updated_at", { ascending: false }).limit(1).maybeSingle()
       : { data: null };
   const savedTemplate = selectedSavedTemplate ?? {};
   const finalSubject = savedTemplate.subject || (template === "birthday" ? "Happy Birthday from BINZEO" : subject);
