@@ -67,7 +67,7 @@ export function renderEmailLayout({
             ${eyebrow ? `<div style="margin-top:19px;color:${selectedTheme.accent};font-size:9px;font-weight:700;letter-spacing:1.8px;text-transform:uppercase;">${eyebrow}</div>` : ""}
           </div>
           <div style="padding:0;text-align:left;">
-            <h1 style="margin:0;color:${selectedTheme.accent};font-size:27px;line-height:1.2;font-weight:750;letter-spacing:-0.035em;">${title}</h1>
+            ${title ? `<h1 style="margin:0;color:${selectedTheme.accent};font-size:27px;line-height:1.2;font-weight:750;letter-spacing:-0.035em;">${title}</h1>` : ""}
             ${description ? `<p style="margin:14px 0 0;color:${selectedTheme.accent};font-size:14px;line-height:1.7;">${description}</p>` : ""}
           </div>
           ${showSecurityDetails ? `<div style="padding:28px 0 0;">${emailSecurityDetails(context)}</div>` : ""}
