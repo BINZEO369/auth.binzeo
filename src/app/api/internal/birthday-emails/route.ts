@@ -23,7 +23,7 @@ export async function GET(request: NextRequest) {
   const birthdays = (profiles ?? []).filter((profile) => typeof profile.date_of_birth === "string" && profile.date_of_birth.slice(5, 7) === month && profile.date_of_birth.slice(8, 10) === day);
   if (!birthdays.length) return Response.json({ date: `${year}-${month}-${day}`, matched: 0, sent: 0, failed: 0, skipped: 0 });
 
-  const { data: savedBirthdayTemplate } = await admin.from("marketing_email_templates").select("subject,preview_text,headline,message,button_label,button_url,buttons,theme,images").eq("template_type", "birthday").eq("is_active", true).order("updated_at", { ascending: false }).limit(1).maybeSingle();
+  const { data: savedBirthdayTemplate } = await admin.from("email_templates").select("subject,preview_text,headline,message,button_label,button_url,buttons,theme,images").eq("template_type", "birthday").eq("is_active", true).order("updated_at", { ascending: false }).limit(1).maybeSingle();
   const template = savedBirthdayTemplate ?? undefined;
   const campaignPreview = buildBirthdayEmail({ siteUrl, name: birthdays[0].display_name, buttonUrl: template?.button_url ?? `${siteUrl}/dashboard/profile`, template });
   const { data: campaign, error: campaignError } = await admin.from("marketing_email_campaigns").insert({ subject: campaignPreview.subject, preview_text: template?.preview_text ?? "A special birthday wish from BINZEO.", html_body: campaignPreview.html, created_by: birthdays[0].id, status: "sending", recipient_count: birthdays.length, started_at: now.toISOString(), template_type: "birthday", birthday_year: year, target_user_ids: birthdays.map((profile) => profile.id), theme: template?.theme ?? "dark" }).select("id").single();
