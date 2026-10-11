@@ -2,7 +2,7 @@
 import { NextRequest } from "next/server";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { fail, ok } from "@/lib/api/response";
-import { escapeEmailText, renderEmailLayout } from "@/lib/email/layout";
+import { parseContentBlocks, renderEmailTemplateHtml } from "@/lib/email/template-renderer";
 import { EMAIL_FROM, getPublicSiteUrl, transporter } from "@/lib/email/transporter";
 
 type OccasionTemplate = {
@@ -18,10 +18,11 @@ type OccasionTemplate = {
   button_url: string | null;
   buttons: unknown;
   images: unknown;
+  content_blocks: unknown;
 };
 type OccasionProfile = { id: string; display_name: string | null; marketing_email: boolean; account_status: string };
 
-const templateFields = "id,name,template_type,theme,subject,preview_text,headline,message,button_label,button_url,buttons,images";
+const templateFields = "id,name,template_type,theme,subject,preview_text,headline,message,button_label,button_url,buttons,images,content_blocks";
 
 async function getContext(request: NextRequest) {
   const token = request.headers.get("authorization")?.replace(/^Bearer\s+/i, "");
@@ -48,51 +49,6 @@ async function getAuthEmails(admin: ReturnType<typeof getSupabaseAdmin>, profile
     results.push(...batchResults.filter((item): item is { profile: OccasionProfile; email: string } => item !== null));
   }
   return results;
-}
-
-function httpsUrl(value: unknown) {
-  if (typeof value !== "string") return "";
-  try {
-    const url = new URL(value);
-    return url.protocol === "https:" ? url.toString() : "";
-  } catch {
-    return "";
-  }
-}
-
-function buildOccasionHtml(template: OccasionTemplate, recipientName: string | null, siteUrl: string) {
-  const name = recipientName?.trim() || "there";
-  const ink = template.theme === "light" ? "#000000" : "#ffffff";
-  const images = Array.isArray(template.images) ? template.images as { url?: unknown; position?: unknown }[] : [];
-  const validImages = images.flatMap((image) => {
-    const url = httpsUrl(image.url);
-    const position = ["top", "after_headline", "after_message", "before_button"].includes(String(image.position)) ? String(image.position) : "after_message";
-    return url ? [{ url, position }] : [];
-  });
-  const renderImages = (position: string) => validImages.filter((image) => image.position === position).map((image) => `<p style="margin:24px 0;text-align:center"><img src="${escapeEmailText(image.url)}" alt="" style="display:block;width:100%;max-width:560px;height:auto;border:0;margin:0 auto" /></p>`).join("");
-  const buttonItems = Array.isArray(template.buttons) ? template.buttons as { label?: unknown; url?: unknown }[] : [];
-  const buttons = buttonItems.flatMap((button) => {
-    const label = typeof button.label === "string" ? button.label.trim().slice(0, 80) : "";
-    const url = httpsUrl(button.url);
-    return label && url ? [`<div style="padding:0 0 12px;text-align:left"><a href="${escapeEmailText(url)}" style="color:${ink};font-size:14px;font-weight:700;text-decoration:underline;text-underline-offset:4px">${escapeEmailText(label)} →</a></div>`] : [];
-  }).join("");
-  const fallbackButtonUrl = httpsUrl(template.button_url);
-  const fallbackButton = !buttons && template.button_label?.trim() && fallbackButtonUrl
-    ? `<div style="padding:0 0 12px;text-align:left"><a href="${escapeEmailText(fallbackButtonUrl)}" style="color:${ink};font-size:14px;font-weight:700;text-decoration:underline;text-underline-offset:4px">${escapeEmailText(template.button_label.trim())} →</a></div>`
-    : "";
-  const message = template.message.replaceAll("{{name}}", name).replaceAll("[Name]", name);
-  const body = `<p style="margin:0 0 22px;color:${ink};font-size:16px;line-height:1.5;font-weight:700">Hey ${escapeEmailText(name)},</p>${renderImages("top")}${renderImages("after_headline")}<div style="color:${ink};font-size:14px;line-height:1.7;white-space:pre-wrap">${escapeEmailText(message).replace(/\n/g, "<br>")}</div>${renderImages("after_message")}${renderImages("before_button")}${buttons || fallbackButton}`;
-  const preferencesUrl = `${siteUrl.replace(/\/+$/, "")}/dashboard/profile#notifications`;
-  return renderEmailLayout({
-    siteUrl,
-    eyebrow: "BINZEO · OCCASION WISH",
-    title: escapeEmailText(template.headline),
-    description: escapeEmailText(template.preview_text ?? ""),
-    body,
-    showSecurityDetails: false,
-    theme: template.theme,
-    footerNote: `You are receiving this occasion email because marketing emails are enabled in your BINZEO notification preferences. <a href="${escapeEmailText(preferencesUrl)}" style="color:${ink};text-decoration:underline;">Manage email preferences</a>.`,
-  });
 }
 
 export async function GET(request: NextRequest) {
@@ -131,7 +87,11 @@ export async function POST(request: NextRequest) {
   const template = templateRow as OccasionTemplate;
   const safeSubject = (template.subject ?? "").replace(/[\r\n]+/g, " ").trim().slice(0, 180);
   if (!safeSubject) return fail("The occasion template subject is empty", 422, "OCCASION_SUBJECT_EMPTY");
-  if (!template.subject?.trim() || !template.headline?.trim() || !template.message?.trim()) {
+  const contentBlocks = parseContentBlocks(template.content_blocks).blocks;
+  const hasBlockContent = contentBlocks.length > 0;
+  const hasBlockHeadline = contentBlocks.some((block) => block.type === "headline" && block.text.trim());
+  const hasBlockMessage = contentBlocks.some((block) => block.type === "message" && block.text.trim());
+  if (!template.subject?.trim() || (hasBlockContent ? !hasBlockHeadline || !hasBlockMessage : !template.headline?.trim() || !template.message?.trim())) {
     return fail("Complete and save the subject, headline and email message before sending", 422, "OCCASION_TEMPLATE_INCOMPLETE");
   }
 
@@ -161,7 +121,7 @@ export async function POST(request: NextRequest) {
 
   try {
     const siteUrl = getPublicSiteUrl(request.headers);
-    const html = buildOccasionHtml(template, recipientName, siteUrl);
+    const html = renderEmailTemplateHtml({ ...template, content_blocks: contentBlocks }, siteUrl, recipientName ?? "there");
     const info = await transporter.sendMail({ from: EMAIL_FROM, to: recipientEmail, subject: safeSubject, html });
     const sentAt = new Date().toISOString();
     const { error: updateError } = await (context.admin.from("occasion_email_deliveries") as any)
