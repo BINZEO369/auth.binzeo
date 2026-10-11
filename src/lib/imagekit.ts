@@ -1,4 +1,5 @@
 import ImageKit, { toFile } from "@imagekit/nodejs";
+import { randomUUID } from "node:crypto";
 
 let client: ImageKit | null = null;
 
@@ -53,7 +54,10 @@ export async function uploadProfileImage(
   const binzeoId = safePathPart(owner.binzeoId, `user-${owner.userId.slice(0, 8)}`);
   const username = safePathPart(owner.username ?? "user", `user-${owner.userId.slice(0, 8)}`);
   const folder = `/binzeo/profiles/${binzeoId}-${username}`;
-  const fileName = `profile-${username}-${binzeoId}.${extensionForMimeType(mimeType)}`;
+  // Never overwrite the same CDN URL: browsers and edge caches may continue to
+  // serve the previous image even after the upload and database update succeed.
+  // A unique asset also lets the caller safely retire the old file after commit.
+  const fileName = `profile-${username}-${binzeoId}-${randomUUID()}.${extensionForMimeType(mimeType)}`;
   const file = await toFile(buffer, fileName);
 
   const uploaded = await imagekit.files.upload({
@@ -61,8 +65,6 @@ export async function uploadProfileImage(
     fileName,
     folder,
     useUniqueFileName: false,
-    overwriteFile: true,
-    overwriteTags: true,
     isPrivateFile: false,
     tags: ["binzeo-profile", `binzeo-id-${binzeoId}`, `username-${username}`],
   });
