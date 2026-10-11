@@ -16,15 +16,20 @@ async function prepareInlineImage(imageUrl: string, cid: string, filename: strin
 }
 type MarketingImage = { url: string; position: string };
 type MarketingTheme = "dark" | "light";
+type MarketingTemplate = "custom" | "birthday";
 const positions = ["top", "after_headline", "after_message", "before_button"];
 const themes: MarketingTheme[] = ["dark", "light"];
-function buildEmail(input: { siteUrl: string; preheader: string; headline: string; message: string; recipient_name?: string; button_label?: string; button_url?: string; images?: MarketingImage[]; unsubscribe_url: string; theme: MarketingTheme }) {
+function buildEmail(input: { siteUrl: string; template: MarketingTemplate; preheader: string; headline: string; message: string; recipient_name?: string; button_label?: string; button_url?: string; images?: MarketingImage[]; unsubscribe_url: string; theme: MarketingTheme }) {
   const ink = input.theme === "light" ? "#000000" : "#ffffff";
+  const name = input.recipient_name?.trim() || "there";
+  const isBirthday = input.template === "birthday";
   const button = input.button_label && input.button_url ? `<div style="padding:0 0 2px;text-align:left;"><a href="${escape(input.button_url)}" style="color:${ink};font-size:14px;font-weight:700;text-decoration:underline;text-underline-offset:4px;">${escape(input.button_label)} →</a></div>` : "";
   const renderImages = (position: string) => (input.images ?? []).filter((image) => image.position === position).map((image) => `<p style="margin:24px 0;text-align:center"><img src="${escape(image.url)}" alt="" style="display:block;width:100%;max-width:560px;height:auto;border:0;margin:0 auto" /></p>`).join("");
   const leadImage = renderImages("top") + renderImages("after_headline");
-  const body = `<p style="margin:0 0 22px;color:${ink};font-size:16px;line-height:1.5;font-weight:700;">Hey ${escape(input.recipient_name?.trim() || "there")},</p>${leadImage}<div style="color:${ink};font-size:14px;line-height:1.7;white-space:pre-wrap">${escape(input.message).replace(/\n/g, "<br>")}</div>${renderImages("after_message")}${renderImages("before_button")}${button}`;
-  return renderEmailLayout({ siteUrl: input.siteUrl, eyebrow: "BINZEO · NEWS", title: escape(input.headline), description: escape(input.preheader), body, showSecurityDetails: false, theme: input.theme, footerNote: `You are receiving this marketing email because you allowed Marketing emails in your BINZEO notification preferences. <a href="${escape(input.unsubscribe_url)}" style="color:${ink};text-decoration:underline;">Unsubscribe from marketing emails</a>` });
+  const birthdayMessage = `Wishing you a wonderful birthday, ${name}! May your new year be filled with meaningful connections, fresh opportunities, and beautiful moments.`;
+  const message = isBirthday && !input.message.trim() ? birthdayMessage : input.message;
+  const body = `<p style="margin:0 0 22px;color:${ink};font-size:16px;line-height:1.5;font-weight:700;">Hey ${escape(name)},</p>${leadImage}<div style="color:${ink};font-size:14px;line-height:1.7;white-space:pre-wrap">${escape(message).replace(/\n/g, "<br>")}</div>${renderImages("after_message")}${renderImages("before_button")}${button}`;
+  return renderEmailLayout({ siteUrl: input.siteUrl, eyebrow: isBirthday ? "BINZEO · BIRTHDAY" : "BINZEO · NEWS", title: escape(input.headline), description: escape(input.preheader), body, showSecurityDetails: false, theme: input.theme, footerNote: `You are receiving this email because you allowed Marketing emails in your BINZEO notification preferences. <a href="${escape(input.unsubscribe_url)}" style="color:${ink};text-decoration:underline;">Unsubscribe from marketing emails</a>` });
 }
 async function getContext(request: NextRequest) {
   const token = request.headers.get("authorization")?.replace(/^Bearer\s+/i, "");
@@ -38,23 +43,25 @@ async function getContext(request: NextRequest) {
   const permissions = Array.isArray(access.permissions) ? access.permissions : [];
   return roles.includes("super_admin") || permissions.includes("marketing.send") ? { admin, user: auth.user } : null;
 }
-async function getRecipients(admin: ReturnType<typeof getSupabaseAdmin>, teamIds: string[] = []) {
+async function getRecipients(admin: ReturnType<typeof getSupabaseAdmin>, teamIds: string[] = [], selectedUserIds: string[] = []) {
   let userIds: string[] | null = null;
-  if (teamIds.length) {
+  if (selectedUserIds.length) {
+    userIds = [...new Set(selectedUserIds)].slice(0, 500);
+  } else if (teamIds.length) {
     const { data: memberships, error } = await (admin.from("user_sector_access") as any).select("user_id").in("sector_id", teamIds).eq("status", "active").limit(5000);
     if (error) throw error;
     const ids = [...new Set((memberships ?? []).map((row: { user_id: string }) => row.user_id))] as string[];
     userIds = ids;
     if (!ids.length) return [];
   }
-  let query = (admin.from("profiles") as any).select("id,display_name").eq("marketing_email", true).eq("account_status", "active").limit(500);
+  let query = (admin.from("profiles") as any).select("id,display_name,date_of_birth").eq("marketing_email", true).eq("account_status", "active").limit(500);
   if (userIds) query = query.in("id", userIds);
   const { data: profiles, error } = await query;
   if (error) throw error;
-  const recipients: { user_id: string; email: string; display_name: string | null }[] = [];
+  const recipients: { user_id: string; email: string; display_name: string | null; date_of_birth: string | null }[] = [];
   for (const profile of profiles ?? []) {
     const result = await admin.auth.admin.getUserById(profile.id);
-    if (result.data.user?.email) recipients.push({ user_id: profile.id, email: result.data.user.email, display_name: profile.display_name });
+    if (result.data.user?.email) recipients.push({ user_id: profile.id, email: result.data.user.email, display_name: profile.display_name, date_of_birth: profile.date_of_birth ?? null });
   }
   return recipients;
 }
@@ -65,7 +72,8 @@ export async function GET(request: NextRequest) {
     const [{ data: teams }] = await Promise.all([
       (context.admin.from("sectors") as any).select("id,sector_code,sector_name").eq("is_active", true).order("sector_name").limit(100),
     ]);
-    return ok({ recipient_count: (await getRecipients(context.admin)).length, teams: teams ?? [], smtp_source: "auth.binzeo" });
+    const recipients = await getRecipients(context.admin);
+    return ok({ recipient_count: recipients.length, users: recipients.map(({ user_id, email, display_name, date_of_birth }) => ({ id: user_id, email, display_name, date_of_birth })), teams: teams ?? [], smtp_source: "auth.binzeo" });
   } catch (error) { return fail(error instanceof Error ? error.message : "Could not load marketing settings", 500, "MARKETING_SETTINGS_FAILED"); }
 }
 export async function POST(request: NextRequest) {
@@ -78,8 +86,10 @@ export async function POST(request: NextRequest) {
   const message = typeof body.message === "string" ? body.message.trim().slice(0, 10000) : "";
   const button_label = typeof body.button_label === "string" ? body.button_label.trim().slice(0, 80) : "";
   const button_url = typeof body.button_url === "string" ? body.button_url.trim().slice(0, 500) : "";
+  const template: MarketingTemplate = body.template === "birthday" ? "birthday" : "custom";
   const theme = themes.includes(body.theme as MarketingTheme) ? body.theme as MarketingTheme : "dark";
   const teamIds = Array.isArray(body.team_ids) ? body.team_ids.filter((id): id is string => typeof id === "string").slice(0, 50) : [];
+  const selectedUserIds = Array.isArray(body.selected_user_ids) ? body.selected_user_ids.filter((id): id is string => typeof id === "string").slice(0, 500) : [];
   const images: MarketingImage[] = Array.isArray(body.images) ? body.images.slice(0, 8).flatMap((item) => {
     if (!item || typeof item !== "object") return [];
     const candidate = item as Record<string, unknown>;
@@ -90,23 +100,28 @@ export async function POST(request: NextRequest) {
   if (!images.length && typeof body.image_url === "string" && /^https:\/\//i.test(body.image_url)) images.push({ url: body.image_url.trim().slice(0, 1000), position: "after_headline" });
   const siteUrl = getPublicSiteUrl(request.headers);
   const unsubscribe_url = `${siteUrl}/dashboard/profile#notifications`;
-  if (!subject || !headline || !message) return fail("Subject, headline and message are required", 422, "VALIDATION_ERROR");
-  const previewHtml = buildEmail({ siteUrl, preheader, headline, message, recipient_name: "there", button_label, button_url, images, unsubscribe_url, theme });
-  const recipients = await getRecipients(context.admin, teamIds);
+  const finalSubject = subject || (template === "birthday" ? "Happy Birthday from BINZEO" : "");
+  const finalPreheader = preheader || (template === "birthday" ? "A special birthday wish from BINZEO." : "");
+  const finalHeadline = headline || (template === "birthday" ? "Happy Birthday" : "");
+  const finalMessage = message || (template === "birthday" ? "" : "");
+  if (!finalSubject || !finalHeadline || (!finalMessage && template !== "birthday")) return fail("Subject, headline and message are required", 422, "VALIDATION_ERROR");
+  const previewHtml = buildEmail({ siteUrl, template, preheader: finalPreheader, headline: finalHeadline, message: finalMessage, recipient_name: "there", button_label, button_url, images, unsubscribe_url, theme });
+  const recipients = await getRecipients(context.admin, teamIds, selectedUserIds);
   if (body.action === "preview") return ok({ subject, html: previewHtml, recipient_count: recipients.length, smtp_source: "auth.binzeo" });
   if (body.action !== "send") return fail("Choose preview or send", 422, "VALIDATION_ERROR");
   const inlineImages: Awaited<ReturnType<typeof prepareInlineImage>>[] = [];
   try { for (const [index, image] of images.entries()) inlineImages.push(await prepareInlineImage(image.url, `marketing-image-${index}@binzeo`, `marketing-image-${index + 1}`)); } catch (error) { return fail(error instanceof Error ? error.message : "The email image could not be embedded", 422, "IMAGE_EMBED_FAILED"); }
-  const { data: campaign, error: campaignError } = await (context.admin.from("marketing_email_campaigns") as any).insert({ subject, preview_text: preheader, html_body: previewHtml, created_by: context.user.id, status: "sending", recipient_count: recipients.length, started_at: new Date().toISOString(), theme, target_team_ids: teamIds }).select("id").single();
+  if (!recipients.length) return fail("Select at least one eligible active user or team", 422, "NO_RECIPIENTS");
+  const { data: campaign, error: campaignError } = await (context.admin.from("marketing_email_campaigns") as any).insert({ subject: finalSubject, preview_text: finalPreheader, html_body: previewHtml, created_by: context.user.id, status: "sending", recipient_count: recipients.length, started_at: new Date().toISOString(), theme, target_team_ids: teamIds }).select("id").single();
   if (campaignError || !campaign) return fail(campaignError?.message ?? "Campaign could not be created", 500, "CAMPAIGN_CREATE_FAILED");
   const { error: deliveryError } = await (context.admin.from("marketing_email_deliveries") as any).insert(recipients.map((recipient) => ({ campaign_id: campaign.id, user_id: recipient.user_id, email: recipient.email, consent_snapshot: true, status: "pending" })));
   if (deliveryError) return fail(deliveryError.message, 500, "DELIVERY_CREATE_FAILED");
   let sent = 0; let failed = 0;
   for (const recipient of recipients) {
     try {
-      const recipientHtml = buildEmail({ siteUrl, preheader, headline, message, recipient_name: recipient.display_name ?? "there", button_label, button_url, images, unsubscribe_url, theme });
+      const recipientHtml = buildEmail({ siteUrl, template, preheader: finalPreheader, headline: finalHeadline, message: finalMessage, recipient_name: recipient.display_name ?? "there", button_label, button_url, images, unsubscribe_url, theme });
       const sendHtml = inlineImages.reduce((html, image) => image.html(html), recipientHtml);
-      const info = await transporter.sendMail({ from: EMAIL_FROM, to: recipient.email, subject, html: sendHtml, attachments: inlineImages.map((image) => image.attachment) });
+      const info = await transporter.sendMail({ from: EMAIL_FROM, to: recipient.email, subject: finalSubject, html: sendHtml, attachments: inlineImages.map((image) => image.attachment) });
       sent += 1;
       await (context.admin.from("marketing_email_deliveries") as any).update({ status: "sent", sent_at: new Date().toISOString(), provider_message_id: info.messageId ?? null }).eq("campaign_id", campaign.id).eq("email", recipient.email);
     } catch (error) {
