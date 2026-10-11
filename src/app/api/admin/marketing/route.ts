@@ -101,19 +101,27 @@ export async function POST(request: NextRequest) {
   const siteUrl = getPublicSiteUrl(request.headers);
   const birthdayYear = new Date().getUTCFullYear();
   const unsubscribe_url = `${siteUrl}/dashboard/profile#notifications`;
-  const finalSubject = subject || (template === "birthday" ? "Happy Birthday from BINZEO" : "");
-  const finalPreheader = preheader || (template === "birthday" ? "A special birthday wish from BINZEO." : "");
-  const finalHeadline = headline || (template === "birthday" ? "Happy Birthday" : "");
-  const finalMessage = message || (template === "birthday" ? "" : "");
+  const { data: savedBirthdayTemplate } = template === "birthday"
+    ? await (context.admin.from("marketing_email_templates") as any).select("subject,preview_text,headline,message,button_label,button_url,theme,images").eq("template_type", "birthday").eq("is_active", true).order("updated_at", { ascending: false }).limit(1).maybeSingle()
+    : { data: null };
+  const birthdayBase = savedBirthdayTemplate ?? {};
+  const finalSubject = template === "birthday" ? (birthdayBase.subject || subject || "Happy Birthday from BINZEO") : subject;
+  const finalPreheader = template === "birthday" ? (birthdayBase.preview_text || preheader || "A special birthday wish from BINZEO.") : preheader;
+  const finalHeadline = template === "birthday" ? (birthdayBase.headline || headline || "Happy Birthday") : headline;
+  const finalMessage = template === "birthday" ? (birthdayBase.message || message || "") : message;
+  const finalButtonLabel = template === "birthday" ? (birthdayBase.button_label || button_label || "Open your BINZEO profile") : button_label;
+  const finalButtonUrl = template === "birthday" ? (birthdayBase.button_url || button_url || `${siteUrl}/dashboard/profile`) : button_url;
+  const finalTheme = template === "birthday" && (birthdayBase.theme === "light" || birthdayBase.theme === "dark") ? birthdayBase.theme : theme;
+  const finalImages = template === "birthday" && Array.isArray(birthdayBase.images) ? birthdayBase.images : images;
   if (!finalSubject || !finalHeadline || (!finalMessage && template !== "birthday")) return fail("Subject, headline and message are required", 422, "VALIDATION_ERROR");
-  const previewHtml = buildEmail({ siteUrl, template, preheader: finalPreheader, headline: finalHeadline, message: finalMessage, recipient_name: "there", button_label, button_url, images, unsubscribe_url, theme });
+  const previewHtml = buildEmail({ siteUrl, template, preheader: finalPreheader, headline: finalHeadline, message: finalMessage, recipient_name: "there", button_label: finalButtonLabel, button_url: finalButtonUrl, images: finalImages, unsubscribe_url, theme: finalTheme });
   const recipients = await getRecipients(context.admin, teamIds, selectedUserIds);
-  if (body.action === "preview") return ok({ subject, html: previewHtml, recipient_count: recipients.length, smtp_source: "auth.binzeo" });
+  if (body.action === "preview") return ok({ subject: finalSubject, html: previewHtml, recipient_count: recipients.length, smtp_source: "auth.binzeo" });
   if (body.action !== "send") return fail("Choose preview or send", 422, "VALIDATION_ERROR");
   const inlineImages: Awaited<ReturnType<typeof prepareInlineImage>>[] = [];
-  try { for (const [index, image] of images.entries()) inlineImages.push(await prepareInlineImage(image.url, `marketing-image-${index}@binzeo`, `marketing-image-${index + 1}`)); } catch (error) { return fail(error instanceof Error ? error.message : "The email image could not be embedded", 422, "IMAGE_EMBED_FAILED"); }
+  try { for (const [index, image] of finalImages.entries()) inlineImages.push(await prepareInlineImage(image.url, `marketing-image-${index}@binzeo`, `marketing-image-${index + 1}`)); } catch (error) { return fail(error instanceof Error ? error.message : "The email image could not be embedded", 422, "IMAGE_EMBED_FAILED"); }
   if (!recipients.length) return fail("Select at least one eligible active user or team", 422, "NO_RECIPIENTS");
-  const { data: campaign, error: campaignError } = await (context.admin.from("marketing_email_campaigns") as any).insert({ subject: finalSubject, preview_text: finalPreheader, html_body: previewHtml, created_by: context.user.id, status: "sending", recipient_count: recipients.length, started_at: new Date().toISOString(), theme, template_type: template, birthday_year: template === "birthday" ? birthdayYear : null, target_team_ids: teamIds, target_user_ids: selectedUserIds }).select("id").single();
+  const { data: campaign, error: campaignError } = await (context.admin.from("marketing_email_campaigns") as any).insert({ subject: finalSubject, preview_text: finalPreheader, html_body: previewHtml, created_by: context.user.id, status: "sending", recipient_count: recipients.length, started_at: new Date().toISOString(), theme: finalTheme, template_type: template, birthday_year: template === "birthday" ? birthdayYear : null, target_team_ids: teamIds, target_user_ids: selectedUserIds }).select("id").single();
   if (campaignError || !campaign) return fail(campaignError?.message ?? "Campaign could not be created", 500, "CAMPAIGN_CREATE_FAILED");
   const { error: deliveryError } = await (context.admin.from("marketing_email_deliveries") as any).insert(recipients.map((recipient) => ({ campaign_id: campaign.id, user_id: recipient.user_id, email: recipient.email, consent_snapshot: true, status: "pending" })));
   if (deliveryError) return fail(deliveryError.message, 500, "DELIVERY_CREATE_FAILED");
@@ -135,7 +143,7 @@ export async function POST(request: NextRequest) {
       birthdayClaimId = claim.id;
     }
     try {
-      const recipientHtml = buildEmail({ siteUrl, template, preheader: finalPreheader, headline: finalHeadline, message: finalMessage, recipient_name: recipient.display_name ?? "there", button_label, button_url, images, unsubscribe_url, theme });
+      const recipientHtml = buildEmail({ siteUrl, template, preheader: finalPreheader, headline: finalHeadline, message: finalMessage, recipient_name: recipient.display_name ?? "there", button_label: finalButtonLabel, button_url: finalButtonUrl, images: finalImages, unsubscribe_url, theme: finalTheme });
       const sendHtml = inlineImages.reduce((html, image) => image.html(html), recipientHtml);
       const info = await transporter.sendMail({ from: EMAIL_FROM, to: recipient.email, subject: finalSubject, html: sendHtml, attachments: inlineImages.map((image) => image.attachment) });
       sent += 1;

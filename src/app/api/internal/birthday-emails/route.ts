@@ -23,7 +23,10 @@ export async function GET(request: NextRequest) {
   const birthdays = (profiles ?? []).filter((profile) => typeof profile.date_of_birth === "string" && profile.date_of_birth.slice(5, 7) === month && profile.date_of_birth.slice(8, 10) === day);
   if (!birthdays.length) return Response.json({ date: `${year}-${month}-${day}`, matched: 0, sent: 0, failed: 0, skipped: 0 });
 
-  const { data: campaign, error: campaignError } = await admin.from("marketing_email_campaigns").insert({ subject: "Happy Birthday from BINZEO", preview_text: "A special birthday wish from BINZEO.", html_body: "", created_by: birthdays[0].id, status: "sending", recipient_count: birthdays.length, started_at: now.toISOString(), template_type: "birthday", birthday_year: year, target_user_ids: birthdays.map((profile) => profile.id) }).select("id").single();
+  const { data: savedBirthdayTemplate } = await admin.from("marketing_email_templates").select("subject,preview_text,headline,message,button_label,button_url,theme,images").eq("template_type", "birthday").eq("is_active", true).order("updated_at", { ascending: false }).limit(1).maybeSingle();
+  const template = savedBirthdayTemplate ?? undefined;
+  const campaignPreview = buildBirthdayEmail({ siteUrl, name: birthdays[0].display_name, buttonUrl: template?.button_url ?? `${siteUrl}/dashboard/profile`, template });
+  const { data: campaign, error: campaignError } = await admin.from("marketing_email_campaigns").insert({ subject: campaignPreview.subject, preview_text: template?.preview_text ?? "A special birthday wish from BINZEO.", html_body: campaignPreview.html, created_by: birthdays[0].id, status: "sending", recipient_count: birthdays.length, started_at: now.toISOString(), template_type: "birthday", birthday_year: year, target_user_ids: birthdays.map((profile) => profile.id), theme: template?.theme ?? "dark" }).select("id").single();
   if (campaignError || !campaign) return Response.json({ error: campaignError?.message ?? "Birthday campaign could not be created" }, { status: 500 });
 
   let sent = 0;
@@ -38,7 +41,7 @@ export async function GET(request: NextRequest) {
     if (claimError || !claim) { failed += 1; continue; }
     const delivery = await admin.from("marketing_email_deliveries").insert({ campaign_id: campaign.id, user_id: profile.id, email, consent_snapshot: true, status: "pending" }).select("id").single();
     try {
-      const emailContent = buildBirthdayEmail({ siteUrl, name: profile.display_name, buttonUrl: `${siteUrl}/dashboard/profile` });
+      const emailContent = buildBirthdayEmail({ siteUrl, name: profile.display_name, buttonUrl: template?.button_url ?? `${siteUrl}/dashboard/profile`, template });
       const info = await transporter.sendMail({ from: EMAIL_FROM, to: email, subject: emailContent.subject, html: emailContent.html });
       sent += 1;
       await admin.from("birthday_email_deliveries").update({ status: "sent", provider_message_id: info.messageId ?? null, sent_at: new Date().toISOString(), updated_at: new Date().toISOString() }).eq("id", claim.id);
