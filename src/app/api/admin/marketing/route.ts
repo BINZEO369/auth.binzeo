@@ -15,19 +15,21 @@ async function prepareInlineImage(imageUrl: string, cid: string, filename: strin
   return { html: (html: string) => html.replaceAll(escape(imageUrl), `cid:${cid}`), attachment: { filename, content: buffer, cid, contentType } };
 }
 type MarketingImage = { url: string; position: string };
+type MarketingButton = { label: string; url: string };
 type MarketingTheme = "dark" | "light";
 type MarketingTemplate = "custom" | "birthday";
 const positions = ["top", "after_headline", "after_message", "before_button"];
 const themes: MarketingTheme[] = ["dark", "light"];
-function buildEmail(input: { siteUrl: string; template: MarketingTemplate; preheader: string; headline: string; message: string; recipient_name?: string; button_label?: string; button_url?: string; images?: MarketingImage[]; unsubscribe_url: string; theme: MarketingTheme }) {
+function buildEmail(input: { siteUrl: string; template: MarketingTemplate; preheader: string; headline: string; message: string; recipient_name?: string; button_label?: string; button_url?: string; images?: MarketingImage[]; buttons?: MarketingButton[]; unsubscribe_url: string; theme: MarketingTheme }) {
   const ink = input.theme === "light" ? "#000000" : "#ffffff";
   const name = input.recipient_name?.trim() || "there";
   const isBirthday = input.template === "birthday";
-  const button = input.button_label && input.button_url ? `<div style="padding:0 0 2px;text-align:left;"><a href="${escape(input.button_url)}" style="color:${ink};font-size:14px;font-weight:700;text-decoration:underline;text-underline-offset:4px;">${escape(input.button_label)} →</a></div>` : "";
+  const buttonItems = input.buttons?.length ? input.buttons : (input.button_label && input.button_url ? [{ label: input.button_label, url: input.button_url }] : []);
+  const button = buttonItems.map((item) => `<div style="padding:0 0 12px;text-align:left;"><a href="${escape(item.url)}" style="color:${ink};font-size:14px;font-weight:700;text-decoration:underline;text-underline-offset:4px;">${escape(item.label)} →</a></div>`).join("");
   const renderImages = (position: string) => (input.images ?? []).filter((image) => image.position === position).map((image) => `<p style="margin:24px 0;text-align:center"><img src="${escape(image.url)}" alt="" style="display:block;width:100%;max-width:560px;height:auto;border:0;margin:0 auto" /></p>`).join("");
   const leadImage = renderImages("top") + renderImages("after_headline");
   const birthdayMessage = `Wishing you a wonderful birthday, ${name}! May your new year be filled with meaningful connections, fresh opportunities, and beautiful moments.`;
-  const message = isBirthday && !input.message.trim() ? birthdayMessage : input.message;
+  const message = (isBirthday && !input.message.trim() ? birthdayMessage : input.message).replaceAll("{{name}}", name).replaceAll("[Name]", name);
   const body = `<p style="margin:0 0 22px;color:${ink};font-size:16px;line-height:1.5;font-weight:700;">Hey ${escape(name)},</p>${leadImage}<div style="color:${ink};font-size:14px;line-height:1.7;white-space:pre-wrap">${escape(message).replace(/\n/g, "<br>")}</div>${renderImages("after_message")}${renderImages("before_button")}${button}`;
   return renderEmailLayout({ siteUrl: input.siteUrl, eyebrow: isBirthday ? "BINZEO · BIRTHDAY" : "BINZEO · NEWS", title: escape(input.headline), description: escape(input.preheader), body, showSecurityDetails: false, theme: input.theme, footerNote: `You are receiving this email because you allowed Marketing emails in your BINZEO notification preferences. <a href="${escape(input.unsubscribe_url)}" style="color:${ink};text-decoration:underline;">Unsubscribe from marketing emails</a>` });
 }
@@ -87,6 +89,7 @@ export async function POST(request: NextRequest) {
   const button_label = typeof body.button_label === "string" ? body.button_label.trim().slice(0, 80) : "";
   const button_url = typeof body.button_url === "string" ? body.button_url.trim().slice(0, 500) : "";
   const template: MarketingTemplate = body.template === "birthday" ? "birthday" : "custom";
+  const templateId = typeof body.template_id === "string" ? body.template_id : "";
   const theme = themes.includes(body.theme as MarketingTheme) ? body.theme as MarketingTheme : "dark";
   const teamIds = Array.isArray(body.team_ids) ? body.team_ids.filter((id): id is string => typeof id === "string").slice(0, 50) : [];
   const selectedUserIds = Array.isArray(body.selected_user_ids) ? body.selected_user_ids.filter((id): id is string => typeof id === "string").slice(0, 500) : [];
@@ -101,27 +104,30 @@ export async function POST(request: NextRequest) {
   const siteUrl = getPublicSiteUrl(request.headers);
   const birthdayYear = new Date().getUTCFullYear();
   const unsubscribe_url = `${siteUrl}/dashboard/profile#notifications`;
-  const { data: savedBirthdayTemplate } = template === "birthday"
-    ? await (context.admin.from("marketing_email_templates") as any).select("subject,preview_text,headline,message,button_label,button_url,theme,images").eq("template_type", "birthday").eq("is_active", true).order("updated_at", { ascending: false }).limit(1).maybeSingle()
-    : { data: null };
-  const birthdayBase = savedBirthdayTemplate ?? {};
-  const finalSubject = template === "birthday" ? (birthdayBase.subject || subject || "Happy Birthday from BINZEO") : subject;
-  const finalPreheader = template === "birthday" ? (birthdayBase.preview_text || preheader || "A special birthday wish from BINZEO.") : preheader;
-  const finalHeadline = template === "birthday" ? (birthdayBase.headline || headline || "Happy Birthday") : headline;
-  const finalMessage = template === "birthday" ? (birthdayBase.message || message || "") : message;
-  const finalButtonLabel = template === "birthday" ? (birthdayBase.button_label || button_label || "Open your BINZEO profile") : button_label;
-  const finalButtonUrl = template === "birthday" ? (birthdayBase.button_url || button_url || `${siteUrl}/dashboard/profile`) : button_url;
-  const finalTheme = template === "birthday" && (birthdayBase.theme === "light" || birthdayBase.theme === "dark") ? birthdayBase.theme : theme;
-  const finalImages = template === "birthday" && Array.isArray(birthdayBase.images) ? birthdayBase.images : images;
+  const { data: selectedSavedTemplate } = templateId
+    ? await (context.admin.from("marketing_email_templates") as any).select("id,template_type,subject,preview_text,headline,message,button_label,button_url,buttons,theme,images").eq("id", templateId).eq("is_active", true).maybeSingle()
+    : template === "birthday"
+      ? await (context.admin.from("marketing_email_templates") as any).select("id,template_type,subject,preview_text,headline,message,button_label,button_url,buttons,theme,images").eq("template_type", "birthday").eq("is_active", true).order("updated_at", { ascending: false }).limit(1).maybeSingle()
+      : { data: null };
+  const savedTemplate = selectedSavedTemplate ?? {};
+  const finalSubject = savedTemplate.subject || (template === "birthday" ? "Happy Birthday from BINZEO" : subject);
+  const finalPreheader = savedTemplate.preview_text || (template === "birthday" ? "A special birthday wish from BINZEO." : preheader);
+  const finalHeadline = savedTemplate.headline || (template === "birthday" ? "Happy Birthday" : headline);
+  const finalMessage = savedTemplate.message || (template === "birthday" ? "" : message);
+  const finalButtonLabel = savedTemplate.button_label || (template === "birthday" ? "Open your BINZEO profile" : button_label);
+  const finalButtonUrl = savedTemplate.button_url || (template === "birthday" ? `${siteUrl}/dashboard/profile` : button_url);
+  const finalTheme = savedTemplate.theme === "light" || savedTemplate.theme === "dark" ? savedTemplate.theme : theme;
+  const finalImages = Array.isArray(savedTemplate.images) ? savedTemplate.images : images;
+  const finalButtons = Array.isArray(savedTemplate.buttons) ? savedTemplate.buttons : [];
   if (!finalSubject || !finalHeadline || (!finalMessage && template !== "birthday")) return fail("Subject, headline and message are required", 422, "VALIDATION_ERROR");
-  const previewHtml = buildEmail({ siteUrl, template, preheader: finalPreheader, headline: finalHeadline, message: finalMessage, recipient_name: "there", button_label: finalButtonLabel, button_url: finalButtonUrl, images: finalImages, unsubscribe_url, theme: finalTheme });
+  const previewHtml = buildEmail({ siteUrl, template, preheader: finalPreheader, headline: finalHeadline, message: finalMessage, recipient_name: "there", button_label: finalButtonLabel, button_url: finalButtonUrl, images: finalImages, buttons: finalButtons, unsubscribe_url, theme: finalTheme });
   const recipients = await getRecipients(context.admin, teamIds, selectedUserIds);
   if (body.action === "preview") return ok({ subject: finalSubject, html: previewHtml, recipient_count: recipients.length, smtp_source: "auth.binzeo" });
   if (body.action !== "send") return fail("Choose preview or send", 422, "VALIDATION_ERROR");
   const inlineImages: Awaited<ReturnType<typeof prepareInlineImage>>[] = [];
   try { for (const [index, image] of finalImages.entries()) inlineImages.push(await prepareInlineImage(image.url, `marketing-image-${index}@binzeo`, `marketing-image-${index + 1}`)); } catch (error) { return fail(error instanceof Error ? error.message : "The email image could not be embedded", 422, "IMAGE_EMBED_FAILED"); }
   if (!recipients.length) return fail("Select at least one eligible active user or team", 422, "NO_RECIPIENTS");
-  const { data: campaign, error: campaignError } = await (context.admin.from("marketing_email_campaigns") as any).insert({ subject: finalSubject, preview_text: finalPreheader, html_body: previewHtml, created_by: context.user.id, status: "sending", recipient_count: recipients.length, started_at: new Date().toISOString(), theme: finalTheme, template_type: template, birthday_year: template === "birthday" ? birthdayYear : null, target_team_ids: teamIds, target_user_ids: selectedUserIds }).select("id").single();
+  const { data: campaign, error: campaignError } = await (context.admin.from("marketing_email_campaigns") as any).insert({ subject: finalSubject, preview_text: finalPreheader, html_body: previewHtml, created_by: context.user.id, status: "sending", recipient_count: recipients.length, started_at: new Date().toISOString(), theme: finalTheme, template_type: template, template_id: selectedSavedTemplate?.id ?? null, birthday_year: template === "birthday" ? birthdayYear : null, target_team_ids: teamIds, target_user_ids: selectedUserIds }).select("id").single();
   if (campaignError || !campaign) return fail(campaignError?.message ?? "Campaign could not be created", 500, "CAMPAIGN_CREATE_FAILED");
   const { error: deliveryError } = await (context.admin.from("marketing_email_deliveries") as any).insert(recipients.map((recipient) => ({ campaign_id: campaign.id, user_id: recipient.user_id, email: recipient.email, consent_snapshot: true, status: "pending" })));
   if (deliveryError) return fail(deliveryError.message, 500, "DELIVERY_CREATE_FAILED");
@@ -143,7 +149,7 @@ export async function POST(request: NextRequest) {
       birthdayClaimId = claim.id;
     }
     try {
-      const recipientHtml = buildEmail({ siteUrl, template, preheader: finalPreheader, headline: finalHeadline, message: finalMessage, recipient_name: recipient.display_name ?? "there", button_label: finalButtonLabel, button_url: finalButtonUrl, images: finalImages, unsubscribe_url, theme: finalTheme });
+      const recipientHtml = buildEmail({ siteUrl, template, preheader: finalPreheader, headline: finalHeadline, message: finalMessage, recipient_name: recipient.display_name ?? "there", button_label: finalButtonLabel, button_url: finalButtonUrl, images: finalImages, buttons: finalButtons, unsubscribe_url, theme: finalTheme });
       const sendHtml = inlineImages.reduce((html, image) => image.html(html), recipientHtml);
       const info = await transporter.sendMail({ from: EMAIL_FROM, to: recipient.email, subject: finalSubject, html: sendHtml, attachments: inlineImages.map((image) => image.attachment) });
       sent += 1;
