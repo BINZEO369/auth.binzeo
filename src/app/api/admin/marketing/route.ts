@@ -99,6 +99,7 @@ export async function POST(request: NextRequest) {
   }) : [];
   if (!images.length && typeof body.image_url === "string" && /^https:\/\//i.test(body.image_url)) images.push({ url: body.image_url.trim().slice(0, 1000), position: "after_headline" });
   const siteUrl = getPublicSiteUrl(request.headers);
+  const birthdayYear = new Date().getUTCFullYear();
   const unsubscribe_url = `${siteUrl}/dashboard/profile#notifications`;
   const finalSubject = subject || (template === "birthday" ? "Happy Birthday from BINZEO" : "");
   const finalPreheader = preheader || (template === "birthday" ? "A special birthday wish from BINZEO." : "");
@@ -112,24 +113,45 @@ export async function POST(request: NextRequest) {
   const inlineImages: Awaited<ReturnType<typeof prepareInlineImage>>[] = [];
   try { for (const [index, image] of images.entries()) inlineImages.push(await prepareInlineImage(image.url, `marketing-image-${index}@binzeo`, `marketing-image-${index + 1}`)); } catch (error) { return fail(error instanceof Error ? error.message : "The email image could not be embedded", 422, "IMAGE_EMBED_FAILED"); }
   if (!recipients.length) return fail("Select at least one eligible active user or team", 422, "NO_RECIPIENTS");
-  const { data: campaign, error: campaignError } = await (context.admin.from("marketing_email_campaigns") as any).insert({ subject: finalSubject, preview_text: finalPreheader, html_body: previewHtml, created_by: context.user.id, status: "sending", recipient_count: recipients.length, started_at: new Date().toISOString(), theme, target_team_ids: teamIds }).select("id").single();
+  const { data: campaign, error: campaignError } = await (context.admin.from("marketing_email_campaigns") as any).insert({ subject: finalSubject, preview_text: finalPreheader, html_body: previewHtml, created_by: context.user.id, status: "sending", recipient_count: recipients.length, started_at: new Date().toISOString(), theme, template_type: template, birthday_year: template === "birthday" ? birthdayYear : null, target_team_ids: teamIds, target_user_ids: selectedUserIds }).select("id").single();
   if (campaignError || !campaign) return fail(campaignError?.message ?? "Campaign could not be created", 500, "CAMPAIGN_CREATE_FAILED");
   const { error: deliveryError } = await (context.admin.from("marketing_email_deliveries") as any).insert(recipients.map((recipient) => ({ campaign_id: campaign.id, user_id: recipient.user_id, email: recipient.email, consent_snapshot: true, status: "pending" })));
   if (deliveryError) return fail(deliveryError.message, 500, "DELIVERY_CREATE_FAILED");
-  let sent = 0; let failed = 0;
+  let sent = 0; let failed = 0; let skipped = 0;
   for (const recipient of recipients) {
+    let birthdayClaimId: string | null = null;
+    if (template === "birthday") {
+      const { data: claim, error: claimError } = await (context.admin.from("birthday_email_deliveries") as any).insert({ user_id: recipient.user_id, birthday_year: birthdayYear, email: recipient.email, campaign_id: campaign.id, status: "sending" }).select("id").single();
+      if (claimError?.code === "23505") {
+        skipped += 1;
+        await (context.admin.from("marketing_email_deliveries") as any).update({ status: "skipped", error_message: `Birthday email already sent for ${birthdayYear}.` }).eq("campaign_id", campaign.id).eq("email", recipient.email);
+        continue;
+      }
+      if (claimError || !claim) {
+        failed += 1;
+        await (context.admin.from("marketing_email_deliveries") as any).update({ status: "failed", error_message: claimError?.message ?? "Birthday delivery guard failed" }).eq("campaign_id", campaign.id).eq("email", recipient.email);
+        continue;
+      }
+      birthdayClaimId = claim.id;
+    }
     try {
       const recipientHtml = buildEmail({ siteUrl, template, preheader: finalPreheader, headline: finalHeadline, message: finalMessage, recipient_name: recipient.display_name ?? "there", button_label, button_url, images, unsubscribe_url, theme });
       const sendHtml = inlineImages.reduce((html, image) => image.html(html), recipientHtml);
       const info = await transporter.sendMail({ from: EMAIL_FROM, to: recipient.email, subject: finalSubject, html: sendHtml, attachments: inlineImages.map((image) => image.attachment) });
       sent += 1;
       await (context.admin.from("marketing_email_deliveries") as any).update({ status: "sent", sent_at: new Date().toISOString(), provider_message_id: info.messageId ?? null }).eq("campaign_id", campaign.id).eq("email", recipient.email);
+      if (birthdayClaimId) {
+        await (context.admin.from("birthday_email_deliveries") as any).update({ status: "sent", sent_at: new Date().toISOString(), provider_message_id: info.messageId ?? null, updated_at: new Date().toISOString() }).eq("id", birthdayClaimId);
+        await (context.admin.from("user_birthdays") as any).update({ last_birthday_wish_year: birthdayYear, last_birthday_wish_sent_at: new Date().toISOString(), updated_at: new Date().toISOString() }).eq("user_id", recipient.user_id);
+      }
     } catch (error) {
       failed += 1;
-      await (context.admin.from("marketing_email_deliveries") as any).update({ status: "failed", error_message: error instanceof Error ? error.message : "Send failed" }).eq("campaign_id", campaign.id).eq("email", recipient.email);
+      const message = error instanceof Error ? error.message : "Send failed";
+      await (context.admin.from("marketing_email_deliveries") as any).update({ status: "failed", error_message: message }).eq("campaign_id", campaign.id).eq("email", recipient.email);
+      if (birthdayClaimId) await (context.admin.from("birthday_email_deliveries") as any).update({ status: "failed", error_message: message, updated_at: new Date().toISOString() }).eq("id", birthdayClaimId);
     }
   }
-  await (context.admin.from("marketing_email_campaigns") as any).update({ status: failed ? (sent ? "partial" : "failed") : "sent", sent_count: sent, failed_count: failed, completed_at: new Date().toISOString() }).eq("id", campaign.id);
+  await (context.admin.from("marketing_email_campaigns") as any).update({ status: failed ? (sent ? "partial" : "failed") : "sent", sent_count: sent, failed_count: failed, skipped_count: skipped, completed_at: new Date().toISOString() }).eq("id", campaign.id);
   await context.admin.from("admin_activity_logs").insert([{ admin_user_id: context.user.id, action_type: "marketing_campaign_sent", target_type: "marketing_email_campaign", target_id: campaign.id, description: `Marketing campaign sent through auth.binzeo SMTP. Sent ${sent}, failed ${failed}.`, metadata: { sent, failed, recipient_count: recipients.length, team_ids: teamIds, theme, smtp_source: "auth.binzeo", consent_filter: "profiles.marketing_email = true and account_status = active" } }] as never);
-  return ok({ campaign_id: campaign.id, recipient_count: recipients.length, sent, failed, smtp_source: "auth.binzeo" });
+  return ok({ campaign_id: campaign.id, recipient_count: recipients.length, sent, failed, skipped, smtp_source: "auth.binzeo" });
 }
