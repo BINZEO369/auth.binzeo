@@ -15,14 +15,10 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ use
     if (error) return fail("Profile lookup failed", 500, "PROFILE_FETCH_FAILED");
     if (!profile) return fail("Profile not found", 404, "PROFILE_NOT_FOUND");
 
-    const { data: authUser, error: authError } = await getSupabaseAdmin().auth.admin.getUserById(profile.id);
-    if (authError || !authUser.user?.email) return fail("Profile not found", 404, "PROFILE_NOT_FOUND");
-
     return ok({
       profile: {
         username: profile.username,
         display_name: profile.display_name || [profile.first_name, profile.last_name].filter(Boolean).join(" ") || "BINZEO user",
-        email: authUser.user.email,
         country_code: profile.country_code?.trim().toUpperCase() || null,
       },
     });

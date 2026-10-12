@@ -7,9 +7,6 @@ import { upsertUserDevice } from "@/lib/device-tracking";
 import { ok, fail } from "@/lib/api/response";
 import { logUserActivity } from "@/lib/activity-log";
 import { isTwoFactorEnabled } from "@/lib/two-factor/service";
-import { sendLoginNotification } from "@/lib/email/two-factor";
-import { getPublicSiteUrl } from "@/lib/email/transporter";
-import { resolveRequestLocation } from "@/lib/request-location";
 
 const tokenSchema = z.object({ token: z.string().min(20).max(256) });
 
@@ -30,6 +27,14 @@ export async function POST(req: NextRequest) {
     const consumed = consumedRaw as { user_id: string; email: string; token_id: string } | null;
     if (consumeError || !consumed?.user_id || !consumed.email) {
       return fail("This temporary login token is invalid, expired, revoked, or already used", 401, "TEMPORARY_TOKEN_INVALID");
+    }
+
+    // A temporary token is a single factor. Never let it bypass an account's
+    // configured second factor. The token is already consumed at this point,
+    // so a denied attempt cannot be replayed after an attacker learns that 2FA
+    // is enabled.
+    if (await isTwoFactorEnabled(consumed.user_id)) {
+      return fail("Two-factor authentication is required for this account. Sign in with your password and complete 2FA.", 403, "TWO_FACTOR_REQUIRED");
     }
 
     const origin = req.headers.get("origin") ?? process.env.NEXT_PUBLIC_SITE_URL;
@@ -55,8 +60,6 @@ export async function POST(req: NextRequest) {
     }
 
     const ip = requestIp(req);
-    const securityLocation = await resolveRequestLocation(req.headers, false);
-    const { data: profile } = await admin.from("profiles").select("display_name, first_name, last_name").eq("id", consumed.user_id).maybeSingle();
     const device = await upsertUserDevice(supabase, consumed.user_id, req.headers, ip);
     const { error: historyError } = await supabase.from("user_login_history").insert({
       user_id: consumed.user_id,
@@ -74,11 +77,6 @@ export async function POST(req: NextRequest) {
       deviceId: device.id,
       metadata: { login_method: "temporary_token" },
     });
-    if (await isTwoFactorEnabled(consumed.user_id)) {
-      try { await sendLoginNotification({ userId: consumed.user_id, email: consumed.email, loginMethod: "temporary token", ipAddress: ip, userAgent: req.headers.get("user-agent"), siteUrl: getPublicSiteUrl(req.headers), context: { name: profile?.display_name || [profile?.first_name, profile?.last_name].filter(Boolean).join(" "), time: new Date().toUTCString(), ipAddress: securityLocation.ip, location: [securityLocation.city, securityLocation.region, securityLocation.country].filter(Boolean).join(", "), browser: req.headers.get("user-agent") } }); }
-      catch (notificationError) { console.error("[TEMPORARY_LOGIN_2FA_NOTIFICATION_ERROR]", notificationError); }
-    }
-
     return ok({ user: { id: consumed.user_id, email: consumed.email }, login_method: "temporary_token" });
   } catch (err) {
     console.error("[TEMPORARY_LOGIN_ERROR]", err);

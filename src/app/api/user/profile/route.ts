@@ -24,10 +24,6 @@ const ALLOWED_FIELDS = [
   "push_notifications",
   "security_notifications",
   "recovery_email",
-  "terms_accepted",
-  "terms_version",
-  "privacy_accepted",
-  "privacy_version",
   "marketing_consent",
 ] as const;
 
@@ -147,14 +143,6 @@ export async function PATCH(req: NextRequest) {
     if ("date_of_birth" in patch) {
       const birthDateError = validateBirthDate(patch.date_of_birth);
       if (birthDateError) return fail(birthDateError, 422, "INVALID_DATE_OF_BIRTH");
-    }
-
-    // Auto-set consent_date when terms or privacy accepted
-    if (
-      (patch.terms_accepted === true || patch.privacy_accepted === true) &&
-      !("consent_date" in body)
-    ) {
-      patch.consent_date = new Date().toISOString();
     }
 
     const { data, error } = await supabase

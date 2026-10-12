@@ -43,45 +43,7 @@ export async function GET(
       return fail("Profile not found", 404, "PROFILE_NOT_FOUND");
     }
 
-    // Fetch verified contacts (public only)
-    const { data: contacts } = await supabase
-      .from("user_contacts")
-      .select("contact_type, contact_value, label, is_primary")
-      .eq("user_id", (
-        await supabase
-          .from("profiles")
-          .select("id")
-          .eq("binzeo_user_id", binzeoId)
-          .maybeSingle()
-      ).data?.id ?? "")
-      .eq("is_verified", true);
-
-    // Fetch sector access
-    const { data: sectors } = await supabase
-      .from("user_sector_access")
-      .select(
-        `
-        status,
-        sectors:sector_id (
-          sector_code,
-          sector_name
-        )
-        `
-      )
-      .eq("user_id", (
-        await supabase
-          .from("profiles")
-          .select("id")
-          .eq("binzeo_user_id", binzeoId)
-          .maybeSingle()
-      ).data?.id ?? "")
-      .eq("status", "active");
-
-    return ok({
-      profile,
-      contacts: contacts ?? [],
-      sectors: sectors ?? [],
-    });
+    return ok({ profile });
   } catch (err) {
     console.error("[PUBLIC_PROFILE_ERROR]", err);
     return fail("Internal server error", 500, "INTERNAL_ERROR");
