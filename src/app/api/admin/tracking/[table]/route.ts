@@ -106,6 +106,7 @@ export async function GET(request: NextRequest, { params }: RouteContext) {
     }
     return noStore(ok({
       table,
+      columns: [...columns],
       rows: data ?? [],
       total: count ?? null,
       count_accuracy: "estimated",
