@@ -69,7 +69,47 @@ function legacyOccasionBlocks(body: Record<string, unknown>): EmailContentBlock[
     const fallback = buttons([{ label: body.button_label, url: body.button_url }])[0];
     if (fallback) blocks.push({ id: "legacy-button-1", type: "button", ...fallback });
   }
-  return blocks;
+  return addLegacyImages(blocks, body.images);
+}
+
+function addLegacyImages(blocks: EmailContentBlock[], value: unknown): EmailContentBlock[] {
+  const existingUrls = new Set(blocks.flatMap((block) => block.type === "image" ? [block.url] : []));
+  const legacyImages = images(value).filter((image) => !existingUrls.has(image.url));
+  if (!legacyImages.length) return blocks;
+  const result = [...blocks];
+  for (const [index, image] of [...legacyImages].reverse().entries()) {
+    const imageBlock: EmailContentBlock = {
+      id: `legacy-image-${legacyImages.length - index}`,
+      type: "image",
+      url: image.url,
+      size: "banner",
+      align: "center",
+      layout: "full",
+      overlay_enabled: false,
+      overlay_title: "",
+      overlay_subtitle: "",
+      overlay_align: "center",
+      overlay_position: "middle",
+      overlay_button_label: "",
+      overlay_button_url: "",
+    };
+    let position = result.length;
+    if (image.position === "top") position = 0;
+    if (image.position === "after_headline") {
+      const headline = result.findIndex((block) => block.type === "headline");
+      position = headline < 0 ? 0 : headline + 1;
+    }
+    if (image.position === "after_message") {
+      const message = result.findIndex((block) => block.type === "message");
+      position = message < 0 ? result.length : message + 1;
+    }
+    if (image.position === "before_button") {
+      const button = result.findIndex((block) => block.type === "button");
+      position = button < 0 ? result.length : button;
+    }
+    result.splice(position, 0, imageBlock);
+  }
+  return result;
 }
 
 const fields = "id,name,template_type,theme,subject,preview_text,headline,message,button_label,button_url,buttons,images,content_blocks,is_active,created_by,created_at,updated_at";
@@ -90,12 +130,21 @@ export async function PUT(request: NextRequest) {
   const defaultName = templateType === "birthday" ? "Birthday" : templateType === "occasion" ? "Occasion / festival" : "Marketing";
   const parsedBlocks = parseContentBlocks(body.content_blocks, true);
   if (parsedBlocks.error) return fail(parsedBlocks.error, 422, "EMAIL_TEMPLATE_BLOCKS_INVALID");
-  const contentBlocks = templateType === "occasion"
-    ? (parsedBlocks.blocks.length ? parsedBlocks.blocks : legacyOccasionBlocks(body))
+  const rawContentBlocks = templateType === "occasion"
+    ? addLegacyImages(parsedBlocks.blocks.length ? parsedBlocks.blocks : legacyOccasionBlocks(body), body.images)
     : [];
+  const normalizedContentBlocks = templateType === "occasion" ? parseContentBlocks(rawContentBlocks, true) : { blocks: [] as EmailContentBlock[] };
+  if (normalizedContentBlocks.error) return fail(normalizedContentBlocks.error, 422, "EMAIL_TEMPLATE_BLOCKS_INVALID");
+  const contentBlocks = normalizedContentBlocks.blocks;
   const blockHeadlines = contentBlocks.filter((block): block is Extract<EmailContentBlock, { type: "headline" }> => block.type === "headline" && Boolean(block.text.trim()));
   const blockMessages = contentBlocks.filter((block): block is Extract<EmailContentBlock, { type: "message" }> => block.type === "message" && Boolean(block.text.trim()));
-  const blockButtons = contentBlocks.filter((block): block is Extract<EmailContentBlock, { type: "button" }> => block.type === "button" && Boolean(block.label.trim() && block.url));
+  const blockButtons = contentBlocks.flatMap((block) => {
+    if (block.type === "button" && block.label.trim() && block.url) return [{ label: block.label.trim(), url: block.url }];
+    if (block.type === "image" && block.overlay_enabled && block.overlay_button_label?.trim() && block.overlay_button_url) {
+      return [{ label: block.overlay_button_label.trim(), url: block.overlay_button_url }];
+    }
+    return [];
+  });
   if (templateType === "occasion" && (!blockHeadlines.length || !blockMessages.length)) {
     return fail("Add at least one non-empty headline block and one message block before saving an Occasion template.", 422, "EMAIL_TEMPLATE_BLOCKS_INCOMPLETE");
   }
@@ -118,7 +167,7 @@ export async function PUT(request: NextRequest) {
     button_label: firstButton?.label ?? (typeof body.button_label === "string" ? body.button_label.trim().slice(0, 80) : ""),
     button_url: firstButton?.url ?? (typeof body.button_url === "string" ? body.button_url.trim().slice(0, 500) : ""),
     buttons: savedButtons,
-    images: images(body.images),
+    images: templateType === "occasion" ? [] : images(body.images),
     content_blocks: contentBlocks,
     is_active: true,
     created_by: c.user.id,
