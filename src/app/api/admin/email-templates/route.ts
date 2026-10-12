@@ -156,6 +156,7 @@ export async function PUT(request: NextRequest) {
   const derivedHeadline = templateType === "occasion" ? blockHeadlines[0]?.text ?? legacyHeadline : legacyHeadline;
   const derivedMessage = templateType === "occasion" ? blockMessages.map((block) => block.text.trim()).join("\n\n").slice(0, 10000) : legacyMessage;
   const firstButton = savedButtons[0];
+  const savedAt = new Date().toISOString();
   const payload = {
     name: typeof body.name === "string" && body.name.trim() ? body.name.trim().slice(0, 120) : `${defaultName} template`,
     template_type: templateType,
@@ -170,15 +171,15 @@ export async function PUT(request: NextRequest) {
     images: templateType === "occasion" ? [] : images(body.images),
     content_blocks: contentBlocks,
     is_active: true,
-    created_by: c.user.id,
+    updated_at: savedAt,
   };
   const id = typeof body.id === "string" ? body.id : "";
   if (templateType === "birthday") {
-    await c.admin.from("email_templates").update({ is_active: false }).eq("template_type", "birthday").eq("is_active", true).neq("id", id || "00000000-0000-0000-0000-000000000000");
+    await c.admin.from("email_templates").update({ is_active: false, updated_at: savedAt }).eq("template_type", "birthday").eq("is_active", true).neq("id", id || "00000000-0000-0000-0000-000000000000");
   }
   const query = id
     ? c.admin.from("email_templates").update(payload).eq("id", id).select(fields).single()
-    : c.admin.from("email_templates").insert(payload).select(fields).single();
+    : c.admin.from("email_templates").insert({ ...payload, created_by: c.user.id }).select(fields).single();
   const { data, error } = await query;
   if (error) return fail(error.message, 500, "EMAIL_TEMPLATE_SAVE_FAILED");
   return ok({ template: data });
