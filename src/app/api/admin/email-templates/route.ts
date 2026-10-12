@@ -184,3 +184,16 @@ export async function PUT(request: NextRequest) {
   if (error) return fail(error.message, 500, "EMAIL_TEMPLATE_SAVE_FAILED");
   return ok({ template: data });
 }
+
+export async function DELETE(request: NextRequest) {
+  const c = await context(request);
+  if (!c) return fail("Email template permission required", 403, "EMAIL_TEMPLATE_FORBIDDEN");
+  const id = request.nextUrl.searchParams.get("id")?.trim() ?? "";
+  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id)) {
+    return fail("A valid template ID is required", 422, "EMAIL_TEMPLATE_ID_INVALID");
+  }
+  const { data, error } = await c.admin.from("email_templates").delete().eq("id", id).select("id").maybeSingle();
+  if (error) return fail(error.message, 500, "EMAIL_TEMPLATE_DELETE_FAILED");
+  if (!data) return fail("Template not found or already deleted", 404, "EMAIL_TEMPLATE_NOT_FOUND");
+  return ok({ deleted_id: data.id });
+}
