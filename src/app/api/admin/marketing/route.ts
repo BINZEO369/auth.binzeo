@@ -4,6 +4,7 @@ import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { ok, fail } from "@/lib/api/response";
 import { EMAIL_FROM, getPublicSiteUrl, transporter } from "@/lib/email/transporter";
 import { renderEmailLayout } from "@/lib/email/layout";
+import { getAuthEmailMap } from "@/lib/admin-email-audience";
 
 function escape(value: string) { return value.replace(/[&<>"']/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[char] ?? char)); }
 async function prepareInlineImage(imageUrl: string, cid: string, filename: string) {
@@ -18,6 +19,7 @@ type MarketingImage = { url: string; position: string };
 type MarketingButton = { label: string; url: string };
 type MarketingTheme = "dark" | "light";
 type MarketingTemplate = "custom" | "birthday";
+type EligibleRecipient = { user_id: string; email: string; display_name: string | null; date_of_birth: string | null; country_code: string | null; preferred_language: string | null; created_at: string | null };
 const positions = ["top", "after_headline", "after_message", "before_button"];
 const themes: MarketingTheme[] = ["dark", "light"];
 function buildEmail(input: { siteUrl: string; template: MarketingTemplate; preheader: string; headline: string; message: string; recipient_name?: string; button_label?: string; button_url?: string; images?: MarketingImage[]; buttons?: MarketingButton[]; unsubscribe_url: string; theme: MarketingTheme }) {
@@ -45,7 +47,7 @@ async function getContext(request: NextRequest) {
   const permissions = Array.isArray(access.permissions) ? access.permissions : [];
   return roles.includes("super_admin") || permissions.includes("marketing.send") ? { admin, user: auth.user } : null;
 }
-async function getRecipients(admin: ReturnType<typeof getSupabaseAdmin>, teamIds: string[] = [], selectedUserIds: string[] = []) {
+async function getRecipients(admin: ReturnType<typeof getSupabaseAdmin>, teamIds: string[] = [], selectedUserIds: string[] = []): Promise<EligibleRecipient[]> {
   let userIds: string[] | null = null;
   if (selectedUserIds.length) {
     userIds = [...new Set(selectedUserIds)].slice(0, 500);
@@ -56,16 +58,16 @@ async function getRecipients(admin: ReturnType<typeof getSupabaseAdmin>, teamIds
     userIds = ids;
     if (!ids.length) return [];
   }
-  let query = (admin.from("profiles") as any).select("id,display_name,date_of_birth").eq("marketing_email", true).eq("account_status", "active").limit(500);
+  let query = (admin.from("profiles") as any).select("id,display_name,date_of_birth,country_code,preferred_language,created_at").eq("marketing_email", true).eq("account_status", "active").limit(1000);
   if (userIds) query = query.in("id", userIds);
   const { data: profiles, error } = await query;
   if (error) throw error;
-  const recipients: { user_id: string; email: string; display_name: string | null; date_of_birth: string | null }[] = [];
-  for (const profile of profiles ?? []) {
-    const result = await admin.auth.admin.getUserById(profile.id);
-    if (result.data.user?.email) recipients.push({ user_id: profile.id, email: result.data.user.email, display_name: profile.display_name, date_of_birth: profile.date_of_birth ?? null });
-  }
-  return recipients;
+  const profileRows = profiles ?? [];
+  const emails = await getAuthEmailMap(admin, profileRows.map((profile: { id: string }) => profile.id));
+  return profileRows.flatMap((profile: { id: string; display_name: string | null; date_of_birth: string | null; country_code: string | null; preferred_language: string | null; created_at: string | null }) => {
+    const email = emails.get(profile.id);
+    return email ? [{ user_id: profile.id, email, display_name: profile.display_name, date_of_birth: profile.date_of_birth ?? null, country_code: profile.country_code ?? null, preferred_language: profile.preferred_language ?? null, created_at: profile.created_at ?? null }] : [];
+  });
 }
 export async function GET(request: NextRequest) {
   const context = await getContext(request);
@@ -75,7 +77,7 @@ export async function GET(request: NextRequest) {
       (context.admin.from("sectors") as any).select("id,sector_code,sector_name").eq("is_active", true).order("sector_name").limit(100),
     ]);
     const recipients = await getRecipients(context.admin);
-    return ok({ recipient_count: recipients.length, users: recipients.map(({ user_id, email, display_name, date_of_birth }) => ({ id: user_id, email, display_name, date_of_birth })), teams: teams ?? [], smtp_source: "auth.binzeo" });
+    return ok({ recipient_count: recipients.length, audience_truncated: recipients.length >= 1000, users: recipients.map(({ user_id, email, display_name, date_of_birth, country_code, preferred_language, created_at }) => ({ id: user_id, email, display_name, date_of_birth, country_code, preferred_language, created_at })), teams: teams ?? [], smtp_source: "auth.binzeo" });
   } catch (error) { return fail(error instanceof Error ? error.message : "Could not load marketing settings", 500, "MARKETING_SETTINGS_FAILED"); }
 }
 export async function POST(request: NextRequest) {

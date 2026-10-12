@@ -4,6 +4,7 @@ import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { fail, ok } from "@/lib/api/response";
 import { parseContentBlocks, renderEmailTemplateHtml } from "@/lib/email/template-renderer";
 import { EMAIL_FROM, getPublicSiteUrl, transporter } from "@/lib/email/transporter";
+import { getAuthEmailMap } from "@/lib/admin-email-audience";
 
 type OccasionTemplate = {
   id: string;
@@ -20,7 +21,7 @@ type OccasionTemplate = {
   images: unknown;
   content_blocks: unknown;
 };
-type OccasionProfile = { id: string; display_name: string | null; marketing_email: boolean; account_status: string };
+type OccasionProfile = { id: string; display_name: string | null; marketing_email: boolean; account_status: string; date_of_birth: string | null; country_code: string | null; preferred_language: string | null; created_at: string | null };
 
 const templateFields = "id,name,template_type,theme,subject,preview_text,headline,message,button_label,button_url,buttons,images,content_blocks";
 
@@ -39,16 +40,11 @@ async function getContext(request: NextRequest) {
 }
 
 async function getAuthEmails(admin: ReturnType<typeof getSupabaseAdmin>, profiles: OccasionProfile[]) {
-  const results: { profile: OccasionProfile; email: string }[] = [];
-  for (let index = 0; index < profiles.length; index += 20) {
-    const batch = profiles.slice(index, index + 20);
-    const batchResults = await Promise.all(batch.map(async (profile) => {
-      const { data } = await admin.auth.admin.getUserById(profile.id);
-      return data.user?.email ? { profile, email: data.user.email } : null;
-    }));
-    results.push(...batchResults.filter((item): item is { profile: OccasionProfile; email: string } => item !== null));
-  }
-  return results;
+  const emails = await getAuthEmailMap(admin, profiles.map((profile) => profile.id));
+  return profiles.flatMap((profile) => {
+    const email = emails.get(profile.id);
+    return email ? [{ profile, email }] : [];
+  });
 }
 
 export async function GET(request: NextRequest) {
@@ -57,7 +53,7 @@ export async function GET(request: NextRequest) {
   try {
     const [{ data: templateRows, error: templateError }, { data: profileRows, error: profileError }, { data: deliveryRows, error: deliveryError }] = await Promise.all([
       (context.admin.from("email_templates") as any).select(templateFields).eq("template_type", "occasion").eq("is_active", true).order("updated_at", { ascending: false }).limit(100),
-      (context.admin.from("profiles") as any).select("id,display_name,marketing_email,account_status").eq("account_status", "active").eq("marketing_email", true).order("display_name").limit(500),
+      (context.admin.from("profiles") as any).select("id,display_name,marketing_email,account_status,date_of_birth,country_code,preferred_language,created_at").eq("account_status", "active").eq("marketing_email", true).order("display_name").limit(1000),
       (context.admin.from("occasion_email_deliveries") as any).select("id,user_id,template_id,template_name,template_type,subject,recipient_email,recipient_name,status,error_message,sent_at,created_at").order("created_at", { ascending: false }).limit(500),
     ]);
     if (templateError) return fail(templateError.message, 500, "OCCASION_TEMPLATES_LOAD_FAILED");
@@ -65,8 +61,8 @@ export async function GET(request: NextRequest) {
     if (deliveryError) return fail(deliveryError.message, 500, "OCCASION_HISTORY_LOAD_FAILED");
     const eligibleProfiles = (profileRows ?? []) as OccasionProfile[];
     const authUsers = await getAuthEmails(context.admin, eligibleProfiles);
-    const users = authUsers.map(({ profile, email }) => ({ id: profile.id, email, display_name: profile.display_name }));
-    return ok({ templates: templateRows ?? [], users, deliveries: deliveryRows ?? [], eligible_user_count: users.length });
+    const users = authUsers.map(({ profile, email }) => ({ id: profile.id, email, display_name: profile.display_name, date_of_birth: profile.date_of_birth, country_code: profile.country_code, preferred_language: profile.preferred_language, created_at: profile.created_at }));
+    return ok({ templates: templateRows ?? [], users, deliveries: deliveryRows ?? [], eligible_user_count: users.length, audience_truncated: (profileRows ?? []).length >= 1000 });
   } catch (error) {
     return fail(error instanceof Error ? error.message : "Could not load occasion mail data", 500, "OCCASION_MAIL_LOAD_FAILED");
   }
