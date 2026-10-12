@@ -15,7 +15,7 @@ type CookiePreferences = {
 type OptionalKey = Exclude<keyof CookiePreferences, "necessary_enabled">;
 type Action = "accept_all" | "reject_optional" | "save_settings";
 
-const CONSENT_VERSION = "2026-10-12.1";
+const CONSENT_VERSION = "2026-10-12.2";
 const DEFAULT_PREFERENCES: CookiePreferences = {
   necessary_enabled: true,
   functional_enabled: false,
@@ -48,7 +48,7 @@ const CATEGORIES: { key: keyof CookiePreferences; title: string; description: st
   {
     key: "analytics_enabled",
     title: "Analytics",
-    description: "First-party pseudonymous page paths, session counts, and referring-site origin only. No query strings, form contents, raw IPs, or raw user-agent strings are stored.",
+    description: "One-way keyed IP and browser-signature hashes; approximate IP-based country, region, city and time zone; derived device/browser/OS and language; sanitized page paths, referring-site origin and session counts. No raw IP, GPS, full URL, query strings, or form contents are stored.",
   },
   {
     key: "experience_enabled",
@@ -212,7 +212,7 @@ export default function PrivacyControls() {
             {view === "notice" ? (
               <>
                 <p className="mt-3 text-sm leading-6 text-black/65">
-                  Essential cookies keep sign-in and security working and remember your choice with a random consent reference. Optional analytics are off unless you enable them. If enabled, BINZEO records pseudonymous page paths, session counts, and the referring site&apos;s origin only; this tracker does not store URL query strings, form contents, raw IP addresses, or raw user-agent strings. The analytics session cookie expires after 30 minutes of inactivity.
+                  Essential cookies keep sign-in and security working and remember your choice with a random consent reference. Optional analytics are off unless you enable them. If enabled, BINZEO records one-way keyed hashes of the IP address and browser signature, approximate IP-based country/region/city/time zone, derived device/browser/OS and language, sanitized page paths, referring-site origin and session counts. Location can be inaccurate and is not GPS. Raw IPs, raw user-agent strings, full URLs, query strings and form contents are not stored. The analytics session cookie expires after 30 minutes of inactivity.
                 </p>
                 <p className="mt-2 text-xs leading-5 text-black/50">
                   No advertising or cross-site tracking scripts are currently configured. Optional categories without an active integration will not load a script.

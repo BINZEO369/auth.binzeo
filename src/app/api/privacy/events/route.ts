@@ -3,6 +3,7 @@ import { randomUUID } from "node:crypto";
 import { NextRequest } from "next/server";
 import { fail, ok } from "@/lib/api/response";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
+import { collectPrivacyVisitorMetadata } from "@/lib/privacy-visitor-metadata";
 import {
   ANALYTICS_SESSION_COOKIE,
   ANALYTICS_SESSION_MAX_AGE_SECONDS,
@@ -92,14 +93,24 @@ export async function POST(request: NextRequest) {
   const consentState = optional.every(Boolean) ? "all" : "partial";
 
   try {
+    const metadata = collectPrivacyVisitorMetadata(request.headers);
     const admin = getSupabaseAdmin();
-    const { error } = await (admin as any).rpc("record_first_party_page_view", {
+    const { error } = await (admin as any).rpc("record_first_party_page_view_enriched", {
       p_visitor_id: consent.visitor_id,
       p_session_id: sessionId,
       p_page_view_id: input.page_view_id,
       p_page_path: pagePath,
       p_referrer_origin: referrerOrigin,
-      p_language_code: null,
+      p_country_code: metadata.countryCode,
+      p_region_code: metadata.regionCode,
+      p_city_name: metadata.cityName,
+      p_device_category: metadata.deviceCategory,
+      p_browser_name: metadata.browserName,
+      p_browser_version: metadata.browserVersion,
+      p_operating_system: metadata.operatingSystem,
+      p_operating_system_version: metadata.operatingSystemVersion,
+      p_language_code: metadata.languageCode,
+      p_timezone: metadata.timezone,
       p_consent_state: consentState,
       p_consent_version: consent.version,
     });

@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 
-export const COOKIE_CONSENT_VERSION = "2026-10-12.1";
+export const COOKIE_CONSENT_VERSION = "2026-10-12.2";
 export const COOKIE_CONSENT_COOKIE = "binzeo_consent";
 export const ANALYTICS_SESSION_COOKIE = "binzeo_session_id";
 export const CONSENT_MAX_AGE_SECONDS = 180 * 24 * 60 * 60;

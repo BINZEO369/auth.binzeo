@@ -4,6 +4,7 @@ import { NextRequest } from "next/server";
 import { fail, ok } from "@/lib/api/response";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { allowPrivacyRequest } from "@/lib/privacy-consent";
+import { collectPrivacyVisitorMetadata } from "@/lib/privacy-visitor-metadata";
 import {
   COOKIE_CONSENT_COOKIE,
   COOKIE_CONSENT_VERSION,
@@ -99,13 +100,17 @@ export async function POST(request: NextRequest) {
   const status = consentStatus(preferences, previous?.preferences);
   let error: { code?: string; message?: string } | null = null;
   try {
+    const metadata = preferences.analytics_enabled ? collectPrivacyVisitorMetadata(request.headers) : null;
     const admin = getSupabaseAdmin();
-    const result = await (admin as any).rpc("record_cookie_consent", {
+    const result = await (admin as any).rpc("record_cookie_consent_with_metadata", {
       p_visitor_id: visitorId,
       p_consent_version: COOKIE_CONSENT_VERSION,
       p_consent_status: status,
       p_consent_method: method,
       p_preferences: preferences,
+      p_ip_address_hash: metadata?.ipAddressHash ?? null,
+      p_country_code: metadata?.countryCode ?? null,
+      p_user_agent_hash: metadata?.userAgentHash ?? null,
     });
     error = result.error;
   } catch (caught) {
