@@ -9,7 +9,7 @@ export async function GET() {
 
     const { data, error } = await supabase
       .from("user_devices")
-      .select("*")
+      .select("id, device_id, device_name, device_type, operating_system, os_version, browser, browser_version, app_version, last_seen_at, is_trusted, created_at")
       .eq("user_id", user.id)
       .order("last_seen_at", { ascending: false, nullsFirst: false })
       .order("created_at", { ascending: false });

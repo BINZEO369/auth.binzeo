@@ -29,7 +29,7 @@ export async function GET() {
 
     const { data, error } = await supabase
       .from("user_addresses")
-      .select("*")
+      .select("id, address_type, address_line_1, address_line_2, address_line_3, country_code, state_province, district, city, area, postal_code, latitude, longitude, is_primary, created_at, updated_at, location_accuracy_meters, location_source")
       .eq("user_id", user.id)
       .order("is_primary", { ascending: false })
       .order("created_at", { ascending: false });

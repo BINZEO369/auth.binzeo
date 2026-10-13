@@ -63,10 +63,11 @@ export async function GET(req: NextRequest) {
   const returnedState = req.nextUrl.searchParams.get("state");
   const oauthError = req.nextUrl.searchParams.get("error");
   const stateCookie = req.cookies.get("binzeo_google_oauth_state")?.value;
+  const codeVerifier = req.cookies.get("binzeo_google_oauth_verifier")?.value;
   const redirectUri = new URL("/api/auth/google/callback", req.url).toString();
 
   if (oauthError) return errorRedirect(req, `google_${oauthError}`);
-  if (!code || !returnedState || !stateCookie) return errorRedirect(req, "google_invalid_callback");
+  if (!code || !returnedState || !stateCookie || !codeVerifier) return errorRedirect(req, "google_invalid_callback");
 
   const [expectedState, encodedNext = "%2Fdashboard"] = stateCookie.split(".");
   const expected = Buffer.from(expectedState);
@@ -83,7 +84,7 @@ export async function GET(req: NextRequest) {
     const tokenResponse = await fetch("https://oauth2.googleapis.com/token", {
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      body: new URLSearchParams({ code, client_id: clientId, client_secret: clientSecret, redirect_uri: redirectUri, grant_type: "authorization_code" }),
+      body: new URLSearchParams({ code, client_id: clientId, client_secret: clientSecret, redirect_uri: redirectUri, grant_type: "authorization_code", code_verifier: codeVerifier }),
       cache: "no-store",
     });
     const tokenData = await tokenResponse.json() as { access_token?: string; error?: string; error_description?: string };
@@ -126,6 +127,7 @@ export async function GET(req: NextRequest) {
         await completeGoogleAccount(sessionData.user, req);
         const response = NextResponse.redirect(new URL(next, req.url));
         response.cookies.delete("binzeo_google_oauth_state");
+        response.cookies.delete("binzeo_google_oauth_verifier");
         return response;
       }
       console.error("[GOOGLE_SESSION_VERIFY_ERROR]", sessionError);
@@ -134,6 +136,7 @@ export async function GET(req: NextRequest) {
     if (actionLink) {
       const response = NextResponse.redirect(actionLink);
       response.cookies.delete("binzeo_google_oauth_state");
+      response.cookies.delete("binzeo_google_oauth_verifier");
       return response;
     }
     return errorRedirect(req, "google_session_failed");

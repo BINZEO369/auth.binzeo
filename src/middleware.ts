@@ -48,6 +48,12 @@ export async function middleware(req: NextRequest) {
     const bucketKey = Array.from(new Uint8Array(digest)).map((byte) => byte.toString(16).padStart(2, '0')).join('')
     const limit = pathname.startsWith('/api/auth/') ? 20 : 60
     const { data: rateData, error: rateError } = await consumeRateLimit(req, bucketKey, limit)
+    if (rateError && pathname.startsWith('/api/auth/')) {
+      return NextResponse.json(
+        { success: false, error: { message: 'Authentication protection is temporarily unavailable. Please try again shortly.', code: 'RATE_LIMIT_UNAVAILABLE' } },
+        { status: 503, headers: { 'Retry-After': '30', 'Cache-Control': 'no-store' } },
+      )
+    }
     if (!rateError && rateData?.[0]?.allowed === false) {
       return NextResponse.json(
         { success: false, error: { message: 'Too many requests. Please try again later.', code: 'RATE_LIMITED' } },
