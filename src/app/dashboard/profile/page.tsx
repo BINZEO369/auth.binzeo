@@ -42,112 +42,68 @@ type UsernameCheck = {
 };
 
 /* ================================================================== */
-/*  SHARED LAYOUT TOKENS (Clean Mobile UI)                             */
+/*  ICONS (SVG) - Matched with the design                              */
 /* ================================================================== */
-const containerCls = "mx-auto w-full max-w-lg pb-24 pt-4";
-
-const inputCls =
-  "w-full rounded-xl border border-gray-200 bg-gray-50/50 px-4 py-3 text-[15px] text-gray-900 placeholder-gray-400 transition-colors focus:border-gray-900 focus:bg-white focus:outline-none";
-
-/* ================================================================== */
-/*  Icons                                                              */
-/* ================================================================== */
-function ChevronRightIcon() {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4 text-gray-400">
-      <path d="m9 18 6-6-6-6" />
-    </svg>
-  );
-}
-
-function ChevronDownIcon({ className }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={className}>
-      <path d="m6 9 6 6 6-6" />
-    </svg>
-  );
-}
-
-/* ================================================================== */
-/*  Field wrapper                                                      */
-/* ================================================================== */
-function Field({ label, hint, children }: { label: string; hint?: string; children: React.ReactNode }) {
-  return (
-    <div className="w-full">
-      <label className="mb-1.5 block text-[13px] font-medium text-gray-600">{label}</label>
-      {children}
-      {hint && <p className="mt-1.5 text-[11.5px] leading-5 text-gray-400">{hint}</p>}
-    </div>
-  );
-}
-
-/* ================================================================== */
-/*  Toggle row (iOS Style)                                             */
-/* ================================================================== */
-function ToggleRow({ label, description, checked, onChange }: { label: string; description: string; checked: boolean; onChange: (v: boolean) => void }) {
-  return (
-    <label className="flex cursor-pointer items-center justify-between gap-4 py-3 border-b border-gray-100 last:border-0">
-      <div className="min-w-0 flex-1">
-        <div className="text-[15px] font-medium text-gray-900">{label}</div>
-        <div className="mt-0.5 text-[12.5px] text-gray-500">{description}</div>
-      </div>
-      <div className="relative shrink-0">
-        <input type="checkbox" checked={checked} onChange={(e) => onChange(e.target.checked)} className="peer sr-only" />
-        <div className="h-7 w-12 rounded-full bg-gray-200 transition-colors duration-300 peer-checked:bg-black" />
-        <div className="absolute left-0.5 top-0.5 h-6 w-6 rounded-full bg-white shadow-sm transition-transform duration-300 peer-checked:translate-x-5" />
-      </div>
-    </label>
-  );
-}
+const Icons = {
+  Back: () => (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5"><path d="m15 18-6-6 6-6"/></svg>
+  ),
+  User: () => (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+  ),
+  Lock: () => (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+  ),
+  Bell: () => (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+  ),
+  Globe: () => (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>
+  ),
+  Info: () => (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+  ),
+  Sun: () => (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>
+  ),
+  Calendar: () => (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
+  ),
+  Help: () => (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>
+  ),
+  Chevron: () => (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4 text-gray-400"><path d="m9 18 6-6-6-6"/></svg>
+  ),
+  Home: () => (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+  ),
+  Explore: () => (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
+  ),
+  Heart: () => (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
+  ),
+  Agents: () => (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+  ),
+  Profile: () => (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+  ),
+  Edit: () => (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-3.5 h-3.5"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>
+  )
+};
 
 /* ================================================================== */
-/*  Collapsible section (iOS Settings Style)                           */
+/*  SHARED STYLES                                                      */
 /* ================================================================== */
-function CollapsibleSection({
-  title,
-  icon,
-  isOpen,
-  onToggle,
-  children,
-}: {
-  title: string;
-  icon: React.ReactNode;
-  isOpen: boolean;
-  onToggle: () => void;
-  children: React.ReactNode;
-}) {
-  return (
-    <div className="mb-6">
-      <h3 className="mb-2 ml-4 text-[12px] font-semibold uppercase tracking-wider text-gray-500">
-        {title}
-      </h3>
-      <div className="overflow-hidden rounded-2xl bg-white">
-        <button
-          type="button"
-          onClick={onToggle}
-          className="flex w-full items-center justify-between bg-white px-4 py-4 transition-colors hover:bg-gray-50"
-        >
-          <div className="flex items-center gap-3 text-gray-900">
-            <span className="text-gray-500">{icon}</span>
-            <span className="text-[15px] font-medium">{title}</span>
-          </div>
-          <ChevronDownIcon
-            className={`h-4 w-4 text-gray-400 transition-transform duration-300 ${isOpen ? "rotate-180" : ""}`}
-          />
-        </button>
-        
-        {isOpen && (
-          <div className="border-t border-gray-100 px-4 py-5">
-            {children}
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
+const cardCls = "bg-white rounded-[20px] overflow-hidden shadow-[0_2px_10px_rgba(0,0,0,0.02)]";
+const listRowCls = "flex items-center justify-between px-4 py-3.5 border-b border-gray-100 last:border-0";
+const inputCls = "text-right bg-transparent border-none outline-none text-[15px] text-gray-500 placeholder-gray-300 w-full max-w-[60%] focus:text-gray-900 transition-colors";
 
 /* ================================================================== */
-/*  Page                                                               */
+/*  MAIN COMPONENT                                                     */
 /* ================================================================== */
 export default function ProfilePage() {
   const [data, setData] = useState<Data | null>(null);
@@ -156,17 +112,10 @@ export default function ProfilePage() {
   const [saving, setSaving] = useState(false);
   const [photoUploading, setPhotoUploading] = useState(false);
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
+  
   const [usernameCheck, setUsernameCheck] = useState<UsernameCheck>({
     checking: false, available: false, checked: "", message: "", suggestions: [],
   });
-
-  const [openSections, setOpenSections] = useState<Record<string, boolean>>({
-    personal: false, regional: false, notifications: false, recovery: false,
-  });
-
-  const toggleSection = (key: keyof typeof openSections) => {
-    setOpenSections((prev) => ({ ...prev, [key]: !prev[key] }));
-  };
 
   useEffect(() => {
     (async () => {
@@ -180,12 +129,6 @@ export default function ProfilePage() {
   }, []);
 
   useEffect(() => {
-    if (window.location.hash === "#notifications") {
-      setOpenSections((prev) => ({ ...prev, notifications: true }));
-    }
-  }, []);
-
-  useEffect(() => {
     const normalized = String(form.username ?? "").trim().toLowerCase().replace(/^@/, "");
     const currentUsername = String(data?.profile?.username ?? "").trim().toLowerCase().replace(/^@/, "");
 
@@ -193,6 +136,7 @@ export default function ProfilePage() {
       setUsernameCheck({ checking: false, available: false, checked: "", message: "Choose a username to continue.", suggestions: [] });
       return;
     }
+
     if (normalized === currentUsername) {
       setUsernameCheck({ checking: false, available: true, checked: normalized, message: "Your current username is available to keep.", suggestions: [] });
       return;
@@ -200,12 +144,16 @@ export default function ProfilePage() {
 
     setUsernameCheck((current) => ({ ...current, checking: true, available: false, checked: "", message: "Checking availability…", suggestions: [] }));
     const timer = setTimeout(async () => {
-      const res = await apiFetch<{ available: boolean; username: string; suggestions?: string[]; message?: string }>("/api/auth/check-username", {
-        method: "POST", body: JSON.stringify({ username: normalized }),
+      const res = await apiFetch<any>("/api/auth/check-username", {
+        method: "POST",
+        body: JSON.stringify({ username: normalized }),
       });
+
       if (res.success) {
         setUsernameCheck({
-          checking: false, available: res.data.available, checked: res.data.username,
+          checking: false,
+          available: res.data.available,
+          checked: res.data.username,
           message: res.data.message ?? (res.data.available ? "Username is available." : "Username is not available."),
           suggestions: res.data.suggestions ?? [],
         });
@@ -213,6 +161,7 @@ export default function ProfilePage() {
         setUsernameCheck({ checking: false, available: false, checked: "", message: res.error.message, suggestions: [] });
       }
     }, 450);
+
     return () => clearTimeout(timer);
   }, [data?.profile?.username, form.username]);
 
@@ -228,7 +177,7 @@ export default function ProfilePage() {
     setMessage(null);
     const body = new FormData();
     body.append("file", file);
-    const res = await apiFetch<{ profile: Pick<Profile, "profile_photo_url" | "profile_photo_public_id"> }>("/api/user/profile/photo", { method: "POST", body });
+    const res = await apiFetch<any>("/api/user/profile/photo", { method: "POST", body });
     if (res.success) {
       setForm((current) => ({ ...current, ...res.data.profile }));
       setMessage({ type: "success", text: "Profile photo updated successfully" });
@@ -248,7 +197,12 @@ export default function ProfilePage() {
     }
     setSaving(true);
     setMessage(null);
-    const res = await apiFetch<{ profile: Profile }>("/api/user/profile", { method: "PATCH", body: JSON.stringify(form) });
+
+    const res = await apiFetch<any>("/api/user/profile", {
+      method: "PATCH",
+      body: JSON.stringify(form),
+    });
+
     if (res.success) {
       setMessage({ type: "success", text: "Profile updated successfully" });
       setForm(res.data.profile);
@@ -260,200 +214,250 @@ export default function ProfilePage() {
 
   if (loading) return <Loader variant="profile" />;
 
+  const displayName = form.display_name || `${form.first_name || ""} ${form.last_name || ""}`.trim() || "User";
+  const userEmail = data?.user?.email || "user@example.com";
+
   return (
-    <div className="min-h-screen bg-[#F2F2F7] font-sans">
-      <form onSubmit={handleSubmit} className={containerCls}>
+    <div className="min-h-screen bg-[#F2F2F7] pb-24 font-sans text-gray-900">
+      {/* Top Header */}
+      <div className="flex items-center justify-center px-4 py-4 pt-8">
+        <h1 className="text-[17px] font-semibold text-gray-900">Profile</h1>
+      </div>
+
+      <form onSubmit={handleSubmit} className="mx-auto max-w-md px-4 space-y-6">
         
-        {/* ============================================================ */}
-        {/*  HEADER & PROFILE CARD (Matching Image 1 & 2)                */}
-        {/* ============================================================ */}
-        <div className="mb-6 flex items-center justify-between px-4">
-          <button type="button" className="text-gray-900">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5">
-              <path d="m15 18-6-6 6-6" />
-            </svg>
-          </button>
-          <h1 className="text-[17px] font-semibold text-gray-900">Profile</h1>
-          <div className="w-5" /> {/* Spacer */}
+        {/* Message Banner */}
+        {message && (
+          <div className={`rounded-xl px-4 py-3 text-sm ${message.type === "success" ? "bg-emerald-50 text-emerald-700 border border-emerald-200" : "bg-rose-50 text-rose-700 border border-rose-200"}`}>
+            {message.text}
+          </div>
+        )}
+
+        {/* Profile Header Card */}
+        <div className={`${cardCls} p-4 flex items-center gap-4`}>
+          <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-full bg-gray-100 border border-gray-200">
+            {form.profile_photo_url ? (
+              <img src={form.profile_photo_url} alt="Profile" className="h-full w-full object-cover" />
+            ) : (
+              <div className="flex h-full w-full items-center justify-center text-xl font-semibold text-gray-400">
+                {displayName.charAt(0).toUpperCase()}
+              </div>
+            )}
+            <label className="absolute inset-0 flex cursor-pointer items-center justify-center bg-black/40 opacity-0 transition-opacity hover:opacity-100">
+              {photoUploading ? <span className="text-[10px] text-white">...</span> : <Icons.Edit />}
+              <input type="file" accept="image/*" onChange={handlePhotoUpload} disabled={photoUploading} className="sr-only" />
+            </label>
+          </div>
+          <div className="min-w-0 flex-1">
+            <h2 className="text-[17px] font-semibold text-gray-900 truncate">{displayName}</h2>
+            <p className="text-[13px] text-gray-500 truncate">{userEmail}</p>
+            <label className="mt-1 inline-flex cursor-pointer items-center gap-1 text-[12px] font-medium text-blue-600 hover:text-blue-700">
+              <Icons.Edit /> Edit Profile
+              <input type="file" accept="image/*" onChange={handlePhotoUpload} disabled={photoUploading} className="sr-only" />
+            </label>
+          </div>
         </div>
 
-        <div className="mb-6 rounded-2xl bg-white p-4 mx-4">
-          <div className="flex items-center gap-4">
-            <div className="h-16 w-16 shrink-0 overflow-hidden rounded-full bg-gray-100">
-              {form.profile_photo_url ? (
-                <img src={form.profile_photo_url} alt="Profile" className="h-full w-full object-cover" />
-              ) : (
-                <div className="flex h-full w-full items-center justify-center text-xl font-semibold text-gray-400">
-                  {(form.display_name || form.first_name || "B").charAt(0).toUpperCase()}
-                </div>
-              )}
+        {/* SECTION: Account details */}
+        <div>
+          <h3 className="mb-2 px-4 text-[13px] font-medium text-gray-500">Account details</h3>
+          <div className={cardCls}>
+            {/* First Name */}
+            <div className={listRowCls}>
+              <div className="flex items-center gap-3">
+                <Icons.User />
+                <span className="text-[15px] text-gray-900">First Name</span>
+              </div>
+              <input type="text" value={form.first_name ?? ""} onChange={(e) => update("first_name", e.target.value)} className={inputCls} placeholder="Enter first name" />
             </div>
-            <div className="min-w-0 flex-1">
-              <h2 className="text-[17px] font-semibold text-gray-900 truncate">
-                {form.display_name || `${form.first_name || ""} ${form.last_name || ""}`.trim() || "User"}
-              </h2>
-              <p className="text-[13px] text-gray-500 truncate">{data?.user?.email || "No email"}</p>
-              <label className="mt-1 inline-flex cursor-pointer items-center text-[13px] font-medium text-blue-500">
-                Edit Profile
-                <input type="file" accept="image/jpeg,image/png,image/webp,image/avif" onChange={handlePhotoUpload} disabled={photoUploading} className="sr-only" />
+            {/* Last Name */}
+            <div className={listRowCls}>
+              <div className="flex items-center gap-3">
+                <Icons.User />
+                <span className="text-[15px] text-gray-900">Last Name</span>
+              </div>
+              <input type="text" value={form.last_name ?? ""} onChange={(e) => update("last_name", e.target.value)} className={inputCls} placeholder="Enter last name" />
+            </div>
+            {/* Username */}
+            <div className={listRowCls}>
+              <div className="flex items-center gap-3">
+                <Icons.User />
+                <span className="text-[15px] text-gray-900">Username</span>
+              </div>
+              <div className="flex flex-col items-end">
+                <input type="text" value={form.username ?? ""} onChange={(e) => update("username", e.target.value)} className={inputCls} placeholder="username" />
+                {usernameCheck.message && (
+                  <span className={`text-[10px] mt-0.5 ${usernameCheck.available ? "text-emerald-600" : "text-rose-500"}`}>{usernameCheck.message}</span>
+                )}
+              </div>
+            </div>
+            {/* Gender */}
+            <div className={listRowCls}>
+              <div className="flex items-center gap-3">
+                <Icons.User />
+                <span className="text-[15px] text-gray-900">Gender</span>
+              </div>
+              <select value={form.gender ?? ""} onChange={(e) => update("gender", e.target.value || null)} className={`${inputCls} appearance-none`}>
+                <option value="">Not specified</option>
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+                <option value="non_binary">Non-binary</option>
+                <option value="prefer_not_to_say">Prefer not to say</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+            {/* Date of Birth */}
+            <div className={listRowCls}>
+              <div className="flex items-center gap-3">
+                <Icons.Calendar />
+                <span className="text-[15px] text-gray-900">Date of Birth</span>
+              </div>
+              <input type="date" value={form.date_of_birth ?? ""} onChange={(e) => update("date_of_birth", e.target.value)} className={inputCls} />
+            </div>
+          </div>
+        </div>
+
+        {/* SECTION: Preferences */}
+        <div>
+          <h3 className="mb-2 px-4 text-[13px] font-medium text-gray-500">Preferences</h3>
+          <div className={cardCls}>
+            {/* Language */}
+            <div className={listRowCls}>
+              <div className="flex items-center gap-3">
+                <Icons.Globe />
+                <span className="text-[15px] text-gray-900">Language</span>
+              </div>
+              <input type="text" value={form.preferred_language ?? ""} onChange={(e) => update("preferred_language", e.target.value)} className={inputCls} placeholder="en" />
+            </div>
+            {/* Timezone */}
+            <div className={listRowCls}>
+              <div className="flex items-center gap-3">
+                <Icons.Globe />
+                <span className="text-[15px] text-gray-900">Timezone</span>
+              </div>
+              <input type="text" value={form.timezone ?? ""} onChange={(e) => update("timezone", e.target.value)} className={inputCls} placeholder="UTC" />
+            </div>
+            {/* Currency */}
+            <div className={listRowCls}>
+              <div className="flex items-center gap-3">
+                <Icons.Info />
+                <span className="text-[15px] text-gray-900">Currency</span>
+              </div>
+              <input type="text" value={form.currency ?? ""} onChange={(e) => update("currency", e.target.value)} className={inputCls} placeholder="USD" />
+            </div>
+            {/* Time Format */}
+            <div className={listRowCls}>
+              <div className="flex items-center gap-3">
+                <Icons.Sun />
+                <span className="text-[15px] text-gray-900">Time Format</span>
+              </div>
+              <select value={form.time_format ?? "24h"} onChange={(e) => update("time_format", e.target.value)} className={`${inputCls} appearance-none`}>
+                <option value="24h">24-hour</option>
+                <option value="12h">12-hour</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        {/* SECTION: Notifications (Toggles) */}
+        <div>
+          <h3 className="mb-2 px-4 text-[13px] font-medium text-gray-500">Notifications</h3>
+          <div className={cardCls}>
+            {/* Marketing Emails */}
+            <div className={listRowCls}>
+              <div className="flex items-center gap-3">
+                <Icons.Bell />
+                <span className="text-[15px] text-gray-900">Marketing Emails</span>
+              </div>
+              <label className="relative inline-flex cursor-pointer items-center">
+                <input type="checkbox" checked={!!form.marketing_email} onChange={(e) => update("marketing_email", e.target.checked)} className="peer sr-only" />
+                <div className="h-6 w-11 rounded-full bg-gray-200 peer-checked:bg-black transition-colors"></div>
+                <div className="absolute left-0.5 top-0.5 h-5 w-5 rounded-full bg-white shadow-sm transition-transform peer-checked:translate-x-5"></div>
+              </label>
+            </div>
+            {/* Push Notifications */}
+            <div className={listRowCls}>
+              <div className="flex items-center gap-3">
+                <Icons.Bell />
+                <span className="text-[15px] text-gray-900">Push Notifications</span>
+              </div>
+              <label className="relative inline-flex cursor-pointer items-center">
+                <input type="checkbox" checked={!!form.push_notifications} onChange={(e) => update("push_notifications", e.target.checked)} className="peer sr-only" />
+                <div className="h-6 w-11 rounded-full bg-gray-200 peer-checked:bg-black transition-colors"></div>
+                <div className="absolute left-0.5 top-0.5 h-5 w-5 rounded-full bg-white shadow-sm transition-transform peer-checked:translate-x-5"></div>
+              </label>
+            </div>
+            {/* Security Notifications */}
+            <div className={listRowCls}>
+              <div className="flex items-center gap-3">
+                <Icons.Lock />
+                <span className="text-[15px] text-gray-900">Security Alerts</span>
+              </div>
+              <label className="relative inline-flex cursor-pointer items-center">
+                <input type="checkbox" checked={!!form.security_notifications} onChange={(e) => update("security_notifications", e.target.checked)} className="peer sr-only" />
+                <div className="h-6 w-11 rounded-full bg-gray-200 peer-checked:bg-black transition-colors"></div>
+                <div className="absolute left-0.5 top-0.5 h-5 w-5 rounded-full bg-white shadow-sm transition-transform peer-checked:translate-x-5"></div>
               </label>
             </div>
           </div>
         </div>
 
-        {/* ============================================================ */}
-        {/*  MESSAGE BANNER                                               */}
-        {/* ============================================================ */}
-        {message && (
-          <div className={`mx-4 mb-4 rounded-xl border px-4 py-3 text-[13px] ${message.type === "success" ? "border-emerald-200 bg-emerald-50 text-emerald-700" : "border-amber-200 bg-amber-50 text-amber-700"}`}>
-            {message.text}
-          </div>
-        )}
-
-        {/* ============================================================ */}
-        {/*  PERSONAL INFORMATION                                        */}
-        {/* ============================================================ */}
-        <div className="px-4">
-          <CollapsibleSection
-            title="Account details"
-            icon={<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>}
-            isOpen={openSections.personal}
-            onToggle={() => toggleSection("personal")}
-          >
-            <div className="space-y-5">
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                <Field label="First name">
-                  <input type="text" value={form.first_name ?? ""} onChange={(e) => update("first_name", e.target.value)} className={inputCls} />
-                </Field>
-                <Field label="Last name">
-                  <input type="text" value={form.last_name ?? ""} onChange={(e) => update("last_name", e.target.value)} className={inputCls} />
-                </Field>
+        {/* SECTION: Support & Recovery */}
+        <div>
+          <h3 className="mb-2 px-4 text-[13px] font-medium text-gray-500">Support</h3>
+          <div className={cardCls}>
+            <div className={listRowCls}>
+              <div className="flex items-center gap-3">
+                <Icons.Help />
+                <span className="text-[15px] text-gray-900">Recovery Email</span>
               </div>
-              <Field label="Middle name">
-                <input type="text" value={form.middle_name ?? ""} onChange={(e) => update("middle_name", e.target.value)} className={inputCls} />
-              </Field>
-              <Field label="Display name">
-                <input type="text" value={form.display_name ?? ""} onChange={(e) => update("display_name", e.target.value)} className={inputCls} placeholder="How your name appears publicly" />
-              </Field>
-              <Field label="Username" hint="Use 3–30 lowercase letters, numbers, or underscores; start with a letter.">
-                <div className="relative">
-                  <input type="text" value={form.username ?? ""} onChange={(e) => update("username", e.target.value)} className={`${inputCls} pr-12`} placeholder="your_username" autoComplete="username" spellCheck={false} />
-                  <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-sm">
-                    {usernameCheck.checking ? "…" : usernameCheck.available ? "✓" : usernameCheck.checked ? "×" : ""}
-                  </span>
-                </div>
-                <div className={`mt-1.5 text-[12px] ${usernameCheck.available ? "text-emerald-600" : usernameCheck.checking ? "text-gray-500" : "text-rose-600"}`}>
-                  {usernameCheck.message}
-                </div>
-              </Field>
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                <Field label="Date of birth">
-                  <input type="date" value={form.date_of_birth ?? ""} onChange={(e) => update("date_of_birth", e.target.value)} className={inputCls} />
-                </Field>
-                <Field label="Gender">
-                  <select value={form.gender ?? ""} onChange={(e) => update("gender", e.target.value || null)} className={inputCls}>
-                    <option value="">Not specified</option>
-                    <option value="male">Male</option>
-                    <option value="female">Female</option>
-                    <option value="non_binary">Non-binary</option>
-                    <option value="prefer_not_to_say">Prefer not to say</option>
-                    <option value="other">Other</option>
-                  </select>
-                </Field>
-              </div>
-            </div>
-          </CollapsibleSection>
-        </div>
-
-        {/* ============================================================ */}
-        {/*  REGIONAL PREFERENCES                                        */}
-        {/* ============================================================ */}
-        <div className="px-4">
-          <CollapsibleSection
-            title="Preferences"
-            icon={<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>}
-            isOpen={openSections.regional}
-            onToggle={() => toggleSection("regional")}
-          >
-            <div className="space-y-5">
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                <Field label="Country code">
-                  <input type="text" maxLength={2} value={form.country_code ?? ""} onChange={(e) => update("country_code", e.target.value.toUpperCase())} className={inputCls} placeholder="US" />
-                </Field>
-                <Field label="Language">
-                  <input type="text" value={form.preferred_language ?? ""} onChange={(e) => update("preferred_language", e.target.value)} className={inputCls} placeholder="en" />
-                </Field>
-              </div>
-              <Field label="Timezone">
-                <input type="text" value={form.timezone ?? ""} onChange={(e) => update("timezone", e.target.value)} className={inputCls} placeholder="UTC" />
-              </Field>
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-                <Field label="Date format">
-                  <input type="text" value={form.date_format ?? ""} onChange={(e) => update("date_format", e.target.value)} className={inputCls} placeholder="YYYY-MM-DD" />
-                </Field>
-                <Field label="Time format">
-                  <select value={form.time_format ?? "24h"} onChange={(e) => update("time_format", e.target.value)} className={inputCls}>
-                    <option value="24h">24-hour</option>
-                    <option value="12h">12-hour</option>
-                  </select>
-                </Field>
-                <Field label="Currency">
-                  <input type="text" value={form.currency ?? ""} onChange={(e) => update("currency", e.target.value)} className={inputCls} placeholder="USD" />
-                </Field>
-              </div>
-            </div>
-          </CollapsibleSection>
-        </div>
-
-        {/* ============================================================ */}
-        {/*  NOTIFICATIONS                                               */}
-        {/* ============================================================ */}
-        <div className="px-4">
-          <CollapsibleSection
-            title="Notifications"
-            icon={<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>}
-            isOpen={openSections.notifications}
-            onToggle={() => toggleSection("notifications")}
-          >
-            <div className="space-y-1">
-              <ToggleRow label="Marketing emails" description="Product updates, tips and offers" checked={!!form.marketing_email} onChange={(v) => update("marketing_email", v)} />
-              <ToggleRow label="Marketing SMS" description="Occasional text messages from BINZEO" checked={!!form.marketing_sms} onChange={(v) => update("marketing_sms", v)} />
-              <ToggleRow label="Push notifications" description="Alerts on the devices you're signed in on" checked={!!form.push_notifications} onChange={(v) => update("push_notifications", v)} />
-              <ToggleRow label="Security notifications" description="Important alerts about your account" checked={!!form.security_notifications} onChange={(v) => update("security_notifications", v)} />
-            </div>
-          </CollapsibleSection>
-        </div>
-
-        {/* ============================================================ */}
-        {/*  ACCOUNT RECOVERY                                            */}
-        {/* ============================================================ */}
-        <div className="px-4">
-          <CollapsibleSection
-            title="Support"
-            icon={<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>}
-            isOpen={openSections.recovery}
-            onToggle={() => toggleSection("recovery")}
-          >
-            <Field label="Recovery email" hint="Used to help you back into your account if you lose access.">
               <input type="email" value={form.recovery_email ?? ""} onChange={(e) => update("recovery_email", e.target.value)} className={inputCls} placeholder="backup@example.com" />
-            </Field>
-          </CollapsibleSection>
+            </div>
+            <div className={listRowCls}>
+              <div className="flex items-center gap-3">
+                <Icons.Info />
+                <span className="text-[15px] text-gray-900">Help Center</span>
+              </div>
+              <Icons.Chevron />
+            </div>
+          </div>
         </div>
 
-        {/* ============================================================ */}
-        {/*  SAVE BAR                                                    */}
-        {/* ============================================================ */}
-        <div className="mt-8 px-4">
-          <button
-            type="submit"
-            disabled={saving}
-            className="flex w-full items-center justify-center rounded-xl bg-black py-3.5 text-[15px] font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-50"
-          >
-            {saving ? "Saving..." : "Save changes"}
+        {/* Save Button */}
+        <button
+          type="submit"
+          disabled={saving}
+          className="w-full rounded-[16px] bg-black py-3.5 text-[15px] font-medium text-white transition-transform active:scale-[0.98] disabled:opacity-50"
+        >
+          {saving ? "Saving..." : "Save Changes"}
+        </button>
+      </form>
+
+      {/* Bottom Navigation Bar (Matching Image 2) */}
+      <div className="fixed bottom-0 left-0 right-0 z-50 border-t border-gray-200 bg-white pb-safe pt-2">
+        <div className="mx-auto flex max-w-md items-center justify-around px-2 pb-2">
+          <button type="button" className="flex flex-col items-center gap-1 text-gray-400 transition-colors hover:text-black">
+            <Icons.Home />
+            <span className="text-[10px] font-medium">Home</span>
+          </button>
+          <button type="button" className="flex flex-col items-center gap-1 text-gray-400 transition-colors hover:text-black">
+            <Icons.Explore />
+            <span className="text-[10px] font-medium">Explore</span>
+          </button>
+          <button type="button" className="flex flex-col items-center gap-1 text-gray-400 transition-colors hover:text-black">
+            <Icons.Heart />
+            <span className="text-[10px] font-medium">Favorites</span>
+          </button>
+          <button type="button" className="flex flex-col items-center gap-1 text-gray-400 transition-colors hover:text-black">
+            <Icons.Agents />
+            <span className="text-[10px] font-medium">Agents</span>
+          </button>
+          <button type="button" className="flex flex-col items-center gap-1 text-black">
+            <Icons.Profile />
+            <span className="text-[10px] font-medium">Profile</span>
           </button>
         </div>
-
-      </form>
+      </div>
     </div>
   );
 }
