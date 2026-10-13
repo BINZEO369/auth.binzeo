@@ -105,72 +105,36 @@ const Icons = {
 /* ================================================================== */
 /*  SHARED STYLES (Apple Liquid Glass Concept on Pure White)           */
 /* ================================================================== */
-const cardCls = "bg-white/80 backdrop-blur-xl rounded-[20px] overflow-hidden border border-gray-100 shadow-[0_8px_30px_rgba(0,0,0,0.04)] transition-all duration-300";
+const cardCls = "bg-white rounded-[16px] overflow-hidden border border-gray-100/80 shadow-[0_2px_10px_rgba(0,0,0,0.02)] transition-all duration-300";
 const listRowCls = "group flex items-center justify-between px-4 py-3.5 border-b border-gray-100/60 last:border-0 active:bg-gray-50/50 transition-colors duration-200 cursor-pointer";
 const inputCls = "text-right bg-transparent border-none outline-none text-[15px] font-medium text-gray-900 placeholder-gray-400 w-full max-w-[60%] focus:ring-0 transition-colors";
+
+/* ================================================================== */
+/*  MENU ITEM COMPONENT (For the iOS-style Settings list)              */
+/* ================================================================== */
+function MenuItem({ icon, label, onClick, isDestructive = false }: { icon: React.ReactNode; label: string; onClick: () => void; isDestructive?: boolean }) {
+  return (
+    <button onClick={onClick} className="flex items-center justify-between w-full px-4 py-3.5 bg-white border-b border-gray-100/60 last:border-0 active:bg-gray-50/50 transition-colors duration-200 text-left">
+      <div className="flex items-center gap-3.5">
+        <span className={`flex items-center justify-center w-[30px] h-[30px] rounded-[8px] ${isDestructive ? "bg-rose-50 text-rose-600" : "bg-gray-50 text-gray-700"}`}>
+          {icon}
+        </span>
+        <span className={`text-[15px] font-medium ${isDestructive ? "text-rose-600" : "text-gray-900"}`}>{label}</span>
+      </div>
+      {!isDestructive && <Icons.Chevron />}
+    </button>
+  );
+}
 
 /* ================================================================== */
 /*  MAIN COMPONENT                                                     */
 /* ================================================================== */
 function AddressesSection() {
-
-type Address = {
-  id: string;
-  address_type: string;
-  address_line_1: string;
-  address_line_2: string | null;
-  address_line_3: string | null;
-  country_code: string | null;
-  state_province: string | null;
-  district: string | null;
-  city: string | null;
-  area: string | null;
-  postal_code: string | null;
-  latitude: number | null;
-  longitude: number | null;
-  location_accuracy_meters: number | null;
-  location_source: string | null;
-  is_primary: boolean;
-};
-
-const containerCls =
-  "relative z-10 mx-auto max-w-6xl space-y-5 px-3 py-5 sm:space-y-6 sm:px-5 sm:py-8";
-
-const inputCls =
-  "w-full px-4 py-3 rounded-xl border border-gray-200 bg-white/60 backdrop-blur-md text-gray-900 text-[15px] placeholder-gray-400 focus:outline-none focus:border-gray-300 focus:bg-white focus:ring-4 focus:ring-gray-100 transition-all duration-300";
-
-const emptyForm: Partial<Address> = {
-  address_type: "home",
-  address_line_1: "",
-  is_primary: false,
-};
-
-const TYPE_LABEL: Record<string, string> = {
-  home: "Home",
-  work: "Work",
-  billing: "Billing",
-  shipping: "Shipping",
-  other: "Other",
-};
-
-function Field({
-  label,
-  children,
-  span,
-}: {
-  label: string;
-  children: React.ReactNode;
-  span?: boolean;
-}) {
-  return (
-    <div className={span ? "col-span-2" : ""}>
-      <label className="mb-2 block text-[10px] font-semibold uppercase tracking-[0.16em] text-gray-500">
-        {label}
-      </label>
-      {children}
-    </div>
-  );
-}
+type Address = { id: string; address_type: string; address_line_1: string; address_line_2: string | null; address_line_3: string | null; country_code: string | null; state_province: string | null; district: string | null; city: string | null; area: string | null; postal_code: string | null; latitude: number | null; longitude: number | null; location_accuracy_meters: number | null; location_source: string | null; is_primary: boolean; };
+const inputCls = "w-full px-4 py-3 rounded-xl border border-gray-200 bg-white/60 backdrop-blur-md text-gray-900 text-[15px] placeholder-gray-400 focus:outline-none focus:border-gray-300 focus:bg-white focus:ring-4 focus:ring-gray-100 transition-all duration-300";
+const emptyForm: Partial<Address> = { address_type: "home", address_line_1: "", is_primary: false };
+const TYPE_LABEL: Record<string, string> = { home: "Home", work: "Work", billing: "Billing", shipping: "Shipping", other: "Other" };
+function Field({ label, children, span }: { label: string; children: React.ReactNode; span?: boolean }) { return <div className={span ? "col-span-2" : ""}><label className="mb-2 block text-[10px] font-semibold uppercase tracking-[0.16em] text-gray-500">{label}</label>{children}</div>; }
 
   const [addresses, setAddresses] = useState<Address[]>([]);
   const [loading, setLoading] = useState(true);
@@ -179,85 +143,31 @@ function Field({
   const [form, setForm] = useState<Partial<Address>>(emptyForm);
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState<string | null>(null);
-  const [message, setMessage] = useState<{
-    type: "success" | "error";
-    text: string;
-  } | null>(null);
+  const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
-  const load = async () => {
-    const res = await apiFetch<{ addresses: Address[] }>("/api/user/addresses");
-    if (res.success) setAddresses(res.data.addresses);
-    setLoading(false);
-  };
-
-  useEffect(() => {
-    load();
-  }, []);
-
-  const update = <K extends keyof Address>(key: K, value: Address[K]) => {
-    setForm((f) => ({ ...f, [key]: value }));
-  };
-
-  const openNew = () => {
-    setForm(emptyForm);
-    setEditingId(null);
-    setShowForm(true);
-    setMessage(null);
-  };
-
-  const openEdit = (a: Address) => {
-    setForm(a);
-    setEditingId(a.id);
-    setShowForm(true);
-    setMessage(null);
-  };
-
-  const cancel = () => {
-    setShowForm(false);
-    setEditingId(null);
-    setForm(emptyForm);
-  };
+  const load = async () => { const res = await apiFetch<{ addresses: Address[] }>("/api/user/addresses"); if (res.success) setAddresses(res.data.addresses); setLoading(false); };
+  useEffect(() => { load(); }, []);
+  const update = <K extends keyof Address>(key: K, value: Address[K]) => { setForm((f) => ({ ...f, [key]: value })); };
+  const openNew = () => { setForm(emptyForm); setEditingId(null); setShowForm(true); setMessage(null); };
+  const openEdit = (a: Address) => { setForm(a); setEditingId(a.id); setShowForm(true); setMessage(null); };
+  const cancel = () => { setShowForm(false); setEditingId(null); setForm(emptyForm); };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setSaving(true);
-    setMessage(null);
-
-    const url = editingId
-      ? `/api/user/addresses/${editingId}`
-      : "/api/user/addresses";
+    e.preventDefault(); setSaving(true); setMessage(null);
+    const url = editingId ? `/api/user/addresses/${editingId}` : "/api/user/addresses";
     const method = editingId ? "PATCH" : "POST";
-
-    const res = await apiFetch<{ address: Address }>(url, {
-      method,
-      body: JSON.stringify(form),
-    });
-
-    if (res.success) {
-      setMessage({
-        type: "success",
-        text: editingId ? "Address updated" : "Address added",
-      });
-      cancel();
-      load();
-    } else {
-      setMessage({ type: "error", text: res.error.message });
-    }
+    const res = await apiFetch<{ address: Address }>(url, { method, body: JSON.stringify(form) });
+    if (res.success) { setMessage({ type: "success", text: editingId ? "Address updated" : "Address added" }); cancel(); load(); }
+    else { setMessage({ type: "error", text: res.error.message }); }
     setSaving(false);
   };
 
   const handleDelete = async (id: string) => {
     if (!confirm("Delete this address?")) return;
     setDeleting(id);
-    const res = await apiFetch(`/api/user/addresses/${id}`, {
-      method: "DELETE",
-    });
-    if (res.success) {
-      setMessage({ type: "success", text: "Address deleted" });
-      load();
-    } else {
-      setMessage({ type: "error", text: res.error.message });
-    }
+    const res = await apiFetch(`/api/user/addresses/${id}`, { method: "DELETE" });
+    if (res.success) { setMessage({ type: "success", text: "Address deleted" }); load(); }
+    else { setMessage({ type: "error", text: res.error.message }); }
     setDeleting(null);
   };
 
@@ -265,14 +175,7 @@ function Field({
 
   return (
     <div className="relative isolate min-h-[80vh]">
-      <style jsx global>{`
-        @keyframes addr-item-in {
-          from { opacity: 0; transform: translateY(20px) scale(0.99); filter: blur(8px); }
-          to   { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
-        }
-      `}</style>
-
-      <div className={containerCls}>
+      <div className="relative z-10 mx-auto max-w-6xl space-y-5 px-3 py-5 sm:space-y-6 sm:px-5 sm:py-8">
         <div className="flex flex-wrap items-start justify-between gap-5 mb-6">
           <div className="min-w-0">
             <h1 className="mb-2 text-2xl font-semibold tracking-[-0.02em] text-gray-900">Addresses</h1>
@@ -312,31 +215,19 @@ function Field({
               <article key={a.id} className="group relative overflow-hidden rounded-3xl border border-gray-100 bg-white/80 backdrop-blur-xl p-6 transition-all duration-500 hover:-translate-y-0.5 hover:shadow-[0_20px_40px_-20px_rgba(0,0,0,0.1)]" style={{ animation: `addr-item-in 0.6s cubic-bezier(0.22, 1, 0.36, 1) ${0.15 + i * 0.06}s both` }}>
                 <div className="relative mb-4 flex items-start justify-between gap-3">
                   <div className="flex flex-wrap items-center gap-2">
-                    <span className="inline-flex items-center gap-1.5 rounded-full border border-gray-200 bg-gray-50 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-gray-600">
-                      {TYPE_LABEL[a.address_type] ?? a.address_type}
-                    </span>
-                    {a.is_primary && (
-                      <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-emerald-700">
-                        <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" /> Primary
-                      </span>
-                    )}
+                    <span className="inline-flex items-center gap-1.5 rounded-full border border-gray-200 bg-gray-50 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-gray-600">{TYPE_LABEL[a.address_type] ?? a.address_type}</span>
+                    {a.is_primary && <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-emerald-700"><span className="h-1.5 w-1.5 rounded-full bg-emerald-500" /> Primary</span>}
                   </div>
                   <div className="flex gap-1 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
                     <button onClick={() => openEdit(a)} className="flex h-9 w-9 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-500 hover:bg-gray-50 hover:text-black transition-all"><Icons.Edit /></button>
-                    <button onClick={() => handleDelete(a.id)} disabled={deleting === a.id} className="flex h-9 w-9 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-500 hover:bg-rose-50 hover:text-rose-600 disabled:opacity-40">
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4"><polyline points="3 6 5 6 21 6" /><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" /></svg>
-                    </button>
+                    <button onClick={() => handleDelete(a.id)} disabled={deleting === a.id} className="flex h-9 w-9 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-500 hover:bg-rose-50 hover:text-rose-600 disabled:opacity-40"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4"><polyline points="3 6 5 6 21 6" /><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" /></svg></button>
                   </div>
                 </div>
                 <div className="relative flex items-start gap-4">
-                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-gray-100 bg-gray-50">
-                    <Image src="/icons/location.svg" alt="" width={18} height={18} className="opacity-60" />
-                  </div>
+                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-gray-100 bg-gray-50"><Image src="/icons/location.svg" alt="" width={18} height={18} className="opacity-60" /></div>
                   <div className="min-w-0 flex-1">
                     <p className="mb-1 text-[14px] font-semibold leading-snug text-gray-900">{a.address_line_1}{a.address_line_2 && <span className="font-normal text-gray-500">, {a.address_line_2}</span>}</p>
-                    {(a.city || a.state_province || a.postal_code || a.country_code) && (
-                      <p className="text-[12.5px] leading-relaxed text-gray-500">{[a.city, a.state_province, a.postal_code, a.country_code].filter(Boolean).join(", ")}</p>
-                    )}
+                    {(a.city || a.state_province || a.postal_code || a.country_code) && <p className="text-[12.5px] leading-relaxed text-gray-500">{[a.city, a.state_province, a.postal_code, a.country_code].filter(Boolean).join(", ")}</p>}
                   </div>
                 </div>
               </article>
@@ -349,45 +240,20 @@ function Field({
             <div className="absolute inset-0 bg-black/40 backdrop-blur-md" onClick={cancel} />
             <div className="relative w-full max-h-[92vh] overflow-y-auto rounded-t-[28px] border border-gray-100 bg-white/90 backdrop-blur-2xl sm:max-w-xl sm:rounded-3xl shadow-2xl animate-in slide-in-from-bottom-4 duration-500">
               <div className="sticky top-0 z-10 flex items-center justify-between border-b border-gray-100 px-6 py-4 bg-white/80 backdrop-blur-xl">
-                <div>
-                  <h2 className="text-[16px] font-semibold text-gray-900">{editingId ? "Edit address" : "New address"}</h2>
-                  <p className="mt-0.5 text-[11.5px] text-gray-500">{editingId ? "Update your saved location" : "Save a new location to your account"}</p>
-                </div>
+                <div><h2 className="text-[16px] font-semibold text-gray-900">{editingId ? "Edit address" : "New address"}</h2><p className="mt-0.5 text-[11.5px] text-gray-500">{editingId ? "Update your saved location" : "Save a new location to your account"}</p></div>
                 <button onClick={cancel} className="flex h-9 w-9 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-500 hover:bg-gray-50 hover:text-black transition-all"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="h-4 w-4"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg></button>
               </div>
               <form onSubmit={handleSubmit} className="space-y-5 p-6">
-                <div className="grid grid-cols-2 gap-4">
-                  <Field label="Type">
-                    <select value={form.address_type ?? "home"} onChange={(e) => update("address_type", e.target.value)} className={inputCls}>
-                      <option value="home">Home</option><option value="work">Work</option><option value="billing">Billing</option><option value="shipping">Shipping</option><option value="other">Other</option>
-                    </select>
-                  </Field>
-                  <Field label="Country code">
-                    <input type="text" maxLength={2} value={form.country_code ?? ""} onChange={(e) => update("country_code", e.target.value.toUpperCase())} className={inputCls} placeholder="US" />
-                  </Field>
-                </div>
+                <div className="grid grid-cols-2 gap-4"><Field label="Type"><select value={form.address_type ?? "home"} onChange={(e) => update("address_type", e.target.value)} className={inputCls}><option value="home">Home</option><option value="work">Work</option><option value="billing">Billing</option><option value="shipping">Shipping</option><option value="other">Other</option></select></Field><Field label="Country code"><input type="text" maxLength={2} value={form.country_code ?? ""} onChange={(e) => update("country_code", e.target.value.toUpperCase())} className={inputCls} placeholder="US" /></Field></div>
                 <Field label="Address line 1" span><input type="text" required value={form.address_line_1 ?? ""} onChange={(e) => update("address_line_1", e.target.value)} className={inputCls} placeholder="Street address" /></Field>
                 <Field label="Address line 2" span><input type="text" value={form.address_line_2 ?? ""} onChange={(e) => update("address_line_2", e.target.value)} className={inputCls} placeholder="Apartment, suite, etc. (optional)" /></Field>
-                <div className="grid grid-cols-2 gap-4">
-                  <Field label="City"><input type="text" value={form.city ?? ""} onChange={(e) => update("city", e.target.value)} className={inputCls} /></Field>
-                  <Field label="State / Province"><input type="text" value={form.state_province ?? ""} onChange={(e) => update("state_province", e.target.value)} className={inputCls} /></Field>
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <Field label="District"><input type="text" value={form.district ?? ""} onChange={(e) => update("district", e.target.value)} className={inputCls} /></Field>
-                  <Field label="Postal code"><input type="text" value={form.postal_code ?? ""} onChange={(e) => update("postal_code", e.target.value)} className={inputCls} /></Field>
-                </div>
+                <div className="grid grid-cols-2 gap-4"><Field label="City"><input type="text" value={form.city ?? ""} onChange={(e) => update("city", e.target.value)} className={inputCls} /></Field><Field label="State / Province"><input type="text" value={form.state_province ?? ""} onChange={(e) => update("state_province", e.target.value)} className={inputCls} /></Field></div>
+                <div className="grid grid-cols-2 gap-4"><Field label="District"><input type="text" value={form.district ?? ""} onChange={(e) => update("district", e.target.value)} className={inputCls} /></Field><Field label="Postal code"><input type="text" value={form.postal_code ?? ""} onChange={(e) => update("postal_code", e.target.value)} className={inputCls} /></Field></div>
                 <label className="flex cursor-pointer items-center justify-between gap-3 rounded-2xl border border-gray-100 bg-white/60 p-4 backdrop-blur-md transition-colors duration-300 hover:bg-white">
                   <div><div className="text-[13.5px] font-semibold text-gray-900">Set as primary</div><div className="mt-0.5 text-[11.5px] text-gray-500">Used by default when sharing your address</div></div>
-                  <div className="relative shrink-0">
-                    <input type="checkbox" checked={!!form.is_primary} onChange={(e) => update("is_primary", e.target.checked)} className="peer sr-only" />
-                    <div className="h-[31px] w-[51px] rounded-full bg-gray-200 peer-checked:bg-black transition-colors duration-300"></div>
-                    <div className="absolute left-[2px] top-[2px] h-[27px] w-[27px] rounded-full bg-white shadow-md transition-transform duration-300 peer-checked:translate-x-[20px]"></div>
-                  </div>
+                  <div className="relative shrink-0"><input type="checkbox" checked={!!form.is_primary} onChange={(e) => update("is_primary", e.target.checked)} className="peer sr-only" /><div className="h-[31px] w-[51px] rounded-full bg-gray-200 peer-checked:bg-black transition-colors duration-300"></div><div className="absolute left-[2px] top-[2px] h-[27px] w-[27px] rounded-full bg-white shadow-md transition-transform duration-300 peer-checked:translate-x-[20px]"></div></div>
                 </label>
-                <div className="flex gap-3 pt-1">
-                  <button type="button" onClick={cancel} className="flex-1 rounded-full border border-gray-200 bg-white px-5 py-3.5 text-[13px] font-medium text-gray-700 hover:bg-gray-50 transition-all">Cancel</button>
-                  <button type="submit" disabled={saving} className="flex-1 rounded-full bg-black px-5 py-3.5 text-[13px] font-medium text-white hover:bg-gray-800 transition-all disabled:opacity-50">{saving ? "Saving..." : (editingId ? "Save changes" : "Add address")}</button>
-                </div>
+                <div className="flex gap-3 pt-1"><button type="button" onClick={cancel} className="flex-1 rounded-full border border-gray-200 bg-white px-5 py-3.5 text-[13px] font-medium text-gray-700 hover:bg-gray-50 transition-all">Cancel</button><button type="submit" disabled={saving} className="flex-1 rounded-full bg-black px-5 py-3.5 text-[13px] font-medium text-white hover:bg-gray-800 transition-all disabled:opacity-50">{saving ? "Saving..." : (editingId ? "Save changes" : "Add address")}</button></div>
               </form>
             </div>
           </div>
@@ -398,32 +264,12 @@ function Field({
 }
 
 function ContactsSection() {
-
-type Contact = {
-  id: string;
-  contact_type: string;
-  contact_value: string;
-  label: string | null;
-  is_primary: boolean;
-  is_verified: boolean;
-};
-
-const containerCls = "relative z-10 mx-auto max-w-6xl space-y-5 px-3 py-5 sm:space-y-6 sm:px-5 sm:py-8";
+type Contact = { id: string; contact_type: string; contact_value: string; label: string | null; is_primary: boolean; is_verified: boolean; };
 const inputCls = "w-full px-4 py-3 rounded-xl border border-gray-200 bg-white/60 backdrop-blur-md text-gray-900 text-[15px] placeholder-gray-400 focus:outline-none focus:border-gray-300 focus:bg-white focus:ring-4 focus:ring-gray-100 transition-all duration-300";
-
 const emptyForm: Partial<Contact> = { contact_type: "website", contact_value: "", is_primary: false };
 const TYPE_ICON: Record<string, string> = { website: "/icons/link.svg", social: "/icons/message.svg", messenger: "/icons/mobile.svg", other: "/icons/link.svg" };
 const TYPE_LABEL: Record<string, string> = { website: "Website", social: "Social", messenger: "Messenger", other: "Other" };
-
-function Field({ label, hint, children }: { label: string; hint?: string; children: React.ReactNode }) {
-  return (
-    <div>
-      <label className="mb-2 block text-[10px] font-semibold uppercase tracking-[0.16em] text-gray-500">{label}</label>
-      {children}
-      {hint && <p className="mt-1.5 text-[11.5px] leading-5 text-gray-400">{hint}</p>}
-    </div>
-  );
-}
+function Field({ label, hint, children }: { label: string; hint?: string; children: React.ReactNode }) { return <div><label className="mb-2 block text-[10px] font-semibold uppercase tracking-[0.16em] text-gray-500">{label}</label>{children}{hint && <p className="mt-1.5 text-[11.5px] leading-5 text-gray-400">{hint}</p>}</div>; }
 
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [loading, setLoading] = useState(true);
@@ -434,14 +280,8 @@ function Field({ label, hint, children }: { label: string; hint?: string; childr
   const [deleting, setDeleting] = useState<string | null>(null);
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
-  const load = async () => {
-    const res = await apiFetch<{ contacts: Contact[] }>("/api/user/contacts");
-    if (res.success) setContacts(res.data.contacts);
-    setLoading(false);
-  };
-
+  const load = async () => { const res = await apiFetch<{ contacts: Contact[] }>("/api/user/contacts"); if (res.success) setContacts(res.data.contacts); setLoading(false); };
   useEffect(() => { load(); }, []);
-
   const update = <K extends keyof Contact>(key: K, value: Contact[K]) => { setForm((f) => ({ ...f, [key]: value })); };
   const openNew = () => { setForm(emptyForm); setEditingId(null); setShowForm(true); setMessage(null); };
   const openEdit = (c: Contact) => { setForm(c); setEditingId(c.id); setShowForm(true); setMessage(null); };
@@ -470,66 +310,34 @@ function Field({ label, hint, children }: { label: string; hint?: string; childr
 
   return (
     <div className="relative isolate min-h-[80vh]">
-      <div className={containerCls}>
+      <div className="relative z-10 mx-auto max-w-6xl space-y-5 px-3 py-5 sm:space-y-6 sm:px-5 sm:py-8">
         <div className="flex flex-wrap items-start justify-between gap-5 mb-6">
-          <div className="min-w-0">
-            <h1 className="mb-2 text-2xl font-semibold tracking-[-0.02em] text-gray-900">Contacts</h1>
-            <p className="max-w-lg text-[13.5px] leading-6 text-gray-500">Websites, social profiles and messaging handles — all in one place.</p>
-          </div>
-          {!showForm && contacts.length > 0 && (
-            <button onClick={openNew} className="group relative inline-flex items-center gap-2 overflow-hidden rounded-full border border-black bg-black px-4 py-2.5 text-[12.5px] font-medium text-white transition-all duration-500 hover:-translate-y-0.5 shadow-lg shadow-black/10">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" className="relative h-4 w-4 transition-transform duration-500 group-hover:rotate-90"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
-              <span className="relative">Add contact</span>
-            </button>
-          )}
+          <div className="min-w-0"><h1 className="mb-2 text-2xl font-semibold tracking-[-0.02em] text-gray-900">Contacts</h1><p className="max-w-lg text-[13.5px] leading-6 text-gray-500">Websites, social profiles and messaging handles — all in one place.</p></div>
+          {!showForm && contacts.length > 0 && <button onClick={openNew} className="group relative inline-flex items-center gap-2 overflow-hidden rounded-full border border-black bg-black px-4 py-2.5 text-[12.5px] font-medium text-white transition-all duration-500 hover:-translate-y-0.5 shadow-lg shadow-black/10"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" className="relative h-4 w-4 transition-transform duration-500 group-hover:rotate-90"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg><span className="relative">Add contact</span></button>}
         </div>
 
-        {message && (
-          <div className={`rounded-[16px] px-4 py-3.5 text-[13px] font-medium animate-in fade-in slide-in-from-top-4 duration-500 backdrop-blur-md mb-5 ${message.type === "success" ? "bg-emerald-50/80 text-emerald-700 border border-emerald-100/80" : "bg-rose-50/80 text-rose-700 border border-rose-100/80"}`}>
-            {message.text}
-          </div>
-        )}
+        {message && <div className={`rounded-[16px] px-4 py-3.5 text-[13px] font-medium animate-in fade-in slide-in-from-top-4 duration-500 backdrop-blur-md mb-5 ${message.type === "success" ? "bg-emerald-50/80 text-emerald-700 border border-emerald-100/80" : "bg-rose-50/80 text-rose-700 border border-rose-100/80"}`}>{message.text}</div>}
 
         {showForm && (
           <form onSubmit={handleSubmit} className="relative overflow-hidden rounded-3xl border border-gray-100 bg-white/80 backdrop-blur-xl p-6 sm:p-7 shadow-sm animate-in fade-in slide-in-from-bottom-4 duration-500 mb-6">
             <h3 className="mb-4 text-[10px] font-semibold uppercase tracking-[0.18em] text-gray-500">{editingId ? "Edit contact" : "New contact"}</h3>
             <div className="space-y-4">
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                <Field label="Type">
-                  <select value={form.contact_type ?? "website"} onChange={(e) => update("contact_type", e.target.value)} className={inputCls}>
-                    <option value="website">Website</option><option value="social">Social</option><option value="messenger">Messenger</option><option value="other">Other</option>
-                  </select>
-                </Field>
-                <Field label="Label"><input type="text" value={form.label ?? ""} onChange={(e) => update("label", e.target.value)} className={inputCls} placeholder="e.g. Personal" /></Field>
-              </div>
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2"><Field label="Type"><select value={form.contact_type ?? "website"} onChange={(e) => update("contact_type", e.target.value)} className={inputCls}><option value="website">Website</option><option value="social">Social</option><option value="messenger">Messenger</option><option value="other">Other</option></select></Field><Field label="Label"><input type="text" value={form.label ?? ""} onChange={(e) => update("label", e.target.value)} className={inputCls} placeholder="e.g. Personal" /></Field></div>
               <Field label="Contact value"><input type="text" required value={form.contact_value ?? ""} onChange={(e) => update("contact_value", e.target.value)} className={inputCls} placeholder="https://example.com or @username" /></Field>
               <label className="flex cursor-pointer items-center justify-between gap-3 rounded-2xl border border-gray-100 bg-white/60 p-4 backdrop-blur-md transition-colors duration-300 hover:bg-white">
                 <div><div className="text-[13.5px] font-semibold text-gray-900">Set as primary</div><div className="mt-0.5 text-[11.5px] text-gray-500">Used by default when sharing this contact</div></div>
-                <div className="relative shrink-0">
-                  <input type="checkbox" checked={!!form.is_primary} onChange={(e) => update("is_primary", e.target.checked)} className="peer sr-only" />
-                  <div className="h-[31px] w-[51px] rounded-full bg-gray-200 peer-checked:bg-black transition-colors duration-300"></div>
-                  <div className="absolute left-[2px] top-[2px] h-[27px] w-[27px] rounded-full bg-white shadow-md transition-transform duration-300 peer-checked:translate-x-[20px]"></div>
-                </div>
+                <div className="relative shrink-0"><input type="checkbox" checked={!!form.is_primary} onChange={(e) => update("is_primary", e.target.checked)} className="peer sr-only" /><div className="h-[31px] w-[51px] rounded-full bg-gray-200 peer-checked:bg-black transition-colors duration-300"></div><div className="absolute left-[2px] top-[2px] h-[27px] w-[27px] rounded-full bg-white shadow-md transition-transform duration-300 peer-checked:translate-x-[20px]"></div></div>
               </label>
-              <div className="flex flex-wrap items-center justify-end gap-3 pt-1">
-                <button type="button" onClick={cancel} className="rounded-full border border-gray-200 bg-white px-5 py-3 text-[13px] font-medium text-gray-700 hover:bg-gray-50 transition-all">Cancel</button>
-                <button type="submit" disabled={saving} className="rounded-full bg-black px-6 py-3 text-[13px] font-medium text-white hover:bg-gray-800 transition-all disabled:opacity-50">{saving ? "Saving..." : (editingId ? "Update contact" : "Add contact")}</button>
-              </div>
+              <div className="flex flex-wrap items-center justify-end gap-3 pt-1"><button type="button" onClick={cancel} className="rounded-full border border-gray-200 bg-white px-5 py-3 text-[13px] font-medium text-gray-700 hover:bg-gray-50 transition-all">Cancel</button><button type="submit" disabled={saving} className="rounded-full bg-black px-6 py-3 text-[13px] font-medium text-white hover:bg-gray-800 transition-all disabled:opacity-50">{saving ? "Saving..." : (editingId ? "Update contact" : "Add contact")}</button></div>
             </div>
           </form>
         )}
 
         {contacts.length === 0 && !showForm && (
           <div className="relative overflow-hidden rounded-3xl border border-gray-100 bg-white/80 backdrop-blur-xl p-12 text-center shadow-sm">
-            <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-3xl border border-gray-100 bg-gray-50 shadow-sm">
-              <Image src="/icons/id-card.svg" alt="" width={32} height={32} className="opacity-60" />
-            </div>
-            <h2 className="mb-3 text-xl font-semibold text-gray-900">No contacts yet</h2>
-            <p className="mx-auto mb-8 max-w-sm text-[13.5px] leading-6 text-gray-500">Add your website, social profiles, and messaging handles so people can reach you.</p>
-            <button onClick={openNew} className="inline-flex items-center gap-2 rounded-full border border-black bg-black px-5 py-3 text-[13px] font-medium text-white transition-all duration-500 hover:-translate-y-0.5 shadow-lg shadow-black/10">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" className="h-4 w-4"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
-              Add your first contact
-            </button>
+            <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-3xl border border-gray-100 bg-gray-50 shadow-sm"><Image src="/icons/id-card.svg" alt="" width={32} height={32} className="opacity-60" /></div>
+            <h2 className="mb-3 text-xl font-semibold text-gray-900">No contacts yet</h2><p className="mx-auto mb-8 max-w-sm text-[13.5px] leading-6 text-gray-500">Add your website, social profiles, and messaging handles so people can reach you.</p>
+            <button onClick={openNew} className="inline-flex items-center gap-2 rounded-full border border-black bg-black px-5 py-3 text-[13px] font-medium text-white transition-all duration-500 hover:-translate-y-0.5 shadow-lg shadow-black/10"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" className="h-4 w-4"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>Add your first contact</button>
           </div>
         )}
 
@@ -543,25 +351,11 @@ function Field({ label, hint, children }: { label: string; hint?: string; childr
                 return (
                   <article key={c.id} className="group relative overflow-hidden rounded-3xl border border-gray-100 bg-white/80 backdrop-blur-xl p-5 transition-all duration-500 hover:-translate-y-0.5 hover:shadow-[0_20px_40px_-20px_rgba(0,0,0,0.1)]" style={{ animation: `addr-item-in 0.6s cubic-bezier(0.22, 1, 0.36, 1) ${0.15 + i * 0.06}s both` }}>
                     <div className="relative mb-4 flex items-start justify-between gap-3">
-                      <div className="flex items-center gap-3">
-                        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl border border-gray-100 bg-gray-50">
-                          <Image src={icon} alt="" width={18} height={18} className="opacity-60" />
-                        </span>
-                        <div className="flex flex-col">
-                          <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-gray-500">{typeLabel}</span>
-                          {c.label && <span className="mt-0.5 text-[11.5px] text-gray-500">{c.label}</span>}
-                        </div>
-                      </div>
-                      <div className="flex shrink-0 flex-wrap items-center justify-end gap-1.5">
-                        {c.is_primary && <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-emerald-700"><span className="h-1.5 w-1.5 rounded-full bg-emerald-500" /> Primary</span>}
-                        {c.is_verified && <span className="inline-flex items-center gap-1 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-emerald-700"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="h-2.5 w-2.5"><path d="M20 6 9 17l-5-5" /></svg> Verified</span>}
-                      </div>
+                      <div className="flex items-center gap-3"><span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl border border-gray-100 bg-gray-50"><Image src={icon} alt="" width={18} height={18} className="opacity-60" /></span><div className="flex flex-col"><span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-gray-500">{typeLabel}</span>{c.label && <span className="mt-0.5 text-[11.5px] text-gray-500">{c.label}</span>}</div></div>
+                      <div className="flex shrink-0 flex-wrap items-center justify-end gap-1.5">{c.is_primary && <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-emerald-700"><span className="h-1.5 w-1.5 rounded-full bg-emerald-500" /> Primary</span>}{c.is_verified && <span className="inline-flex items-center gap-1 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-emerald-700"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="h-2.5 w-2.5"><path d="M20 6 9 17l-5-5" /></svg> Verified</span>}</div>
                     </div>
                     <p className="relative mb-4 truncate text-[14.5px] font-semibold text-gray-900" title={c.contact_value}>{c.contact_value}</p>
-                    <div className="relative flex items-center justify-end gap-2 border-t border-gray-100 pt-3">
-                      <button onClick={() => openEdit(c)} className="inline-flex items-center gap-1.5 rounded-full border border-gray-200 bg-white px-3.5 py-1.5 text-[11.5px] font-medium text-gray-700 hover:bg-gray-50 transition-all"><Icons.Edit /> Edit</button>
-                      <button onClick={() => handleDelete(c.id)} disabled={deleting === c.id} className="inline-flex items-center gap-1.5 rounded-full border border-gray-200 bg-white px-3.5 py-1.5 text-[11.5px] font-medium text-gray-700 hover:bg-rose-50 hover:text-rose-600 disabled:opacity-40 transition-all"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-3.5 w-3.5"><polyline points="3 6 5 6 21 6" /><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" /></svg> Delete</button>
-                    </div>
+                    <div className="relative flex items-center justify-end gap-2 border-t border-gray-100 pt-3"><button onClick={() => openEdit(c)} className="inline-flex items-center gap-1.5 rounded-full border border-gray-200 bg-white px-3.5 py-1.5 text-[11.5px] font-medium text-gray-700 hover:bg-gray-50 transition-all"><Icons.Edit /> Edit</button><button onClick={() => handleDelete(c.id)} disabled={deleting === c.id} className="inline-flex items-center gap-1.5 rounded-full border border-gray-200 bg-white px-3.5 py-1.5 text-[11.5px] font-medium text-gray-700 hover:bg-rose-50 hover:text-rose-600 disabled:opacity-40 transition-all"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-3.5 w-3.5"><polyline points="3 6 5 6 21 6" /><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" /></svg> Delete</button></div>
                   </article>
                 );
               })}
@@ -575,19 +369,7 @@ function Field({ label, hint, children }: { label: string; hint?: string; childr
 
 function DevicesSection() {
 type Device = { id: string; device_id: string; device_name: string | null; device_type: string | null; operating_system: string | null; os_version: string | null; browser: string | null; browser_version: string | null; app_version: string | null; last_seen_at: string | null; is_trusted: boolean; created_at: string; };
-
-function timeAgo(iso: string | null) {
-  if (!iso) return "Never";
-  const diff = Date.now() - new Date(iso).getTime();
-  const mins = Math.floor(diff / 60000);
-  if (mins < 1) return "Just now";
-  if (mins < 60) return `${mins}m ago`;
-  const hrs = Math.floor(mins / 60);
-  if (hrs < 24) return `${hrs}h ago`;
-  const days = Math.floor(hrs / 24);
-  if (days < 30) return `${days}d ago`;
-  return new Date(iso).toLocaleDateString();
-}
+function timeAgo(iso: string | null) { if (!iso) return "Never"; const diff = Date.now() - new Date(iso).getTime(); const mins = Math.floor(diff / 60000); if (mins < 1) return "Just now"; if (mins < 60) return `${mins}m ago`; const hrs = Math.floor(mins / 60); if (hrs < 24) return `${hrs}h ago`; const days = Math.floor(hrs / 24); if (days < 30) return `${days}d ago`; return new Date(iso).toLocaleDateString(); }
 
   const [devices, setDevices] = useState<Device[]>([]);
   const [loading, setLoading] = useState(true);
@@ -596,12 +378,7 @@ function timeAgo(iso: string | null) {
   const [editName, setEditName] = useState("");
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
-  const load = async () => {
-    const res = await apiFetch<{ devices: Device[] }>("/api/user/devices");
-    if (res.success) setDevices(res.data.devices);
-    setLoading(false);
-  };
-
+  const load = async () => { const res = await apiFetch<{ devices: Device[] }>("/api/user/devices"); if (res.success) setDevices(res.data.devices); setLoading(false); };
   useEffect(() => { load(); }, []);
 
   const toggleTrust = async (d: Device) => {
@@ -633,47 +410,22 @@ function timeAgo(iso: string | null) {
 
   return (
     <div className="max-w-3xl mx-auto space-y-6">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">Devices</h1>
-        <p className="text-sm text-gray-500">Devices that have accessed your Binzeo ID account</p>
-      </div>
-
-      {message && (
-        <div className={`rounded-[16px] px-4 py-3.5 text-[13px] font-medium animate-in fade-in slide-in-from-top-4 duration-500 backdrop-blur-md ${message.type === "success" ? "bg-emerald-50/80 text-emerald-700 border border-emerald-100/80" : "bg-rose-50/80 text-rose-700 border border-rose-100/80"}`}>
-          {message.text}
-        </div>
-      )}
-
+      <div className="mb-6"><h1 className="text-2xl font-bold text-gray-900 mb-2">Devices</h1><p className="text-sm text-gray-500">Devices that have accessed your Binzeo ID account</p></div>
+      {message && <div className={`rounded-[16px] px-4 py-3.5 text-[13px] font-medium animate-in fade-in slide-in-from-top-4 duration-500 backdrop-blur-md ${message.type === "success" ? "bg-emerald-50/80 text-emerald-700 border border-emerald-100/80" : "bg-rose-50/80 text-rose-700 border border-rose-100/80"}`}>{message.text}</div>}
       {devices.length === 0 ? (
-        <div className="p-12 rounded-3xl border border-gray-100 bg-white/80 backdrop-blur-xl text-center shadow-sm">
-          <Image src="/icons/device.svg" alt="" width={40} height={40} className="opacity-40 mx-auto mb-4" />
-          <p className="text-gray-500 text-sm">No devices recorded yet.</p>
-        </div>
+        <div className="p-12 rounded-3xl border border-gray-100 bg-white/80 backdrop-blur-xl text-center shadow-sm"><Image src="/icons/device.svg" alt="" width={40} height={40} className="opacity-40 mx-auto mb-4" /><p className="text-gray-500 text-sm">No devices recorded yet.</p></div>
       ) : (
         <div className="space-y-3">
           {devices.map((d) => (
             <div key={d.id} className="p-5 rounded-3xl border border-gray-100 bg-white/80 backdrop-blur-xl hover:shadow-[0_20px_40px_-20px_rgba(0,0,0,0.1)] transition-all duration-300">
               <div className="flex items-start justify-between gap-3 mb-3">
                 <div className="flex items-start gap-3 min-w-0 flex-1">
-                  <div className="w-10 h-10 rounded-xl bg-gray-50 border border-gray-100 flex items-center justify-center shrink-0">
-                    <Image src={d.device_type === "mobile" ? "/icons/mobile.svg" : "/icons/device.svg"} alt={d.device_type ?? "device"} width={24} height={24} className="opacity-60" />
-                  </div>
+                  <div className="w-10 h-10 rounded-xl bg-gray-50 border border-gray-100 flex items-center justify-center shrink-0"><Image src={d.device_type === "mobile" ? "/icons/mobile.svg" : "/icons/device.svg"} alt={d.device_type ?? "device"} width={24} height={24} className="opacity-60" /></div>
                   <div className="min-w-0 flex-1">
                     {editingId === d.id ? (
-                      <div className="flex items-center gap-2">
-                        <input type="text" value={editName} onChange={(e) => setEditName(e.target.value)} className="w-full px-3 py-1.5 rounded-lg border border-gray-200 bg-white text-sm focus:outline-none focus:border-gray-300" autoFocus />
-                        <button onClick={() => handleRename(d.id)} disabled={busyId === d.id} className="text-xs text-gray-700 font-medium hover:text-black shrink-0">Save</button>
-                        <button onClick={() => setEditingId(null)} className="text-xs text-gray-500 hover:text-gray-700 shrink-0">Cancel</button>
-                      </div>
+                      <div className="flex items-center gap-2"><input type="text" value={editName} onChange={(e) => setEditName(e.target.value)} className="w-full px-3 py-1.5 rounded-lg border border-gray-200 bg-white text-sm focus:outline-none focus:border-gray-300" autoFocus /><button onClick={() => handleRename(d.id)} disabled={busyId === d.id} className="text-xs text-gray-700 font-medium hover:text-black shrink-0">Save</button><button onClick={() => setEditingId(null)} className="text-xs text-gray-500 hover:text-gray-700 shrink-0">Cancel</button></div>
                     ) : (
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <span className="font-semibold text-gray-900 text-sm truncate">{d.device_name ?? "Unnamed device"}</span>
-                        {d.is_trusted && (
-                          <span className="inline-flex items-center gap-1 rounded-full border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-[10px] font-semibold text-emerald-700">
-                            <Image src="/icons/check.svg" alt="" width={12} height={12} className="opacity-70" /> Trusted
-                          </span>
-                        )}
-                      </div>
+                      <div className="flex items-center gap-2 flex-wrap"><span className="font-semibold text-gray-900 text-sm truncate">{d.device_name ?? "Unnamed device"}</span>{d.is_trusted && <span className="inline-flex items-center gap-1 rounded-full border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-[10px] font-semibold text-emerald-700"><Image src="/icons/check.svg" alt="" width={12} height={12} className="opacity-70" /> Trusted</span>}</div>
                     )}
                     <div className="text-xs text-gray-500 mt-1 truncate">{[d.operating_system, d.browser, d.device_type].filter(Boolean).join(" · ")}</div>
                     <div className="text-xs text-gray-400 mt-0.5">Last seen: {timeAgo(d.last_seen_at)}</div>
@@ -704,104 +456,47 @@ type SectorAccess = { sector_id: string; status: string; selected_at: string; up
   const [busyId, setBusyId] = useState<string | null>(null);
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
-  const load = async () => {
-    const [a, b] = await Promise.all([apiFetch<{ sectors: Sector[] }>("/api/sectors"), apiFetch<{ sector_access: SectorAccess[] }>("/api/user/sector-access")]);
-    if (a.success) setAllSectors(a.data.sectors);
-    if (b.success) setMySectors(b.data.sector_access);
-    setLoading(false);
-  };
-
+  const load = async () => { const [a, b] = await Promise.all([apiFetch<{ sectors: Sector[] }>("/api/sectors"), apiFetch<{ sector_access: SectorAccess[] }>("/api/user/sector-access")]); if (a.success) setAllSectors(a.data.sectors); if (b.success) setMySectors(b.data.sector_access); setLoading(false); };
   useEffect(() => { load(); }, []);
-
   const mySectorIds = new Set(mySectors.map((s) => s.sector_id));
 
-  const handleJoin = async (sectorId: string) => {
-    setBusyId(sectorId); setMessage(null);
-    const res = await apiFetch("/api/user/sector-access", { method: "POST", body: JSON.stringify({ sector_id: sectorId, status: "active" }) });
-    if (res.success) { setMessage({ type: "success", text: "Joined sector" }); await load(); }
-    else { setMessage({ type: "error", text: res.error.message }); }
-    setBusyId(null);
-  };
-
-  const handleLeave = async (sectorId: string) => {
-    if (!confirm("Leave this sector?")) return;
-    setBusyId(sectorId); setMessage(null);
-    const res = await apiFetch(`/api/user/sector-access/${sectorId}`, { method: "DELETE" });
-    if (res.success) { setMessage({ type: "success", text: "Left sector" }); await load(); }
-    else { setMessage({ type: "error", text: res.error.message }); }
-    setBusyId(null);
-  };
-
-  const handleStatusChange = async (sectorId: string, status: string) => {
-    setBusyId(sectorId); setMessage(null);
-    const res = await apiFetch(`/api/user/sector-access/${sectorId}`, { method: "PATCH", body: JSON.stringify({ status }) });
-    if (res.success) { setMessage({ type: "success", text: "Status updated" }); await load(); }
-    else { setMessage({ type: "error", text: res.error.message }); }
-    setBusyId(null);
-  };
+  const handleJoin = async (sectorId: string) => { setBusyId(sectorId); setMessage(null); const res = await apiFetch("/api/user/sector-access", { method: "POST", body: JSON.stringify({ sector_id: sectorId, status: "active" }) }); if (res.success) { setMessage({ type: "success", text: "Joined sector" }); await load(); } else { setMessage({ type: "error", text: res.error.message }); } setBusyId(null); };
+  const handleLeave = async (sectorId: string) => { if (!confirm("Leave this sector?")) return; setBusyId(sectorId); setMessage(null); const res = await apiFetch(`/api/user/sector-access/${sectorId}`, { method: "DELETE" }); if (res.success) { setMessage({ type: "success", text: "Left sector" }); await load(); } else { setMessage({ type: "error", text: res.error.message }); } setBusyId(null); };
+  const handleStatusChange = async (sectorId: string, status: string) => { setBusyId(sectorId); setMessage(null); const res = await apiFetch(`/api/user/sector-access/${sectorId}`, { method: "PATCH", body: JSON.stringify({ status }) }); if (res.success) { setMessage({ type: "success", text: "Status updated" }); await load(); } else { setMessage({ type: "error", text: res.error.message }); } setBusyId(null); };
 
   if (loading) return <Loader variant="sectors" />;
 
   return (
     <div className="max-w-3xl mx-auto space-y-6">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">Sectors</h1>
-        <p className="text-sm text-gray-500">Join industry sectors to unlock related features</p>
-      </div>
-
-      {message && (
-        <div className={`rounded-[16px] px-4 py-3.5 text-[13px] font-medium animate-in fade-in slide-in-from-top-4 duration-500 backdrop-blur-md ${message.type === "success" ? "bg-emerald-50/80 text-emerald-700 border border-emerald-100/80" : "bg-rose-50/80 text-rose-700 border border-rose-100/80"}`}>
-          {message.text}
-        </div>
-      )}
-
+      <div className="mb-6"><h1 className="text-2xl font-bold text-gray-900 mb-2">Sectors</h1><p className="text-sm text-gray-500">Join industry sectors to unlock related features</p></div>
+      {message && <div className={`rounded-[16px] px-4 py-3.5 text-[13px] font-medium animate-in fade-in slide-in-from-top-4 duration-500 backdrop-blur-md ${message.type === "success" ? "bg-emerald-50/80 text-emerald-700 border border-emerald-100/80" : "bg-rose-50/80 text-rose-700 border border-rose-100/80"}`}>{message.text}</div>}
       {mySectors.length > 0 && (
         <section className="space-y-3">
           <h2 className="text-[10px] font-semibold text-gray-500 uppercase tracking-[0.18em]">My Sectors ({mySectors.length})</h2>
           <div className="space-y-2">
             {mySectors.map((s) => (
               <div key={s.sector_id} className="p-4 rounded-3xl border border-gray-100 bg-white/80 backdrop-blur-xl flex items-center justify-between gap-3 shadow-sm">
-                <div className="min-w-0">
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="font-mono text-[10px] text-gray-600 px-1.5 py-0.5 rounded bg-gray-100 border border-gray-200">{s.sectors?.sector_code}</span>
-                    <span className="font-medium text-gray-900 text-sm truncate">{s.sectors?.sector_name}</span>
-                  </div>
-                  <div className="text-xs text-gray-500">Status: <span className={s.status === "active" ? "text-emerald-600 font-medium" : "text-gray-500"}>{s.status}</span></div>
-                </div>
-                <div className="flex items-center gap-2 shrink-0">
-                  <select value={s.status} disabled={busyId === s.sector_id} onChange={(e) => handleStatusChange(s.sector_id, e.target.value)} className="text-xs px-2 py-1 rounded-lg border border-gray-200 bg-white text-gray-900 focus:outline-none">
-                    <option value="active">Active</option><option value="paused">Paused</option><option value="inactive">Inactive</option>
-                  </select>
-                  <button onClick={() => handleLeave(s.sector_id)} disabled={busyId === s.sector_id} className="text-xs text-rose-500 hover:text-rose-700 font-medium disabled:opacity-50">Leave</button>
-                </div>
+                <div className="min-w-0"><div className="flex items-center gap-2 mb-1"><span className="font-mono text-[10px] text-gray-600 px-1.5 py-0.5 rounded bg-gray-100 border border-gray-200">{s.sectors?.sector_code}</span><span className="font-medium text-gray-900 text-sm truncate">{s.sectors?.sector_name}</span></div><div className="text-xs text-gray-500">Status: <span className={s.status === "active" ? "text-emerald-600 font-medium" : "text-gray-500"}>{s.status}</span></div></div>
+                <div className="flex items-center gap-2 shrink-0"><select value={s.status} disabled={busyId === s.sector_id} onChange={(e) => handleStatusChange(s.sector_id, e.target.value)} className="text-xs px-2 py-1 rounded-lg border border-gray-200 bg-white text-gray-900 focus:outline-none"><option value="active">Active</option><option value="paused">Paused</option><option value="inactive">Inactive</option></select><button onClick={() => handleLeave(s.sector_id)} disabled={busyId === s.sector_id} className="text-xs text-rose-500 hover:text-rose-700 font-medium disabled:opacity-50">Leave</button></div>
               </div>
             ))}
           </div>
         </section>
       )}
-
       <section className="space-y-3">
         <h2 className="text-[10px] font-semibold text-gray-500 uppercase tracking-[0.18em]">Available Sectors</h2>
         {allSectors.length === 0 ? (
-          <div className="p-12 rounded-3xl border border-gray-100 bg-white/80 backdrop-blur-xl text-center shadow-sm">
-            <Image src="/icons/building.svg" alt="" width={40} height={40} className="opacity-40 mx-auto mb-4" />
-            <p className="text-gray-500 text-sm">No sectors available right now.</p>
-          </div>
+          <div className="p-12 rounded-3xl border border-gray-100 bg-white/80 backdrop-blur-xl text-center shadow-sm"><Image src="/icons/building.svg" alt="" width={40} height={40} className="opacity-40 mx-auto mb-4" /><p className="text-gray-500 text-sm">No sectors available right now.</p></div>
         ) : (
           <div className="grid sm:grid-cols-2 gap-3">
             {allSectors.map((s) => {
               const joined = mySectorIds.has(s.id);
               return (
                 <div key={s.id} className="p-5 rounded-3xl border border-gray-100 bg-white/80 backdrop-blur-xl hover:shadow-[0_20px_40px_-20px_rgba(0,0,0,0.1)] transition-all duration-300 flex flex-col">
-                  <div className="flex items-start justify-between gap-2 mb-2">
-                    <div className="font-mono text-[10px] text-gray-600 px-1.5 py-0.5 rounded bg-gray-100 border border-gray-200">{s.sector_code}</div>
-                    {joined && <span className="inline-flex items-center gap-1 rounded-full border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-[10px] font-semibold text-emerald-700"><Image src="/icons/check.svg" alt="" width={12} height={12} className="opacity-70" /> Joined</span>}
-                  </div>
+                  <div className="flex items-start justify-between gap-2 mb-2"><div className="font-mono text-[10px] text-gray-600 px-1.5 py-0.5 rounded bg-gray-100 border border-gray-200">{s.sector_code}</div>{joined && <span className="inline-flex items-center gap-1 rounded-full border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-[10px] font-semibold text-emerald-700"><Image src="/icons/check.svg" alt="" width={12} height={12} className="opacity-70" /> Joined</span>}</div>
                   <div className="font-semibold text-gray-900 text-sm mb-1">{s.sector_name}</div>
                   {s.description && <p className="text-xs text-gray-500 mb-4 flex-1">{s.description}</p>}
-                  <button onClick={() => joined ? handleLeave(s.id) : handleJoin(s.id)} disabled={busyId === s.id} className={`mt-auto w-full py-2.5 rounded-xl text-sm font-medium transition-colors disabled:opacity-60 ${joined ? "border border-gray-200 text-gray-700 hover:bg-gray-50" : "bg-black text-white hover:bg-gray-800"}`}>
-                    {busyId === s.id ? "..." : joined ? "Leave" : "Join"}
-                  </button>
+                  <button onClick={() => joined ? handleLeave(s.id) : handleJoin(s.id)} disabled={busyId === s.id} className={`mt-auto w-full py-2.5 rounded-xl text-sm font-medium transition-colors disabled:opacity-60 ${joined ? "border border-gray-200 text-gray-700 hover:bg-gray-50" : "bg-black text-white hover:bg-gray-800"}`}>{busyId === s.id ? "..." : joined ? "Leave" : "Join"}</button>
                 </div>
               );
             })}
@@ -818,53 +513,12 @@ type ActivityEntry = { id: string; activity_type: string; activity_description: 
 type AuthMethod = { id: string; provider: string; auth_method: string; provider_email: string | null; first_seen_at: string; last_sign_in_at: string | null; login_count: number; last_event: string | null; };
 type Verification = { id: string; verification_type: string; verification_status: string; verified_at: string | null; last_requested_at: string | null; expires_at: string | null; attempt_count: number; };
 
-const containerCls = "relative z-10 mx-auto w-full max-w-6xl space-y-5 px-3 py-5 sm:space-y-6 sm:px-5 sm:py-8";
-
-function LockIcon({ className = "h-4 w-4" }: { className?: string }) {
-  return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>;
-}
-
-function timeAgo(iso: string | null) {
-  if (!iso) return "—";
-  const diff = Date.now() - new Date(iso).getTime();
-  const mins = Math.floor(diff / 60000);
-  if (mins < 1) return "Just now";
-  if (mins < 60) return `${mins}m ago`;
-  const hrs = Math.floor(mins / 60);
-  if (hrs < 24) return `${hrs}h ago`;
-  const days = Math.floor(hrs / 24);
-  if (days < 30) return `${days}d ago`;
-  return new Date(iso).toLocaleDateString();
-}
-
-function SectionHeading({ children }: { children: React.ReactNode }) {
-  return <div className="mb-4 flex items-center gap-3"><span className="whitespace-nowrap text-[10px] font-semibold uppercase tracking-[0.18em] text-gray-500">{children}</span><span aria-hidden="true" className="h-px flex-1 bg-gradient-to-r from-gray-200 to-transparent" /></div>;
-}
-
-function StatusPill({ status }: { status: string }) {
-  const map: Record<string, string> = { success: "border-emerald-200 bg-emerald-50 text-emerald-700", verified: "border-emerald-200 bg-emerald-50 text-emerald-700", failed: "border-red-200 bg-red-50 text-red-700", blocked: "border-amber-200 bg-amber-50 text-amber-700", pending: "border-amber-200 bg-amber-50 text-amber-700" };
-  const cls = map[status] ?? "border-gray-200 bg-gray-50 text-gray-700";
-  return <span className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] ${cls}`}>{status}</span>;
-}
-
-function PrimaryButton({ href, children, icon }: { href?: string; children: React.ReactNode; icon?: React.ReactNode }) {
-  const cls = "group relative inline-flex items-center gap-2 overflow-hidden rounded-full border border-black px-4 py-2.5 text-[12.5px] font-medium transition-all duration-500 hover:-translate-y-0.5 shadow-lg shadow-black/10";
-  const style: React.CSSProperties = { background: "#0a0a0a", color: "#ffffff" };
-  const inner = (<><span aria-hidden="true" className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100" style={{ background: "radial-gradient(circle at 30% 30%, rgba(255,255,255,0.2), transparent 60%)" }} />{icon && <span className="relative flex items-center">{icon}</span>}<span className="relative" style={{ color: "#ffffff" }}>{children}</span></>);
-  if (href) return <Link href={href} className={cls} style={style}>{inner}</Link>;
-  return <button type="button" className={cls} style={style}>{inner}</button>;
-}
-
-function EmptyState({ icon, text }: { icon: string; text: string }) {
-  return (
-    <div className="relative overflow-hidden rounded-3xl border border-gray-100 bg-white/80 backdrop-blur-xl p-10 text-center shadow-sm">
-      <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl border border-gray-100 bg-gray-50 shadow-sm">
-        <Image src={icon} alt="" width={24} height={24} className="opacity-60" />
-      </div>
-      <p className="text-[13px] text-gray-500">{text}</p>
-    </div>
-  );
-}
+function LockIcon({ className = "h-4 w-4" }: { className?: string }) { return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>; }
+function timeAgo(iso: string | null) { if (!iso) return "—"; const diff = Date.now() - new Date(iso).getTime(); const mins = Math.floor(diff / 60000); if (mins < 1) return "Just now"; if (mins < 60) return `${mins}m ago`; const hrs = Math.floor(mins / 60); if (hrs < 24) return `${hrs}h ago`; const days = Math.floor(hrs / 24); if (days < 30) return `${days}d ago`; return new Date(iso).toLocaleDateString(); }
+function SectionHeading({ children }: { children: React.ReactNode }) { return <div className="mb-4 flex items-center gap-3"><span className="whitespace-nowrap text-[10px] font-semibold uppercase tracking-[0.18em] text-gray-500">{children}</span><span aria-hidden="true" className="h-px flex-1 bg-gradient-to-r from-gray-200 to-transparent" /></div>; }
+function StatusPill({ status }: { status: string }) { const map: Record<string, string> = { success: "border-emerald-200 bg-emerald-50 text-emerald-700", verified: "border-emerald-200 bg-emerald-50 text-emerald-700", failed: "border-red-200 bg-red-50 text-red-700", blocked: "border-amber-200 bg-amber-50 text-amber-700", pending: "border-amber-200 bg-amber-50 text-amber-700" }; const cls = map[status] ?? "border-gray-200 bg-gray-50 text-gray-700"; return <span className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] ${cls}`}>{status}</span>; }
+function PrimaryButton({ href, children, icon }: { href?: string; children: React.ReactNode; icon?: React.ReactNode }) { const cls = "group relative inline-flex items-center gap-2 overflow-hidden rounded-full border border-black px-4 py-2.5 text-[12.5px] font-medium transition-all duration-500 hover:-translate-y-0.5 shadow-lg shadow-black/10"; const style: React.CSSProperties = { background: "#0a0a0a", color: "#ffffff" }; const inner = (<><span aria-hidden="true" className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100" style={{ background: "radial-gradient(circle at 30% 30%, rgba(255,255,255,0.2), transparent 60%)" }} />{icon && <span className="relative flex items-center">{icon}</span>}<span className="relative" style={{ color: "#ffffff" }}>{children}</span></>); if (href) return <Link href={href} className={cls} style={style}>{inner}</Link>; return <button type="button" className={cls} style={style}>{inner}</button>; }
+function EmptyState({ icon, text }: { icon: string; text: string }) { return (<div className="relative overflow-hidden rounded-3xl border border-gray-100 bg-white/80 backdrop-blur-xl p-10 text-center shadow-sm"><div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl border border-gray-100 bg-gray-50 shadow-sm"><Image src={icon} alt="" width={24} height={24} className="opacity-60" /></div><p className="text-[13px] text-gray-500">{text}</p></div>); }
 
 const TABS = [{ id: "logins", label: "Login History" }, { id: "activity", label: "Activity" }, { id: "methods", label: "Auth Methods" }, { id: "verifications", label: "Verifications" }] as const;
 type TabId = (typeof TABS)[number]["id"];
@@ -914,110 +568,27 @@ type TabId = (typeof TABS)[number]["id"];
         .sec-tool-wrap:hover { border-color: rgba(0,0,0,0.1); box-shadow: 0 20px 40px -20px rgba(0,0,0,0.1) !important; }
       `}</style>
 
-      <div className={containerCls}>
+      <div className="relative z-10 mx-auto w-full max-w-6xl space-y-5 px-3 py-5 sm:space-y-6 sm:px-5 sm:py-8">
         <div className="flex flex-wrap items-start justify-between gap-5 mb-6">
-          <div className="min-w-0">
-            <h1 className="mb-2 text-2xl font-semibold tracking-[-0.02em] text-gray-900">Security</h1>
-            <p className="max-w-lg text-[13.5px] leading-6 text-gray-500">Monitor your account activity and manage security settings.</p>
-          </div>
+          <div className="min-w-0"><h1 className="mb-2 text-2xl font-semibold tracking-[-0.02em] text-gray-900">Security</h1><p className="max-w-lg text-[13.5px] leading-6 text-gray-500">Monitor your account activity and manage security settings.</p></div>
           <PrimaryButton href="/dashboard/security/password" icon={<LockIcon className="h-4 w-4" />}>Change password</PrimaryButton>
         </div>
 
-        <div className="sec-tool-wrap mb-5" style={{ animation: "sec-item-in 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.15s both" }}>
-          <div data-sec-tool className="relative w-full"><TemporaryLoginTokens /></div>
-        </div>
-
-        <div className="sec-tool-wrap mb-5" style={{ animation: "sec-item-in 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.2s both" }}>
-          <div data-sec-tool className="relative w-full"><PasskeyManager /></div>
-        </div>
-
-        <div className="sec-tool-wrap mb-5" style={{ animation: "sec-item-in 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.25s both" }}>
-          <div data-sec-tool className="relative w-full"><TwoFactorSettings /></div>
-        </div>
+        <div className="sec-tool-wrap mb-5" style={{ animation: "sec-item-in 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.15s both" }}><div data-sec-tool className="relative w-full"><TemporaryLoginTokens /></div></div>
+        <div className="sec-tool-wrap mb-5" style={{ animation: "sec-item-in 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.2s both" }}><div data-sec-tool className="relative w-full"><PasskeyManager /></div></div>
+        <div className="sec-tool-wrap mb-5" style={{ animation: "sec-item-in 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.25s both" }}><div data-sec-tool className="relative w-full"><TwoFactorSettings /></div></div>
 
         <section className="relative w-full overflow-hidden rounded-3xl border border-gray-100 bg-white/80 backdrop-blur-xl p-5 sm:p-7 shadow-sm" style={{ animation: "sec-item-in 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.3s both" }}>
           <div className="relative">
             <SectionHeading>Account Activity</SectionHeading>
             <div className="mb-5 flex flex-wrap gap-2">
-              {TABS.map((t) => {
-                const active = tab === t.id;
-                return (
-                  <button key={t.id} type="button" onClick={() => setTab(t.id)} className={`group relative inline-flex items-center gap-2 overflow-hidden rounded-full border px-3.5 py-2 text-[12px] font-medium transition-all duration-500 ${active ? "border-black bg-black text-white shadow-md shadow-black/10" : "border-gray-200 bg-white text-gray-600 hover:bg-gray-50 hover:text-black"}`}>
-                    <span className="relative">{t.label}</span>
-                  </button>
-                );
-              })}
+              {TABS.map((t) => { const active = tab === t.id; return (<button key={t.id} type="button" onClick={() => setTab(t.id)} className={`group relative inline-flex items-center gap-2 overflow-hidden rounded-full border px-3.5 py-2 text-[12px] font-medium transition-all duration-500 ${active ? "border-black bg-black text-white shadow-md shadow-black/10" : "border-gray-200 bg-white text-gray-600 hover:bg-gray-50 hover:text-black"}`}><span className="relative">{t.label}</span></button>); })}
             </div>
 
-            {tab === "logins" && (
-              <div className="space-y-3">
-                {logins.length === 0 ? <EmptyState icon="/icons/lock.svg" text="No login history yet." /> : logins.map((l, i) => (
-                  <article key={l.id} className="group relative overflow-hidden rounded-2xl border border-gray-100 bg-white p-4 transition-all duration-500 hover:shadow-[0_18px_40px_-22px_rgba(0,0,0,0.1)] sm:p-5" style={{ animation: `sec-item-in 0.55s cubic-bezier(0.22, 1, 0.36, 1) ${0.05 + i * 0.03}s both` }}>
-                    <div className="relative flex items-start justify-between gap-3">
-                      <div className="min-w-0 flex-1">
-                        <div className="mb-2 flex flex-wrap items-center gap-2">
-                          <StatusPill status={l.login_status} />
-                          <span className="rounded-full border border-gray-200 bg-gray-50 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-gray-600">{l.login_method ?? "password"}</span>
-                        </div>
-                        <div className="truncate text-[12.5px] text-gray-600">{l.ip_address ?? "No IP"} · {[l.city, l.country].filter(Boolean).join(", ") || "Unknown location"}</div>
-                        {l.user_devices && <div className="mt-1 text-[11.5px] text-gray-500">{l.user_devices.device_name ?? l.user_devices.device_type ?? "Unknown device"}{l.user_devices.operating_system && ` · ${l.user_devices.operating_system}`}{l.user_devices.browser && ` · ${l.user_devices.browser}`}</div>}
-                      </div>
-                      <div className="shrink-0 text-[11px] font-medium text-gray-400">{timeAgo(l.login_at)}</div>
-                    </div>
-                  </article>
-                ))}
-              </div>
-            )}
-
-            {tab === "activity" && (
-              <div className="space-y-3">
-                {activities.length === 0 ? <EmptyState icon="/icons/history.svg" text="No activity recorded yet." /> : activities.map((a, i) => (
-                  <article key={a.id} className="group relative overflow-hidden rounded-2xl border border-gray-100 bg-white p-4 transition-all duration-500 hover:shadow-[0_18px_40px_-22px_rgba(0,0,0,0.1)] sm:p-5" style={{ animation: `sec-item-in 0.55s cubic-bezier(0.22, 1, 0.36, 1) ${0.05 + i * 0.03}s both` }}>
-                    <div className="relative flex items-start justify-between gap-3">
-                      <div className="min-w-0 flex-1">
-                        <div className="mb-0.5 text-[13px] font-semibold capitalize text-gray-900">{a.activity_type.replace(/_/g, " ")}</div>
-                        {a.activity_description && <div className="text-[12px] text-gray-500">{a.activity_description}</div>}
-                        {a.ip_address && <div className="mt-1 text-[11px] text-gray-400">IP: {a.ip_address}</div>}
-                      </div>
-                      <div className="shrink-0 text-[11px] font-medium text-gray-400">{timeAgo(a.created_at)}</div>
-                    </div>
-                  </article>
-                ))}
-              </div>
-            )}
-
-            {tab === "methods" && (
-              <div className="space-y-3">
-                {methods.length === 0 ? <EmptyState icon="/icons/lock.svg" text="No auth methods linked yet." /> : methods.map((m, i) => (
-                  <article key={m.id} className="group relative overflow-hidden rounded-2xl border border-gray-100 bg-white p-4 transition-all duration-500 hover:shadow-[0_18px_40px_-22px_rgba(0,0,0,0.1)] sm:p-5" style={{ animation: `sec-item-in 0.55s cubic-bezier(0.22, 1, 0.36, 1) ${0.05 + i * 0.03}s both` }}>
-                    <div className="relative flex items-start justify-between gap-3">
-                      <div className="min-w-0 flex-1">
-                        <div className="mb-1 flex flex-wrap items-center gap-2"><span className="text-[13px] font-semibold capitalize text-gray-900">{m.auth_method.replace(/_/g, " ")}</span><span className="text-[11px] text-gray-500">via {m.provider}</span></div>
-                        {m.provider_email && <div className="text-[12px] text-gray-500">{m.provider_email}</div>}
-                        <div className="mt-1 text-[11px] text-gray-400">Signed in {m.login_count} time{m.login_count !== 1 ? "s" : ""}{m.last_sign_in_at && ` · Last: ${timeAgo(m.last_sign_in_at)}`}</div>
-                      </div>
-                      <span className="shrink-0 rounded-full border border-gray-200 bg-gray-50 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-gray-600">{m.last_event ?? "linked"}</span>
-                    </div>
-                  </article>
-                ))}
-              </div>
-            )}
-
-            {tab === "verifications" && (
-              <div className="space-y-3">
-                {verifications.length === 0 ? <EmptyState icon="/icons/check.svg" text="No verification records yet." /> : verifications.map((v, i) => (
-                  <article key={v.id} className="group relative overflow-hidden rounded-2xl border border-gray-100 bg-white p-4 transition-all duration-500 hover:shadow-[0_18px_40px_-22px_rgba(0,0,0,0.1)] sm:p-5" style={{ animation: `sec-item-in 0.55s cubic-bezier(0.22, 1, 0.36, 1) ${0.05 + i * 0.03}s both` }}>
-                    <div className="relative flex items-start justify-between gap-3">
-                      <div className="min-w-0 flex-1">
-                        <div className="mb-1 flex flex-wrap items-center gap-2"><span className="text-[13px] font-semibold capitalize text-gray-900">{v.verification_type}</span><StatusPill status={v.verification_status} /></div>
-                        <div className="text-[11.5px] text-gray-500">{v.verified_at ? `Verified ${timeAgo(v.verified_at)}` : v.last_requested_at ? `Requested ${timeAgo(v.last_requested_at)}` : "No activity"}</div>
-                        <div className="mt-0.5 text-[11px] text-gray-400">Attempts: {v.attempt_count}</div>
-                      </div>
-                    </div>
-                  </article>
-                ))}
-              </div>
-            )}
+            {tab === "logins" && (<div className="space-y-3">{logins.length === 0 ? <EmptyState icon="/icons/lock.svg" text="No login history yet." /> : logins.map((l, i) => (<article key={l.id} className="group relative overflow-hidden rounded-2xl border border-gray-100 bg-white p-4 transition-all duration-500 hover:shadow-[0_18px_40px_-22px_rgba(0,0,0,0.1)] sm:p-5" style={{ animation: `sec-item-in 0.55s cubic-bezier(0.22, 1, 0.36, 1) ${0.05 + i * 0.03}s both` }}><div className="relative flex items-start justify-between gap-3"><div className="min-w-0 flex-1"><div className="mb-2 flex flex-wrap items-center gap-2"><StatusPill status={l.login_status} /><span className="rounded-full border border-gray-200 bg-gray-50 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-gray-600">{l.login_method ?? "password"}</span></div><div className="truncate text-[12.5px] text-gray-600">{l.ip_address ?? "No IP"} · {[l.city, l.country].filter(Boolean).join(", ") || "Unknown location"}</div>{l.user_devices && <div className="mt-1 text-[11.5px] text-gray-500">{l.user_devices.device_name ?? l.user_devices.device_type ?? "Unknown device"}{l.user_devices.operating_system && ` · ${l.user_devices.operating_system}`}{l.user_devices.browser && ` · ${l.user_devices.browser}`}</div>}</div><div className="shrink-0 text-[11px] font-medium text-gray-400">{timeAgo(l.login_at)}</div></div></article>))}</div>)}
+            {tab === "activity" && (<div className="space-y-3">{activities.length === 0 ? <EmptyState icon="/icons/history.svg" text="No activity recorded yet." /> : activities.map((a, i) => (<article key={a.id} className="group relative overflow-hidden rounded-2xl border border-gray-100 bg-white p-4 transition-all duration-500 hover:shadow-[0_18px_40px_-22px_rgba(0,0,0,0.1)] sm:p-5" style={{ animation: `sec-item-in 0.55s cubic-bezier(0.22, 1, 0.36, 1) ${0.05 + i * 0.03}s both` }}><div className="relative flex items-start justify-between gap-3"><div className="min-w-0 flex-1"><div className="mb-0.5 text-[13px] font-semibold capitalize text-gray-900">{a.activity_type.replace(/_/g, " ")}</div>{a.activity_description && <div className="text-[12px] text-gray-500">{a.activity_description}</div>}{a.ip_address && <div className="mt-1 text-[11px] text-gray-400">IP: {a.ip_address}</div>}</div><div className="shrink-0 text-[11px] font-medium text-gray-400">{timeAgo(a.created_at)}</div></div></article>))}</div>)}
+            {tab === "methods" && (<div className="space-y-3">{methods.length === 0 ? <EmptyState icon="/icons/lock.svg" text="No auth methods linked yet." /> : methods.map((m, i) => (<article key={m.id} className="group relative overflow-hidden rounded-2xl border border-gray-100 bg-white p-4 transition-all duration-500 hover:shadow-[0_18px_40px_-22px_rgba(0,0,0,0.1)] sm:p-5" style={{ animation: `sec-item-in 0.55s cubic-bezier(0.22, 1, 0.36, 1) ${0.05 + i * 0.03}s both` }}><div className="relative flex items-start justify-between gap-3"><div className="min-w-0 flex-1"><div className="mb-1 flex flex-wrap items-center gap-2"><span className="text-[13px] font-semibold capitalize text-gray-900">{m.auth_method.replace(/_/g, " ")}</span><span className="text-[11px] text-gray-500">via {m.provider}</span></div>{m.provider_email && <div className="text-[12px] text-gray-500">{m.provider_email}</div>}<div className="mt-1 text-[11px] text-gray-400">Signed in {m.login_count} time{m.login_count !== 1 ? "s" : ""}{m.last_sign_in_at && ` · Last: ${timeAgo(m.last_sign_in_at)}`}</div></div><span className="shrink-0 rounded-full border border-gray-200 bg-gray-50 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-gray-600">{m.last_event ?? "linked"}</span></div></article>))}</div>)}
+            {tab === "verifications" && (<div className="space-y-3">{verifications.length === 0 ? <EmptyState icon="/icons/check.svg" text="No verification records yet." /> : verifications.map((v, i) => (<article key={v.id} className="group relative overflow-hidden rounded-2xl border border-gray-100 bg-white p-4 transition-all duration-500 hover:shadow-[0_18px_40px_-22px_rgba(0,0,0,0.1)] sm:p-5" style={{ animation: `sec-item-in 0.55s cubic-bezier(0.22, 1, 0.36, 1) ${0.05 + i * 0.03}s both` }}><div className="relative flex items-start justify-between gap-3"><div className="min-w-0 flex-1"><div className="mb-1 flex flex-wrap items-center gap-2"><span className="text-[13px] font-semibold capitalize text-gray-900">{v.verification_type}</span><StatusPill status={v.verification_status} /></div><div className="text-[11.5px] text-gray-500">{v.verified_at ? `Verified ${timeAgo(v.verified_at)}` : v.last_requested_at ? `Requested ${timeAgo(v.last_requested_at)}` : "No activity"}</div><div className="mt-0.5 text-[11px] text-gray-400">Attempts: {v.attempt_count}</div></div></div></article>))}</div>)}
           </div>
         </section>
       </div>
@@ -1027,7 +598,7 @@ type TabId = (typeof TABS)[number]["id"];
 
 export default function ProfilePage() {
   const router = useRouter();
-  const [activeSection, setActiveSection] = useState<"profile" | "security" | "contacts" | "addresses" | "devices" | "sectors">("profile");
+  const [activeSection, setActiveSection] = useState<"menu" | "profile" | "security" | "contacts" | "addresses" | "devices" | "sectors">("menu");
   const [data, setData] = useState<Data | null>(null);
   const [form, setForm] = useState<Partial<Profile>>({});
   const [loading, setLoading] = useState(true);
@@ -1163,183 +734,171 @@ export default function ProfilePage() {
       
       {/* Top Header (Sticky & Professional) */}
       <div className="sticky top-0 z-40 bg-white/80 backdrop-blur-xl border-b border-gray-100/80 flex items-center justify-between px-4 py-3.5 transition-all duration-300">
-        <button type="button" className="p-1 -ml-2 rounded-full active:bg-gray-100 transition-colors">
-          <Icons.Back />
-        </button>
-        <h1 className="text-[17px] font-semibold text-gray-900 absolute left-1/2 -translate-x-1/2 tracking-tight">Profile</h1>
+        {activeSection === "menu" ? (
+          <div className="w-6" />
+        ) : (
+          <button type="button" onClick={() => setActiveSection("menu")} className="p-1 -ml-2 rounded-full active:bg-gray-100 transition-colors">
+            <Icons.Back />
+          </button>
+        )}
+        <h1 className="text-[17px] font-semibold text-gray-900 absolute left-1/2 -translate-x-1/2 tracking-tight">
+          {activeSection === "menu" ? "Settings" : sectionTabs.find(t => t[0] === activeSection)?.[1]}
+        </h1>
         <div className="w-6" />
       </div>
 
-      <form onSubmit={handleSubmit} className="mx-auto max-w-md px-4 space-y-7 pt-5">
-        
-        {/* Message Banner */}
-        {message && (
-          <div className={`rounded-[14px] px-4 py-3.5 text-[13px] font-medium animate-in fade-in slide-in-from-top-4 duration-500 ${message.type === "success" ? "bg-emerald-50 text-emerald-700 border border-emerald-100" : "bg-rose-50 text-rose-700 border border-rose-100"}`}>
-            {message.text}
-          </div>
-        )}
-
-        {/* Profile Header Card (Always at the top) */}
-        <div className={`${cardCls} p-4 flex items-center gap-4 animate-in fade-in slide-in-from-bottom-4 duration-500`}>
-          <div className="relative h-[68px] w-[68px] shrink-0 overflow-hidden rounded-full border-2 border-white shadow-sm bg-gray-100">
-            {form.profile_photo_url ? (
-              <img src={form.profile_photo_url} alt="Profile" className="h-full w-full object-cover" />
-            ) : (
-              <div className="flex h-full w-full items-center justify-center text-2xl font-semibold text-gray-400">
-                {displayName.charAt(0).toUpperCase()}
-              </div>
-            )}
-            {photoUploading && (
-              <div className="absolute inset-0 flex items-center justify-center bg-black/40 text-[10px] text-white">
-                <span className="animate-pulse">...</span>
-              </div>
-            )}
-          </div>
-          <div className="min-w-0 flex-1">
-            <h2 className="text-[17px] font-semibold text-gray-900 truncate leading-tight tracking-tight">{displayName}</h2>
-            <p className="text-[13px] text-gray-500 truncate mt-0.5">{userEmail}</p>
-            <label className="mt-1.5 inline-flex cursor-pointer items-center gap-1.5 text-[12px] font-medium text-blue-600 hover:text-blue-700 active:scale-95 transition-all duration-200 bg-blue-50 px-3 py-1 rounded-full">
-              <Icons.Edit /> Edit Photo
-              <input type="file" accept="image/*" onChange={handlePhotoUpload} disabled={photoUploading} className="sr-only" />
-            </label>
-          </div>
-        </div>
-
-        {/* Account Center Navigation (Icons moved down, arranged in a beautiful grid) */}
-        <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 delay-100">
-          <h3 className="mb-3 px-4 text-[13px] font-medium text-gray-500 tracking-wide uppercase">Account Center</h3>
-          <div className="grid grid-cols-2 gap-3 px-1">
-            {sectionTabs.map(([key, label]) => (
-              <button
-                key={key}
-                type="button"
-                onClick={() => selectSection(key)}
-                className={`flex flex-col items-center justify-center gap-2 rounded-[16px] border p-4 transition-all duration-300 ${
-                  activeSection === key
-                    ? "border-black bg-black text-white shadow-lg shadow-black/10"
-                    : "border-gray-100 bg-white/80 backdrop-blur-xl text-gray-600 hover:bg-gray-50"
-                }`}
-              >
-                <span className={`flex h-10 w-10 items-center justify-center rounded-full ${activeSection === key ? "bg-white/20" : "bg-gray-50"}`}>
-                  {key === "profile" && <Icons.User />}
-                  {key === "security" && <Icons.Lock />}
-                  {key === "contacts" && <Icons.Info />}
-                  {key === "addresses" && <Icons.Globe />}
-                  {key === "devices" && <Icons.Agents />}
-                  {key === "sectors" && <Icons.Explore />}
-                </span>
-                <span className="text-[13px] font-semibold">{label}</span>
+      {activeSection === "menu" ? (
+        /* ================= MAIN MENU VIEW (Exactly like iOS Settings) ================= */
+        <div className="mx-auto max-w-md px-4 space-y-6 pt-5 animate-in fade-in slide-in-from-bottom-4 duration-500">
+          
+          {/* Profile Header Card */}
+          <div className={`${cardCls} p-4 flex items-center gap-4`}>
+            <div className="relative h-[68px] w-[68px] shrink-0 overflow-hidden rounded-full border-2 border-white shadow-sm bg-gray-100">
+              {form.profile_photo_url ? (
+                <img src={form.profile_photo_url} alt="Profile" className="h-full w-full object-cover" />
+              ) : (
+                <div className="flex h-full w-full items-center justify-center text-2xl font-semibold text-gray-400">
+                  {displayName.charAt(0).toUpperCase()}
+                </div>
+              )}
+            </div>
+            <div className="min-w-0 flex-1">
+              <h2 className="text-[17px] font-semibold text-gray-900 truncate leading-tight tracking-tight">{displayName}</h2>
+              <p className="text-[13px] text-gray-500 truncate mt-0.5">{userEmail}</p>
+              <button onClick={() => setActiveSection("profile")} className="mt-1.5 inline-flex items-center gap-1.5 text-[12px] font-medium text-blue-600 hover:text-blue-700 active:scale-95 transition-all duration-200 bg-blue-50 px-3 py-1 rounded-full">
+                <Icons.Edit /> Edit Profile
               </button>
-            ))}
+            </div>
           </div>
-        </div>
 
-        {/* Conditional Rendering of the Active Section */}
-        {activeSection === "profile" ? (
-          <>
-            {/* SECTION: Account details */}
-            <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 delay-200">
-              <h3 className="mb-2 px-4 text-[13px] font-medium text-gray-500 tracking-wide uppercase">Account details</h3>
-              <div className={cardCls}>
-                <div className={listRowCls}>
-                  <div className="flex items-center gap-3"><Icons.User /><span className="text-[15px] font-normal text-gray-900">First Name</span></div>
-                  <input type="text" value={form.first_name ?? ""} onChange={(e) => update("first_name", e.target.value)} className={inputCls} placeholder="Enter first name" />
-                </div>
-                <div className={listRowCls}>
-                  <div className="flex items-center gap-3"><Icons.User /><span className="text-[15px] font-normal text-gray-900">Last Name</span></div>
-                  <input type="text" value={form.last_name ?? ""} onChange={(e) => update("last_name", e.target.value)} className={inputCls} placeholder="Enter last name" />
-                </div>
-                <div className={listRowCls}>
-                  <div className="flex items-center gap-3"><Icons.User /><span className="text-[15px] font-normal text-gray-900">Username</span></div>
-                  <div className="flex flex-col items-end max-w-[60%] w-full">
-                    <input type="text" value={form.username ?? ""} onChange={(e) => update("username", e.target.value)} className={`${inputCls} max-w-full`} placeholder="username" />
-                    {usernameCheck.message && <span className={`text-[10px] mt-0.5 text-right w-full font-medium ${usernameCheck.available ? "text-emerald-600" : "text-rose-500"}`}>{usernameCheck.message}</span>}
+          {/* SECTION: Account details */}
+          <div>
+            <h3 className="mb-2 px-4 text-[13px] font-medium text-gray-500 tracking-wide uppercase">Account details</h3>
+            <div className={cardCls}>
+              <MenuItem icon={<Icons.User />} label="Profile" onClick={() => setActiveSection("profile")} />
+            </div>
+          </div>
+
+          {/* SECTION: Security & Preferences */}
+          <div>
+            <h3 className="mb-2 px-4 text-[13px] font-medium text-gray-500 tracking-wide uppercase">Security & Preferences</h3>
+            <div className={cardCls}>
+              <MenuItem icon={<Icons.Lock />} label="Security" onClick={() => setActiveSection("security")} />
+              <MenuItem icon={<Icons.Info />} label="Contacts" onClick={() => setActiveSection("contacts")} />
+              <MenuItem icon={<Icons.Globe />} label="Addresses" onClick={() => setActiveSection("addresses")} />
+            </div>
+          </div>
+
+          {/* SECTION: General */}
+          <div>
+            <h3 className="mb-2 px-4 text-[13px] font-medium text-gray-500 tracking-wide uppercase">General</h3>
+            <div className={cardCls}>
+              <MenuItem icon={<Icons.Agents />} label="Devices" onClick={() => setActiveSection("devices")} />
+              <MenuItem icon={<Icons.Explore />} label="Sectors" onClick={() => setActiveSection("sectors")} />
+            </div>
+          </div>
+
+          {/* SECTION: Support */}
+          <div>
+            <h3 className="mb-2 px-4 text-[13px] font-medium text-gray-500 tracking-wide uppercase">Support</h3>
+            <div className={cardCls}>
+              <MenuItem icon={<Icons.Help />} label="Help Center" onClick={() => {}} />
+              <MenuItem icon={<Icons.Lock />} label="Log Out" onClick={handleLogout} isDestructive />
+            </div>
+          </div>
+
+        </div>
+      ) : (
+        /* ================= SUB-SECTION VIEWS ================= */
+        <div className="mx-auto max-w-6xl px-3 pt-4 sm:px-5">
+          {activeSection === "profile" && (
+            <form onSubmit={handleSubmit} className="mx-auto max-w-md px-4 space-y-7 pt-2">
+              {message && (
+                <div className={`rounded-[14px] px-4 py-3.5 text-[13px] font-medium animate-in fade-in slide-in-from-top-4 duration-500 ${message.type === "success" ? "bg-emerald-50 text-emerald-700 border border-emerald-100" : "bg-rose-50 text-rose-700 border border-rose-100"}`}>{message.text}</div>
+              )}
+
+              <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 delay-100">
+                <h3 className="mb-2 px-4 text-[13px] font-medium text-gray-500 tracking-wide uppercase">Account details</h3>
+                <div className={cardCls}>
+                  <div className={listRowCls}>
+                    <div className="flex items-center gap-3"><Icons.User /><span className="text-[15px] font-normal text-gray-900">First Name</span></div>
+                    <input type="text" value={form.first_name ?? ""} onChange={(e) => update("first_name", e.target.value)} className={inputCls} placeholder="Enter first name" />
+                  </div>
+                  <div className={listRowCls}>
+                    <div className="flex items-center gap-3"><Icons.User /><span className="text-[15px] font-normal text-gray-900">Last Name</span></div>
+                    <input type="text" value={form.last_name ?? ""} onChange={(e) => update("last_name", e.target.value)} className={inputCls} placeholder="Enter last name" />
+                  </div>
+                  <div className={listRowCls}>
+                    <div className="flex items-center gap-3"><Icons.User /><span className="text-[15px] font-normal text-gray-900">Username</span></div>
+                    <div className="flex flex-col items-end max-w-[60%] w-full">
+                      <input type="text" value={form.username ?? ""} onChange={(e) => update("username", e.target.value)} className={`${inputCls} max-w-full`} placeholder="username" />
+                      {usernameCheck.message && <span className={`text-[10px] mt-0.5 text-right w-full font-medium ${usernameCheck.available ? "text-emerald-600" : "text-rose-500"}`}>{usernameCheck.message}</span>}
+                    </div>
+                  </div>
+                  <div className={listRowCls}>
+                    <div className="flex items-center gap-3"><Icons.User /><span className="text-[15px] font-normal text-gray-900">Gender</span></div>
+                    <select value={form.gender ?? ""} onChange={(e) => update("gender", e.target.value || null)} className={`${inputCls} appearance-none`}>
+                      <option value="">Not specified</option><option value="male">Male</option><option value="female">Female</option><option value="non_binary">Non-binary</option><option value="prefer_not_to_say">Prefer not to say</option><option value="other">Other</option>
+                    </select>
+                  </div>
+                  <div className={listRowCls}>
+                    <div className="flex items-center gap-3"><Icons.Calendar /><span className="text-[15px] font-normal text-gray-900">Date of Birth</span></div>
+                    <input type="date" value={form.date_of_birth ?? ""} onChange={(e) => update("date_of_birth", e.target.value)} className={inputCls} />
                   </div>
                 </div>
-                <div className={listRowCls}>
-                  <div className="flex items-center gap-3"><Icons.User /><span className="text-[15px] font-normal text-gray-900">Gender</span></div>
-                  <select value={form.gender ?? ""} onChange={(e) => update("gender", e.target.value || null)} className={`${inputCls} appearance-none`}>
-                    <option value="">Not specified</option><option value="male">Male</option><option value="female">Female</option><option value="non_binary">Non-binary</option><option value="prefer_not_to_say">Prefer not to say</option><option value="other">Other</option>
-                  </select>
-                </div>
-                <div className={listRowCls}>
-                  <div className="flex items-center gap-3"><Icons.Calendar /><span className="text-[15px] font-normal text-gray-900">Date of Birth</span></div>
-                  <input type="date" value={form.date_of_birth ?? ""} onChange={(e) => update("date_of_birth", e.target.value)} className={inputCls} />
+              </div>
+
+              <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 delay-200">
+                <h3 className="mb-2 px-4 text-[13px] font-medium text-gray-500 tracking-wide uppercase">Preferences</h3>
+                <div className={cardCls}>
+                  <div className={listRowCls}><div className="flex items-center gap-3"><Icons.Globe /><span className="text-[15px] font-normal text-gray-900">Language</span></div><input type="text" value={form.preferred_language ?? ""} onChange={(e) => update("preferred_language", e.target.value)} className={inputCls} placeholder="English" /></div>
+                  <div className={listRowCls}><div className="flex items-center gap-3"><Icons.Globe /><span className="text-[15px] font-normal text-gray-900">Timezone</span></div><input type="text" value={form.timezone ?? ""} onChange={(e) => update("timezone", e.target.value)} className={inputCls} placeholder="UTC" /></div>
+                  <div className={listRowCls}><div className="flex items-center gap-3"><Icons.Info /><span className="text-[15px] font-normal text-gray-900">Currency</span></div><input type="text" value={form.currency ?? ""} onChange={(e) => update("currency", e.target.value)} className={inputCls} placeholder="USD" /></div>
+                  <div className={listRowCls}><div className="flex items-center gap-3"><Icons.Sun /><span className="text-[15px] font-normal text-gray-900">Light/Dark Mode</span></div><select value={form.time_format ?? "24h"} onChange={(e) => update("time_format", e.target.value)} className={`${inputCls} appearance-none`}><option value="24h">24-hour</option><option value="12h">12-hour</option></select></div>
                 </div>
               </div>
-            </div>
 
-            {/* SECTION: Preferences */}
-            <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 delay-300">
-              <h3 className="mb-2 px-4 text-[13px] font-medium text-gray-500 tracking-wide uppercase">Preferences</h3>
-              <div className={cardCls}>
-                <div className={listRowCls}><div className="flex items-center gap-3"><Icons.Globe /><span className="text-[15px] font-normal text-gray-900">Language</span></div><input type="text" value={form.preferred_language ?? ""} onChange={(e) => update("preferred_language", e.target.value)} className={inputCls} placeholder="English" /></div>
-                <div className={listRowCls}><div className="flex items-center gap-3"><Icons.Globe /><span className="text-[15px] font-normal text-gray-900">Timezone</span></div><input type="text" value={form.timezone ?? ""} onChange={(e) => update("timezone", e.target.value)} className={inputCls} placeholder="UTC" /></div>
-                <div className={listRowCls}><div className="flex items-center gap-3"><Icons.Info /><span className="text-[15px] font-normal text-gray-900">Currency</span></div><input type="text" value={form.currency ?? ""} onChange={(e) => update("currency", e.target.value)} className={inputCls} placeholder="USD" /></div>
-                <div className={listRowCls}>
-                  <div className="flex items-center gap-3"><Icons.Sun /><span className="text-[15px] font-normal text-gray-900">Light/Dark Mode</span></div>
-                  <select value={form.time_format ?? "24h"} onChange={(e) => update("time_format", e.target.value)} className={`${inputCls} appearance-none`}><option value="24h">24-hour</option><option value="12h">12-hour</option></select>
+              <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 delay-300">
+                <h3 className="mb-2 px-4 text-[13px] font-medium text-gray-500 tracking-wide uppercase">Notifications</h3>
+                <div className={cardCls}>
+                  <div className={listRowCls}>
+                    <div className="flex items-center gap-3"><Icons.Bell /><span className="text-[15px] font-normal text-gray-900">Marketing Emails</span></div>
+                    <label className="relative inline-flex cursor-pointer items-center"><input type="checkbox" checked={!!form.marketing_email} onChange={(e) => update("marketing_email", e.target.checked)} className="peer sr-only" /><div className="h-[31px] w-[51px] rounded-full bg-gray-200 peer-checked:bg-black transition-colors duration-300"></div><div className="absolute left-[2px] top-[2px] h-[27px] w-[27px] rounded-full bg-white shadow-md transition-transform duration-300 ease-[cubic-bezier(0.175,0.885,0.32,1.275)] peer-checked:translate-x-[20px]"></div></label>
+                  </div>
+                  <div className={listRowCls}>
+                    <div className="flex items-center gap-3"><Icons.Bell /><span className="text-[15px] font-normal text-gray-900">Push Notifications</span></div>
+                    <label className="relative inline-flex cursor-pointer items-center"><input type="checkbox" checked={!!form.push_notifications} onChange={(e) => update("push_notifications", e.target.checked)} className="peer sr-only" /><div className="h-[31px] w-[51px] rounded-full bg-gray-200 peer-checked:bg-black transition-colors duration-300"></div><div className="absolute left-[2px] top-[2px] h-[27px] w-[27px] rounded-full bg-white shadow-md transition-transform duration-300 ease-[cubic-bezier(0.175,0.885,0.32,1.275)] peer-checked:translate-x-[20px]"></div></label>
+                  </div>
+                  <div className={listRowCls}>
+                    <div className="flex items-center gap-3"><Icons.Lock /><span className="text-[15px] font-normal text-gray-900">Security Alerts</span></div>
+                    <label className="relative inline-flex cursor-pointer items-center"><input type="checkbox" checked={!!form.security_notifications} onChange={(e) => update("security_notifications", e.target.checked)} className="peer sr-only" /><div className="h-[31px] w-[51px] rounded-full bg-gray-200 peer-checked:bg-black transition-colors duration-300"></div><div className="absolute left-[2px] top-[2px] h-[27px] w-[27px] rounded-full bg-white shadow-md transition-transform duration-300 ease-[cubic-bezier(0.175,0.885,0.32,1.275)] peer-checked:translate-x-[20px]"></div></label>
+                  </div>
                 </div>
               </div>
-            </div>
 
-            {/* SECTION: Notifications (Toggles) */}
-            <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 delay-400">
-              <h3 className="mb-2 px-4 text-[13px] font-medium text-gray-500 tracking-wide uppercase">Notifications</h3>
-              <div className={cardCls}>
-                <div className={listRowCls}>
-                  <div className="flex items-center gap-3"><Icons.Bell /><span className="text-[15px] font-normal text-gray-900">Marketing Emails</span></div>
-                  <label className="relative inline-flex cursor-pointer items-center">
-                    <input type="checkbox" checked={!!form.marketing_email} onChange={(e) => update("marketing_email", e.target.checked)} className="peer sr-only" />
-                    <div className="h-[31px] w-[51px] rounded-full bg-gray-200 peer-checked:bg-black transition-colors duration-300"></div>
-                    <div className="absolute left-[2px] top-[2px] h-[27px] w-[27px] rounded-full bg-white shadow-md transition-transform duration-300 ease-[cubic-bezier(0.175,0.885,0.32,1.275)] peer-checked:translate-x-[20px]"></div>
-                  </label>
-                </div>
-                <div className={listRowCls}>
-                  <div className="flex items-center gap-3"><Icons.Bell /><span className="text-[15px] font-normal text-gray-900">Push Notifications</span></div>
-                  <label className="relative inline-flex cursor-pointer items-center">
-                    <input type="checkbox" checked={!!form.push_notifications} onChange={(e) => update("push_notifications", e.target.checked)} className="peer sr-only" />
-                    <div className="h-[31px] w-[51px] rounded-full bg-gray-200 peer-checked:bg-black transition-colors duration-300"></div>
-                    <div className="absolute left-[2px] top-[2px] h-[27px] w-[27px] rounded-full bg-white shadow-md transition-transform duration-300 ease-[cubic-bezier(0.175,0.885,0.32,1.275)] peer-checked:translate-x-[20px]"></div>
-                  </label>
-                </div>
-                <div className={listRowCls}>
-                  <div className="flex items-center gap-3"><Icons.Lock /><span className="text-[15px] font-normal text-gray-900">Security Alerts</span></div>
-                  <label className="relative inline-flex cursor-pointer items-center">
-                    <input type="checkbox" checked={!!form.security_notifications} onChange={(e) => update("security_notifications", e.target.checked)} className="peer sr-only" />
-                    <div className="h-[31px] w-[51px] rounded-full bg-gray-200 peer-checked:bg-black transition-colors duration-300"></div>
-                    <div className="absolute left-[2px] top-[2px] h-[27px] w-[27px] rounded-full bg-white shadow-md transition-transform duration-300 ease-[cubic-bezier(0.175,0.885,0.32,1.275)] peer-checked:translate-x-[20px]"></div>
-                  </label>
+              <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 delay-400">
+                <h3 className="mb-2 px-4 text-[13px] font-medium text-gray-500 tracking-wide uppercase">Support</h3>
+                <div className={cardCls}>
+                  <div className={listRowCls}><div className="flex items-center gap-3"><Icons.Help /><span className="text-[15px] font-normal text-gray-900">Recovery Email</span></div><input type="email" value={form.recovery_email ?? ""} onChange={(e) => update("recovery_email", e.target.value)} className={inputCls} placeholder="backup@example.com" /></div>
+                  <div className={listRowCls}><div className="flex items-center gap-3"><Icons.Info /><span className="text-[15px] font-normal text-gray-900">Help Center</span></div><Icons.Chevron /></div>
                 </div>
               </div>
-            </div>
 
-            {/* SECTION: Support */}
-            <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 delay-500">
-              <h3 className="mb-2 px-4 text-[13px] font-medium text-gray-500 tracking-wide uppercase">Support</h3>
-              <div className={cardCls}>
-                <div className={listRowCls}><div className="flex items-center gap-3"><Icons.Help /><span className="text-[15px] font-normal text-gray-900">Recovery Email</span></div><input type="email" value={form.recovery_email ?? ""} onChange={(e) => update("recovery_email", e.target.value)} className={inputCls} placeholder="backup@example.com" /></div>
-                <div className={listRowCls}><div className="flex items-center gap-3"><Icons.Info /><span className="text-[15px] font-normal text-gray-900">Help Center</span></div><Icons.Chevron /></div>
+              <div className="pt-2 pb-6 animate-in fade-in slide-in-from-bottom-4 duration-500 delay-500">
+                <button type="submit" disabled={saving} className="w-full rounded-[16px] bg-black py-4 text-[15px] font-semibold text-white transition-all duration-300 hover:bg-gray-800 active:scale-[0.97] disabled:opacity-50 shadow-lg shadow-black/10 flex items-center justify-center gap-2">
+                  {saving ? (<><svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>Saving...</>) : ("Save Changes")}
+                </button>
               </div>
-            </div>
+            </form>
+          )}
 
-            {/* Save Button */}
-            <div className="pt-2 pb-6 animate-in fade-in slide-in-from-bottom-4 duration-500 delay-500">
-              <button type="submit" disabled={saving} className="w-full rounded-[16px] bg-black py-4 text-[15px] font-semibold text-white transition-all duration-300 hover:bg-gray-800 active:scale-[0.97] disabled:opacity-50 shadow-lg shadow-black/10 flex items-center justify-center gap-2">
-                {saving ? (<><svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>Saving...</>) : ("Save Changes")}
-              </button>
-            </div>
-          </>
-        ) : (
-          <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 pt-2">
-            {activeSection === "security" && <SecuritySection />}
-            {activeSection === "contacts" && <ContactsSection />}
-            {activeSection === "addresses" && <AddressesSection />}
-            {activeSection === "devices" && <DevicesSection />}
-            {activeSection === "sectors" && <SectorsSection />}
-          </div>
-        )}
-      </form>
+          {activeSection === "security" && <SecuritySection />}
+          {activeSection === "contacts" && <ContactsSection />}
+          {activeSection === "addresses" && <AddressesSection />}
+          {activeSection === "devices" && <DevicesSection />}
+          {activeSection === "sectors" && <SectorsSection />}
+        </div>
+      )}
 
       {/* Bottom Navigation Bar (Strictly Matching Image 2) */}
       <div className="fixed bottom-0 left-0 right-0 z-50 border-t border-gray-100 bg-white/80 backdrop-blur-xl pb-safe pt-2 shadow-[0_-4px_20px_rgba(0,0,0,0.03)]">
