@@ -82,20 +82,11 @@ const Icons = {
   Chevron: () => (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="w-[15px] h-[15px] text-gray-300"><path d="m9 18 6-6-6-6"/></svg>
   ),
-  Home: () => (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-[22px] h-[22px]"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-  ),
   Explore: () => (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-[22px] h-[22px]"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
-  ),
-  Heart: () => (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-[22px] h-[22px]"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-[17px] h-[17px]"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
   ),
   Agents: () => (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-[22px] h-[22px]"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-  ),
-  Profile: () => (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-[22px] h-[22px]"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-[17px] h-[17px]"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
   ),
   Edit: () => (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-3.5 h-3.5"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>
@@ -103,10 +94,10 @@ const Icons = {
 };
 
 /* ================================================================== */
-/*  SHARED STYLES — Liquid Glass on Pure White                         */
+/*  SHARED STYLES — Pure White Background                              */
 /* ================================================================== */
-const cardCls = "bg-white/70 backdrop-blur-xl rounded-[18px] overflow-hidden border border-white/60 shadow-[0_4px_24px_rgba(0,0,0,0.04)] transition-all duration-300";
-const listRowCls = "group flex items-center justify-between px-4 py-3.5 border-b border-gray-100/50 last:border-0 active:bg-gray-50/40 transition-colors duration-200 cursor-pointer";
+const cardCls = "bg-white rounded-[18px] overflow-hidden border border-gray-100 shadow-[0_2px_10px_rgba(0,0,0,0.03)] transition-all duration-300";
+const listRowCls = "group flex items-center justify-between px-4 py-3.5 border-b border-gray-100 last:border-0 active:bg-gray-50 transition-colors duration-200 cursor-pointer";
 const inputCls = "text-right bg-transparent border-none outline-none text-[15px] font-medium text-gray-900 placeholder-gray-400 w-full max-w-[60%] focus:ring-0 transition-colors";
 
 /* ================================================================== */
@@ -114,9 +105,9 @@ const inputCls = "text-right bg-transparent border-none outline-none text-[15px]
 /* ================================================================== */
 function MenuItem({ icon, label, onClick, isDestructive = false }: { icon: React.ReactNode; label: string; onClick: () => void; isDestructive?: boolean }) {
   return (
-    <button onClick={onClick} className="flex items-center justify-between w-full px-4 py-3.5 bg-white/60 border-b border-gray-100/50 last:border-0 active:bg-gray-50/60 transition-colors duration-200 text-left">
+    <button onClick={onClick} className="flex items-center justify-between w-full px-4 py-3.5 bg-white border-b border-gray-100 last:border-0 active:bg-gray-50 transition-colors duration-200 text-left">
       <div className="flex items-center gap-3.5">
-        <span className={`flex items-center justify-center w-[30px] h-[30px] rounded-[8px] ${isDestructive ? "bg-rose-50 text-rose-600" : "bg-gray-100/80 text-gray-700"}`}>
+        <span className={`flex items-center justify-center w-[30px] h-[30px] rounded-[8px] ${isDestructive ? "bg-rose-50 text-rose-600" : "bg-gray-100 text-gray-700"}`}>
           {icon}
         </span>
         <span className={`text-[15px] font-medium ${isDestructive ? "text-rose-600" : "text-gray-900"}`}>{label}</span>
@@ -186,11 +177,11 @@ function AddressesSection() {
           )}
         </div>
 
-        {message && <div className={`rounded-[16px] px-4 py-3.5 text-[13px] font-medium animate-in fade-in slide-in-from-top-4 duration-500 backdrop-blur-md mb-5 ${message.type === "success" ? "bg-emerald-50/80 text-emerald-700 border border-emerald-100/80" : "bg-rose-50/80 text-rose-700 border border-rose-100/80"}`}>{message.text}</div>}
+        {message && <div className={`rounded-[16px] px-4 py-3.5 text-[13px] font-medium animate-in fade-in slide-in-from-top-4 duration-500 mb-5 ${message.type === "success" ? "bg-emerald-50 text-emerald-700 border border-emerald-100" : "bg-rose-50 text-rose-700 border border-rose-100"}`}>{message.text}</div>}
 
         {!loading && addresses.length === 0 && !showForm && (
-          <div className="relative overflow-hidden rounded-3xl border border-white/60 bg-white/70 backdrop-blur-xl p-12 text-center shadow-sm">
-            <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-3xl border border-white/60 bg-white/80 shadow-sm">
+          <div className="relative overflow-hidden rounded-3xl border border-gray-100 bg-white p-12 text-center shadow-sm">
+            <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-3xl border border-gray-100 bg-gray-50 shadow-sm">
               <Image src="/icons/location.svg" alt="" width={32} height={32} className="opacity-60" />
             </div>
             <h2 className="mb-3 text-xl font-semibold text-gray-900">No addresses yet</h2>
@@ -205,10 +196,10 @@ function AddressesSection() {
         {!loading && addresses.length > 0 && (
           <div className="space-y-4">
             {addresses.map((a, i) => (
-              <article key={a.id} className="group relative overflow-hidden rounded-3xl border border-white/60 bg-white/70 backdrop-blur-xl p-6 transition-all duration-500 hover:-translate-y-0.5 hover:shadow-[0_20px_40px_-20px_rgba(0,0,0,0.1)]" style={{ animation: `addr-item-in 0.6s cubic-bezier(0.22, 1, 0.36, 1) ${0.15 + i * 0.06}s both` }}>
+              <article key={a.id} className="group relative overflow-hidden rounded-3xl border border-gray-100 bg-white p-6 transition-all duration-500 hover:-translate-y-0.5 hover:shadow-[0_20px_40px_-20px_rgba(0,0,0,0.1)]" style={{ animation: `addr-item-in 0.6s cubic-bezier(0.22, 1, 0.36, 1) ${0.15 + i * 0.06}s both` }}>
                 <div className="relative mb-4 flex items-start justify-between gap-3">
                   <div className="flex flex-wrap items-center gap-2">
-                    <span className="inline-flex items-center gap-1.5 rounded-full border border-gray-200/70 bg-white/80 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-gray-600">{TYPE_LABEL[a.address_type] ?? a.address_type}</span>
+                    <span className="inline-flex items-center gap-1.5 rounded-full border border-gray-200 bg-gray-50 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-gray-600">{TYPE_LABEL[a.address_type] ?? a.address_type}</span>
                     {a.is_primary && <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-emerald-700"><span className="h-1.5 w-1.5 rounded-full bg-emerald-500" /> Primary</span>}
                   </div>
                   <div className="flex gap-1 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
@@ -217,7 +208,7 @@ function AddressesSection() {
                   </div>
                 </div>
                 <div className="relative flex items-start gap-4">
-                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-white/60 bg-white/80"><Image src="/icons/location.svg" alt="" width={18} height={18} className="opacity-60" /></div>
+                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-gray-100 bg-gray-50"><Image src="/icons/location.svg" alt="" width={18} height={18} className="opacity-60" /></div>
                   <div className="min-w-0 flex-1">
                     <p className="mb-1 text-[14px] font-semibold leading-snug text-gray-900">{a.address_line_1}{a.address_line_2 && <span className="font-normal text-gray-500">, {a.address_line_2}</span>}</p>
                     {(a.city || a.state_province || a.postal_code || a.country_code) && <p className="text-[12.5px] leading-relaxed text-gray-500">{[a.city, a.state_province, a.postal_code, a.country_code].filter(Boolean).join(", ")}</p>}
@@ -231,8 +222,8 @@ function AddressesSection() {
         {showForm && (
           <div className="fixed inset-0 z-50 flex items-end justify-center p-0 sm:items-center sm:p-6 animate-in fade-in duration-300">
             <div className="absolute inset-0 bg-black/40 backdrop-blur-md" onClick={cancel} />
-            <div className="relative w-full max-h-[92vh] overflow-y-auto rounded-t-[28px] border border-white/60 bg-white/90 backdrop-blur-2xl sm:max-w-xl sm:rounded-3xl shadow-2xl animate-in slide-in-from-bottom-4 duration-500">
-              <div className="sticky top-0 z-10 flex items-center justify-between border-b border-gray-100 px-6 py-4 bg-white/80 backdrop-blur-xl">
+            <div className="relative w-full max-h-[92vh] overflow-y-auto rounded-t-[28px] border border-gray-100 bg-white sm:max-w-xl sm:rounded-3xl shadow-2xl animate-in slide-in-from-bottom-4 duration-500">
+              <div className="sticky top-0 z-10 flex items-center justify-between border-b border-gray-100 px-6 py-4 bg-white">
                 <div><h2 className="text-[16px] font-semibold text-gray-900">{editingId ? "Edit address" : "New address"}</h2><p className="mt-0.5 text-[11.5px] text-gray-500">{editingId ? "Update your saved location" : "Save a new location to your account"}</p></div>
                 <button onClick={cancel} className="flex h-9 w-9 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-500 hover:bg-gray-50 hover:text-black transition-all"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="h-4 w-4"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg></button>
               </div>
@@ -242,7 +233,7 @@ function AddressesSection() {
                 <Field label="Address line 2" span><input type="text" value={form.address_line_2 ?? ""} onChange={(e) => update("address_line_2", e.target.value)} className={modalInputCls} placeholder="Apartment, suite, etc. (optional)" /></Field>
                 <div className="grid grid-cols-2 gap-4"><Field label="City"><input type="text" value={form.city ?? ""} onChange={(e) => update("city", e.target.value)} className={modalInputCls} /></Field><Field label="State / Province"><input type="text" value={form.state_province ?? ""} onChange={(e) => update("state_province", e.target.value)} className={modalInputCls} /></Field></div>
                 <div className="grid grid-cols-2 gap-4"><Field label="District"><input type="text" value={form.district ?? ""} onChange={(e) => update("district", e.target.value)} className={modalInputCls} /></Field><Field label="Postal code"><input type="text" value={form.postal_code ?? ""} onChange={(e) => update("postal_code", e.target.value)} className={modalInputCls} /></Field></div>
-                <label className="flex cursor-pointer items-center justify-between gap-3 rounded-2xl border border-white/60 bg-white/60 p-4 backdrop-blur-md transition-colors duration-300 hover:bg-white">
+                <label className="flex cursor-pointer items-center justify-between gap-3 rounded-2xl border border-gray-100 bg-gray-50 p-4 transition-colors duration-300 hover:bg-white">
                   <div><div className="text-[13.5px] font-semibold text-gray-900">Set as primary</div><div className="mt-0.5 text-[11.5px] text-gray-500">Used by default when sharing your address</div></div>
                   <div className="relative shrink-0"><input type="checkbox" checked={!!form.is_primary} onChange={(e) => update("is_primary", e.target.checked)} className="peer sr-only" /><div className="h-[31px] w-[51px] rounded-full bg-gray-200 peer-checked:bg-black transition-colors duration-300"></div><div className="absolute left-[2px] top-[2px] h-[27px] w-[27px] rounded-full bg-white shadow-md transition-transform duration-300 peer-checked:translate-x-[20px]"></div></div>
                 </label>
@@ -312,15 +303,15 @@ function ContactsSection() {
           {!showForm && contacts.length > 0 && <button onClick={openNew} className="group relative inline-flex items-center gap-2 overflow-hidden rounded-full border border-black bg-black px-4 py-2.5 text-[12.5px] font-medium text-white transition-all duration-500 hover:-translate-y-0.5 shadow-lg shadow-black/10"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" className="relative h-4 w-4 transition-transform duration-500 group-hover:rotate-90"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg><span className="relative">Add contact</span></button>}
         </div>
 
-        {message && <div className={`rounded-[16px] px-4 py-3.5 text-[13px] font-medium animate-in fade-in slide-in-from-top-4 duration-500 backdrop-blur-md mb-5 ${message.type === "success" ? "bg-emerald-50/80 text-emerald-700 border border-emerald-100/80" : "bg-rose-50/80 text-rose-700 border border-rose-100/80"}`}>{message.text}</div>}
+        {message && <div className={`rounded-[16px] px-4 py-3.5 text-[13px] font-medium animate-in fade-in slide-in-from-top-4 duration-500 mb-5 ${message.type === "success" ? "bg-emerald-50 text-emerald-700 border border-emerald-100" : "bg-rose-50 text-rose-700 border border-rose-100"}`}>{message.text}</div>}
 
         {showForm && (
-          <form onSubmit={handleSubmit} className="relative overflow-hidden rounded-3xl border border-white/60 bg-white/70 backdrop-blur-xl p-6 sm:p-7 shadow-sm animate-in fade-in slide-in-from-bottom-4 duration-500 mb-6">
+          <form onSubmit={handleSubmit} className="relative overflow-hidden rounded-3xl border border-gray-100 bg-white p-6 sm:p-7 shadow-sm animate-in fade-in slide-in-from-bottom-4 duration-500 mb-6">
             <h3 className="mb-4 text-[10px] font-semibold uppercase tracking-[0.18em] text-gray-500">{editingId ? "Edit contact" : "New contact"}</h3>
             <div className="space-y-4">
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2"><Field label="Type"><select value={form.contact_type ?? "website"} onChange={(e) => update("contact_type", e.target.value)} className={modalInputCls}><option value="website">Website</option><option value="social">Social</option><option value="messenger">Messenger</option><option value="other">Other</option></select></Field><Field label="Label"><input type="text" value={form.label ?? ""} onChange={(e) => update("label", e.target.value)} className={modalInputCls} placeholder="e.g. Personal" /></Field></div>
               <Field label="Contact value"><input type="text" required value={form.contact_value ?? ""} onChange={(e) => update("contact_value", e.target.value)} className={modalInputCls} placeholder="https://example.com or @username" /></Field>
-              <label className="flex cursor-pointer items-center justify-between gap-3 rounded-2xl border border-white/60 bg-white/60 p-4 backdrop-blur-md transition-colors duration-300 hover:bg-white">
+              <label className="flex cursor-pointer items-center justify-between gap-3 rounded-2xl border border-gray-100 bg-gray-50 p-4 transition-colors duration-300 hover:bg-white">
                 <div><div className="text-[13.5px] font-semibold text-gray-900">Set as primary</div><div className="mt-0.5 text-[11.5px] text-gray-500">Used by default when sharing this contact</div></div>
                 <div className="relative shrink-0"><input type="checkbox" checked={!!form.is_primary} onChange={(e) => update("is_primary", e.target.checked)} className="peer sr-only" /><div className="h-[31px] w-[51px] rounded-full bg-gray-200 peer-checked:bg-black transition-colors duration-300"></div><div className="absolute left-[2px] top-[2px] h-[27px] w-[27px] rounded-full bg-white shadow-md transition-transform duration-300 peer-checked:translate-x-[20px]"></div></div>
               </label>
@@ -330,8 +321,8 @@ function ContactsSection() {
         )}
 
         {contacts.length === 0 && !showForm && (
-          <div className="relative overflow-hidden rounded-3xl border border-white/60 bg-white/70 backdrop-blur-xl p-12 text-center shadow-sm">
-            <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-3xl border border-white/60 bg-white/80 shadow-sm"><Image src="/icons/id-card.svg" alt="" width={32} height={32} className="opacity-60" /></div>
+          <div className="relative overflow-hidden rounded-3xl border border-gray-100 bg-white p-12 text-center shadow-sm">
+            <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-3xl border border-gray-100 bg-gray-50 shadow-sm"><Image src="/icons/id-card.svg" alt="" width={32} height={32} className="opacity-60" /></div>
             <h2 className="mb-3 text-xl font-semibold text-gray-900">No contacts yet</h2><p className="mx-auto mb-8 max-w-sm text-[13.5px] leading-6 text-gray-500">Add your website, social profiles, and messaging handles so people can reach you.</p>
             <button onClick={openNew} className="inline-flex items-center gap-2 rounded-full border border-black bg-black px-5 py-3 text-[13px] font-medium text-white transition-all duration-500 hover:-translate-y-0.5 shadow-lg shadow-black/10"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" className="h-4 w-4"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>Add your first contact</button>
           </div>
@@ -345,9 +336,9 @@ function ContactsSection() {
                 const icon = TYPE_ICON[c.contact_type] ?? "/icons/link.svg";
                 const typeLabel = TYPE_LABEL[c.contact_type] ?? c.contact_type;
                 return (
-                  <article key={c.id} className="group relative overflow-hidden rounded-3xl border border-white/60 bg-white/70 backdrop-blur-xl p-5 transition-all duration-500 hover:-translate-y-0.5 hover:shadow-[0_20px_40px_-20px_rgba(0,0,0,0.1)]" style={{ animation: `addr-item-in 0.6s cubic-bezier(0.22, 1, 0.36, 1) ${0.15 + i * 0.06}s both` }}>
+                  <article key={c.id} className="group relative overflow-hidden rounded-3xl border border-gray-100 bg-white p-5 transition-all duration-500 hover:-translate-y-0.5 hover:shadow-[0_20px_40px_-20px_rgba(0,0,0,0.1)]" style={{ animation: `addr-item-in 0.6s cubic-bezier(0.22, 1, 0.36, 1) ${0.15 + i * 0.06}s both` }}>
                     <div className="relative mb-4 flex items-start justify-between gap-3">
-                      <div className="flex items-center gap-3"><span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl border border-white/60 bg-white/80"><Image src={icon} alt="" width={18} height={18} className="opacity-60" /></span><div className="flex flex-col"><span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-gray-500">{typeLabel}</span>{c.label && <span className="mt-0.5 text-[11.5px] text-gray-500">{c.label}</span>}</div></div>
+                      <div className="flex items-center gap-3"><span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl border border-gray-100 bg-gray-50"><Image src={icon} alt="" width={18} height={18} className="opacity-60" /></span><div className="flex flex-col"><span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-gray-500">{typeLabel}</span>{c.label && <span className="mt-0.5 text-[11.5px] text-gray-500">{c.label}</span>}</div></div>
                       <div className="flex shrink-0 flex-wrap items-center justify-end gap-1.5">{c.is_primary && <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-emerald-700"><span className="h-1.5 w-1.5 rounded-full bg-emerald-500" /> Primary</span>}{c.is_verified && <span className="inline-flex items-center gap-1 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-emerald-700"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="h-2.5 w-2.5"><path d="M20 6 9 17l-5-5" /></svg> Verified</span>}</div>
                     </div>
                     <p className="relative mb-4 truncate text-[14.5px] font-semibold text-gray-900" title={c.contact_value}>{c.contact_value}</p>
@@ -410,16 +401,16 @@ function DevicesSection() {
   return (
     <div className="max-w-3xl mx-auto space-y-6">
       <div className="mb-6"><h1 className="text-2xl font-bold text-gray-900 mb-2">Devices</h1><p className="text-sm text-gray-500">Devices that have accessed your Binzeo ID account</p></div>
-      {message && <div className={`rounded-[16px] px-4 py-3.5 text-[13px] font-medium animate-in fade-in slide-in-from-top-4 duration-500 backdrop-blur-md ${message.type === "success" ? "bg-emerald-50/80 text-emerald-700 border border-emerald-100/80" : "bg-rose-50/80 text-rose-700 border border-rose-100/80"}`}>{message.text}</div>}
+      {message && <div className={`rounded-[16px] px-4 py-3.5 text-[13px] font-medium animate-in fade-in slide-in-from-top-4 duration-500 ${message.type === "success" ? "bg-emerald-50 text-emerald-700 border border-emerald-100" : "bg-rose-50 text-rose-700 border border-rose-100"}`}>{message.text}</div>}
       {devices.length === 0 ? (
-        <div className="p-12 rounded-3xl border border-white/60 bg-white/70 backdrop-blur-xl text-center shadow-sm"><Image src="/icons/device.svg" alt="" width={40} height={40} className="opacity-40 mx-auto mb-4" /><p className="text-gray-500 text-sm">No devices recorded yet.</p></div>
+        <div className="p-12 rounded-3xl border border-gray-100 bg-white text-center shadow-sm"><Image src="/icons/device.svg" alt="" width={40} height={40} className="opacity-40 mx-auto mb-4" /><p className="text-gray-500 text-sm">No devices recorded yet.</p></div>
       ) : (
         <div className="space-y-3">
           {devices.map((d) => (
-            <div key={d.id} className="p-5 rounded-3xl border border-white/60 bg-white/70 backdrop-blur-xl hover:shadow-[0_20px_40px_-20px_rgba(0,0,0,0.1)] transition-all duration-300">
+            <div key={d.id} className="p-5 rounded-3xl border border-gray-100 bg-white hover:shadow-[0_20px_40px_-20px_rgba(0,0,0,0.1)] transition-all duration-300">
               <div className="flex items-start justify-between gap-3 mb-3">
                 <div className="flex items-start gap-3 min-w-0 flex-1">
-                  <div className="w-10 h-10 rounded-xl bg-white/80 border border-white/60 flex items-center justify-center shrink-0"><Image src={d.device_type === "mobile" ? "/icons/mobile.svg" : "/icons/device.svg"} alt={d.device_type ?? "device"} width={24} height={24} className="opacity-60" /></div>
+                  <div className="w-10 h-10 rounded-xl bg-gray-50 border border-gray-100 flex items-center justify-center shrink-0"><Image src={d.device_type === "mobile" ? "/icons/mobile.svg" : "/icons/device.svg"} alt={d.device_type ?? "device"} width={24} height={24} className="opacity-60" /></div>
                   <div className="min-w-0 flex-1">
                     {editingId === d.id ? (
                       <div className="flex items-center gap-2"><input type="text" value={editName} onChange={(e) => setEditName(e.target.value)} className="w-full px-3 py-1.5 rounded-lg border border-gray-200 bg-white text-sm focus:outline-none focus:border-gray-300" autoFocus /><button onClick={() => handleRename(d.id)} disabled={busyId === d.id} className="text-xs text-gray-700 font-medium hover:text-black shrink-0">Save</button><button onClick={() => setEditingId(null)} className="text-xs text-gray-500 hover:text-gray-700 shrink-0">Cancel</button></div>
@@ -431,7 +422,7 @@ function DevicesSection() {
                   </div>
                 </div>
               </div>
-              <div className="flex items-center gap-3 pt-3 border-t border-gray-100/60">
+              <div className="flex items-center gap-3 pt-3 border-t border-gray-100">
                 <button onClick={() => { setEditingId(d.id); setEditName(d.device_name ?? d.device_id); }} className="text-xs text-gray-500 hover:text-gray-900 font-medium transition-colors">Rename</button>
                 <button onClick={() => toggleTrust(d)} disabled={busyId === d.id} className="text-xs text-gray-500 hover:text-gray-900 font-medium transition-colors disabled:opacity-50">{d.is_trusted ? "Untrust" : "Trust"}</button>
                 <div className="flex-1" />
@@ -471,14 +462,14 @@ function SectorsSection() {
   return (
     <div className="max-w-3xl mx-auto space-y-6">
       <div className="mb-6"><h1 className="text-2xl font-bold text-gray-900 mb-2">Sectors</h1><p className="text-sm text-gray-500">Join industry sectors to unlock related features</p></div>
-      {message && <div className={`rounded-[16px] px-4 py-3.5 text-[13px] font-medium animate-in fade-in slide-in-from-top-4 duration-500 backdrop-blur-md ${message.type === "success" ? "bg-emerald-50/80 text-emerald-700 border border-emerald-100/80" : "bg-rose-50/80 text-rose-700 border border-rose-100/80"}`}>{message.text}</div>}
+      {message && <div className={`rounded-[16px] px-4 py-3.5 text-[13px] font-medium animate-in fade-in slide-in-from-top-4 duration-500 ${message.type === "success" ? "bg-emerald-50 text-emerald-700 border border-emerald-100" : "bg-rose-50 text-rose-700 border border-rose-100"}`}>{message.text}</div>}
       {mySectors.length > 0 && (
         <section className="space-y-3">
           <h2 className="text-[10px] font-semibold text-gray-500 uppercase tracking-[0.18em]">My Sectors ({mySectors.length})</h2>
           <div className="space-y-2">
             {mySectors.map((s) => (
-              <div key={s.sector_id} className="p-4 rounded-3xl border border-white/60 bg-white/70 backdrop-blur-xl flex items-center justify-between gap-3 shadow-sm">
-                <div className="min-w-0"><div className="flex items-center gap-2 mb-1"><span className="font-mono text-[10px] text-gray-600 px-1.5 py-0.5 rounded bg-white/80 border border-gray-200">{s.sectors?.sector_code}</span><span className="font-medium text-gray-900 text-sm truncate">{s.sectors?.sector_name}</span></div><div className="text-xs text-gray-500">Status: <span className={s.status === "active" ? "text-emerald-600 font-medium" : "text-gray-500"}>{s.status}</span></div></div>
+              <div key={s.sector_id} className="p-4 rounded-3xl border border-gray-100 bg-white flex items-center justify-between gap-3 shadow-sm">
+                <div className="min-w-0"><div className="flex items-center gap-2 mb-1"><span className="font-mono text-[10px] text-gray-600 px-1.5 py-0.5 rounded bg-gray-100 border border-gray-200">{s.sectors?.sector_code}</span><span className="font-medium text-gray-900 text-sm truncate">{s.sectors?.sector_name}</span></div><div className="text-xs text-gray-500">Status: <span className={s.status === "active" ? "text-emerald-600 font-medium" : "text-gray-500"}>{s.status}</span></div></div>
                 <div className="flex items-center gap-2 shrink-0"><select value={s.status} disabled={busyId === s.sector_id} onChange={(e) => handleStatusChange(s.sector_id, e.target.value)} className="text-xs px-2 py-1 rounded-lg border border-gray-200 bg-white text-gray-900 focus:outline-none"><option value="active">Active</option><option value="paused">Paused</option><option value="inactive">Inactive</option></select><button onClick={() => handleLeave(s.sector_id)} disabled={busyId === s.sector_id} className="text-xs text-rose-500 hover:text-rose-700 font-medium disabled:opacity-50">Leave</button></div>
               </div>
             ))}
@@ -488,14 +479,14 @@ function SectorsSection() {
       <section className="space-y-3">
         <h2 className="text-[10px] font-semibold text-gray-500 uppercase tracking-[0.18em]">Available Sectors</h2>
         {allSectors.length === 0 ? (
-          <div className="p-12 rounded-3xl border border-white/60 bg-white/70 backdrop-blur-xl text-center shadow-sm"><Image src="/icons/building.svg" alt="" width={40} height={40} className="opacity-40 mx-auto mb-4" /><p className="text-gray-500 text-sm">No sectors available right now.</p></div>
+          <div className="p-12 rounded-3xl border border-gray-100 bg-white text-center shadow-sm"><Image src="/icons/building.svg" alt="" width={40} height={40} className="opacity-40 mx-auto mb-4" /><p className="text-gray-500 text-sm">No sectors available right now.</p></div>
         ) : (
           <div className="grid sm:grid-cols-2 gap-3">
             {allSectors.map((s) => {
               const joined = mySectorIds.has(s.id);
               return (
-                <div key={s.id} className="p-5 rounded-3xl border border-white/60 bg-white/70 backdrop-blur-xl hover:shadow-[0_20px_40px_-20px_rgba(0,0,0,0.1)] transition-all duration-300 flex flex-col">
-                  <div className="flex items-start justify-between gap-2 mb-2"><div className="font-mono text-[10px] text-gray-600 px-1.5 py-0.5 rounded bg-white/80 border border-gray-200">{s.sector_code}</div>{joined && <span className="inline-flex items-center gap-1 rounded-full border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-[10px] font-semibold text-emerald-700"><Image src="/icons/check.svg" alt="" width={12} height={12} className="opacity-70" /> Joined</span>}</div>
+                <div key={s.id} className="p-5 rounded-3xl border border-gray-100 bg-white hover:shadow-[0_20px_40px_-20px_rgba(0,0,0,0.1)] transition-all duration-300 flex flex-col">
+                  <div className="flex items-start justify-between gap-2 mb-2"><div className="font-mono text-[10px] text-gray-600 px-1.5 py-0.5 rounded bg-gray-100 border border-gray-200">{s.sector_code}</div>{joined && <span className="inline-flex items-center gap-1 rounded-full border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-[10px] font-semibold text-emerald-700"><Image src="/icons/check.svg" alt="" width={12} height={12} className="opacity-70" /> Joined</span>}</div>
                   <div className="font-semibold text-gray-900 text-sm mb-1">{s.sector_name}</div>
                   {s.description && <p className="text-xs text-gray-500 mb-4 flex-1">{s.description}</p>}
                   <button onClick={() => joined ? handleLeave(s.id) : handleJoin(s.id)} disabled={busyId === s.id} className={`mt-auto w-full py-2.5 rounded-xl text-sm font-medium transition-colors disabled:opacity-60 ${joined ? "border border-gray-200 text-gray-700 hover:bg-gray-50" : "bg-black text-white hover:bg-gray-800"}`}>{busyId === s.id ? "..." : joined ? "Leave" : "Join"}</button>
@@ -523,7 +514,7 @@ function SecuritySection() {
   function SectionHeading({ children }: { children: React.ReactNode }) { return <div className="mb-4 flex items-center gap-3"><span className="whitespace-nowrap text-[10px] font-semibold uppercase tracking-[0.18em] text-gray-500">{children}</span><span aria-hidden="true" className="h-px flex-1 bg-gradient-to-r from-gray-200 to-transparent" /></div>; }
   function StatusPill({ status }: { status: string }) { const map: Record<string, string> = { success: "border-emerald-200 bg-emerald-50 text-emerald-700", verified: "border-emerald-200 bg-emerald-50 text-emerald-700", failed: "border-red-200 bg-red-50 text-red-700", blocked: "border-amber-200 bg-amber-50 text-amber-700", pending: "border-amber-200 bg-amber-50 text-amber-700" }; const cls = map[status] ?? "border-gray-200 bg-gray-50 text-gray-700"; return <span className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] ${cls}`}>{status}</span>; }
   function PrimaryButton({ href, children, icon }: { href?: string; children: React.ReactNode; icon?: React.ReactNode }) { const cls = "group relative inline-flex items-center gap-2 overflow-hidden rounded-full border border-black px-4 py-2.5 text-[12.5px] font-medium transition-all duration-500 hover:-translate-y-0.5 shadow-lg shadow-black/10"; const style: React.CSSProperties = { background: "#0a0a0a", color: "#ffffff" }; const inner = (<><span aria-hidden="true" className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100" style={{ background: "radial-gradient(circle at 30% 30%, rgba(255,255,255,0.2), transparent 60%)" }} />{icon && <span className="relative flex items-center">{icon}</span>}<span className="relative" style={{ color: "#ffffff" }}>{children}</span></>); if (href) return <Link href={href} className={cls} style={style}>{inner}</Link>; return <button type="button" className={cls} style={style}>{inner}</button>; }
-  function EmptyState({ icon, text }: { icon: string; text: string }) { return (<div className="relative overflow-hidden rounded-3xl border border-white/60 bg-white/70 backdrop-blur-xl p-10 text-center shadow-sm"><div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl border border-white/60 bg-white/80 shadow-sm"><Image src={icon} alt="" width={24} height={24} className="opacity-60" /></div><p className="text-[13px] text-gray-500">{text}</p></div>); }
+  function EmptyState({ icon, text }: { icon: string; text: string }) { return (<div className="relative overflow-hidden rounded-3xl border border-gray-100 bg-white p-10 text-center shadow-sm"><div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl border border-gray-100 bg-gray-50 shadow-sm"><Image src={icon} alt="" width={24} height={24} className="opacity-60" /></div><p className="text-[13px] text-gray-500">{text}</p></div>); }
 
   const TABS = [{ id: "logins", label: "Login History" }, { id: "activity", label: "Activity" }, { id: "methods", label: "Auth Methods" }, { id: "verifications", label: "Verifications" }] as const;
   type TabId = (typeof TABS)[number]["id"];
@@ -556,11 +547,11 @@ function SecuritySection() {
         [data-sec-tool] { width: 100% !important; overflow-x: hidden; text-align: left; }
         [data-sec-tool] > * { width: 100% !important; margin-left: 0 !important; margin-right: 0 !important; max-width: 100% !important; }
         [data-sec-tool] > div, [data-sec-tool] > section, [data-sec-tool] > article { background: transparent !important; border: none !important; box-shadow: none !important; padding: 0 !important; border-radius: 0 !important; width: 100% !important; }
-        [data-sec-tool] input:not([type="checkbox"]):not([type="radio"]):not([type="submit"]):not([type="button"]):not([type="hidden"]), [data-sec-tool] select, [data-sec-tool] textarea { width: 100% !important; padding: 12px 14px !important; border-radius: 12px !important; border: 1px solid rgba(0,0,0,0.1) !important; background: rgba(255,255,255,0.8) !important; color: rgba(0,0,0,0.9) !important; font-size: 14px !important; line-height: 1.4 !important; outline: none !important; transition: all 0.3s; }
+        [data-sec-tool] input:not([type="checkbox"]):not([type="radio"]):not([type="submit"]):not([type="button"]):not([type="hidden"]), [data-sec-tool] select, [data-sec-tool] textarea { width: 100% !important; padding: 12px 14px !important; border-radius: 12px !important; border: 1px solid rgba(0,0,0,0.1) !important; background: #fff !important; color: rgba(0,0,0,0.9) !important; font-size: 14px !important; line-height: 1.4 !important; outline: none !important; transition: all 0.3s; }
         [data-sec-tool] input:focus, [data-sec-tool] select:focus, [data-sec-tool] textarea:focus { border-color: rgba(0,0,0,0.3) !important; background: #fff !important; box-shadow: 0 0 0 4px rgba(0,0,0,0.05) !important; }
         [data-sec-tool] label { display: block !important; font-size: 10px !important; font-weight: 600 !important; text-transform: uppercase !important; letter-spacing: 0.16em !important; color: rgba(0,0,0,0.6) !important; margin-bottom: 8px !important; }
-        [data-sec-tool] button:not([type="submit"]):not([data-primary]) { border-radius: 999px !important; border: 1px solid rgba(0,0,0,0.1) !important; background: rgba(255,255,255,0.8) !important; color: rgba(0,0,0,0.75) !important; font-weight: 500 !important; padding: 10px 18px !important; font-size: 12.5px !important; transition: all 0.4s !important; max-width: 100% !important; white-space: normal !important; }
-        [data-sec-tool] button:not([type="submit"]):not([data-primary]):hover { background: #fff !important; border-color: rgba(0,0,0,0.2) !important; color: rgba(0,0,0,0.95) !important; transform: translateY(-2px); }
+        [data-sec-tool] button:not([type="submit"]):not([data-primary]) { border-radius: 999px !important; border: 1px solid rgba(0,0,0,0.1) !important; background: #fff !important; color: rgba(0,0,0,0.75) !important; font-weight: 500 !important; padding: 10px 18px !important; font-size: 12.5px !important; transition: all 0.4s !important; max-width: 100% !important; white-space: normal !important; }
+        [data-sec-tool] button:not([type="submit"]):not([data-primary]):hover { background: #f9fafb !important; border-color: rgba(0,0,0,0.2) !important; color: rgba(0,0,0,0.95) !important; transform: translateY(-2px); }
         [data-sec-tool] button[type="submit"], [data-sec-tool] button[data-primary] { border-radius: 999px !important; border: 1px solid #0a0a0a !important; background: #0a0a0a !important; color: #ffffff !important; font-weight: 500 !important; font-size: 12.5px !important; padding: 12px 22px !important; box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important; transition: all 0.5s !important; cursor: pointer; max-width: 100% !important; white-space: normal !important; }
         [data-sec-tool] button[type="submit"] *, [data-sec-tool] button[data-primary] * { color: #ffffff !important; }
         [data-sec-tool] button[type="submit"]:hover, [data-sec-tool] button[data-primary]:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.15) !important; }
@@ -568,9 +559,9 @@ function SecuritySection() {
         [data-sec-tool] p, [data-sec-tool] small, [data-sec-tool] span { color: rgba(0,0,0,0.65); }
         [data-sec-tool] a { color: rgba(0,0,0,0.75) !important; text-decoration: underline; text-underline-offset: 2px; transition: color 0.3s; }
         [data-sec-tool] a:hover { color: #000 !important; }
-        .sec-tool-wrap { position: relative; overflow: hidden; border-radius: 24px; border: 1px solid rgba(255,255,255,0.6); padding: 20px; transition: border-color 0.5s, box-shadow 0.5s; background: rgba(255,255,255,0.7); backdrop-filter: blur(20px); box-shadow: 0 4px 24px rgba(0,0,0,0.04); }
+        .sec-tool-wrap { position: relative; overflow: hidden; border-radius: 24px; border: 1px solid #f3f4f6; padding: 20px; transition: border-color 0.5s, box-shadow 0.5s; background: #ffffff; box-shadow: 0 2px 10px rgba(0,0,0,0.03); }
         @media (min-width: 640px) { .sec-tool-wrap { padding: 24px; } }
-        .sec-tool-wrap:hover { border-color: rgba(255,255,255,0.8); box-shadow: 0 20px 40px -20px rgba(0,0,0,0.1) !important; }
+        .sec-tool-wrap:hover { border-color: #e5e7eb; box-shadow: 0 20px 40px -20px rgba(0,0,0,0.1) !important; }
       `}</style>
 
       <div className="relative z-10 mx-auto w-full max-w-6xl space-y-5 px-3 py-5 sm:space-y-6 sm:px-5 sm:py-8">
@@ -583,17 +574,17 @@ function SecuritySection() {
         <div className="sec-tool-wrap mb-5" style={{ animation: "sec-item-in 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.2s both" }}><div data-sec-tool className="relative w-full"><PasskeyManager /></div></div>
         <div className="sec-tool-wrap mb-5" style={{ animation: "sec-item-in 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.25s both" }}><div data-sec-tool className="relative w-full"><TwoFactorSettings /></div></div>
 
-        <section className="relative w-full overflow-hidden rounded-3xl border border-white/60 bg-white/70 backdrop-blur-xl p-5 sm:p-7 shadow-sm" style={{ animation: "sec-item-in 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.3s both" }}>
+        <section className="relative w-full overflow-hidden rounded-3xl border border-gray-100 bg-white p-5 sm:p-7 shadow-sm" style={{ animation: "sec-item-in 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.3s both" }}>
           <div className="relative">
             <SectionHeading>Account Activity</SectionHeading>
             <div className="mb-5 flex flex-wrap gap-2">
               {TABS.map((t) => { const active = tab === t.id; return (<button key={t.id} type="button" onClick={() => setTab(t.id)} className={`group relative inline-flex items-center gap-2 overflow-hidden rounded-full border px-3.5 py-2 text-[12px] font-medium transition-all duration-500 ${active ? "border-black bg-black text-white shadow-md shadow-black/10" : "border-gray-200 bg-white text-gray-600 hover:bg-gray-50 hover:text-black"}`}><span className="relative">{t.label}</span></button>); })}
             </div>
 
-            {tab === "logins" && (<div className="space-y-3">{logins.length === 0 ? <EmptyState icon="/icons/lock.svg" text="No login history yet." /> : logins.map((l, i) => (<article key={l.id} className="group relative overflow-hidden rounded-2xl border border-white/60 bg-white/80 p-4 transition-all duration-500 hover:shadow-[0_18px_40px_-22px_rgba(0,0,0,0.1)] sm:p-5" style={{ animation: `sec-item-in 0.55s cubic-bezier(0.22, 1, 0.36, 1) ${0.05 + i * 0.03}s both` }}><div className="relative flex items-start justify-between gap-3"><div className="min-w-0 flex-1"><div className="mb-2 flex flex-wrap items-center gap-2"><StatusPill status={l.login_status} /><span className="rounded-full border border-gray-200 bg-gray-50 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-gray-600">{l.login_method ?? "password"}</span></div><div className="truncate text-[12.5px] text-gray-600">{l.ip_address ?? "No IP"} · {[l.city, l.country].filter(Boolean).join(", ") || "Unknown location"}</div>{l.user_devices && <div className="mt-1 text-[11.5px] text-gray-500">{l.user_devices.device_name ?? l.user_devices.device_type ?? "Unknown device"}{l.user_devices.operating_system && ` · ${l.user_devices.operating_system}`}{l.user_devices.browser && ` · ${l.user_devices.browser}`}</div>}</div><div className="shrink-0 text-[11px] font-medium text-gray-400">{timeAgo(l.login_at)}</div></div></article>))}</div>)}
-            {tab === "activity" && (<div className="space-y-3">{activities.length === 0 ? <EmptyState icon="/icons/history.svg" text="No activity recorded yet." /> : activities.map((a, i) => (<article key={a.id} className="group relative overflow-hidden rounded-2xl border border-white/60 bg-white/80 p-4 transition-all duration-500 hover:shadow-[0_18px_40px_-22px_rgba(0,0,0,0.1)] sm:p-5" style={{ animation: `sec-item-in 0.55s cubic-bezier(0.22, 1, 0.36, 1) ${0.05 + i * 0.03}s both` }}><div className="relative flex items-start justify-between gap-3"><div className="min-w-0 flex-1"><div className="mb-0.5 text-[13px] font-semibold capitalize text-gray-900">{a.activity_type.replace(/_/g, " ")}</div>{a.activity_description && <div className="text-[12px] text-gray-500">{a.activity_description}</div>}{a.ip_address && <div className="mt-1 text-[11px] text-gray-400">IP: {a.ip_address}</div>}</div><div className="shrink-0 text-[11px] font-medium text-gray-400">{timeAgo(a.created_at)}</div></div></article>))}</div>)}
-            {tab === "methods" && (<div className="space-y-3">{methods.length === 0 ? <EmptyState icon="/icons/lock.svg" text="No auth methods linked yet." /> : methods.map((m, i) => (<article key={m.id} className="group relative overflow-hidden rounded-2xl border border-white/60 bg-white/80 p-4 transition-all duration-500 hover:shadow-[0_18px_40px_-22px_rgba(0,0,0,0.1)] sm:p-5" style={{ animation: `sec-item-in 0.55s cubic-bezier(0.22, 1, 0.36, 1) ${0.05 + i * 0.03}s both` }}><div className="relative flex items-start justify-between gap-3"><div className="min-w-0 flex-1"><div className="mb-1 flex flex-wrap items-center gap-2"><span className="text-[13px] font-semibold capitalize text-gray-900">{m.auth_method.replace(/_/g, " ")}</span><span className="text-[11px] text-gray-500">via {m.provider}</span></div>{m.provider_email && <div className="text-[12px] text-gray-500">{m.provider_email}</div>}<div className="mt-1 text-[11px] text-gray-400">Signed in {m.login_count} time{m.login_count !== 1 ? "s" : ""}{m.last_sign_in_at && ` · Last: ${timeAgo(m.last_sign_in_at)}`}</div></div><span className="shrink-0 rounded-full border border-gray-200 bg-gray-50 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-gray-600">{m.last_event ?? "linked"}</span></div></article>))}</div>)}
-            {tab === "verifications" && (<div className="space-y-3">{verifications.length === 0 ? <EmptyState icon="/icons/check.svg" text="No verification records yet." /> : verifications.map((v, i) => (<article key={v.id} className="group relative overflow-hidden rounded-2xl border border-white/60 bg-white/80 p-4 transition-all duration-500 hover:shadow-[0_18px_40px_-22px_rgba(0,0,0,0.1)] sm:p-5" style={{ animation: `sec-item-in 0.55s cubic-bezier(0.22, 1, 0.36, 1) ${0.05 + i * 0.03}s both` }}><div className="relative flex items-start justify-between gap-3"><div className="min-w-0 flex-1"><div className="mb-1 flex flex-wrap items-center gap-2"><span className="text-[13px] font-semibold capitalize text-gray-900">{v.verification_type}</span><StatusPill status={v.verification_status} /></div><div className="text-[11.5px] text-gray-500">{v.verified_at ? `Verified ${timeAgo(v.verified_at)}` : v.last_requested_at ? `Requested ${timeAgo(v.last_requested_at)}` : "No activity"}</div><div className="mt-0.5 text-[11px] text-gray-400">Attempts: {v.attempt_count}</div></div></div></article>))}</div>)}
+            {tab === "logins" && (<div className="space-y-3">{logins.length === 0 ? <EmptyState icon="/icons/lock.svg" text="No login history yet." /> : logins.map((l, i) => (<article key={l.id} className="group relative overflow-hidden rounded-2xl border border-gray-100 bg-white p-4 transition-all duration-500 hover:shadow-[0_18px_40px_-22px_rgba(0,0,0,0.1)] sm:p-5" style={{ animation: `sec-item-in 0.55s cubic-bezier(0.22, 1, 0.36, 1) ${0.05 + i * 0.03}s both` }}><div className="relative flex items-start justify-between gap-3"><div className="min-w-0 flex-1"><div className="mb-2 flex flex-wrap items-center gap-2"><StatusPill status={l.login_status} /><span className="rounded-full border border-gray-200 bg-gray-50 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-gray-600">{l.login_method ?? "password"}</span></div><div className="truncate text-[12.5px] text-gray-600">{l.ip_address ?? "No IP"} · {[l.city, l.country].filter(Boolean).join(", ") || "Unknown location"}</div>{l.user_devices && <div className="mt-1 text-[11.5px] text-gray-500">{l.user_devices.device_name ?? l.user_devices.device_type ?? "Unknown device"}{l.user_devices.operating_system && ` · ${l.user_devices.operating_system}`}{l.user_devices.browser && ` · ${l.user_devices.browser}`}</div>}</div><div className="shrink-0 text-[11px] font-medium text-gray-400">{timeAgo(l.login_at)}</div></div></article>))}</div>)}
+            {tab === "activity" && (<div className="space-y-3">{activities.length === 0 ? <EmptyState icon="/icons/history.svg" text="No activity recorded yet." /> : activities.map((a, i) => (<article key={a.id} className="group relative overflow-hidden rounded-2xl border border-gray-100 bg-white p-4 transition-all duration-500 hover:shadow-[0_18px_40px_-22px_rgba(0,0,0,0.1)] sm:p-5" style={{ animation: `sec-item-in 0.55s cubic-bezier(0.22, 1, 0.36, 1) ${0.05 + i * 0.03}s both` }}><div className="relative flex items-start justify-between gap-3"><div className="min-w-0 flex-1"><div className="mb-0.5 text-[13px] font-semibold capitalize text-gray-900">{a.activity_type.replace(/_/g, " ")}</div>{a.activity_description && <div className="text-[12px] text-gray-500">{a.activity_description}</div>}{a.ip_address && <div className="mt-1 text-[11px] text-gray-400">IP: {a.ip_address}</div>}</div><div className="shrink-0 text-[11px] font-medium text-gray-400">{timeAgo(a.created_at)}</div></div></article>))}</div>)}
+            {tab === "methods" && (<div className="space-y-3">{methods.length === 0 ? <EmptyState icon="/icons/lock.svg" text="No auth methods linked yet." /> : methods.map((m, i) => (<article key={m.id} className="group relative overflow-hidden rounded-2xl border border-gray-100 bg-white p-4 transition-all duration-500 hover:shadow-[0_18px_40px_-22px_rgba(0,0,0,0.1)] sm:p-5" style={{ animation: `sec-item-in 0.55s cubic-bezier(0.22, 1, 0.36, 1) ${0.05 + i * 0.03}s both` }}><div className="relative flex items-start justify-between gap-3"><div className="min-w-0 flex-1"><div className="mb-1 flex flex-wrap items-center gap-2"><span className="text-[13px] font-semibold capitalize text-gray-900">{m.auth_method.replace(/_/g, " ")}</span><span className="text-[11px] text-gray-500">via {m.provider}</span></div>{m.provider_email && <div className="text-[12px] text-gray-500">{m.provider_email}</div>}<div className="mt-1 text-[11px] text-gray-400">Signed in {m.login_count} time{m.login_count !== 1 ? "s" : ""}{m.last_sign_in_at && ` · Last: ${timeAgo(m.last_sign_in_at)}`}</div></div><span className="shrink-0 rounded-full border border-gray-200 bg-gray-50 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-gray-600">{m.last_event ?? "linked"}</span></div></article>))}</div>)}
+            {tab === "verifications" && (<div className="space-y-3">{verifications.length === 0 ? <EmptyState icon="/icons/check.svg" text="No verification records yet." /> : verifications.map((v, i) => (<article key={v.id} className="group relative overflow-hidden rounded-2xl border border-gray-100 bg-white p-4 transition-all duration-500 hover:shadow-[0_18px_40px_-22px_rgba(0,0,0,0.1)] sm:p-5" style={{ animation: `sec-item-in 0.55s cubic-bezier(0.22, 1, 0.36, 1) ${0.05 + i * 0.03}s both` }}><div className="relative flex items-start justify-between gap-3"><div className="min-w-0 flex-1"><div className="mb-1 flex flex-wrap items-center gap-2"><span className="text-[13px] font-semibold capitalize text-gray-900">{v.verification_type}</span><StatusPill status={v.verification_status} /></div><div className="text-[11.5px] text-gray-500">{v.verified_at ? `Verified ${timeAgo(v.verified_at)}` : v.last_requested_at ? `Requested ${timeAgo(v.last_requested_at)}` : "No activity"}</div><div className="mt-0.5 text-[11px] text-gray-400">Attempts: {v.attempt_count}</div></div></div></article>))}</div>)}
           </div>
         </section>
       </div>
@@ -738,12 +729,12 @@ export default function ProfilePage() {
   const userEmail = data?.user?.email || "user@example.com";
 
   return (
-    <div className="min-h-screen bg-white pb-32 font-sans text-gray-900 selection:bg-black selection:text-white antialiased">
+    <div className="min-h-screen bg-white font-sans text-gray-900 selection:bg-black selection:text-white antialiased">
 
       {/* ============================================================ */}
-      {/*  STICKY HEADER — NO GAP WITH CONTENT BELOW                    */}
+      {/*  STICKY HEADER — Pure white, no gap                          */}
       {/* ============================================================ */}
-      <div className="sticky top-0 z-40 bg-white/70 backdrop-blur-xl border-b border-white/60 flex items-center justify-between px-4 py-3.5 transition-all duration-300">
+      <div className="sticky top-0 z-40 bg-white flex items-center justify-between px-4 py-3.5 relative">
         {activeSection === "menu" ? (
           <div className="w-6" />
         ) : (
@@ -758,12 +749,12 @@ export default function ProfilePage() {
       </div>
 
       {/* ============================================================ */}
-      {/*  NO TOP SPACING — content begins right after header           */}
+      {/*  CONTENT — starts right below header, pure white              */}
       {/* ============================================================ */}
 
       {activeSection === "menu" ? (
-        /* ================= MAIN MENU VIEW (Exactly like iOS Settings) ================= */
-        <div className="mx-auto max-w-md px-4 pt-4 space-y-5 animate-in fade-in duration-500">
+        /* ================= MAIN MENU VIEW (iOS Settings) ================= */
+        <div className="mx-auto max-w-md px-4 pt-2 pb-8 space-y-5 animate-in fade-in duration-500">
 
           {/* Profile Header Card */}
           <div className={`${cardCls} p-4 flex items-center gap-4`}>
@@ -823,10 +814,10 @@ export default function ProfilePage() {
 
         </div>
       ) : (
-        /* ================= SUB-SECTION VIEWS — no gap below header ================= */
-        <div className="mx-auto max-w-6xl px-3 sm:px-5">
+        /* ================= SUB-SECTION VIEWS ================= */
+        <div className="mx-auto max-w-6xl px-3 sm:px-5 pb-8">
           {activeSection === "profile" && (
-            <form onSubmit={handleSubmit} className="mx-auto max-w-md px-4 pt-4 space-y-6">
+            <form onSubmit={handleSubmit} className="mx-auto max-w-md px-4 pt-2 space-y-6">
               {message && (
                 <div className={`rounded-[14px] px-4 py-3.5 text-[13px] font-medium animate-in fade-in slide-in-from-top-4 duration-500 ${message.type === "success" ? "bg-emerald-50 text-emerald-700 border border-emerald-100" : "bg-rose-50 text-rose-700 border border-rose-100"}`}>{message.text}</div>
               )}
@@ -940,17 +931,6 @@ export default function ProfilePage() {
           {activeSection === "sectors" && <SectorsSection />}
         </div>
       )}
-
-      {/* Bottom Navigation Bar — Liquid Glass */}
-      <div className="fixed bottom-0 left-0 right-0 z-50 border-t border-white/60 bg-white/70 backdrop-blur-xl pb-safe pt-2 shadow-[0_-4px_20px_rgba(0,0,0,0.03)]">
-        <div className="mx-auto flex max-w-md items-center justify-around px-2 pb-3">
-          <button type="button" className="flex flex-col items-center gap-1.5 text-gray-400 transition-all duration-300 hover:text-black active:scale-95"><Icons.Home /><span className="text-[10px] font-medium tracking-wide">Home</span></button>
-          <button type="button" className="flex flex-col items-center gap-1.5 text-gray-400 transition-all duration-300 hover:text-black active:scale-95"><Icons.Explore /><span className="text-[10px] font-medium tracking-wide">Explore</span></button>
-          <button type="button" className="flex flex-col items-center gap-1.5 text-gray-400 transition-all duration-300 hover:text-black active:scale-95"><Icons.Heart /><span className="text-[10px] font-medium tracking-wide">Favorites</span></button>
-          <button type="button" className="flex flex-col items-center gap-1.5 text-gray-400 transition-all duration-300 hover:text-black active:scale-95"><Icons.Agents /><span className="text-[10px] font-medium tracking-wide">Agents</span></button>
-          <button type="button" className="flex flex-col items-center gap-1.5 text-black scale-105"><Icons.Profile /><span className="text-[10px] font-semibold tracking-wide">Profile</span></button>
-        </div>
-      </div>
     </div>
   );
 }
