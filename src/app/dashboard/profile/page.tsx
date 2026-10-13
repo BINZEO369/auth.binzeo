@@ -96,7 +96,7 @@ const Icons = {
 /* ================================================================== */
 /*  SHARED STYLES — Pure White Background                              */
 /* ================================================================== */
-const cardCls = "bg-white rounded-[18px] overflow-hidden border border-gray-100 shadow-[0_2px_10px_rgba(0,0,0,0.03)] transition-all duration-300";
+const cardCls = "bg-white rounded-[18px] overflow-hidden border border-gray-100 shadow-[0_2px_10px_rgba(0,0,0,0.03)]";
 const listRowCls = "group flex items-center justify-between px-4 py-3.5 border-b border-gray-100 last:border-0 active:bg-gray-50 transition-colors duration-200 cursor-pointer";
 const inputCls = "text-right bg-transparent border-none outline-none text-[15px] font-medium text-gray-900 placeholder-gray-400 w-full max-w-[60%] focus:ring-0 transition-colors";
 
@@ -177,7 +177,7 @@ function AddressesSection() {
           )}
         </div>
 
-        {message && <div className={`rounded-[16px] px-4 py-3.5 text-[13px] font-medium animate-in fade-in slide-in-from-top-4 duration-500 mb-5 ${message.type === "success" ? "bg-emerald-50 text-emerald-700 border border-emerald-100" : "bg-rose-50 text-rose-700 border border-rose-100"}`}>{message.text}</div>}
+        {message && <div className={`rounded-[16px] px-4 py-3.5 text-[13px] font-medium mb-5 ${message.type === "success" ? "bg-emerald-50 text-emerald-700 border border-emerald-100" : "bg-rose-50 text-rose-700 border border-rose-100"}`}>{message.text}</div>}
 
         {!loading && addresses.length === 0 && !showForm && (
           <div className="relative overflow-hidden rounded-3xl border border-gray-100 bg-white p-12 text-center shadow-sm">
@@ -195,8 +195,8 @@ function AddressesSection() {
 
         {!loading && addresses.length > 0 && (
           <div className="space-y-4">
-            {addresses.map((a, i) => (
-              <article key={a.id} className="group relative overflow-hidden rounded-3xl border border-gray-100 bg-white p-6 transition-all duration-500 hover:-translate-y-0.5 hover:shadow-[0_20px_40px_-20px_rgba(0,0,0,0.1)]" style={{ animation: `addr-item-in 0.6s cubic-bezier(0.22, 1, 0.36, 1) ${0.15 + i * 0.06}s both` }}>
+            {addresses.map((a) => (
+              <article key={a.id} className="group relative overflow-hidden rounded-3xl border border-gray-100 bg-white p-6 transition-all duration-500 hover:-translate-y-0.5 hover:shadow-[0_20px_40px_-20px_rgba(0,0,0,0.1)]">
                 <div className="relative mb-4 flex items-start justify-between gap-3">
                   <div className="flex flex-wrap items-center gap-2">
                     <span className="inline-flex items-center gap-1.5 rounded-full border border-gray-200 bg-gray-50 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-gray-600">{TYPE_LABEL[a.address_type] ?? a.address_type}</span>
@@ -220,9 +220,9 @@ function AddressesSection() {
         )}
 
         {showForm && (
-          <div className="fixed inset-0 z-50 flex items-end justify-center p-0 sm:items-center sm:p-6 animate-in fade-in duration-300">
+          <div className="fixed inset-0 z-50 flex items-end justify-center p-0 sm:items-center sm:p-6">
             <div className="absolute inset-0 bg-black/40 backdrop-blur-md" onClick={cancel} />
-            <div className="relative w-full max-h-[92vh] overflow-y-auto rounded-t-[28px] border border-gray-100 bg-white sm:max-w-xl sm:rounded-3xl shadow-2xl animate-in slide-in-from-bottom-4 duration-500">
+            <div className="relative w-full max-h-[92vh] overflow-y-auto rounded-t-[28px] border border-gray-100 bg-white sm:max-w-xl sm:rounded-3xl shadow-2xl">
               <div className="sticky top-0 z-10 flex items-center justify-between border-b border-gray-100 px-6 py-4 bg-white">
                 <div><h2 className="text-[16px] font-semibold text-gray-900">{editingId ? "Edit address" : "New address"}</h2><p className="mt-0.5 text-[11.5px] text-gray-500">{editingId ? "Update your saved location" : "Save a new location to your account"}</p></div>
                 <button onClick={cancel} className="flex h-9 w-9 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-500 hover:bg-gray-50 hover:text-black transition-all"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="h-4 w-4"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg></button>
@@ -303,10 +303,10 @@ function ContactsSection() {
           {!showForm && contacts.length > 0 && <button onClick={openNew} className="group relative inline-flex items-center gap-2 overflow-hidden rounded-full border border-black bg-black px-4 py-2.5 text-[12.5px] font-medium text-white transition-all duration-500 hover:-translate-y-0.5 shadow-lg shadow-black/10"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" className="relative h-4 w-4 transition-transform duration-500 group-hover:rotate-90"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg><span className="relative">Add contact</span></button>}
         </div>
 
-        {message && <div className={`rounded-[16px] px-4 py-3.5 text-[13px] font-medium animate-in fade-in slide-in-from-top-4 duration-500 mb-5 ${message.type === "success" ? "bg-emerald-50 text-emerald-700 border border-emerald-100" : "bg-rose-50 text-rose-700 border border-rose-100"}`}>{message.text}</div>}
+        {message && <div className={`rounded-[16px] px-4 py-3.5 text-[13px] font-medium mb-5 ${message.type === "success" ? "bg-emerald-50 text-emerald-700 border border-emerald-100" : "bg-rose-50 text-rose-700 border border-rose-100"}`}>{message.text}</div>}
 
         {showForm && (
-          <form onSubmit={handleSubmit} className="relative overflow-hidden rounded-3xl border border-gray-100 bg-white p-6 sm:p-7 shadow-sm animate-in fade-in slide-in-from-bottom-4 duration-500 mb-6">
+          <form onSubmit={handleSubmit} className="relative overflow-hidden rounded-3xl border border-gray-100 bg-white p-6 sm:p-7 shadow-sm mb-6">
             <h3 className="mb-4 text-[10px] font-semibold uppercase tracking-[0.18em] text-gray-500">{editingId ? "Edit contact" : "New contact"}</h3>
             <div className="space-y-4">
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2"><Field label="Type"><select value={form.contact_type ?? "website"} onChange={(e) => update("contact_type", e.target.value)} className={modalInputCls}><option value="website">Website</option><option value="social">Social</option><option value="messenger">Messenger</option><option value="other">Other</option></select></Field><Field label="Label"><input type="text" value={form.label ?? ""} onChange={(e) => update("label", e.target.value)} className={modalInputCls} placeholder="e.g. Personal" /></Field></div>
@@ -332,11 +332,11 @@ function ContactsSection() {
           <div>
             <h3 className="mb-4 text-[10px] font-semibold uppercase tracking-[0.18em] text-gray-500">Saved Contacts</h3>
             <div className="grid gap-4 sm:grid-cols-2">
-              {contacts.map((c, i) => {
+              {contacts.map((c) => {
                 const icon = TYPE_ICON[c.contact_type] ?? "/icons/link.svg";
                 const typeLabel = TYPE_LABEL[c.contact_type] ?? c.contact_type;
                 return (
-                  <article key={c.id} className="group relative overflow-hidden rounded-3xl border border-gray-100 bg-white p-5 transition-all duration-500 hover:-translate-y-0.5 hover:shadow-[0_20px_40px_-20px_rgba(0,0,0,0.1)]" style={{ animation: `addr-item-in 0.6s cubic-bezier(0.22, 1, 0.36, 1) ${0.15 + i * 0.06}s both` }}>
+                  <article key={c.id} className="group relative overflow-hidden rounded-3xl border border-gray-100 bg-white p-5 transition-all duration-500 hover:-translate-y-0.5 hover:shadow-[0_20px_40px_-20px_rgba(0,0,0,0.1)]">
                     <div className="relative mb-4 flex items-start justify-between gap-3">
                       <div className="flex items-center gap-3"><span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl border border-gray-100 bg-gray-50"><Image src={icon} alt="" width={18} height={18} className="opacity-60" /></span><div className="flex flex-col"><span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-gray-500">{typeLabel}</span>{c.label && <span className="mt-0.5 text-[11.5px] text-gray-500">{c.label}</span>}</div></div>
                       <div className="flex shrink-0 flex-wrap items-center justify-end gap-1.5">{c.is_primary && <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-emerald-700"><span className="h-1.5 w-1.5 rounded-full bg-emerald-500" /> Primary</span>}{c.is_verified && <span className="inline-flex items-center gap-1 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-emerald-700"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="h-2.5 w-2.5"><path d="M20 6 9 17l-5-5" /></svg> Verified</span>}</div>
@@ -401,7 +401,7 @@ function DevicesSection() {
   return (
     <div className="max-w-3xl mx-auto space-y-6">
       <div className="mb-6"><h1 className="text-2xl font-bold text-gray-900 mb-2">Devices</h1><p className="text-sm text-gray-500">Devices that have accessed your Binzeo ID account</p></div>
-      {message && <div className={`rounded-[16px] px-4 py-3.5 text-[13px] font-medium animate-in fade-in slide-in-from-top-4 duration-500 ${message.type === "success" ? "bg-emerald-50 text-emerald-700 border border-emerald-100" : "bg-rose-50 text-rose-700 border border-rose-100"}`}>{message.text}</div>}
+      {message && <div className={`rounded-[16px] px-4 py-3.5 text-[13px] font-medium ${message.type === "success" ? "bg-emerald-50 text-emerald-700 border border-emerald-100" : "bg-rose-50 text-rose-700 border border-rose-100"}`}>{message.text}</div>}
       {devices.length === 0 ? (
         <div className="p-12 rounded-3xl border border-gray-100 bg-white text-center shadow-sm"><Image src="/icons/device.svg" alt="" width={40} height={40} className="opacity-40 mx-auto mb-4" /><p className="text-gray-500 text-sm">No devices recorded yet.</p></div>
       ) : (
@@ -462,7 +462,7 @@ function SectorsSection() {
   return (
     <div className="max-w-3xl mx-auto space-y-6">
       <div className="mb-6"><h1 className="text-2xl font-bold text-gray-900 mb-2">Sectors</h1><p className="text-sm text-gray-500">Join industry sectors to unlock related features</p></div>
-      {message && <div className={`rounded-[16px] px-4 py-3.5 text-[13px] font-medium animate-in fade-in slide-in-from-top-4 duration-500 ${message.type === "success" ? "bg-emerald-50 text-emerald-700 border border-emerald-100" : "bg-rose-50 text-rose-700 border border-rose-100"}`}>{message.text}</div>}
+      {message && <div className={`rounded-[16px] px-4 py-3.5 text-[13px] font-medium ${message.type === "success" ? "bg-emerald-50 text-emerald-700 border border-emerald-100" : "bg-rose-50 text-rose-700 border border-rose-100"}`}>{message.text}</div>}
       {mySectors.length > 0 && (
         <section className="space-y-3">
           <h2 className="text-[10px] font-semibold text-gray-500 uppercase tracking-[0.18em]">My Sectors ({mySectors.length})</h2>
@@ -542,26 +542,23 @@ function SecuritySection() {
   return (
     <div className="relative isolate min-h-[80vh] w-full overflow-x-hidden">
       <style jsx global>{`
-        @keyframes sec-item-in { from { opacity: 0; transform: translateY(20px) scale(0.99); filter: blur(8px); } to { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); } }
         [data-sec-tool], [data-sec-tool] * { box-sizing: border-box; max-width: 100%; }
         [data-sec-tool] { width: 100% !important; overflow-x: hidden; text-align: left; }
         [data-sec-tool] > * { width: 100% !important; margin-left: 0 !important; margin-right: 0 !important; max-width: 100% !important; }
         [data-sec-tool] > div, [data-sec-tool] > section, [data-sec-tool] > article { background: transparent !important; border: none !important; box-shadow: none !important; padding: 0 !important; border-radius: 0 !important; width: 100% !important; }
-        [data-sec-tool] input:not([type="checkbox"]):not([type="radio"]):not([type="submit"]):not([type="button"]):not([type="hidden"]), [data-sec-tool] select, [data-sec-tool] textarea { width: 100% !important; padding: 12px 14px !important; border-radius: 12px !important; border: 1px solid rgba(0,0,0,0.1) !important; background: #fff !important; color: rgba(0,0,0,0.9) !important; font-size: 14px !important; line-height: 1.4 !important; outline: none !important; transition: all 0.3s; }
+        [data-sec-tool] input:not([type="checkbox"]):not([type="radio"]):not([type="submit"]):not([type="button"]):not([type="hidden"]), [data-sec-tool] select, [data-sec-tool] textarea { width: 100% !important; padding: 12px 14px !important; border-radius: 12px !important; border: 1px solid rgba(0,0,0,0.1) !important; background: #fff !important; color: rgba(0,0,0,0.9) !important; font-size: 14px !important; line-height: 1.4 !important; outline: none !important; }
         [data-sec-tool] input:focus, [data-sec-tool] select:focus, [data-sec-tool] textarea:focus { border-color: rgba(0,0,0,0.3) !important; background: #fff !important; box-shadow: 0 0 0 4px rgba(0,0,0,0.05) !important; }
         [data-sec-tool] label { display: block !important; font-size: 10px !important; font-weight: 600 !important; text-transform: uppercase !important; letter-spacing: 0.16em !important; color: rgba(0,0,0,0.6) !important; margin-bottom: 8px !important; }
-        [data-sec-tool] button:not([type="submit"]):not([data-primary]) { border-radius: 999px !important; border: 1px solid rgba(0,0,0,0.1) !important; background: #fff !important; color: rgba(0,0,0,0.75) !important; font-weight: 500 !important; padding: 10px 18px !important; font-size: 12.5px !important; transition: all 0.4s !important; max-width: 100% !important; white-space: normal !important; }
-        [data-sec-tool] button:not([type="submit"]):not([data-primary]):hover { background: #f9fafb !important; border-color: rgba(0,0,0,0.2) !important; color: rgba(0,0,0,0.95) !important; transform: translateY(-2px); }
-        [data-sec-tool] button[type="submit"], [data-sec-tool] button[data-primary] { border-radius: 999px !important; border: 1px solid #0a0a0a !important; background: #0a0a0a !important; color: #ffffff !important; font-weight: 500 !important; font-size: 12.5px !important; padding: 12px 22px !important; box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important; transition: all 0.5s !important; cursor: pointer; max-width: 100% !important; white-space: normal !important; }
+        [data-sec-tool] button:not([type="submit"]):not([data-primary]) { border-radius: 999px !important; border: 1px solid rgba(0,0,0,0.1) !important; background: #fff !important; color: rgba(0,0,0,0.75) !important; font-weight: 500 !important; padding: 10px 18px !important; font-size: 12.5px !important; max-width: 100% !important; white-space: normal !important; }
+        [data-sec-tool] button:not([type="submit"]):not([data-primary]):hover { background: #f9fafb !important; border-color: rgba(0,0,0,0.2) !important; color: rgba(0,0,0,0.95) !important; }
+        [data-sec-tool] button[type="submit"], [data-sec-tool] button[data-primary] { border-radius: 999px !important; border: 1px solid #0a0a0a !important; background: #0a0a0a !important; color: #ffffff !important; font-weight: 500 !important; font-size: 12.5px !important; padding: 12px 22px !important; cursor: pointer; max-width: 100% !important; white-space: normal !important; }
         [data-sec-tool] button[type="submit"] *, [data-sec-tool] button[data-primary] * { color: #ffffff !important; }
-        [data-sec-tool] button[type="submit"]:hover, [data-sec-tool] button[data-primary]:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.15) !important; }
         [data-sec-tool] h1, [data-sec-tool] h2, [data-sec-tool] h3, [data-sec-tool] h4 { color: rgba(0,0,0,0.9) !important; font-weight: 600 !important; letter-spacing: -0.01em !important; }
         [data-sec-tool] p, [data-sec-tool] small, [data-sec-tool] span { color: rgba(0,0,0,0.65); }
-        [data-sec-tool] a { color: rgba(0,0,0,0.75) !important; text-decoration: underline; text-underline-offset: 2px; transition: color 0.3s; }
+        [data-sec-tool] a { color: rgba(0,0,0,0.75) !important; text-decoration: underline; text-underline-offset: 2px; }
         [data-sec-tool] a:hover { color: #000 !important; }
-        .sec-tool-wrap { position: relative; overflow: hidden; border-radius: 24px; border: 1px solid #f3f4f6; padding: 20px; transition: border-color 0.5s, box-shadow 0.5s; background: #ffffff; box-shadow: 0 2px 10px rgba(0,0,0,0.03); }
+        .sec-tool-wrap { position: relative; overflow: hidden; border-radius: 24px; border: 1px solid #f3f4f6; padding: 20px; background: #ffffff; box-shadow: 0 2px 10px rgba(0,0,0,0.03); }
         @media (min-width: 640px) { .sec-tool-wrap { padding: 24px; } }
-        .sec-tool-wrap:hover { border-color: #e5e7eb; box-shadow: 0 20px 40px -20px rgba(0,0,0,0.1) !important; }
       `}</style>
 
       <div className="relative z-10 mx-auto w-full max-w-6xl space-y-5 px-3 py-5 sm:space-y-6 sm:px-5 sm:py-8">
@@ -570,21 +567,21 @@ function SecuritySection() {
           <PrimaryButton href="/dashboard/security/password" icon={<LockIcon className="h-4 w-4" />}>Change password</PrimaryButton>
         </div>
 
-        <div className="sec-tool-wrap mb-5" style={{ animation: "sec-item-in 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.15s both" }}><div data-sec-tool className="relative w-full"><TemporaryLoginTokens /></div></div>
-        <div className="sec-tool-wrap mb-5" style={{ animation: "sec-item-in 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.2s both" }}><div data-sec-tool className="relative w-full"><PasskeyManager /></div></div>
-        <div className="sec-tool-wrap mb-5" style={{ animation: "sec-item-in 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.25s both" }}><div data-sec-tool className="relative w-full"><TwoFactorSettings /></div></div>
+        <div className="sec-tool-wrap mb-5"><div data-sec-tool className="relative w-full"><TemporaryLoginTokens /></div></div>
+        <div className="sec-tool-wrap mb-5"><div data-sec-tool className="relative w-full"><PasskeyManager /></div></div>
+        <div className="sec-tool-wrap mb-5"><div data-sec-tool className="relative w-full"><TwoFactorSettings /></div></div>
 
-        <section className="relative w-full overflow-hidden rounded-3xl border border-gray-100 bg-white p-5 sm:p-7 shadow-sm" style={{ animation: "sec-item-in 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.3s both" }}>
+        <section className="relative w-full overflow-hidden rounded-3xl border border-gray-100 bg-white p-5 sm:p-7 shadow-sm">
           <div className="relative">
             <SectionHeading>Account Activity</SectionHeading>
             <div className="mb-5 flex flex-wrap gap-2">
               {TABS.map((t) => { const active = tab === t.id; return (<button key={t.id} type="button" onClick={() => setTab(t.id)} className={`group relative inline-flex items-center gap-2 overflow-hidden rounded-full border px-3.5 py-2 text-[12px] font-medium transition-all duration-500 ${active ? "border-black bg-black text-white shadow-md shadow-black/10" : "border-gray-200 bg-white text-gray-600 hover:bg-gray-50 hover:text-black"}`}><span className="relative">{t.label}</span></button>); })}
             </div>
 
-            {tab === "logins" && (<div className="space-y-3">{logins.length === 0 ? <EmptyState icon="/icons/lock.svg" text="No login history yet." /> : logins.map((l, i) => (<article key={l.id} className="group relative overflow-hidden rounded-2xl border border-gray-100 bg-white p-4 transition-all duration-500 hover:shadow-[0_18px_40px_-22px_rgba(0,0,0,0.1)] sm:p-5" style={{ animation: `sec-item-in 0.55s cubic-bezier(0.22, 1, 0.36, 1) ${0.05 + i * 0.03}s both` }}><div className="relative flex items-start justify-between gap-3"><div className="min-w-0 flex-1"><div className="mb-2 flex flex-wrap items-center gap-2"><StatusPill status={l.login_status} /><span className="rounded-full border border-gray-200 bg-gray-50 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-gray-600">{l.login_method ?? "password"}</span></div><div className="truncate text-[12.5px] text-gray-600">{l.ip_address ?? "No IP"} · {[l.city, l.country].filter(Boolean).join(", ") || "Unknown location"}</div>{l.user_devices && <div className="mt-1 text-[11.5px] text-gray-500">{l.user_devices.device_name ?? l.user_devices.device_type ?? "Unknown device"}{l.user_devices.operating_system && ` · ${l.user_devices.operating_system}`}{l.user_devices.browser && ` · ${l.user_devices.browser}`}</div>}</div><div className="shrink-0 text-[11px] font-medium text-gray-400">{timeAgo(l.login_at)}</div></div></article>))}</div>)}
-            {tab === "activity" && (<div className="space-y-3">{activities.length === 0 ? <EmptyState icon="/icons/history.svg" text="No activity recorded yet." /> : activities.map((a, i) => (<article key={a.id} className="group relative overflow-hidden rounded-2xl border border-gray-100 bg-white p-4 transition-all duration-500 hover:shadow-[0_18px_40px_-22px_rgba(0,0,0,0.1)] sm:p-5" style={{ animation: `sec-item-in 0.55s cubic-bezier(0.22, 1, 0.36, 1) ${0.05 + i * 0.03}s both` }}><div className="relative flex items-start justify-between gap-3"><div className="min-w-0 flex-1"><div className="mb-0.5 text-[13px] font-semibold capitalize text-gray-900">{a.activity_type.replace(/_/g, " ")}</div>{a.activity_description && <div className="text-[12px] text-gray-500">{a.activity_description}</div>}{a.ip_address && <div className="mt-1 text-[11px] text-gray-400">IP: {a.ip_address}</div>}</div><div className="shrink-0 text-[11px] font-medium text-gray-400">{timeAgo(a.created_at)}</div></div></article>))}</div>)}
-            {tab === "methods" && (<div className="space-y-3">{methods.length === 0 ? <EmptyState icon="/icons/lock.svg" text="No auth methods linked yet." /> : methods.map((m, i) => (<article key={m.id} className="group relative overflow-hidden rounded-2xl border border-gray-100 bg-white p-4 transition-all duration-500 hover:shadow-[0_18px_40px_-22px_rgba(0,0,0,0.1)] sm:p-5" style={{ animation: `sec-item-in 0.55s cubic-bezier(0.22, 1, 0.36, 1) ${0.05 + i * 0.03}s both` }}><div className="relative flex items-start justify-between gap-3"><div className="min-w-0 flex-1"><div className="mb-1 flex flex-wrap items-center gap-2"><span className="text-[13px] font-semibold capitalize text-gray-900">{m.auth_method.replace(/_/g, " ")}</span><span className="text-[11px] text-gray-500">via {m.provider}</span></div>{m.provider_email && <div className="text-[12px] text-gray-500">{m.provider_email}</div>}<div className="mt-1 text-[11px] text-gray-400">Signed in {m.login_count} time{m.login_count !== 1 ? "s" : ""}{m.last_sign_in_at && ` · Last: ${timeAgo(m.last_sign_in_at)}`}</div></div><span className="shrink-0 rounded-full border border-gray-200 bg-gray-50 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-gray-600">{m.last_event ?? "linked"}</span></div></article>))}</div>)}
-            {tab === "verifications" && (<div className="space-y-3">{verifications.length === 0 ? <EmptyState icon="/icons/check.svg" text="No verification records yet." /> : verifications.map((v, i) => (<article key={v.id} className="group relative overflow-hidden rounded-2xl border border-gray-100 bg-white p-4 transition-all duration-500 hover:shadow-[0_18px_40px_-22px_rgba(0,0,0,0.1)] sm:p-5" style={{ animation: `sec-item-in 0.55s cubic-bezier(0.22, 1, 0.36, 1) ${0.05 + i * 0.03}s both` }}><div className="relative flex items-start justify-between gap-3"><div className="min-w-0 flex-1"><div className="mb-1 flex flex-wrap items-center gap-2"><span className="text-[13px] font-semibold capitalize text-gray-900">{v.verification_type}</span><StatusPill status={v.verification_status} /></div><div className="text-[11.5px] text-gray-500">{v.verified_at ? `Verified ${timeAgo(v.verified_at)}` : v.last_requested_at ? `Requested ${timeAgo(v.last_requested_at)}` : "No activity"}</div><div className="mt-0.5 text-[11px] text-gray-400">Attempts: {v.attempt_count}</div></div></div></article>))}</div>)}
+            {tab === "logins" && (<div className="space-y-3">{logins.length === 0 ? <EmptyState icon="/icons/lock.svg" text="No login history yet." /> : logins.map((l) => (<article key={l.id} className="group relative overflow-hidden rounded-2xl border border-gray-100 bg-white p-4 transition-all duration-500 hover:shadow-[0_18px_40px_-22px_rgba(0,0,0,0.1)] sm:p-5"><div className="relative flex items-start justify-between gap-3"><div className="min-w-0 flex-1"><div className="mb-2 flex flex-wrap items-center gap-2"><StatusPill status={l.login_status} /><span className="rounded-full border border-gray-200 bg-gray-50 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-gray-600">{l.login_method ?? "password"}</span></div><div className="truncate text-[12.5px] text-gray-600">{l.ip_address ?? "No IP"} · {[l.city, l.country].filter(Boolean).join(", ") || "Unknown location"}</div>{l.user_devices && <div className="mt-1 text-[11.5px] text-gray-500">{l.user_devices.device_name ?? l.user_devices.device_type ?? "Unknown device"}{l.user_devices.operating_system && ` · ${l.user_devices.operating_system}`}{l.user_devices.browser && ` · ${l.user_devices.browser}`}</div>}</div><div className="shrink-0 text-[11px] font-medium text-gray-400">{timeAgo(l.login_at)}</div></div></article>))}</div>)}
+            {tab === "activity" && (<div className="space-y-3">{activities.length === 0 ? <EmptyState icon="/icons/history.svg" text="No activity recorded yet." /> : activities.map((a) => (<article key={a.id} className="group relative overflow-hidden rounded-2xl border border-gray-100 bg-white p-4 transition-all duration-500 hover:shadow-[0_18px_40px_-22px_rgba(0,0,0,0.1)] sm:p-5"><div className="relative flex items-start justify-between gap-3"><div className="min-w-0 flex-1"><div className="mb-0.5 text-[13px] font-semibold capitalize text-gray-900">{a.activity_type.replace(/_/g, " ")}</div>{a.activity_description && <div className="text-[12px] text-gray-500">{a.activity_description}</div>}{a.ip_address && <div className="mt-1 text-[11px] text-gray-400">IP: {a.ip_address}</div>}</div><div className="shrink-0 text-[11px] font-medium text-gray-400">{timeAgo(a.created_at)}</div></div></article>))}</div>)}
+            {tab === "methods" && (<div className="space-y-3">{methods.length === 0 ? <EmptyState icon="/icons/lock.svg" text="No auth methods linked yet." /> : methods.map((m) => (<article key={m.id} className="group relative overflow-hidden rounded-2xl border border-gray-100 bg-white p-4 transition-all duration-500 hover:shadow-[0_18px_40px_-22px_rgba(0,0,0,0.1)] sm:p-5"><div className="relative flex items-start justify-between gap-3"><div className="min-w-0 flex-1"><div className="mb-1 flex flex-wrap items-center gap-2"><span className="text-[13px] font-semibold capitalize text-gray-900">{m.auth_method.replace(/_/g, " ")}</span><span className="text-[11px] text-gray-500">via {m.provider}</span></div>{m.provider_email && <div className="text-[12px] text-gray-500">{m.provider_email}</div>}<div className="mt-1 text-[11px] text-gray-400">Signed in {m.login_count} time{m.login_count !== 1 ? "s" : ""}{m.last_sign_in_at && ` · Last: ${timeAgo(m.last_sign_in_at)}`}</div></div><span className="shrink-0 rounded-full border border-gray-200 bg-gray-50 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-gray-600">{m.last_event ?? "linked"}</span></div></article>))}</div>)}
+            {tab === "verifications" && (<div className="space-y-3">{verifications.length === 0 ? <EmptyState icon="/icons/check.svg" text="No verification records yet." /> : verifications.map((v) => (<article key={v.id} className="group relative overflow-hidden rounded-2xl border border-gray-100 bg-white p-4 transition-all duration-500 hover:shadow-[0_18px_40px_-22px_rgba(0,0,0,0.1)] sm:p-5"><div className="relative flex items-start justify-between gap-3"><div className="min-w-0 flex-1"><div className="mb-1 flex flex-wrap items-center gap-2"><span className="text-[13px] font-semibold capitalize text-gray-900">{v.verification_type}</span><StatusPill status={v.verification_status} /></div><div className="text-[11.5px] text-gray-500">{v.verified_at ? `Verified ${timeAgo(v.verified_at)}` : v.last_requested_at ? `Requested ${timeAgo(v.last_requested_at)}` : "No activity"}</div><div className="mt-0.5 text-[11px] text-gray-400">Attempts: {v.attempt_count}</div></div></div></article>))}</div>)}
           </div>
         </section>
       </div>
@@ -617,10 +614,6 @@ export default function ProfilePage() {
     ["devices", "Devices"],
     ["sectors", "Sectors"],
   ] as const;
-
-  const selectSection = (section: typeof sectionTabs[number][0]) => {
-    setActiveSection(section);
-  };
 
   const handleLogout = async () => {
     await fetch("/api/auth/logout", { method: "POST" });
@@ -731,10 +724,8 @@ export default function ProfilePage() {
   return (
     <div className="min-h-screen bg-white font-sans text-gray-900 selection:bg-black selection:text-white antialiased">
 
-      {/* ============================================================ */}
-      {/*  STICKY HEADER — Pure white, no gap                          */}
-      {/* ============================================================ */}
-      <div className="sticky top-0 z-40 bg-white flex items-center justify-between px-4 py-3.5 relative">
+      {/* STICKY HEADER — Pure white, no gap */}
+      <div className="sticky top-0 z-40 bg-white flex items-center justify-between px-4 py-3.5">
         {activeSection === "menu" ? (
           <div className="w-6" />
         ) : (
@@ -748,13 +739,9 @@ export default function ProfilePage() {
         <div className="w-6" />
       </div>
 
-      {/* ============================================================ */}
-      {/*  CONTENT — starts right below header, pure white              */}
-      {/* ============================================================ */}
-
       {activeSection === "menu" ? (
-        /* ================= MAIN MENU VIEW (iOS Settings) ================= */
-        <div className="mx-auto max-w-md px-4 pt-2 pb-8 space-y-5 animate-in fade-in duration-500">
+        /* ================= MAIN MENU VIEW ================= */
+        <div className="mx-auto max-w-md px-4 pt-2 pb-8 space-y-5">
 
           {/* Profile Header Card */}
           <div className={`${cardCls} p-4 flex items-center gap-4`}>
@@ -819,11 +806,10 @@ export default function ProfilePage() {
           {activeSection === "profile" && (
             <form onSubmit={handleSubmit} className="mx-auto max-w-md px-4 pt-2 space-y-6">
               {message && (
-                <div className={`rounded-[14px] px-4 py-3.5 text-[13px] font-medium animate-in fade-in slide-in-from-top-4 duration-500 ${message.type === "success" ? "bg-emerald-50 text-emerald-700 border border-emerald-100" : "bg-rose-50 text-rose-700 border border-rose-100"}`}>{message.text}</div>
+                <div className={`rounded-[14px] px-4 py-3.5 text-[13px] font-medium ${message.type === "success" ? "bg-emerald-50 text-emerald-700 border border-emerald-100" : "bg-rose-50 text-rose-700 border border-rose-100"}`}>{message.text}</div>
               )}
 
-              {/* Profile header (photo + edit) */}
-              <div className={`${cardCls} p-4 flex items-center gap-4 animate-in fade-in duration-500`}>
+              <div className={`${cardCls} p-4 flex items-center gap-4`}>
                 <div className="relative h-[64px] w-[64px] shrink-0 overflow-hidden rounded-full border-2 border-white shadow-sm bg-gray-100">
                   {form.profile_photo_url ? (
                     <img src={form.profile_photo_url} alt="Profile" className="h-full w-full object-cover" />
@@ -831,7 +817,7 @@ export default function ProfilePage() {
                     <div className="flex h-full w-full items-center justify-center text-2xl font-semibold text-gray-400">{displayName.charAt(0).toUpperCase()}</div>
                   )}
                   {photoUploading && (
-                    <div className="absolute inset-0 flex items-center justify-center bg-black/40 text-[10px] text-white"><span className="animate-pulse">...</span></div>
+                    <div className="absolute inset-0 flex items-center justify-center bg-black/40 text-[10px] text-white"><span>...</span></div>
                   )}
                 </div>
                 <div className="min-w-0 flex-1">
@@ -844,8 +830,7 @@ export default function ProfilePage() {
                 </div>
               </div>
 
-              {/* SECTION: Account details */}
-              <div className="animate-in fade-in duration-500">
+              <div>
                 <h3 className="mb-2 px-4 text-[12px] font-medium text-gray-500 tracking-wide uppercase">Account details</h3>
                 <div className={cardCls}>
                   <div className={listRowCls}>
@@ -876,8 +861,7 @@ export default function ProfilePage() {
                 </div>
               </div>
 
-              {/* SECTION: Preferences */}
-              <div className="animate-in fade-in duration-500">
+              <div>
                 <h3 className="mb-2 px-4 text-[12px] font-medium text-gray-500 tracking-wide uppercase">Preferences</h3>
                 <div className={cardCls}>
                   <div className={listRowCls}><div className="flex items-center gap-3"><Icons.Globe /><span className="text-[15px] font-normal text-gray-900">Language</span></div><input type="text" value={form.preferred_language ?? ""} onChange={(e) => update("preferred_language", e.target.value)} className={inputCls} placeholder="English" /></div>
@@ -887,8 +871,7 @@ export default function ProfilePage() {
                 </div>
               </div>
 
-              {/* SECTION: Notifications */}
-              <div className="animate-in fade-in duration-500">
+              <div>
                 <h3 className="mb-2 px-4 text-[12px] font-medium text-gray-500 tracking-wide uppercase">Notifications</h3>
                 <div className={cardCls}>
                   <div className={listRowCls}>
@@ -906,8 +889,7 @@ export default function ProfilePage() {
                 </div>
               </div>
 
-              {/* SECTION: Support */}
-              <div className="animate-in fade-in duration-500">
+              <div>
                 <h3 className="mb-2 px-4 text-[12px] font-medium text-gray-500 tracking-wide uppercase">Support</h3>
                 <div className={cardCls}>
                   <div className={listRowCls}><div className="flex items-center gap-3"><Icons.Help /><span className="text-[15px] font-normal text-gray-900">Recovery Email</span></div><input type="email" value={form.recovery_email ?? ""} onChange={(e) => update("recovery_email", e.target.value)} className={inputCls} placeholder="backup@example.com" /></div>
@@ -915,7 +897,6 @@ export default function ProfilePage() {
                 </div>
               </div>
 
-              {/* Save Button */}
               <div className="pt-2 pb-6">
                 <button type="submit" disabled={saving} className="w-full rounded-[16px] bg-black py-4 text-[15px] font-semibold text-white transition-all duration-300 hover:bg-gray-800 active:scale-[0.97] disabled:opacity-50 shadow-lg shadow-black/10 flex items-center justify-center gap-2">
                   {saving ? (<><svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>Saving...</>) : ("Save Changes")}
