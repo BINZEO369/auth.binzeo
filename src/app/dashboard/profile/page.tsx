@@ -42,38 +42,38 @@ type UsernameCheck = {
 };
 
 /* ================================================================== */
-/*  ICONS (SVG) - Strictly matched with iOS design                     */
+/*  ICONS (SVG) - Perfectly matched with iOS design                    */
 /* ================================================================== */
 const Icons = {
   Back: () => (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6 text-black"><path d="m15 18-6-6 6-6"/></svg>
   ),
   User: () => (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5 text-gray-800"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-[18px] h-[18px] text-gray-700"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
   ),
   Lock: () => (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5 text-gray-800"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-[18px] h-[18px] text-gray-700"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
   ),
   Bell: () => (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5 text-gray-800"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-[18px] h-[18px] text-gray-700"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
   ),
   Globe: () => (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5 text-gray-800"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-[18px] h-[18px] text-gray-700"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>
   ),
   Info: () => (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5 text-gray-800"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-[18px] h-[18px] text-gray-700"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
   ),
   Sun: () => (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5 text-gray-800"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-[18px] h-[18px] text-gray-700"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>
   ),
   Calendar: () => (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5 text-gray-800"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-[18px] h-[18px] text-gray-700"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
   ),
   Help: () => (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5 text-gray-800"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-[18px] h-[18px] text-gray-700"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>
   ),
   Chevron: () => (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4 text-gray-300"><path d="m9 18 6-6-6-6"/></svg>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4 text-gray-400"><path d="m9 18 6-6-6-6"/></svg>
   ),
   Home: () => (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
@@ -96,11 +96,12 @@ const Icons = {
 };
 
 /* ================================================================== */
-/*  SHARED STYLES (Strictly matched with iOS design)                   */
+/*  SHARED STYLES (Advanced & Professional iOS feel)                   */
 /* ================================================================== */
-const cardCls = "bg-white rounded-[16px] overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.02)] border border-gray-100/50";
-const listRowCls = "flex items-center justify-between px-4 py-3.5 border-b border-gray-100/80 last:border-0";
-const inputCls = "text-right bg-transparent border-none outline-none text-[15px] text-gray-500 placeholder-gray-300 w-full max-w-[60%] focus:text-gray-900 transition-colors";
+// সাদার উপর হালকা সেকশন তৈরি করার জন্য bg-[#F8F9FA] এবং হালকা বর্ডার ব্যবহার করা হয়েছে
+const cardCls = "bg-[#F8F9FA] rounded-[16px] overflow-hidden border border-gray-100 transition-all duration-300";
+const listRowCls = "flex items-center justify-between px-4 py-3.5 border-b border-gray-200/60 last:border-0";
+const inputCls = "text-right bg-transparent border-none outline-none text-[15px] font-medium text-gray-900 placeholder-gray-400 w-full max-w-[60%] focus:ring-0 transition-colors";
 
 /* ================================================================== */
 /*  MAIN COMPONENT                                                     */
@@ -218,33 +219,33 @@ export default function ProfilePage() {
   const userEmail = data?.user?.email || "user@example.com";
 
   return (
-    <div className="min-h-screen bg-[#F2F2F7] pb-28 font-sans text-gray-900 selection:bg-black selection:text-white">
+    <div className="min-h-screen bg-white pb-28 font-sans text-gray-900 selection:bg-black selection:text-white">
       
-      {/* Top Header (Matching Image 1) */}
-      <div className="sticky top-0 z-40 bg-[#F2F2F7]/90 backdrop-blur-md flex items-center justify-between px-4 py-3.5">
-        <button type="button" className="p-1 -ml-2 rounded-full hover:bg-gray-200 transition-colors">
+      {/* Top Header (Sticky & Professional) */}
+      <div className="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-gray-100 flex items-center justify-between px-4 py-3.5">
+        <button type="button" className="p-1 -ml-2 rounded-full hover:bg-gray-100 transition-colors">
           <Icons.Back />
         </button>
         <h1 className="text-[17px] font-semibold text-gray-900 absolute left-1/2 -translate-x-1/2">Profile</h1>
         <div className="w-6" /> {/* Spacer for centering */}
       </div>
 
-      <form onSubmit={handleSubmit} className="mx-auto max-w-md px-4 space-y-6 pt-2">
+      <form onSubmit={handleSubmit} className="mx-auto max-w-md px-4 space-y-6 pt-4">
         
         {/* Message Banner */}
         {message && (
-          <div className={`rounded-xl px-4 py-3 text-[13px] font-medium ${message.type === "success" ? "bg-emerald-50 text-emerald-700 border border-emerald-100" : "bg-rose-50 text-rose-700 border border-rose-100"}`}>
+          <div className={`rounded-xl px-4 py-3 text-[13px] font-medium animate-in fade-in slide-in-from-top-2 duration-300 ${message.type === "success" ? "bg-emerald-50 text-emerald-700 border border-emerald-100" : "bg-rose-50 text-rose-700 border border-rose-100"}`}>
             {message.text}
           </div>
         )}
 
-        {/* Profile Header Card (Matching Image 1) */}
+        {/* Profile Header Card */}
         <div className={`${cardCls} p-4 flex items-center gap-4`}>
-          <div className="relative h-[60px] w-[60px] shrink-0 overflow-hidden rounded-full border border-gray-200/60 shadow-sm">
+          <div className="relative h-[64px] w-[64px] shrink-0 overflow-hidden rounded-full border-2 border-white shadow-sm bg-gray-100">
             {form.profile_photo_url ? (
               <img src={form.profile_photo_url} alt="Profile" className="h-full w-full object-cover" />
             ) : (
-              <div className="flex h-full w-full items-center justify-center text-xl font-semibold text-gray-400 bg-gray-50">
+              <div className="flex h-full w-full items-center justify-center text-xl font-semibold text-gray-400">
                 {displayName.charAt(0).toUpperCase()}
               </div>
             )}
@@ -255,18 +256,18 @@ export default function ProfilePage() {
             )}
           </div>
           <div className="min-w-0 flex-1">
-            <h2 className="text-[16px] font-semibold text-gray-900 truncate leading-tight">{displayName}</h2>
+            <h2 className="text-[17px] font-semibold text-gray-900 truncate leading-tight tracking-tight">{displayName}</h2>
             <p className="text-[13px] text-gray-500 truncate mt-0.5">{userEmail}</p>
-            <label className="mt-1.5 inline-flex cursor-pointer items-center gap-1 text-[12px] font-medium text-blue-600 hover:text-blue-700 transition-colors">
+            <label className="mt-1.5 inline-flex cursor-pointer items-center gap-1.5 text-[12px] font-medium text-blue-600 hover:text-blue-700 transition-colors bg-blue-50 px-2.5 py-1 rounded-full">
               <Icons.Edit /> Edit Profile
               <input type="file" accept="image/*" onChange={handlePhotoUpload} disabled={photoUploading} className="sr-only" />
             </label>
           </div>
         </div>
 
-        {/* SECTION: Account details (Matching Image 1) */}
+        {/* SECTION: Account details */}
         <div>
-          <h3 className="mb-2 px-4 text-[13px] font-medium text-gray-500 tracking-wide">Account details</h3>
+          <h3 className="mb-2 px-4 text-[13px] font-medium text-gray-500 tracking-wide uppercase">Account details</h3>
           <div className={cardCls}>
             {/* First Name */}
             <div className={listRowCls}>
@@ -323,9 +324,9 @@ export default function ProfilePage() {
           </div>
         </div>
 
-        {/* SECTION: Preferences (Matching Image 1 - Target/General) */}
+        {/* SECTION: Preferences */}
         <div>
-          <h3 className="mb-2 px-4 text-[13px] font-medium text-gray-500 tracking-wide">Preferences</h3>
+          <h3 className="mb-2 px-4 text-[13px] font-medium text-gray-500 tracking-wide uppercase">Preferences</h3>
           <div className={cardCls}>
             {/* Language */}
             <div className={listRowCls}>
@@ -367,7 +368,7 @@ export default function ProfilePage() {
 
         {/* SECTION: Notifications (Toggles) */}
         <div>
-          <h3 className="mb-2 px-4 text-[13px] font-medium text-gray-500 tracking-wide">Notifications</h3>
+          <h3 className="mb-2 px-4 text-[13px] font-medium text-gray-500 tracking-wide uppercase">Notifications</h3>
           <div className={cardCls}>
             {/* Marketing Emails */}
             <div className={listRowCls}>
@@ -377,8 +378,8 @@ export default function ProfilePage() {
               </div>
               <label className="relative inline-flex cursor-pointer items-center">
                 <input type="checkbox" checked={!!form.marketing_email} onChange={(e) => update("marketing_email", e.target.checked)} className="peer sr-only" />
-                <div className="h-[26px] w-[46px] rounded-full bg-gray-200 peer-checked:bg-black transition-colors duration-300"></div>
-                <div className="absolute left-[2px] top-[2px] h-[22px] w-[22px] rounded-full bg-white shadow-sm transition-transform duration-300 peer-checked:translate-x-[20px]"></div>
+                <div className="h-[28px] w-[48px] rounded-full bg-gray-200 peer-checked:bg-black transition-colors duration-300"></div>
+                <div className="absolute left-[2px] top-[2px] h-[24px] w-[24px] rounded-full bg-white shadow-sm transition-transform duration-300 peer-checked:translate-x-[20px]"></div>
               </label>
             </div>
             {/* Push Notifications */}
@@ -389,8 +390,8 @@ export default function ProfilePage() {
               </div>
               <label className="relative inline-flex cursor-pointer items-center">
                 <input type="checkbox" checked={!!form.push_notifications} onChange={(e) => update("push_notifications", e.target.checked)} className="peer sr-only" />
-                <div className="h-[26px] w-[46px] rounded-full bg-gray-200 peer-checked:bg-black transition-colors duration-300"></div>
-                <div className="absolute left-[2px] top-[2px] h-[22px] w-[22px] rounded-full bg-white shadow-sm transition-transform duration-300 peer-checked:translate-x-[20px]"></div>
+                <div className="h-[28px] w-[48px] rounded-full bg-gray-200 peer-checked:bg-black transition-colors duration-300"></div>
+                <div className="absolute left-[2px] top-[2px] h-[24px] w-[24px] rounded-full bg-white shadow-sm transition-transform duration-300 peer-checked:translate-x-[20px]"></div>
               </label>
             </div>
             {/* Security Notifications */}
@@ -401,16 +402,16 @@ export default function ProfilePage() {
               </div>
               <label className="relative inline-flex cursor-pointer items-center">
                 <input type="checkbox" checked={!!form.security_notifications} onChange={(e) => update("security_notifications", e.target.checked)} className="peer sr-only" />
-                <div className="h-[26px] w-[46px] rounded-full bg-gray-200 peer-checked:bg-black transition-colors duration-300"></div>
-                <div className="absolute left-[2px] top-[2px] h-[22px] w-[22px] rounded-full bg-white shadow-sm transition-transform duration-300 peer-checked:translate-x-[20px]"></div>
+                <div className="h-[28px] w-[48px] rounded-full bg-gray-200 peer-checked:bg-black transition-colors duration-300"></div>
+                <div className="absolute left-[2px] top-[2px] h-[24px] w-[24px] rounded-full bg-white shadow-sm transition-transform duration-300 peer-checked:translate-x-[20px]"></div>
               </label>
             </div>
           </div>
         </div>
 
-        {/* SECTION: Support (Matching Image 1 & 2) */}
+        {/* SECTION: Support */}
         <div>
-          <h3 className="mb-2 px-4 text-[13px] font-medium text-gray-500 tracking-wide">Support</h3>
+          <h3 className="mb-2 px-4 text-[13px] font-medium text-gray-500 tracking-wide uppercase">Support</h3>
           <div className={cardCls}>
             <div className={listRowCls}>
               <div className="flex items-center gap-3">
@@ -434,7 +435,7 @@ export default function ProfilePage() {
           <button
             type="submit"
             disabled={saving}
-            className="w-full rounded-[16px] bg-black py-4 text-[15px] font-semibold text-white transition-all duration-300 active:scale-[0.98] disabled:opacity-50 shadow-md shadow-black/10"
+            className="w-full rounded-[16px] bg-black py-4 text-[15px] font-semibold text-white transition-all duration-300 hover:bg-gray-800 active:scale-[0.98] disabled:opacity-50 shadow-md shadow-black/10"
           >
             {saving ? "Saving..." : "Save Changes"}
           </button>
@@ -442,7 +443,7 @@ export default function ProfilePage() {
       </form>
 
       {/* Bottom Navigation Bar (Strictly Matching Image 2) */}
-      <div className="fixed bottom-0 left-0 right-0 z-50 border-t border-gray-200/60 bg-white pb-safe pt-2">
+      <div className="fixed bottom-0 left-0 right-0 z-50 border-t border-gray-100 bg-white pb-safe pt-2 shadow-[0_-4px_10px_rgba(0,0,0,0.02)]">
         <div className="mx-auto flex max-w-md items-center justify-around px-2 pb-3">
           <button type="button" className="flex flex-col items-center gap-1 text-gray-400 transition-colors hover:text-black">
             <Icons.Home />
