@@ -103,10 +103,10 @@ const Icons = {
 };
 
 /* ================================================================== */
-/*  SHARED STYLES (Advanced & Professional iOS feel)                   */
+/*  SHARED STYLES (Apple Liquid Glass Concept on Pure White)           */
 /* ================================================================== */
-const cardCls = "bg-[#F8F9FA] rounded-[16px] overflow-hidden border border-gray-100/80 transition-all duration-300";
-const listRowCls = "group flex items-center justify-between px-4 py-3.5 border-b border-gray-200/60 last:border-0 active:bg-gray-100 transition-colors duration-200 cursor-pointer";
+const cardCls = "bg-white/80 backdrop-blur-xl rounded-[20px] overflow-hidden border border-gray-100 shadow-[0_8px_30px_rgba(0,0,0,0.04)] transition-all duration-300";
+const listRowCls = "group flex items-center justify-between px-4 py-3.5 border-b border-gray-100/60 last:border-0 active:bg-gray-50/50 transition-colors duration-200 cursor-pointer";
 const inputCls = "text-right bg-transparent border-none outline-none text-[15px] font-medium text-gray-900 placeholder-gray-400 w-full max-w-[60%] focus:ring-0 transition-colors";
 
 /* ================================================================== */
@@ -133,31 +133,11 @@ type Address = {
   is_primary: boolean;
 };
 
-/* ================================================================== */
-/*  Liquid glass — same as dashboard overview                          */
-/* ================================================================== */
-const liquidGlass = {
-  background:
-    "radial-gradient(120% 120% at 30% 12%, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0.40) 45%, rgba(255,255,255,0.28) 100%)",
-  backdropFilter: "blur(26px) saturate(180%)",
-  WebkitBackdropFilter: "blur(26px) saturate(180%)",
-  boxShadow:
-    "inset 0 1px 0 0 rgba(255,255,255,0.85), inset 0 0 0 1px rgba(255,255,255,0.35), 0 2px 4px rgba(0,0,0,0.04), 0 18px 42px -22px rgba(0,0,0,0.28)",
-} as const;
-
-/* ================================================================== */
-/*  SHARED LAYOUT TOKENS — remember for future pages                  */
-/* ================================================================== */
-/*  - Page container:  max-w-6xl  (wider, better on small screens)     */
-/*  - Mobile padding:  px-3 sm:px-5                                    */
-/*  - Vertical padding: py-5 sm:py-8                                   */
-/*  - Content gap:     space-y-5 sm:space-y-6                          */
-/*  - Modal width:     sm:max-w-xl                                     */
 const containerCls =
   "relative z-10 mx-auto max-w-6xl space-y-5 px-3 py-5 sm:space-y-6 sm:px-5 sm:py-8";
 
 const inputCls =
-  "w-full px-4 py-3 rounded-xl border border-white/40 bg-white/40 backdrop-blur-md text-black/90 text-[15px] placeholder-black/35 focus:outline-none focus:border-white/60 focus:bg-white/60 focus:ring-4 focus:ring-white/30 transition-all duration-300";
+  "w-full px-4 py-3 rounded-xl border border-gray-200 bg-white/60 backdrop-blur-md text-gray-900 text-[15px] placeholder-gray-400 focus:outline-none focus:border-gray-300 focus:bg-white focus:ring-4 focus:ring-gray-100 transition-all duration-300";
 
 const emptyForm: Partial<Address> = {
   address_type: "home",
@@ -173,14 +153,6 @@ const TYPE_LABEL: Record<string, string> = {
   other: "Other",
 };
 
-/* ================================================================== */
-/*  Background layer — full viewport, no gaps                          */
-/* ================================================================== */
-
-
-/* ================================================================== */
-/*  Field wrapper                                                      */
-/* ================================================================== */
 function Field({
   label,
   children,
@@ -192,18 +164,13 @@ function Field({
 }) {
   return (
     <div className={span ? "col-span-2" : ""}>
-      <label className="mb-2 block text-[10px] font-semibold uppercase tracking-[0.16em] text-black/60">
+      <label className="mb-2 block text-[10px] font-semibold uppercase tracking-[0.16em] text-gray-500">
         {label}
       </label>
       {children}
     </div>
   );
 }
-
-
-/* ================================================================== */
-/*  Main component                                                     */
-/* ================================================================== */
 
   const [addresses, setAddresses] = useState<Address[]>([]);
   const [loading, setLoading] = useState(true);
@@ -294,465 +261,81 @@ function Field({
     setDeleting(null);
   };
 
-  /* ---------------- loading state ---------------- */
   if (loading) return <Loader variant="addresses" />;
 
   return (
     <div className="relative isolate min-h-[80vh]">
-      {/* ============================================================ */}
-      {/*  KEYFRAMES                                                    */}
-      {/* ============================================================ */}
       <style jsx global>{`
         @keyframes addr-item-in {
           from { opacity: 0; transform: translateY(20px) scale(0.99); filter: blur(8px); }
           to   { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
         }
-        @keyframes addr-banner-in {
-          from { opacity: 0; transform: translateY(24px); filter: blur(10px); }
-          to   { opacity: 1; transform: translateY(0); filter: blur(0); }
-        }
-        @keyframes addr-float-soft {
-          0%, 100% { transform: translateY(0); }
-          50%      { transform: translateY(-5px); }
-        }
-        @keyframes addr-kenburns {
-          0%, 100% { transform: scale(1.04) translate(0, 0); }
-          50%      { transform: scale(1.12) translate(-1%, -0.8%); }
-        }
-        @keyframes addr-pulse-ring {
-          0%   { transform: scale(0.9); opacity: 0.7; }
-          70%  { transform: scale(1.6); opacity: 0; }
-          100% { transform: scale(1.6); opacity: 0; }
-        }
-        @media (prefers-reduced-motion: reduce) {
-          [data-addr-anim] {
-            animation: none !important;
-            opacity: 1 !important;
-            transform: none !important;
-            filter: none !important;
-          }
-        }
       `}</style>
 
-      {/* Background */}
-
-      {/* ============================================================ */}
-      {/*  CONTENT — wider container (max-w-6xl)                        */}
-      {/* ============================================================ */}
       <div className={containerCls}>
-        {/* ============================================================ */}
-        {/*  HERO BANNER                                                  */}
-        {/* ============================================================ */}
-        <div
-          data-addr-anim
-          className="relative overflow-hidden rounded-3xl border border-white/[0.4] p-6 sm:p-9"
-          style={{
-            background:
-              "radial-gradient(120% 120% at 30% 12%, rgba(255,255,255,0.58) 0%, rgba(255,255,255,0.42) 45%, rgba(255,255,255,0.30) 100%)",
-            backdropFilter: "blur(32px) saturate(180%)",
-            WebkitBackdropFilter: "blur(32px) saturate(180%)",
-            boxShadow:
-              "inset 0 1px 0 0 rgba(255,255,255,0.9), inset 0 0 0 1px rgba(255,255,255,0.35), 0 2px 4px rgba(0,0,0,0.04), 0 30px 64px -28px rgba(0,0,0,0.34)",
-            animation:
-              "addr-banner-in 0.85s cubic-bezier(0.22, 1, 0.36, 1) 0.05s both",
-          }}
-        >
-          {/* Top sheen */}
-          <div
-            aria-hidden="true"
-            className="pointer-events-none absolute inset-x-0 top-0 h-px"
-            style={{
-              background:
-                "linear-gradient(90deg, transparent, rgba(255,255,255,1), transparent)",
-            }}
-          />
-
-          {/* Floating light blobs */}
-          <div
-            aria-hidden="true"
-            className="pointer-events-none absolute -left-16 -top-16 h-52 w-52 rounded-full opacity-70"
-            style={{
-              background:
-                "radial-gradient(circle, rgba(180,200,255,0.5) 0%, rgba(180,200,255,0) 70%)",
-              filter: "blur(36px)",
-              animation: "addr-float-soft 7s ease-in-out infinite",
-            }}
-          />
-          <div
-            aria-hidden="true"
-            className="pointer-events-none absolute -right-16 -bottom-16 h-52 w-52 rounded-full opacity-70"
-            style={{
-              background:
-                "radial-gradient(circle, rgba(255,200,180,0.45) 0%, rgba(255,200,180,0) 70%)",
-              filter: "blur(36px)",
-              animation: "addr-float-soft 7s ease-in-out 1.4s infinite",
-            }}
-          />
-
-          <div className="relative">
-            {/* Kicker */}
-            <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-white/40 bg-white/40 px-3 py-1.5 backdrop-blur-md">
-              <span
-                className="h-1.5 w-1.5 rounded-full bg-black/80"
-                style={{ animation: "addr-float-soft 2.4s ease-in-out infinite" }}
-              />
-              <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-black/70">
-                Locations
-              </span>
-            </div>
-
-            <div className="flex flex-wrap items-start justify-between gap-5">
-              <div className="min-w-0">
-                <h1
-                  className="mb-3 text-2xl font-semibold tracking-[-0.02em] text-black sm:text-3xl"
-                  style={{
-                    textShadow:
-                      "0 1px 12px rgba(255,255,255,0.85), 0 1px 2px rgba(255,255,255,0.6)",
-                  }}
-                >
-                  Addresses
-                </h1>
-                <p className="max-w-lg text-[13.5px] leading-6 text-black/70">
-                  Keep your saved locations in one place. Add or edit anytime —
-                  changes apply instantly.
-                </p>
-              </div>
-
-              {!showForm && addresses.length > 0 && (
-                <button
-                  onClick={openNew}
-                  className="group relative inline-flex items-center gap-2 overflow-hidden rounded-full border border-black bg-black px-4 py-2.5 text-[12.5px] font-medium text-white transition-all duration-500 hover:-translate-y-0.5"
-                  style={{
-                    boxShadow:
-                      "inset 0 1px 0 0 rgba(255,255,255,0.14), 0 2px 4px rgba(0,0,0,0.08), 0 12px 28px -12px rgba(0,0,0,0.5)",
-                  }}
-                >
-                  <span
-                    aria-hidden="true"
-                    className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
-                    style={{
-                      background:
-                        "radial-gradient(circle at 30% 30%, rgba(255,255,255,0.2), transparent 60%)",
-                    }}
-                  />
-                  <svg
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2.2"
-                    strokeLinecap="round"
-                    className="relative h-4 w-4 transition-transform duration-500 group-hover:rotate-90"
-                  >
-                    <line x1="12" y1="5" x2="12" y2="19" />
-                    <line x1="5" y1="12" x2="19" y2="12" />
-                  </svg>
-                  <span className="relative">Add address</span>
-                </button>
-              )}
-            </div>
+        <div className="flex flex-wrap items-start justify-between gap-5 mb-6">
+          <div className="min-w-0">
+            <h1 className="mb-2 text-2xl font-semibold tracking-[-0.02em] text-gray-900">Addresses</h1>
+            <p className="max-w-lg text-[13.5px] leading-6 text-gray-500">Keep your saved locations in one place. Add or edit anytime — changes apply instantly.</p>
           </div>
+          {!showForm && addresses.length > 0 && (
+            <button onClick={openNew} className="group relative inline-flex items-center gap-2 overflow-hidden rounded-full border border-black bg-black px-4 py-2.5 text-[12.5px] font-medium text-white transition-all duration-500 hover:-translate-y-0.5 shadow-lg shadow-black/10">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" className="relative h-4 w-4 transition-transform duration-500 group-hover:rotate-90"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
+              <span className="relative">Add address</span>
+            </button>
+          )}
         </div>
 
-        {/* ============================================================ */}
-        {/*  MESSAGE BANNER                                               */}
-        {/* ============================================================ */}
         {message && (
-          <div
-            className={`relative overflow-hidden rounded-2xl border px-4 py-3.5 text-[13px] backdrop-blur-md ${
-              message.type === "success"
-                ? "border-emerald-300/60 bg-emerald-100/50 text-emerald-800"
-                : "border-amber-300/60 bg-amber-100/50 text-amber-800"
-            }`}
-            style={{
-              animation: `addr-item-in 0.5s cubic-bezier(0.22, 1, 0.36, 1) both`,
-            }}
-          >
-            <div className="flex items-start gap-3">
-              <div className="mt-0.5 shrink-0">
-                {message.type === "success" ? (
-                  <svg
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="h-4 w-4"
-                  >
-                    <path d="M20 6 9 17l-5-5" />
-                  </svg>
-                ) : (
-                  <svg
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="h-4 w-4"
-                  >
-                    <circle cx="12" cy="12" r="10" />
-                    <line x1="12" y1="8" x2="12" y2="12" />
-                    <line x1="12" y1="16" x2="12.01" y2="16" />
-                  </svg>
-                )}
-              </div>
-              <span className="leading-relaxed">{message.text}</span>
-            </div>
+          <div className={`rounded-[16px] px-4 py-3.5 text-[13px] font-medium animate-in fade-in slide-in-from-top-4 duration-500 backdrop-blur-md mb-5 ${message.type === "success" ? "bg-emerald-50/80 text-emerald-700 border border-emerald-100/80" : "bg-rose-50/80 text-rose-700 border border-rose-100/80"}`}>
+            {message.text}
           </div>
         )}
 
-        {/* ============================================================ */}
-        {/*  EMPTY STATE                                                  */}
-        {/* ============================================================ */}
         {!loading && addresses.length === 0 && !showForm && (
-          <div
-            data-addr-anim
-            className="relative overflow-hidden rounded-3xl border border-white/[0.4] p-12 text-center sm:p-16"
-            style={{
-              background:
-                "radial-gradient(120% 120% at 30% 12%, rgba(255,255,255,0.58) 0%, rgba(255,255,255,0.42) 45%, rgba(255,255,255,0.30) 100%)",
-              backdropFilter: "blur(32px) saturate(180%)",
-              WebkitBackdropFilter: "blur(32px) saturate(180%)",
-              boxShadow:
-                "inset 0 1px 0 0 rgba(255,255,255,0.9), inset 0 0 0 1px rgba(255,255,255,0.35), 0 2px 4px rgba(0,0,0,0.04), 0 30px 64px -28px rgba(0,0,0,0.34)",
-              animation:
-                "addr-banner-in 0.85s cubic-bezier(0.22, 1, 0.36, 1) 0.1s both",
-            }}
-          >
-            <div className="relative">
-              <div
-                className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-3xl border border-white/40"
-                style={{
-                  background:
-                    "radial-gradient(120% 120% at 30% 15%, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0.5) 100%)",
-                  backdropFilter: "blur(14px)",
-                  WebkitBackdropFilter: "blur(14px)",
-                  boxShadow:
-                    "inset 0 1px 0 0 rgba(255,255,255,1), 0 6px 16px -8px rgba(0,0,0,0.10)",
-                  animation: "addr-float-soft 4s ease-in-out infinite",
-                }}
-              >
-                <Image
-                  src="/icons/location.svg"
-                  alt=""
-                  width={32}
-                  height={32}
-                  className="opacity-75"
-                />
-              </div>
-
-              <h2
-                className="mb-3 text-xl font-semibold tracking-[-0.01em] text-black"
-                style={{
-                  textShadow:
-                    "0 1px 12px rgba(255,255,255,0.85), 0 1px 2px rgba(255,255,255,0.6)",
-                }}
-              >
-                No addresses yet
-              </h2>
-              <p className="mx-auto mb-8 max-w-sm text-[13.5px] leading-6 text-black/65">
-                Add a home, work, or billing address so it&apos;s always ready
-                when you need it.
-              </p>
-
-              <button
-                onClick={openNew}
-                className="group relative inline-flex items-center gap-2 overflow-hidden rounded-full border border-black bg-black px-5 py-3 text-[13px] font-medium text-white transition-all duration-500 hover:-translate-y-0.5"
-                style={{
-                  boxShadow:
-                    "inset 0 1px 0 0 rgba(255,255,255,0.14), 0 2px 4px rgba(0,0,0,0.08), 0 12px 28px -12px rgba(0,0,0,0.5)",
-                }}
-              >
-                <span
-                  aria-hidden="true"
-                  className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
-                  style={{
-                    background:
-                      "radial-gradient(circle at 30% 30%, rgba(255,255,255,0.2), transparent 60%)",
-                  }}
-                />
-                <svg
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2.2"
-                  strokeLinecap="round"
-                  className="relative h-4 w-4 transition-transform duration-500 group-hover:rotate-90"
-                >
-                  <line x1="12" y1="5" x2="12" y2="19" />
-                  <line x1="5" y1="12" x2="19" y2="12" />
-                </svg>
-                <span className="relative">Add your first address</span>
-              </button>
+          <div className="relative overflow-hidden rounded-3xl border border-gray-100 bg-white/80 backdrop-blur-xl p-12 text-center shadow-sm">
+            <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-3xl border border-gray-100 bg-gray-50 shadow-sm">
+              <Image src="/icons/location.svg" alt="" width={32} height={32} className="opacity-60" />
             </div>
+            <h2 className="mb-3 text-xl font-semibold text-gray-900">No addresses yet</h2>
+            <p className="mx-auto mb-8 max-w-sm text-[13.5px] leading-6 text-gray-500">Add a home, work, or billing address so it&apos;s always ready when you need it.</p>
+            <button onClick={openNew} className="inline-flex items-center gap-2 rounded-full border border-black bg-black px-5 py-3 text-[13px] font-medium text-white transition-all duration-500 hover:-translate-y-0.5 shadow-lg shadow-black/10">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" className="h-4 w-4"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
+              Add your first address
+            </button>
           </div>
         )}
 
-        {/* ============================================================ */}
-        {/*  ADDRESS LIST                                                 */}
-        {/* ============================================================ */}
         {!loading && addresses.length > 0 && (
           <div className="space-y-4">
             {addresses.map((a, i) => (
-              <article
-                key={a.id}
-                className="group relative overflow-hidden rounded-3xl border border-white/[0.35] p-6 transition-all duration-500 hover:-translate-y-0.5 hover:border-white/[0.5] hover:shadow-[0_22px_48px_-22px_rgba(0,0,0,0.32)]"
-                style={{
-                  ...liquidGlass,
-                  animation: `addr-item-in 0.6s cubic-bezier(0.22, 1, 0.36, 1) ${
-                    0.15 + i * 0.06
-                  }s both`,
-                }}
-              >
-                {/* Hover sheen */}
-                <span
-                  aria-hidden="true"
-                  className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
-                  style={{
-                    background:
-                      "radial-gradient(circle at 25% 15%, rgba(255,255,255,0.35), transparent 60%)",
-                  }}
-                />
-
-                {/* Top row — badges + actions */}
+              <article key={a.id} className="group relative overflow-hidden rounded-3xl border border-gray-100 bg-white/80 backdrop-blur-xl p-6 transition-all duration-500 hover:-translate-y-0.5 hover:shadow-[0_20px_40px_-20px_rgba(0,0,0,0.1)]" style={{ animation: `addr-item-in 0.6s cubic-bezier(0.22, 1, 0.36, 1) ${0.15 + i * 0.06}s both` }}>
                 <div className="relative mb-4 flex items-start justify-between gap-3">
                   <div className="flex flex-wrap items-center gap-2">
-                    <span className="inline-flex items-center gap-1.5 rounded-full border border-white/40 bg-white/40 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-black/70 backdrop-blur-md">
+                    <span className="inline-flex items-center gap-1.5 rounded-full border border-gray-200 bg-gray-50 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-gray-600">
                       {TYPE_LABEL[a.address_type] ?? a.address_type}
                     </span>
                     {a.is_primary && (
-                      <span className="relative inline-flex items-center gap-1.5 rounded-full border border-emerald-300/60 bg-emerald-100/50 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-emerald-800 backdrop-blur-md">
-                        <span className="relative flex h-1.5 w-1.5">
-                          <span
-                            className="absolute inset-0 rounded-full bg-emerald-600"
-                            style={{
-                              animation:
-                                "addr-pulse-ring 2.4s cubic-bezier(0.4, 0, 0.6, 1) infinite",
-                            }}
-                          />
-                          <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-600" />
-                        </span>
-                        Primary
+                      <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-emerald-700">
+                        <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" /> Primary
                       </span>
                     )}
                   </div>
-
                   <div className="flex gap-1 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
-                    <button
-                      onClick={() => openEdit(a)}
-                      aria-label="Edit"
-                      className="flex h-9 w-9 items-center justify-center rounded-full border border-white/40 bg-white/40 text-black/65 backdrop-blur-md transition-all duration-300 hover:-translate-y-0.5 hover:border-white/60 hover:bg-white/60 hover:text-black"
-                    >
-                      <svg
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        className="h-4 w-4"
-                      >
-                        <path d="M12 20h9" />
-                        <path d="M16.5 3.5a2.121 2.121 0 1 1 3 3L7 19l-4 1 1-4 12.5-12.5z" />
-                      </svg>
-                    </button>
-                    <button
-                      onClick={() => handleDelete(a.id)}
-                      disabled={deleting === a.id}
-                      aria-label="Delete"
-                      className="flex h-9 w-9 items-center justify-center rounded-full border border-white/40 bg-white/40 text-black/65 backdrop-blur-md transition-all duration-300 hover:-translate-y-0.5 hover:border-red-300/60 hover:bg-red-100/50 hover:text-red-700 disabled:opacity-40"
-                    >
-                      {deleting === a.id ? (
-                        <span aria-hidden="true" />
-                      ) : (
-                        <svg
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          className="h-4 w-4"
-                        >
-                          <polyline points="3 6 5 6 21 6" />
-                          <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
-                        </svg>
-                      )}
+                    <button onClick={() => openEdit(a)} className="flex h-9 w-9 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-500 hover:bg-gray-50 hover:text-black transition-all"><Icons.Edit /></button>
+                    <button onClick={() => handleDelete(a.id)} disabled={deleting === a.id} className="flex h-9 w-9 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-500 hover:bg-rose-50 hover:text-rose-600 disabled:opacity-40">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4"><polyline points="3 6 5 6 21 6" /><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" /></svg>
                     </button>
                   </div>
                 </div>
-
-                {/* Address content */}
                 <div className="relative flex items-start gap-4">
-                  <div
-                    className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-white/40 transition-colors duration-500 group-hover:border-white/60"
-                    style={{
-                      background:
-                        "radial-gradient(120% 120% at 30% 15%, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0.5) 100%)",
-                      backdropFilter: "blur(14px)",
-                      WebkitBackdropFilter: "blur(14px)",
-                      boxShadow:
-                        "inset 0 1px 0 0 rgba(255,255,255,1), 0 2px 8px -4px rgba(0,0,0,0.08)",
-                    }}
-                  >
-                    <Image
-                      src="/icons/location.svg"
-                      alt=""
-                      width={18}
-                      height={18}
-                      className="opacity-70"
-                    />
+                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-gray-100 bg-gray-50">
+                    <Image src="/icons/location.svg" alt="" width={18} height={18} className="opacity-60" />
                   </div>
-
                   <div className="min-w-0 flex-1">
-                    <p className="mb-1 text-[14px] font-semibold leading-snug text-black/90">
-                      {a.address_line_1}
-                      {a.address_line_2 && (
-                        <span className="font-normal text-black/60">
-                          , {a.address_line_2}
-                        </span>
-                      )}
-                    </p>
-
-                    {(a.city ||
-                      a.state_province ||
-                      a.postal_code ||
-                      a.country_code) && (
-                      <p className="text-[12.5px] leading-relaxed text-black/60">
-                        {[a.city, a.state_province, a.postal_code, a.country_code]
-                          .filter(Boolean)
-                          .join(", ")}
-                      </p>
-                    )}
-
-                    {a.latitude !== null && a.longitude !== null && (
-                      <div className="mt-3 inline-flex items-center gap-2 rounded-lg border border-white/40 bg-white/40 px-2.5 py-1 backdrop-blur-md">
-                        <svg
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          className="h-3 w-3 text-black/45"
-                        >
-                          <path d="M12 2a7 7 0 0 0-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 0 0-7-7z" />
-                          <circle cx="12" cy="9" r="2.5" />
-                        </svg>
-                        <span className="font-mono text-[11px] tracking-tight text-black/70">
-                          {Number(a.latitude).toFixed(5)},{" "}
-                          {Number(a.longitude).toFixed(5)}
-                        </span>
-                        {a.location_accuracy_meters !== null && (
-                          <>
-                            <span className="h-3 w-px bg-black/20" />
-                            <span className="text-[11px] text-black/60">
-                              ±{Math.round(a.location_accuracy_meters)}m
-                            </span>
-                          </>
-                        )}
-                      </div>
+                    <p className="mb-1 text-[14px] font-semibold leading-snug text-gray-900">{a.address_line_1}{a.address_line_2 && <span className="font-normal text-gray-500">, {a.address_line_2}</span>}</p>
+                    {(a.city || a.state_province || a.postal_code || a.country_code) && (
+                      <p className="text-[12.5px] leading-relaxed text-gray-500">{[a.city, a.state_province, a.postal_code, a.country_code].filter(Boolean).join(", ")}</p>
                     )}
                   </div>
                 </div>
@@ -761,220 +344,49 @@ function Field({
           </div>
         )}
 
-        {/* ============================================================ */}
-        {/*  MODAL FORM — liquid glass, wider panel                       */}
-        {/* ============================================================ */}
         {showForm && (
-          <div
-            className="fixed inset-0 z-50 flex items-end justify-center p-0 sm:items-center sm:p-6"
-            style={{
-              animation: `addr-banner-in 0.3s cubic-bezier(0.22, 1, 0.36, 1) both`,
-            }}
-          >
-            {/* Backdrop */}
-            <div
-              className="absolute inset-0 bg-black/40 backdrop-blur-md"
-              onClick={cancel}
-            />
-
-            {/* Panel */}
-            <div
-              className="relative w-full max-h-[92vh] overflow-y-auto rounded-t-[28px] border border-white/[0.4] sm:max-w-xl sm:rounded-3xl"
-              style={{
-                background:
-                  "radial-gradient(120% 120% at 30% 12%, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0.72) 45%, rgba(255,255,255,0.60) 100%)",
-                backdropFilter: "blur(36px) saturate(180%)",
-                WebkitBackdropFilter: "blur(36px) saturate(180%)",
-                boxShadow:
-                  "inset 0 1px 0 0 rgba(255,255,255,1), inset 0 0 0 1px rgba(255,255,255,0.4), 0 32px 80px -24px rgba(0,0,0,0.35)",
-                animation:
-                  "addr-banner-in 0.5s cubic-bezier(0.22, 1, 0.36, 1) both",
-              }}
-            >
-              {/* Sticky header */}
-              <div
-                className="sticky top-0 z-10 flex items-center justify-between border-b border-white/30 px-6 py-4"
-                style={{
-                  background: "rgba(255,255,255,0.55)",
-                  backdropFilter: "blur(24px) saturate(180%)",
-                  WebkitBackdropFilter: "blur(24px) saturate(180%)",
-                }}
-              >
+          <div className="fixed inset-0 z-50 flex items-end justify-center p-0 sm:items-center sm:p-6 animate-in fade-in duration-300">
+            <div className="absolute inset-0 bg-black/40 backdrop-blur-md" onClick={cancel} />
+            <div className="relative w-full max-h-[92vh] overflow-y-auto rounded-t-[28px] border border-gray-100 bg-white/90 backdrop-blur-2xl sm:max-w-xl sm:rounded-3xl shadow-2xl animate-in slide-in-from-bottom-4 duration-500">
+              <div className="sticky top-0 z-10 flex items-center justify-between border-b border-gray-100 px-6 py-4 bg-white/80 backdrop-blur-xl">
                 <div>
-                  <h2 className="text-[16px] font-semibold tracking-[-0.01em] text-black/90">
-                    {editingId ? "Edit address" : "New address"}
-                  </h2>
-                  <p className="mt-0.5 text-[11.5px] text-black/55">
-                    {editingId
-                      ? "Update your saved location"
-                      : "Save a new location to your account"}
-                  </p>
+                  <h2 className="text-[16px] font-semibold text-gray-900">{editingId ? "Edit address" : "New address"}</h2>
+                  <p className="mt-0.5 text-[11.5px] text-gray-500">{editingId ? "Update your saved location" : "Save a new location to your account"}</p>
                 </div>
-                <button
-                  onClick={cancel}
-                  aria-label="Close"
-                  className="flex h-9 w-9 items-center justify-center rounded-full border border-white/40 bg-white/40 text-black/65 backdrop-blur-md transition-all duration-300 hover:-translate-y-0.5 hover:border-white/60 hover:bg-white/60 hover:text-black"
-                >
-                  <svg
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    className="h-4 w-4"
-                  >
-                    <line x1="18" y1="6" x2="6" y2="18" />
-                    <line x1="6" y1="6" x2="18" y2="18" />
-                  </svg>
-                </button>
+                <button onClick={cancel} className="flex h-9 w-9 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-500 hover:bg-gray-50 hover:text-black transition-all"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="h-4 w-4"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg></button>
               </div>
-
               <form onSubmit={handleSubmit} className="space-y-5 p-6">
                 <div className="grid grid-cols-2 gap-4">
                   <Field label="Type">
-                    <select
-                      value={form.address_type ?? "home"}
-                      onChange={(e) => update("address_type", e.target.value)}
-                      className={inputCls}
-                    >
-                      <option value="home">Home</option>
-                      <option value="work">Work</option>
-                      <option value="billing">Billing</option>
-                      <option value="shipping">Shipping</option>
-                      <option value="other">Other</option>
+                    <select value={form.address_type ?? "home"} onChange={(e) => update("address_type", e.target.value)} className={inputCls}>
+                      <option value="home">Home</option><option value="work">Work</option><option value="billing">Billing</option><option value="shipping">Shipping</option><option value="other">Other</option>
                     </select>
                   </Field>
                   <Field label="Country code">
-                    <input
-                      type="text"
-                      maxLength={2}
-                      value={form.country_code ?? ""}
-                      onChange={(e) =>
-                        update("country_code", e.target.value.toUpperCase())
-                      }
-                      className={inputCls}
-                      placeholder="US"
-                    />
+                    <input type="text" maxLength={2} value={form.country_code ?? ""} onChange={(e) => update("country_code", e.target.value.toUpperCase())} className={inputCls} placeholder="US" />
                   </Field>
                 </div>
-
-                <Field label="Address line 1" span>
-                  <input
-                    type="text"
-                    required
-                    value={form.address_line_1 ?? ""}
-                    onChange={(e) => update("address_line_1", e.target.value)}
-                    className={inputCls}
-                    placeholder="Street address"
-                  />
-                </Field>
-
-                <Field label="Address line 2" span>
-                  <input
-                    type="text"
-                    value={form.address_line_2 ?? ""}
-                    onChange={(e) => update("address_line_2", e.target.value)}
-                    className={inputCls}
-                    placeholder="Apartment, suite, etc. (optional)"
-                  />
-                </Field>
-
+                <Field label="Address line 1" span><input type="text" required value={form.address_line_1 ?? ""} onChange={(e) => update("address_line_1", e.target.value)} className={inputCls} placeholder="Street address" /></Field>
+                <Field label="Address line 2" span><input type="text" value={form.address_line_2 ?? ""} onChange={(e) => update("address_line_2", e.target.value)} className={inputCls} placeholder="Apartment, suite, etc. (optional)" /></Field>
                 <div className="grid grid-cols-2 gap-4">
-                  <Field label="City">
-                    <input
-                      type="text"
-                      value={form.city ?? ""}
-                      onChange={(e) => update("city", e.target.value)}
-                      className={inputCls}
-                    />
-                  </Field>
-                  <Field label="State / Province">
-                    <input
-                      type="text"
-                      value={form.state_province ?? ""}
-                      onChange={(e) => update("state_province", e.target.value)}
-                      className={inputCls}
-                    />
-                  </Field>
+                  <Field label="City"><input type="text" value={form.city ?? ""} onChange={(e) => update("city", e.target.value)} className={inputCls} /></Field>
+                  <Field label="State / Province"><input type="text" value={form.state_province ?? ""} onChange={(e) => update("state_province", e.target.value)} className={inputCls} /></Field>
                 </div>
-
                 <div className="grid grid-cols-2 gap-4">
-                  <Field label="District">
-                    <input
-                      type="text"
-                      value={form.district ?? ""}
-                      onChange={(e) => update("district", e.target.value)}
-                      className={inputCls}
-                    />
-                  </Field>
-                  <Field label="Postal code">
-                    <input
-                      type="text"
-                      value={form.postal_code ?? ""}
-                      onChange={(e) => update("postal_code", e.target.value)}
-                      className={inputCls}
-                    />
-                  </Field>
+                  <Field label="District"><input type="text" value={form.district ?? ""} onChange={(e) => update("district", e.target.value)} className={inputCls} /></Field>
+                  <Field label="Postal code"><input type="text" value={form.postal_code ?? ""} onChange={(e) => update("postal_code", e.target.value)} className={inputCls} /></Field>
                 </div>
-
-                {/* Primary toggle — liquid glass card */}
-                <label className="flex cursor-pointer items-center justify-between gap-3 rounded-2xl border border-white/40 bg-white/40 p-4 backdrop-blur-md transition-colors duration-300 hover:border-white/60 hover:bg-white/60">
-                  <div>
-                    <div className="text-[13.5px] font-semibold text-black/90">
-                      Set as primary
-                    </div>
-                    <div className="mt-0.5 text-[11.5px] text-black/55">
-                      Used by default when sharing your address
-                    </div>
-                  </div>
+                <label className="flex cursor-pointer items-center justify-between gap-3 rounded-2xl border border-gray-100 bg-white/60 p-4 backdrop-blur-md transition-colors duration-300 hover:bg-white">
+                  <div><div className="text-[13.5px] font-semibold text-gray-900">Set as primary</div><div className="mt-0.5 text-[11.5px] text-gray-500">Used by default when sharing your address</div></div>
                   <div className="relative shrink-0">
-                    <input
-                      type="checkbox"
-                      checked={!!form.is_primary}
-                      onChange={(e) => update("is_primary", e.target.checked)}
-                      className="peer sr-only"
-                    />
-                    <div className="h-6 w-11 rounded-full bg-white/60 transition-colors duration-300 peer-checked:bg-black/90" />
-                    <div className="absolute left-0.5 top-0.5 h-5 w-5 rounded-full bg-white shadow-sm transition-transform duration-300 peer-checked:translate-x-5" />
+                    <input type="checkbox" checked={!!form.is_primary} onChange={(e) => update("is_primary", e.target.checked)} className="peer sr-only" />
+                    <div className="h-[31px] w-[51px] rounded-full bg-gray-200 peer-checked:bg-black transition-colors duration-300"></div>
+                    <div className="absolute left-[2px] top-[2px] h-[27px] w-[27px] rounded-full bg-white shadow-md transition-transform duration-300 peer-checked:translate-x-[20px]"></div>
                   </div>
                 </label>
-
                 <div className="flex gap-3 pt-1">
-                  <button
-                    type="button"
-                    onClick={cancel}
-                    className="flex-1 rounded-full border border-white/40 bg-white/40 px-5 py-3.5 text-[13px] font-medium text-black/75 backdrop-blur-md transition-all duration-500 hover:-translate-y-0.5 hover:border-white/60 hover:bg-white/60 hover:text-black"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    disabled={saving}
-                    className="group relative inline-flex flex-1 items-center justify-center gap-2 overflow-hidden rounded-full border border-black bg-black px-5 py-3.5 text-[13px] font-medium text-white transition-all duration-500 hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-60"
-                    style={{
-                      boxShadow:
-                        "inset 0 1px 0 0 rgba(255,255,255,0.14), 0 2px 4px rgba(0,0,0,0.08), 0 12px 28px -12px rgba(0,0,0,0.5)",
-                    }}
-                  >
-                    <span
-                      aria-hidden="true"
-                      className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
-                      style={{
-                        background:
-                          "radial-gradient(circle at 30% 30%, rgba(255,255,255,0.2), transparent 60%)",
-                      }}
-                    />
-                    {saving ? (
-                      <>
-                        <span aria-hidden="true" />
-                        <span className="relative">Saving...</span>
-                      </>
-                    ) : (
-                      <span className="relative">
-                        {editingId ? "Save changes" : "Add address"}
-                      </span>
-                    )}
-                  </button>
+                  <button type="button" onClick={cancel} className="flex-1 rounded-full border border-gray-200 bg-white px-5 py-3.5 text-[13px] font-medium text-gray-700 hover:bg-gray-50 transition-all">Cancel</button>
+                  <button type="submit" disabled={saving} className="flex-1 rounded-full bg-black px-5 py-3.5 text-[13px] font-medium text-white hover:bg-gray-800 transition-all disabled:opacity-50">{saving ? "Saving..." : (editingId ? "Save changes" : "Add address")}</button>
                 </div>
               </form>
             </div>
@@ -996,101 +408,22 @@ type Contact = {
   is_verified: boolean;
 };
 
-/* ================================================================== */
-/*  Liquid glass — same as dashboard / addresses / profile / security  */
-/* ================================================================== */
-const liquidGlass = {
-  background:
-    "radial-gradient(120% 120% at 30% 12%, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0.40) 45%, rgba(255,255,255,0.28) 100%)",
-  backdropFilter: "blur(26px) saturate(180%)",
-  WebkitBackdropFilter: "blur(26px) saturate(180%)",
-  boxShadow:
-    "inset 0 1px 0 0 rgba(255,255,255,0.85), inset 0 0 0 1px rgba(255,255,255,0.35), 0 2px 4px rgba(0,0,0,0.04), 0 18px 42px -22px rgba(0,0,0,0.28)",
-} as const;
+const containerCls = "relative z-10 mx-auto max-w-6xl space-y-5 px-3 py-5 sm:space-y-6 sm:px-5 sm:py-8";
+const inputCls = "w-full px-4 py-3 rounded-xl border border-gray-200 bg-white/60 backdrop-blur-md text-gray-900 text-[15px] placeholder-gray-400 focus:outline-none focus:border-gray-300 focus:bg-white focus:ring-4 focus:ring-gray-100 transition-all duration-300";
 
-/* ================================================================== */
-/*  SHARED LAYOUT TOKENS                                               */
-/* ================================================================== */
-const containerCls =
-  "relative z-10 mx-auto max-w-6xl space-y-5 px-3 py-5 sm:space-y-6 sm:px-5 sm:py-8";
+const emptyForm: Partial<Contact> = { contact_type: "website", contact_value: "", is_primary: false };
+const TYPE_ICON: Record<string, string> = { website: "/icons/link.svg", social: "/icons/message.svg", messenger: "/icons/mobile.svg", other: "/icons/link.svg" };
+const TYPE_LABEL: Record<string, string> = { website: "Website", social: "Social", messenger: "Messenger", other: "Other" };
 
-const inputCls =
-  "w-full px-4 py-3 rounded-xl border border-white/40 bg-white/40 backdrop-blur-md text-black/90 text-[15px] placeholder-black/35 focus:outline-none focus:border-white/60 focus:bg-white/60 focus:ring-4 focus:ring-white/30 transition-all duration-300";
-
-const emptyForm: Partial<Contact> = {
-  contact_type: "website",
-  contact_value: "",
-  is_primary: false,
-};
-
-const TYPE_ICON: Record<string, string> = {
-  website: "/icons/link.svg",
-  social: "/icons/message.svg",
-  messenger: "/icons/mobile.svg",
-  other: "/icons/link.svg",
-};
-
-const TYPE_LABEL: Record<string, string> = {
-  website: "Website",
-  social: "Social",
-  messenger: "Messenger",
-  other: "Other",
-};
-
-/* ================================================================== */
-/*  Background layer — full viewport                                   */
-/* ================================================================== */
-
-
-/* ================================================================== */
-/*  Field wrapper                                                      */
-/* ================================================================== */
-function Field({
-  label,
-  hint,
-  children,
-}: {
-  label: string;
-  hint?: string;
-  children: React.ReactNode;
-}) {
+function Field({ label, hint, children }: { label: string; hint?: string; children: React.ReactNode }) {
   return (
     <div>
-      <label className="mb-2 block text-[10px] font-semibold uppercase tracking-[0.16em] text-black/60">
-        {label}
-      </label>
+      <label className="mb-2 block text-[10px] font-semibold uppercase tracking-[0.16em] text-gray-500">{label}</label>
       {children}
-      {hint && (
-        <p className="mt-1.5 text-[11.5px] leading-5 text-black/50">{hint}</p>
-      )}
+      {hint && <p className="mt-1.5 text-[11.5px] leading-5 text-gray-400">{hint}</p>}
     </div>
   );
 }
-
-/* ================================================================== */
-/*  Section heading                                                    */
-/* ================================================================== */
-function SectionHeading({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="mb-4 flex items-center gap-3">
-      <span className="whitespace-nowrap text-[10px] font-semibold uppercase tracking-[0.18em] text-black/55">
-        {children}
-      </span>
-      <span
-        aria-hidden="true"
-        className="h-px flex-1"
-        style={{
-          background:
-            "linear-gradient(90deg, rgba(255,255,255,0.6), rgba(255,255,255,0))",
-        }}
-      />
-    </div>
-  );
-}
-
-/* ================================================================== */
-/*  Page                                                               */
-/* ================================================================== */
 
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [loading, setLoading] = useState(true);
@@ -1099,10 +432,7 @@ function SectionHeading({ children }: { children: React.ReactNode }) {
   const [form, setForm] = useState<Partial<Contact>>(emptyForm);
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState<string | null>(null);
-  const [message, setMessage] = useState<{
-    type: "success" | "error";
-    text: string;
-  } | null>(null);
+  const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
   const load = async () => {
     const res = await apiFetch<{ contacts: Contact[] }>("/api/user/contacts");
@@ -1110,657 +440,127 @@ function SectionHeading({ children }: { children: React.ReactNode }) {
     setLoading(false);
   };
 
-  useEffect(() => {
-    load();
-  }, []);
+  useEffect(() => { load(); }, []);
 
-  const update = <K extends keyof Contact>(key: K, value: Contact[K]) => {
-    setForm((f) => ({ ...f, [key]: value }));
-  };
-
-  const openNew = () => {
-    setForm(emptyForm);
-    setEditingId(null);
-    setShowForm(true);
-    setMessage(null);
-  };
-
-  const openEdit = (c: Contact) => {
-    setForm(c);
-    setEditingId(c.id);
-    setShowForm(true);
-    setMessage(null);
-  };
-
-  const cancel = () => {
-    setShowForm(false);
-    setEditingId(null);
-    setForm(emptyForm);
-  };
+  const update = <K extends keyof Contact>(key: K, value: Contact[K]) => { setForm((f) => ({ ...f, [key]: value })); };
+  const openNew = () => { setForm(emptyForm); setEditingId(null); setShowForm(true); setMessage(null); };
+  const openEdit = (c: Contact) => { setForm(c); setEditingId(c.id); setShowForm(true); setMessage(null); };
+  const cancel = () => { setShowForm(false); setEditingId(null); setForm(emptyForm); };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setSaving(true);
-    setMessage(null);
-
-    const url = editingId
-      ? `/api/user/contacts/${editingId}`
-      : "/api/user/contacts";
+    e.preventDefault(); setSaving(true); setMessage(null);
+    const url = editingId ? `/api/user/contacts/${editingId}` : "/api/user/contacts";
     const method = editingId ? "PATCH" : "POST";
-
-    const res = await apiFetch<{ contact: Contact }>(url, {
-      method,
-      body: JSON.stringify(form),
-    });
-
-    if (res.success) {
-      setMessage({
-        type: "success",
-        text: editingId ? "Contact updated" : "Contact added",
-      });
-      cancel();
-      load();
-    } else {
-      setMessage({ type: "error", text: res.error.message });
-    }
+    const res = await apiFetch<{ contact: Contact }>(url, { method, body: JSON.stringify(form) });
+    if (res.success) { setMessage({ type: "success", text: editingId ? "Contact updated" : "Contact added" }); cancel(); load(); }
+    else { setMessage({ type: "error", text: res.error.message }); }
     setSaving(false);
   };
 
   const handleDelete = async (id: string) => {
     if (!confirm("Delete this contact?")) return;
     setDeleting(id);
-    const res = await apiFetch(`/api/user/contacts/${id}`, {
-      method: "DELETE",
-    });
-    if (res.success) {
-      setMessage({ type: "success", text: "Contact deleted" });
-      load();
-    } else {
-      setMessage({ type: "error", text: res.error.message });
-    }
+    const res = await apiFetch(`/api/user/contacts/${id}`, { method: "DELETE" });
+    if (res.success) { setMessage({ type: "success", text: "Contact deleted" }); load(); }
+    else { setMessage({ type: "error", text: res.error.message }); }
     setDeleting(null);
   };
 
-  /* ---------------- loading state ---------------- */
   if (loading) return <Loader variant="contacts" />;
 
   return (
     <div className="relative isolate min-h-[80vh]">
-      {/* ============================================================ */}
-      {/*  KEYFRAMES                                                    */}
-      {/* ============================================================ */}
-      <style jsx global>{`
-        @keyframes cont-item-in {
-          from { opacity: 0; transform: translateY(20px) scale(0.99); filter: blur(8px); }
-          to   { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
-        }
-        @keyframes cont-banner-in {
-          from { opacity: 0; transform: translateY(24px); filter: blur(10px); }
-          to   { opacity: 1; transform: translateY(0); filter: blur(0); }
-        }
-        @keyframes cont-float-soft {
-          0%, 100% { transform: translateY(0); }
-          50%      { transform: translateY(-5px); }
-        }
-        @keyframes cont-kenburns {
-          0%, 100% { transform: scale(1.04) translate(0, 0); }
-          50%      { transform: scale(1.12) translate(-1%, -0.8%); }
-        }
-        @keyframes cont-pulse-ring {
-          0%   { transform: scale(0.9); opacity: 0.7; }
-          70%  { transform: scale(1.6); opacity: 0; }
-          100% { transform: scale(1.6); opacity: 0; }
-        }
-        @media (prefers-reduced-motion: reduce) {
-          [data-cont-anim] {
-            animation: none !important;
-            opacity: 1 !important;
-            transform: none !important;
-            filter: none !important;
-          }
-        }
-      `}</style>
-
-      {/* Background */}
-
-      {/* ============================================================ */}
-      {/*  CONTENT                                                      */}
-      {/* ============================================================ */}
       <div className={containerCls}>
-        {/* ============================================================ */}
-        {/*  HERO BANNER                                                  */}
-        {/* ============================================================ */}
-        <div
-          data-cont-anim
-          className="relative overflow-hidden rounded-3xl border border-white/[0.4] p-6 sm:p-9"
-          style={{
-            background:
-              "radial-gradient(120% 120% at 30% 12%, rgba(255,255,255,0.58) 0%, rgba(255,255,255,0.42) 45%, rgba(255,255,255,0.30) 100%)",
-            backdropFilter: "blur(32px) saturate(180%)",
-            WebkitBackdropFilter: "blur(32px) saturate(180%)",
-            boxShadow:
-              "inset 0 1px 0 0 rgba(255,255,255,0.9), inset 0 0 0 1px rgba(255,255,255,0.35), 0 2px 4px rgba(0,0,0,0.04), 0 30px 64px -28px rgba(0,0,0,0.34)",
-            animation:
-              "cont-banner-in 0.85s cubic-bezier(0.22, 1, 0.36, 1) 0.05s both",
-          }}
-        >
-          {/* Top sheen */}
-          <div
-            aria-hidden="true"
-            className="pointer-events-none absolute inset-x-0 top-0 h-px"
-            style={{
-              background:
-                "linear-gradient(90deg, transparent, rgba(255,255,255,1), transparent)",
-            }}
-          />
-
-          {/* Floating light blobs */}
-          <div
-            aria-hidden="true"
-            className="pointer-events-none absolute -left-16 -top-16 h-52 w-52 rounded-full opacity-70"
-            style={{
-              background:
-                "radial-gradient(circle, rgba(180,200,255,0.5) 0%, rgba(180,200,255,0) 70%)",
-              filter: "blur(36px)",
-              animation: "cont-float-soft 7s ease-in-out infinite",
-            }}
-          />
-          <div
-            aria-hidden="true"
-            className="pointer-events-none absolute -right-16 -bottom-16 h-52 w-52 rounded-full opacity-70"
-            style={{
-              background:
-                "radial-gradient(circle, rgba(255,200,180,0.45) 0%, rgba(255,200,180,0) 70%)",
-              filter: "blur(36px)",
-              animation: "cont-float-soft 7s ease-in-out 1.4s infinite",
-            }}
-          />
-
-          <div className="relative">
-            {/* Kicker */}
-            <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-white/40 bg-white/40 px-3 py-1.5 backdrop-blur-md">
-              <span
-                className="h-1.5 w-1.5 rounded-full bg-black/80"
-                style={{ animation: "cont-float-soft 2.4s ease-in-out infinite" }}
-              />
-              <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-black/70">
-                Connections
-              </span>
-            </div>
-
-            <div className="flex flex-wrap items-start justify-between gap-5">
-              <div className="min-w-0">
-                <h1
-                  className="mb-3 text-2xl font-semibold tracking-[-0.02em] text-black sm:text-3xl"
-                  style={{
-                    textShadow:
-                      "0 1px 12px rgba(255,255,255,0.85), 0 1px 2px rgba(255,255,255,0.6)",
-                  }}
-                >
-                  Contacts
-                </h1>
-                <p className="max-w-lg text-[13.5px] leading-6 text-black/70">
-                  Websites, social profiles and messaging handles — all in one
-                  place.
-                </p>
-              </div>
-
-              {!showForm && contacts.length > 0 && (
-                <button
-                  onClick={openNew}
-                  className="group relative inline-flex items-center gap-2 overflow-hidden rounded-full border border-black bg-black px-4 py-2.5 text-[12.5px] font-medium text-white transition-all duration-500 hover:-translate-y-0.5"
-                  style={{
-                    boxShadow:
-                      "inset 0 1px 0 0 rgba(255,255,255,0.14), 0 2px 4px rgba(0,0,0,0.08), 0 12px 28px -12px rgba(0,0,0,0.5)",
-                  }}
-                >
-                  <span
-                    aria-hidden="true"
-                    className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
-                    style={{
-                      background:
-                        "radial-gradient(circle at 30% 30%, rgba(255,255,255,0.2), transparent 60%)",
-                    }}
-                  />
-                  <svg
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2.2"
-                    strokeLinecap="round"
-                    className="relative h-4 w-4 transition-transform duration-500 group-hover:rotate-90"
-                  >
-                    <line x1="12" y1="5" x2="12" y2="19" />
-                    <line x1="5" y1="12" x2="19" y2="12" />
-                  </svg>
-                  <span className="relative">Add contact</span>
-                </button>
-              )}
-            </div>
+        <div className="flex flex-wrap items-start justify-between gap-5 mb-6">
+          <div className="min-w-0">
+            <h1 className="mb-2 text-2xl font-semibold tracking-[-0.02em] text-gray-900">Contacts</h1>
+            <p className="max-w-lg text-[13.5px] leading-6 text-gray-500">Websites, social profiles and messaging handles — all in one place.</p>
           </div>
+          {!showForm && contacts.length > 0 && (
+            <button onClick={openNew} className="group relative inline-flex items-center gap-2 overflow-hidden rounded-full border border-black bg-black px-4 py-2.5 text-[12.5px] font-medium text-white transition-all duration-500 hover:-translate-y-0.5 shadow-lg shadow-black/10">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" className="relative h-4 w-4 transition-transform duration-500 group-hover:rotate-90"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
+              <span className="relative">Add contact</span>
+            </button>
+          )}
         </div>
 
-        {/* ============================================================ */}
-        {/*  MESSAGE BANNER                                               */}
-        {/* ============================================================ */}
         {message && (
-          <div
-            className={`relative overflow-hidden rounded-2xl border px-4 py-3.5 text-[13px] backdrop-blur-md ${
-              message.type === "success"
-                ? "border-emerald-300/60 bg-emerald-100/50 text-emerald-800"
-                : "border-amber-300/60 bg-amber-100/50 text-amber-800"
-            }`}
-            style={{
-              animation: `cont-item-in 0.5s cubic-bezier(0.22, 1, 0.36, 1) both`,
-            }}
-          >
-            <div className="flex items-start gap-3">
-              <div className="mt-0.5 shrink-0">
-                {message.type === "success" ? (
-                  <svg
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="h-4 w-4"
-                  >
-                    <path d="M20 6 9 17l-5-5" />
-                  </svg>
-                ) : (
-                  <svg
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="h-4 w-4"
-                  >
-                    <circle cx="12" cy="12" r="10" />
-                    <line x1="12" y1="8" x2="12" y2="12" />
-                    <line x1="12" y1="16" x2="12.01" y2="16" />
-                  </svg>
-                )}
-              </div>
-              <span className="leading-relaxed">{message.text}</span>
-            </div>
+          <div className={`rounded-[16px] px-4 py-3.5 text-[13px] font-medium animate-in fade-in slide-in-from-top-4 duration-500 backdrop-blur-md mb-5 ${message.type === "success" ? "bg-emerald-50/80 text-emerald-700 border border-emerald-100/80" : "bg-rose-50/80 text-rose-700 border border-rose-100/80"}`}>
+            {message.text}
           </div>
         )}
 
-        {/* ============================================================ */}
-        {/*  FORM CARD (when open)                                        */}
-        {/* ============================================================ */}
         {showForm && (
-          <form
-            onSubmit={handleSubmit}
-            className="relative overflow-hidden rounded-3xl border border-white/[0.35] p-6 sm:p-7"
-            style={{
-              ...liquidGlass,
-              animation:
-                "cont-item-in 0.55s cubic-bezier(0.22, 1, 0.36, 1) 0.1s both",
-            }}
-          >
-            <span
-              aria-hidden="true"
-              className="pointer-events-none absolute inset-x-0 top-0 h-px"
-              style={{
-                background:
-                  "linear-gradient(90deg, transparent, rgba(255,255,255,1), transparent)",
-              }}
-            />
-
-            <div className="relative">
-              <SectionHeading>
-                {editingId ? "Edit contact" : "New contact"}
-              </SectionHeading>
-
-              <div className="space-y-4">
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                  <Field label="Type">
-                    <select
-                      value={form.contact_type ?? "website"}
-                      onChange={(e) => update("contact_type", e.target.value)}
-                      className={inputCls}
-                    >
-                      <option value="website">Website</option>
-                      <option value="social">Social</option>
-                      <option value="messenger">Messenger</option>
-                      <option value="other">Other</option>
-                    </select>
-                  </Field>
-                  <Field label="Label">
-                    <input
-                      type="text"
-                      value={form.label ?? ""}
-                      onChange={(e) => update("label", e.target.value)}
-                      className={inputCls}
-                      placeholder="e.g. Personal"
-                    />
-                  </Field>
-                </div>
-
-                <Field label="Contact value">
-                  <input
-                    type="text"
-                    required
-                    value={form.contact_value ?? ""}
-                    onChange={(e) => update("contact_value", e.target.value)}
-                    className={inputCls}
-                    placeholder="https://example.com or @username"
-                  />
+          <form onSubmit={handleSubmit} className="relative overflow-hidden rounded-3xl border border-gray-100 bg-white/80 backdrop-blur-xl p-6 sm:p-7 shadow-sm animate-in fade-in slide-in-from-bottom-4 duration-500 mb-6">
+            <h3 className="mb-4 text-[10px] font-semibold uppercase tracking-[0.18em] text-gray-500">{editingId ? "Edit contact" : "New contact"}</h3>
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <Field label="Type">
+                  <select value={form.contact_type ?? "website"} onChange={(e) => update("contact_type", e.target.value)} className={inputCls}>
+                    <option value="website">Website</option><option value="social">Social</option><option value="messenger">Messenger</option><option value="other">Other</option>
+                  </select>
                 </Field>
-
-                {/* Primary toggle — liquid glass card */}
-                <label className="flex cursor-pointer items-center justify-between gap-3 rounded-2xl border border-white/40 bg-white/40 p-4 backdrop-blur-md transition-colors duration-300 hover:border-white/60 hover:bg-white/60">
-                  <div>
-                    <div className="text-[13.5px] font-semibold text-black/90">
-                      Set as primary
-                    </div>
-                    <div className="mt-0.5 text-[11.5px] text-black/55">
-                      Used by default when sharing this contact
-                    </div>
-                  </div>
-                  <div className="relative shrink-0">
-                    <input
-                      type="checkbox"
-                      checked={!!form.is_primary}
-                      onChange={(e) => update("is_primary", e.target.checked)}
-                      className="peer sr-only"
-                    />
-                    <div className="h-6 w-11 rounded-full bg-white/60 transition-colors duration-300 peer-checked:bg-black/90" />
-                    <div className="absolute left-0.5 top-0.5 h-5 w-5 rounded-full bg-white shadow-sm transition-transform duration-300 peer-checked:translate-x-5" />
-                  </div>
-                </label>
-
-                {/* Actions */}
-                <div className="flex flex-wrap items-center justify-end gap-3 pt-1">
-                  <button
-                    type="button"
-                    onClick={cancel}
-                    className="rounded-full border border-white/40 bg-white/40 px-5 py-3 text-[13px] font-medium text-black/75 backdrop-blur-md transition-all duration-500 hover:-translate-y-0.5 hover:border-white/60 hover:bg-white/60 hover:text-black"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    disabled={saving}
-                    className="group relative inline-flex items-center justify-center gap-2 overflow-hidden rounded-full border border-black bg-black px-6 py-3 text-[13px] font-medium text-white transition-all duration-500 hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-60"
-                    style={{
-                      boxShadow:
-                        "inset 0 1px 0 0 rgba(255,255,255,0.14), 0 2px 4px rgba(0,0,0,0.08), 0 12px 28px -12px rgba(0,0,0,0.5)",
-                    }}
-                  >
-                    <span
-                      aria-hidden="true"
-                      className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
-                      style={{
-                        background:
-                          "radial-gradient(circle at 30% 30%, rgba(255,255,255,0.2), transparent 60%)",
-                      }}
-                    />
-                    {saving ? (
-                      <>
-                        <span aria-hidden="true" />
-                        <span className="relative">Saving...</span>
-                      </>
-                    ) : (
-                      <span className="relative">
-                        {editingId ? "Update contact" : "Add contact"}
-                      </span>
-                    )}
-                  </button>
+                <Field label="Label"><input type="text" value={form.label ?? ""} onChange={(e) => update("label", e.target.value)} className={inputCls} placeholder="e.g. Personal" /></Field>
+              </div>
+              <Field label="Contact value"><input type="text" required value={form.contact_value ?? ""} onChange={(e) => update("contact_value", e.target.value)} className={inputCls} placeholder="https://example.com or @username" /></Field>
+              <label className="flex cursor-pointer items-center justify-between gap-3 rounded-2xl border border-gray-100 bg-white/60 p-4 backdrop-blur-md transition-colors duration-300 hover:bg-white">
+                <div><div className="text-[13.5px] font-semibold text-gray-900">Set as primary</div><div className="mt-0.5 text-[11.5px] text-gray-500">Used by default when sharing this contact</div></div>
+                <div className="relative shrink-0">
+                  <input type="checkbox" checked={!!form.is_primary} onChange={(e) => update("is_primary", e.target.checked)} className="peer sr-only" />
+                  <div className="h-[31px] w-[51px] rounded-full bg-gray-200 peer-checked:bg-black transition-colors duration-300"></div>
+                  <div className="absolute left-[2px] top-[2px] h-[27px] w-[27px] rounded-full bg-white shadow-md transition-transform duration-300 peer-checked:translate-x-[20px]"></div>
                 </div>
+              </label>
+              <div className="flex flex-wrap items-center justify-end gap-3 pt-1">
+                <button type="button" onClick={cancel} className="rounded-full border border-gray-200 bg-white px-5 py-3 text-[13px] font-medium text-gray-700 hover:bg-gray-50 transition-all">Cancel</button>
+                <button type="submit" disabled={saving} className="rounded-full bg-black px-6 py-3 text-[13px] font-medium text-white hover:bg-gray-800 transition-all disabled:opacity-50">{saving ? "Saving..." : (editingId ? "Update contact" : "Add contact")}</button>
               </div>
             </div>
           </form>
         )}
 
-        {/* ============================================================ */}
-        {/*  EMPTY STATE                                                  */}
-        {/* ============================================================ */}
         {contacts.length === 0 && !showForm && (
-          <div
-            data-cont-anim
-            className="relative overflow-hidden rounded-3xl border border-white/[0.4] p-12 text-center sm:p-16"
-            style={{
-              background:
-                "radial-gradient(120% 120% at 30% 12%, rgba(255,255,255,0.58) 0%, rgba(255,255,255,0.42) 45%, rgba(255,255,255,0.30) 100%)",
-              backdropFilter: "blur(32px) saturate(180%)",
-              WebkitBackdropFilter: "blur(32px) saturate(180%)",
-              boxShadow:
-                "inset 0 1px 0 0 rgba(255,255,255,0.9), inset 0 0 0 1px rgba(255,255,255,0.35), 0 2px 4px rgba(0,0,0,0.04), 0 30px 64px -28px rgba(0,0,0,0.34)",
-              animation:
-                "cont-banner-in 0.85s cubic-bezier(0.22, 1, 0.36, 1) 0.1s both",
-            }}
-          >
-            <div className="relative">
-              <div
-                className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-3xl border border-white/40"
-                style={{
-                  background:
-                    "radial-gradient(120% 120% at 30% 15%, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0.5) 100%)",
-                  backdropFilter: "blur(14px)",
-                  WebkitBackdropFilter: "blur(14px)",
-                  boxShadow:
-                    "inset 0 1px 0 0 rgba(255,255,255,1), 0 6px 16px -8px rgba(0,0,0,0.10)",
-                  animation: "cont-float-soft 4s ease-in-out infinite",
-                }}
-              >
-                <Image
-                  src="/icons/id-card.svg"
-                  alt=""
-                  width={32}
-                  height={32}
-                  className="opacity-70"
-                />
-              </div>
-
-              <h2
-                className="mb-3 text-xl font-semibold tracking-[-0.01em] text-black"
-                style={{
-                  textShadow:
-                    "0 1px 12px rgba(255,255,255,0.85), 0 1px 2px rgba(255,255,255,0.6)",
-                }}
-              >
-                No contacts yet
-              </h2>
-              <p className="mx-auto mb-8 max-w-sm text-[13.5px] leading-6 text-black/65">
-                Add your website, social profiles, and messaging handles so
-                people can reach you.
-              </p>
-
-              <button
-                onClick={openNew}
-                className="group relative inline-flex items-center gap-2 overflow-hidden rounded-full border border-black bg-black px-5 py-3 text-[13px] font-medium text-white transition-all duration-500 hover:-translate-y-0.5"
-                style={{
-                  boxShadow:
-                    "inset 0 1px 0 0 rgba(255,255,255,0.14), 0 2px 4px rgba(0,0,0,0.08), 0 12px 28px -12px rgba(0,0,0,0.5)",
-                }}
-              >
-                <span
-                  aria-hidden="true"
-                  className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
-                  style={{
-                    background:
-                      "radial-gradient(circle at 30% 30%, rgba(255,255,255,0.2), transparent 60%)",
-                  }}
-                />
-                <svg
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2.2"
-                  strokeLinecap="round"
-                  className="relative h-4 w-4 transition-transform duration-500 group-hover:rotate-90"
-                >
-                  <line x1="12" y1="5" x2="12" y2="19" />
-                  <line x1="5" y1="12" x2="19" y2="12" />
-                </svg>
-                <span className="relative">Add your first contact</span>
-              </button>
+          <div className="relative overflow-hidden rounded-3xl border border-gray-100 bg-white/80 backdrop-blur-xl p-12 text-center shadow-sm">
+            <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-3xl border border-gray-100 bg-gray-50 shadow-sm">
+              <Image src="/icons/id-card.svg" alt="" width={32} height={32} className="opacity-60" />
             </div>
+            <h2 className="mb-3 text-xl font-semibold text-gray-900">No contacts yet</h2>
+            <p className="mx-auto mb-8 max-w-sm text-[13.5px] leading-6 text-gray-500">Add your website, social profiles, and messaging handles so people can reach you.</p>
+            <button onClick={openNew} className="inline-flex items-center gap-2 rounded-full border border-black bg-black px-5 py-3 text-[13px] font-medium text-white transition-all duration-500 hover:-translate-y-0.5 shadow-lg shadow-black/10">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" className="h-4 w-4"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
+              Add your first contact
+            </button>
           </div>
         )}
 
-        {/* ============================================================ */}
-        {/*  CONTACTS GRID                                                */}
-        {/* ============================================================ */}
         {contacts.length > 0 && (
           <div>
-            <SectionHeading>Saved Contacts</SectionHeading>
-
+            <h3 className="mb-4 text-[10px] font-semibold uppercase tracking-[0.18em] text-gray-500">Saved Contacts</h3>
             <div className="grid gap-4 sm:grid-cols-2">
               {contacts.map((c, i) => {
                 const icon = TYPE_ICON[c.contact_type] ?? "/icons/link.svg";
-                const typeLabel =
-                  TYPE_LABEL[c.contact_type] ?? c.contact_type;
-
+                const typeLabel = TYPE_LABEL[c.contact_type] ?? c.contact_type;
                 return (
-                  <article
-                    key={c.id}
-                    className="group relative overflow-hidden rounded-3xl border border-white/[0.35] p-5 transition-all duration-500 hover:-translate-y-0.5 hover:border-white/[0.5] hover:shadow-[0_22px_48px_-22px_rgba(0,0,0,0.32)]"
-                    style={{
-                      ...liquidGlass,
-                      animation: `cont-item-in 0.6s cubic-bezier(0.22, 1, 0.36, 1) ${
-                        0.15 + i * 0.06
-                      }s both`,
-                    }}
-                  >
-                    {/* Hover sheen */}
-                    <span
-                      aria-hidden="true"
-                      className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
-                      style={{
-                        background:
-                          "radial-gradient(circle at 25% 15%, rgba(255,255,255,0.35), transparent 60%)",
-                      }}
-                    />
-
-                    {/* Top row — icon + type + badges */}
+                  <article key={c.id} className="group relative overflow-hidden rounded-3xl border border-gray-100 bg-white/80 backdrop-blur-xl p-5 transition-all duration-500 hover:-translate-y-0.5 hover:shadow-[0_20px_40px_-20px_rgba(0,0,0,0.1)]" style={{ animation: `addr-item-in 0.6s cubic-bezier(0.22, 1, 0.36, 1) ${0.15 + i * 0.06}s both` }}>
                     <div className="relative mb-4 flex items-start justify-between gap-3">
                       <div className="flex items-center gap-3">
-                        <span
-                          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl border border-white/40 transition-colors duration-500 group-hover:border-white/60"
-                          style={{
-                            background:
-                              "radial-gradient(120% 120% at 30% 15%, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0.5) 100%)",
-                            backdropFilter: "blur(14px)",
-                            WebkitBackdropFilter: "blur(14px)",
-                            boxShadow:
-                              "inset 0 1px 0 0 rgba(255,255,255,1), 0 2px 8px -4px rgba(0,0,0,0.08)",
-                          }}
-                        >
-                          <Image
-                            src={icon}
-                            alt=""
-                            width={18}
-                            height={18}
-                            className="opacity-70"
-                          />
+                        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl border border-gray-100 bg-gray-50">
+                          <Image src={icon} alt="" width={18} height={18} className="opacity-60" />
                         </span>
                         <div className="flex flex-col">
-                          <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-black/55">
-                            {typeLabel}
-                          </span>
-                          {c.label && (
-                            <span className="mt-0.5 text-[11.5px] text-black/60">
-                              {c.label}
-                            </span>
-                          )}
+                          <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-gray-500">{typeLabel}</span>
+                          {c.label && <span className="mt-0.5 text-[11.5px] text-gray-500">{c.label}</span>}
                         </div>
                       </div>
-
-                      {/* Badges */}
                       <div className="flex shrink-0 flex-wrap items-center justify-end gap-1.5">
-                        {c.is_primary && (
-                          <span className="relative inline-flex items-center gap-1.5 rounded-full border border-emerald-300/60 bg-emerald-100/50 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-emerald-800 backdrop-blur-md">
-                            <span className="relative flex h-1.5 w-1.5">
-                              <span
-                                className="absolute inset-0 rounded-full bg-emerald-600"
-                                style={{
-                                  animation:
-                                    "cont-pulse-ring 2.4s cubic-bezier(0.4, 0, 0.6, 1) infinite",
-                                }}
-                              />
-                              <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-600" />
-                            </span>
-                            Primary
-                          </span>
-                        )}
-                        {c.is_verified && (
-                          <span className="inline-flex items-center gap-1 rounded-full border border-emerald-300/60 bg-emerald-100/50 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-emerald-800 backdrop-blur-md">
-                            <svg
-                              viewBox="0 0 24 24"
-                              fill="none"
-                              stroke="currentColor"
-                              strokeWidth="3"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              className="h-2.5 w-2.5"
-                            >
-                              <path d="M20 6 9 17l-5-5" />
-                            </svg>
-                            Verified
-                          </span>
-                        )}
+                        {c.is_primary && <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-emerald-700"><span className="h-1.5 w-1.5 rounded-full bg-emerald-500" /> Primary</span>}
+                        {c.is_verified && <span className="inline-flex items-center gap-1 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-emerald-700"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="h-2.5 w-2.5"><path d="M20 6 9 17l-5-5" /></svg> Verified</span>}
                       </div>
                     </div>
-
-                    {/* Value */}
-                    <p
-                      className="relative mb-4 truncate text-[14.5px] font-semibold text-black/90"
-                      title={c.contact_value}
-                    >
-                      {c.contact_value}
-                    </p>
-
-                    {/* Actions row — separated and clear */}
-                    <div className="relative flex items-center justify-end gap-2 border-t border-white/30 pt-3">
-                      <button
-                        onClick={() => openEdit(c)}
-                        aria-label="Edit contact"
-                        className="group/btn inline-flex items-center gap-1.5 rounded-full border border-white/40 bg-white/40 px-3.5 py-1.5 text-[11.5px] font-medium text-black/75 backdrop-blur-md transition-all duration-500 hover:-translate-y-0.5 hover:border-white/60 hover:bg-white/60 hover:text-black"
-                      >
-                        <svg
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          className="h-3.5 w-3.5"
-                        >
-                          <path d="M12 20h9" />
-                          <path d="M16.5 3.5a2.121 2.121 0 1 1 3 3L7 19l-4 1 1-4 12.5-12.5z" />
-                        </svg>
-                        Edit
-                      </button>
-                      <button
-                        onClick={() => handleDelete(c.id)}
-                        disabled={deleting === c.id}
-                        aria-label="Delete contact"
-                        className="inline-flex items-center gap-1.5 rounded-full border border-white/40 bg-white/40 px-3.5 py-1.5 text-[11.5px] font-medium text-black/75 backdrop-blur-md transition-all duration-500 hover:-translate-y-0.5 hover:border-red-300/60 hover:bg-red-100/50 hover:text-red-700 disabled:opacity-40"
-                      >
-                        {deleting === c.id ? (
-                          <span aria-hidden="true" />
-                        ) : (
-                          <svg
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            className="h-3.5 w-3.5"
-                          >
-                            <polyline points="3 6 5 6 21 6" />
-                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
-                          </svg>
-                        )}
-                        Delete
-                      </button>
+                    <p className="relative mb-4 truncate text-[14.5px] font-semibold text-gray-900" title={c.contact_value}>{c.contact_value}</p>
+                    <div className="relative flex items-center justify-end gap-2 border-t border-gray-100 pt-3">
+                      <button onClick={() => openEdit(c)} className="inline-flex items-center gap-1.5 rounded-full border border-gray-200 bg-white px-3.5 py-1.5 text-[11.5px] font-medium text-gray-700 hover:bg-gray-50 transition-all"><Icons.Edit /> Edit</button>
+                      <button onClick={() => handleDelete(c.id)} disabled={deleting === c.id} className="inline-flex items-center gap-1.5 rounded-full border border-gray-200 bg-white px-3.5 py-1.5 text-[11.5px] font-medium text-gray-700 hover:bg-rose-50 hover:text-rose-600 disabled:opacity-40 transition-all"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-3.5 w-3.5"><polyline points="3 6 5 6 21 6" /><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" /></svg> Delete</button>
                     </div>
                   </article>
                 );
@@ -1774,24 +574,7 @@ function SectionHeading({ children }: { children: React.ReactNode }) {
 }
 
 function DevicesSection() {
-
-type Device = {
-  id: string;
-  device_id: string;
-  device_name: string | null;
-  device_type: string | null;
-  operating_system: string | null;
-  os_version: string | null;
-  browser: string | null;
-  browser_version: string | null;
-  app_version: string | null;
-  last_seen_at: string | null;
-  is_trusted: boolean;
-  created_at: string;
-};
-
-const inputCls =
-  "w-full px-3 py-2 rounded-lg border border-[#dddddd] bg-[#f3f3f3] text-[#111111] text-sm placeholder-gray-600 focus:outline-none focus:border-[#777777] focus:ring-2 focus:ring-[#777777]/30 transition-colors";
+type Device = { id: string; device_id: string; device_name: string | null; device_type: string | null; operating_system: string | null; os_version: string | null; browser: string | null; browser_version: string | null; app_version: string | null; last_seen_at: string | null; is_trusted: boolean; created_at: string; };
 
 function timeAgo(iso: string | null) {
   if (!iso) return "Never";
@@ -1811,10 +594,7 @@ function timeAgo(iso: string | null) {
   const [busyId, setBusyId] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editName, setEditName] = useState("");
-  const [message, setMessage] = useState<{
-    type: "success" | "error";
-    text: string;
-  } | null>(null);
+  const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
   const load = async () => {
     const res = await apiFetch<{ devices: Device[] }>("/api/user/devices");
@@ -1822,208 +602,89 @@ function timeAgo(iso: string | null) {
     setLoading(false);
   };
 
-  useEffect(() => {
-    load();
-  }, []);
+  useEffect(() => { load(); }, []);
 
   const toggleTrust = async (d: Device) => {
-    setBusyId(d.id);
-    setMessage(null);
-    const res = await apiFetch(`/api/user/devices/${d.id}`, {
-      method: "PATCH",
-      body: JSON.stringify({ is_trusted: !d.is_trusted }),
-    });
-    if (res.success) {
-      setMessage({
-        type: "success",
-        text: d.is_trusted ? "Device untrusted" : "Device trusted",
-      });
-      await load();
-    } else {
-      setMessage({ type: "error", text: res.error.message });
-    }
+    setBusyId(d.id); setMessage(null);
+    const res = await apiFetch(`/api/user/devices/${d.id}`, { method: "PATCH", body: JSON.stringify({ is_trusted: !d.is_trusted }) });
+    if (res.success) { setMessage({ type: "success", text: d.is_trusted ? "Device untrusted" : "Device trusted" }); await load(); }
+    else { setMessage({ type: "error", text: res.error.message }); }
     setBusyId(null);
   };
 
   const handleRename = async (id: string) => {
-    setBusyId(id);
-    setMessage(null);
-    const res = await apiFetch(`/api/user/devices/${id}`, {
-      method: "PATCH",
-      body: JSON.stringify({ device_name: editName.trim() }),
-    });
-    if (res.success) {
-      setMessage({ type: "success", text: "Device renamed" });
-      setEditingId(null);
-      await load();
-    } else {
-      setMessage({ type: "error", text: res.error.message });
-    }
+    setBusyId(id); setMessage(null);
+    const res = await apiFetch(`/api/user/devices/${id}`, { method: "PATCH", body: JSON.stringify({ device_name: editName.trim() }) });
+    if (res.success) { setMessage({ type: "success", text: "Device renamed" }); setEditingId(null); await load(); }
+    else { setMessage({ type: "error", text: res.error.message }); }
     setBusyId(null);
   };
 
   const handleRemove = async (id: string) => {
     if (!confirm("Remove this device? You may need to log in again.")) return;
-    setBusyId(id);
-    setMessage(null);
-    const res = await apiFetch(`/api/user/devices/${id}`, {
-      method: "DELETE",
-    });
-    if (res.success) {
-      setMessage({ type: "success", text: "Device removed" });
-      await load();
-    } else {
-      setMessage({ type: "error", text: res.error.message });
-    }
+    setBusyId(id); setMessage(null);
+    const res = await apiFetch(`/api/user/devices/${id}`, { method: "DELETE" });
+    if (res.success) { setMessage({ type: "success", text: "Device removed" }); await load(); }
+    else { setMessage({ type: "error", text: res.error.message }); }
     setBusyId(null);
-  };
-
-  const startEdit = (d: Device) => {
-    setEditingId(d.id);
-    setEditName(d.device_name ?? d.device_id);
   };
 
   if (loading) return <Loader variant="devices" />;
 
   return (
     <div className="max-w-3xl mx-auto space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-[#111111] mb-1">Devices</h1>
-        <p className="text-sm text-[#6666666]">
-          Devices that have accessed your Binzeo ID account
-        </p>
+      <div className="mb-6">
+        <h1 className="text-2xl font-bold text-gray-900 mb-2">Devices</h1>
+        <p className="text-sm text-gray-500">Devices that have accessed your Binzeo ID account</p>
       </div>
 
       {message && (
-        <div
-          className={`p-3 rounded-lg border text-sm ${
-            message.type === "success"
-              ? "bg-[#eeeeee] border-[#d1d1d1] text-[#444444]"
-              : "bg-[#f2f2f2] border-[#cccccc] text-[#333333]"
-          }`}
-        >
+        <div className={`rounded-[16px] px-4 py-3.5 text-[13px] font-medium animate-in fade-in slide-in-from-top-4 duration-500 backdrop-blur-md ${message.type === "success" ? "bg-emerald-50/80 text-emerald-700 border border-emerald-100/80" : "bg-rose-50/80 text-rose-700 border border-rose-100/80"}`}>
           {message.text}
         </div>
       )}
 
       {devices.length === 0 ? (
-        <div className="p-12 rounded-2xl border border-dashed border-[#dddddd] text-center">
-          <Image
-            src="/icons/device.svg"
-            alt=""
-            width={40}
-            height={40}
-            className="invert mx-auto mb-3"
-          />
-          <p className="text-[#6666666] text-sm">
-            No devices recorded yet.
-          </p>
+        <div className="p-12 rounded-3xl border border-gray-100 bg-white/80 backdrop-blur-xl text-center shadow-sm">
+          <Image src="/icons/device.svg" alt="" width={40} height={40} className="opacity-40 mx-auto mb-4" />
+          <p className="text-gray-500 text-sm">No devices recorded yet.</p>
         </div>
       ) : (
         <div className="space-y-3">
           {devices.map((d) => (
-            <div
-              key={d.id}
-              className="p-5 rounded-2xl border border-[#dddddd] bg-white hover:border-[#cfcfcf] transition-colors"
-            >
+            <div key={d.id} className="p-5 rounded-3xl border border-gray-100 bg-white/80 backdrop-blur-xl hover:shadow-[0_20px_40px_-20px_rgba(0,0,0,0.1)] transition-all duration-300">
               <div className="flex items-start justify-between gap-3 mb-3">
                 <div className="flex items-start gap-3 min-w-0 flex-1">
-                  <div className="w-10 h-10 rounded-xl bg-[#eeeeee] border border-[#c9c9c9] flex items-center justify-center shrink-0 text-lg">
-                    <Image
-                      src={
-                        d.device_type === "mobile"
-                          ? "/icons/mobile.svg"
-                          : "/icons/device.svg"
-                      }
-                      alt={d.device_type ?? "device"}
-                      width={24}
-                      height={24}
-                      className="invert"
-                    />
+                  <div className="w-10 h-10 rounded-xl bg-gray-50 border border-gray-100 flex items-center justify-center shrink-0">
+                    <Image src={d.device_type === "mobile" ? "/icons/mobile.svg" : "/icons/device.svg"} alt={d.device_type ?? "device"} width={24} height={24} className="opacity-60" />
                   </div>
-
                   <div className="min-w-0 flex-1">
                     {editingId === d.id ? (
                       <div className="flex items-center gap-2">
-                        <input
-                          type="text"
-                          value={editName}
-                          onChange={(e) => setEditName(e.target.value)}
-                          className={inputCls + " !py-1.5 !text-sm"}
-                          autoFocus
-                        />
-                        <button
-                          onClick={() => handleRename(d.id)}
-                          disabled={busyId === d.id}
-                          className="text-xs text-[#333333] hover:text-[#5e5e5e] shrink-0"
-                        >
-                          Save
-                        </button>
-                        <button
-                          onClick={() => setEditingId(null)}
-                          className="text-xs text-[#666666] hover:text-[#444444] shrink-0"
-                        >
-                          Cancel
-                        </button>
+                        <input type="text" value={editName} onChange={(e) => setEditName(e.target.value)} className="w-full px-3 py-1.5 rounded-lg border border-gray-200 bg-white text-sm focus:outline-none focus:border-gray-300" autoFocus />
+                        <button onClick={() => handleRename(d.id)} disabled={busyId === d.id} className="text-xs text-gray-700 font-medium hover:text-black shrink-0">Save</button>
+                        <button onClick={() => setEditingId(null)} className="text-xs text-gray-500 hover:text-gray-700 shrink-0">Cancel</button>
                       </div>
                     ) : (
                       <div className="flex items-center gap-2 flex-wrap">
-                        <span className="font-medium text-[#111111] text-sm truncate">
-                          {d.device_name ?? "Unnamed device"}
-                        </span>
+                        <span className="font-semibold text-gray-900 text-sm truncate">{d.device_name ?? "Unnamed device"}</span>
                         {d.is_trusted && (
-                          <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#eeeeee] text-[#444444] border border-[#cccccc]">
-                            <Image
-                              src="/icons/check.svg"
-                              alt=""
-                              width={12}
-                              height={12}
-                              className="invert inline-block mr-1 align-[-2px]"
-                            />
-                            Trusted
+                          <span className="inline-flex items-center gap-1 rounded-full border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-[10px] font-semibold text-emerald-700">
+                            <Image src="/icons/check.svg" alt="" width={12} height={12} className="opacity-70" /> Trusted
                           </span>
                         )}
                       </div>
                     )}
-
-                    <div className="text-xs text-[#666666] mt-1 truncate">
-                      {[
-                        d.operating_system,
-                        d.browser,
-                        d.device_type,
-                      ]
-                        .filter(Boolean)
-                        .join(" · ")}
-                    </div>
-                    <div className="text-xs text-[#888888] mt-0.5">
-                      Last seen: {timeAgo(d.last_seen_at)}
-                    </div>
+                    <div className="text-xs text-gray-500 mt-1 truncate">{[d.operating_system, d.browser, d.device_type].filter(Boolean).join(" · ")}</div>
+                    <div className="text-xs text-gray-400 mt-0.5">Last seen: {timeAgo(d.last_seen_at)}</div>
                   </div>
                 </div>
               </div>
-
-              <div className="flex items-center gap-3 pt-3 border-t border-[#dddddd]">
-                <button
-                  onClick={() => startEdit(d)}
-                  className="text-xs text-[#6666666] hover:text-[#333333] transition-colors"
-                >
-                  Rename
-                </button>
-                <button
-                  onClick={() => toggleTrust(d)}
-                  disabled={busyId === d.id}
-                  className="text-xs text-[#6666666] hover:text-[#333333] transition-colors disabled:opacity-50"
-                >
-                  {d.is_trusted ? "Untrust" : "Trust"}
-                </button>
+              <div className="flex items-center gap-3 pt-3 border-t border-gray-100">
+                <button onClick={() => { setEditingId(d.id); setEditName(d.device_name ?? d.device_id); }} className="text-xs text-gray-500 hover:text-gray-900 font-medium transition-colors">Rename</button>
+                <button onClick={() => toggleTrust(d)} disabled={busyId === d.id} className="text-xs text-gray-500 hover:text-gray-900 font-medium transition-colors disabled:opacity-50">{d.is_trusted ? "Untrust" : "Trust"}</button>
                 <div className="flex-1" />
-                <button
-                  onClick={() => handleRemove(d.id)}
-                  disabled={busyId === d.id}
-                  className="text-xs text-[#333333] hover:text-[#6666666] disabled:opacity-50"
-                >
-                  Remove
-                </button>
+                <button onClick={() => handleRemove(d.id)} disabled={busyId === d.id} className="text-xs text-rose-500 hover:text-rose-700 font-medium transition-colors disabled:opacity-50">Remove</button>
               </div>
             </div>
           ))}
@@ -2034,93 +695,48 @@ function timeAgo(iso: string | null) {
 }
 
 function SectorsSection() {
-
-type Sector = {
-  id: string;
-  sector_code: string;
-  sector_name: string;
-  description: string | null;
-  is_active: boolean;
-};
-
-type SectorAccess = {
-  sector_id: string;
-  status: string;
-  selected_at: string;
-  updated_at: string;
-  sectors: Sector | null;
-};
+type Sector = { id: string; sector_code: string; sector_name: string; description: string | null; is_active: boolean; };
+type SectorAccess = { sector_id: string; status: string; selected_at: string; updated_at: string; sectors: Sector | null; };
 
   const [allSectors, setAllSectors] = useState<Sector[]>([]);
   const [mySectors, setMySectors] = useState<SectorAccess[]>([]);
   const [loading, setLoading] = useState(true);
   const [busyId, setBusyId] = useState<string | null>(null);
-  const [message, setMessage] = useState<{
-    type: "success" | "error";
-    text: string;
-  } | null>(null);
+  const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
   const load = async () => {
-    const [a, b] = await Promise.all([
-      apiFetch<{ sectors: Sector[] }>("/api/sectors"),
-      apiFetch<{ sector_access: SectorAccess[] }>("/api/user/sector-access"),
-    ]);
+    const [a, b] = await Promise.all([apiFetch<{ sectors: Sector[] }>("/api/sectors"), apiFetch<{ sector_access: SectorAccess[] }>("/api/user/sector-access")]);
     if (a.success) setAllSectors(a.data.sectors);
     if (b.success) setMySectors(b.data.sector_access);
     setLoading(false);
   };
 
-  useEffect(() => {
-    load();
-  }, []);
+  useEffect(() => { load(); }, []);
 
   const mySectorIds = new Set(mySectors.map((s) => s.sector_id));
 
   const handleJoin = async (sectorId: string) => {
-    setBusyId(sectorId);
-    setMessage(null);
-    const res = await apiFetch("/api/user/sector-access", {
-      method: "POST",
-      body: JSON.stringify({ sector_id: sectorId, status: "active" }),
-    });
-    if (res.success) {
-      setMessage({ type: "success", text: "Joined sector" });
-      await load();
-    } else {
-      setMessage({ type: "error", text: res.error.message });
-    }
+    setBusyId(sectorId); setMessage(null);
+    const res = await apiFetch("/api/user/sector-access", { method: "POST", body: JSON.stringify({ sector_id: sectorId, status: "active" }) });
+    if (res.success) { setMessage({ type: "success", text: "Joined sector" }); await load(); }
+    else { setMessage({ type: "error", text: res.error.message }); }
     setBusyId(null);
   };
 
   const handleLeave = async (sectorId: string) => {
     if (!confirm("Leave this sector?")) return;
-    setBusyId(sectorId);
-    setMessage(null);
-    const res = await apiFetch(`/api/user/sector-access/${sectorId}`, {
-      method: "DELETE",
-    });
-    if (res.success) {
-      setMessage({ type: "success", text: "Left sector" });
-      await load();
-    } else {
-      setMessage({ type: "error", text: res.error.message });
-    }
+    setBusyId(sectorId); setMessage(null);
+    const res = await apiFetch(`/api/user/sector-access/${sectorId}`, { method: "DELETE" });
+    if (res.success) { setMessage({ type: "success", text: "Left sector" }); await load(); }
+    else { setMessage({ type: "error", text: res.error.message }); }
     setBusyId(null);
   };
 
   const handleStatusChange = async (sectorId: string, status: string) => {
-    setBusyId(sectorId);
-    setMessage(null);
-    const res = await apiFetch(`/api/user/sector-access/${sectorId}`, {
-      method: "PATCH",
-      body: JSON.stringify({ status }),
-    });
-    if (res.success) {
-      setMessage({ type: "success", text: "Status updated" });
-      await load();
-    } else {
-      setMessage({ type: "error", text: res.error.message });
-    }
+    setBusyId(sectorId); setMessage(null);
+    const res = await apiFetch(`/api/user/sector-access/${sectorId}`, { method: "PATCH", body: JSON.stringify({ status }) });
+    if (res.success) { setMessage({ type: "success", text: "Status updated" }); await load(); }
+    else { setMessage({ type: "error", text: res.error.message }); }
     setBusyId(null);
   };
 
@@ -2128,81 +744,35 @@ type SectorAccess = {
 
   return (
     <div className="max-w-3xl mx-auto space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-[#111111] mb-1">Sectors</h1>
-        <p className="text-sm text-[#6666666]">
-          Join industry sectors to unlock related features
-        </p>
+      <div className="mb-6">
+        <h1 className="text-2xl font-bold text-gray-900 mb-2">Sectors</h1>
+        <p className="text-sm text-gray-500">Join industry sectors to unlock related features</p>
       </div>
 
       {message && (
-        <div
-          className={`p-3 rounded-lg border text-sm ${
-            message.type === "success"
-              ? "bg-[#eeeeee] border-[#d1d1d1] text-[#444444]"
-              : "bg-[#f2f2f2] border-[#cccccc] text-[#333333]"
-          }`}
-        >
+        <div className={`rounded-[16px] px-4 py-3.5 text-[13px] font-medium animate-in fade-in slide-in-from-top-4 duration-500 backdrop-blur-md ${message.type === "success" ? "bg-emerald-50/80 text-emerald-700 border border-emerald-100/80" : "bg-rose-50/80 text-rose-700 border border-rose-100/80"}`}>
           {message.text}
         </div>
       )}
 
-      {/* My Sectors */}
       {mySectors.length > 0 && (
         <section className="space-y-3">
-          <h2 className="text-xs font-semibold text-[#6666666] uppercase tracking-wider">
-            My Sectors ({mySectors.length})
-          </h2>
+          <h2 className="text-[10px] font-semibold text-gray-500 uppercase tracking-[0.18em]">My Sectors ({mySectors.length})</h2>
           <div className="space-y-2">
             {mySectors.map((s) => (
-              <div
-                key={s.sector_id}
-                className="p-4 rounded-2xl border border-[#c9c9c9] bg-[#2b2b2b]/5 flex items-center justify-between gap-3"
-              >
+              <div key={s.sector_id} className="p-4 rounded-3xl border border-gray-100 bg-white/80 backdrop-blur-xl flex items-center justify-between gap-3 shadow-sm">
                 <div className="min-w-0">
                   <div className="flex items-center gap-2 mb-1">
-                    <span className="font-mono text-[10px] text-[#333333] px-1.5 py-0.5 rounded bg-[#eeeeee]">
-                      {s.sectors?.sector_code}
-                    </span>
-                    <span className="font-medium text-[#111111] text-sm truncate">
-                      {s.sectors?.sector_name}
-                    </span>
+                    <span className="font-mono text-[10px] text-gray-600 px-1.5 py-0.5 rounded bg-gray-100 border border-gray-200">{s.sectors?.sector_code}</span>
+                    <span className="font-medium text-gray-900 text-sm truncate">{s.sectors?.sector_name}</span>
                   </div>
-                  <div className="text-xs text-[#666666]">
-                    Status:{" "}
-                    <span
-                      className={
-                        s.status === "active"
-                          ? "text-[#444444]"
-                          : s.status === "paused"
-                          ? "text-[#444444]"
-                          : "text-[#6666666]"
-                      }
-                    >
-                      {s.status}
-                    </span>
-                  </div>
+                  <div className="text-xs text-gray-500">Status: <span className={s.status === "active" ? "text-emerald-600 font-medium" : "text-gray-500"}>{s.status}</span></div>
                 </div>
                 <div className="flex items-center gap-2 shrink-0">
-                  <select
-                    value={s.status}
-                    disabled={busyId === s.sector_id}
-                    onChange={(e) =>
-                      handleStatusChange(s.sector_id, e.target.value)
-                    }
-                    className="text-xs px-2 py-1 rounded border border-[#dddddd] bg-[#f3f3f3] text-[#111111]"
-                  >
-                    <option value="active">Active</option>
-                    <option value="paused">Paused</option>
-                    <option value="inactive">Inactive</option>
+                  <select value={s.status} disabled={busyId === s.sector_id} onChange={(e) => handleStatusChange(s.sector_id, e.target.value)} className="text-xs px-2 py-1 rounded-lg border border-gray-200 bg-white text-gray-900 focus:outline-none">
+                    <option value="active">Active</option><option value="paused">Paused</option><option value="inactive">Inactive</option>
                   </select>
-                  <button
-                    onClick={() => handleLeave(s.sector_id)}
-                    disabled={busyId === s.sector_id}
-                    className="text-xs text-[#333333] hover:text-[#6666666] disabled:opacity-50"
-                  >
-                    Leave
-                  </button>
+                  <button onClick={() => handleLeave(s.sector_id)} disabled={busyId === s.sector_id} className="text-xs text-rose-500 hover:text-rose-700 font-medium disabled:opacity-50">Leave</button>
                 </div>
               </div>
             ))}
@@ -2210,77 +780,27 @@ type SectorAccess = {
         </section>
       )}
 
-      {/* Available Sectors */}
       <section className="space-y-3">
-        <h2 className="text-xs font-semibold text-[#6666666] uppercase tracking-wider">
-          Available Sectors
-        </h2>
-
+        <h2 className="text-[10px] font-semibold text-gray-500 uppercase tracking-[0.18em]">Available Sectors</h2>
         {allSectors.length === 0 ? (
-          <div className="p-12 rounded-2xl border border-dashed border-[#dddddd] text-center">
-            <Image
-              src="/icons/building.svg"
-              alt=""
-              width={40}
-              height={40}
-              className="invert mx-auto mb-3"
-            />
-            <p className="text-[#6666666] text-sm">
-              No sectors available right now.
-            </p>
+          <div className="p-12 rounded-3xl border border-gray-100 bg-white/80 backdrop-blur-xl text-center shadow-sm">
+            <Image src="/icons/building.svg" alt="" width={40} height={40} className="opacity-40 mx-auto mb-4" />
+            <p className="text-gray-500 text-sm">No sectors available right now.</p>
           </div>
         ) : (
           <div className="grid sm:grid-cols-2 gap-3">
             {allSectors.map((s) => {
               const joined = mySectorIds.has(s.id);
               return (
-                <div
-                  key={s.id}
-                  className="p-5 rounded-2xl border border-[#dddddd] bg-white hover:border-[#cfcfcf] transition-colors flex flex-col"
-                >
+                <div key={s.id} className="p-5 rounded-3xl border border-gray-100 bg-white/80 backdrop-blur-xl hover:shadow-[0_20px_40px_-20px_rgba(0,0,0,0.1)] transition-all duration-300 flex flex-col">
                   <div className="flex items-start justify-between gap-2 mb-2">
-                    <div className="font-mono text-[10px] text-[#333333] px-1.5 py-0.5 rounded bg-[#eeeeee]">
-                      {s.sector_code}
-                    </div>
-                    {joined && (
-                      <span className="text-xs px-2 py-0.5 rounded-full bg-[#eeeeee] text-[#444444] border border-[#cccccc]">
-                        <Image
-                          src="/icons/check.svg"
-                          alt=""
-                          width={12}
-                          height={12}
-                          className="invert inline-block mr-1 align-[-2px]"
-                        />
-                        Joined
-                      </span>
-                    )}
+                    <div className="font-mono text-[10px] text-gray-600 px-1.5 py-0.5 rounded bg-gray-100 border border-gray-200">{s.sector_code}</div>
+                    {joined && <span className="inline-flex items-center gap-1 rounded-full border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-[10px] font-semibold text-emerald-700"><Image src="/icons/check.svg" alt="" width={12} height={12} className="opacity-70" /> Joined</span>}
                   </div>
-
-                  <div className="font-medium text-[#111111] text-sm mb-1">
-                    {s.sector_name}
-                  </div>
-                  {s.description && (
-                    <p className="text-xs text-[#666666] mb-4 flex-1">
-                      {s.description}
-                    </p>
-                  )}
-
-                  <button
-                    onClick={() =>
-                      joined ? handleLeave(s.id) : handleJoin(s.id)
-                    }
-                    disabled={busyId === s.id}
-                    className={`mt-auto w-full py-2 rounded-lg text-sm font-medium transition-colors disabled:opacity-60 ${
-                      joined
-                        ? "border border-[#dddddd] text-[#444444] hover:border-[#cccccc] hover:text-[#333333]"
-                        : "bg-[#111111] hover:bg-[#2b2b2b] text-white"
-                    }`}
-                  >
-                    {busyId === s.id
-                      ? "..."
-                      : joined
-                      ? "Leave"
-                      : "Join"}
+                  <div className="font-semibold text-gray-900 text-sm mb-1">{s.sector_name}</div>
+                  {s.description && <p className="text-xs text-gray-500 mb-4 flex-1">{s.description}</p>}
+                  <button onClick={() => joined ? handleLeave(s.id) : handleJoin(s.id)} disabled={busyId === s.id} className={`mt-auto w-full py-2.5 rounded-xl text-sm font-medium transition-colors disabled:opacity-60 ${joined ? "border border-gray-200 text-gray-700 hover:bg-gray-50" : "bg-black text-white hover:bg-gray-800"}`}>
+                    {busyId === s.id ? "..." : joined ? "Leave" : "Join"}
                   </button>
                 </div>
               );
@@ -2293,104 +813,17 @@ type SectorAccess = {
 }
 
 function SecuritySection() {
+type LoginEntry = { id: string; login_method: string | null; login_status: string; ip_address: string | null; user_agent: string | null; country: string | null; city: string | null; latitude: number | null; longitude: number | null; location_accuracy_meters: number | null; location_source: string | null; login_at: string; logout_at: string | null; user_devices: { device_name: string | null; device_type: string | null; operating_system: string | null; os_version: string | null; browser: string | null; browser_version: string | null; } | null; };
+type ActivityEntry = { id: string; activity_type: string; activity_description: string | null; ip_address: string | null; created_at: string; };
+type AuthMethod = { id: string; provider: string; auth_method: string; provider_email: string | null; first_seen_at: string; last_sign_in_at: string | null; login_count: number; last_event: string | null; };
+type Verification = { id: string; verification_type: string; verification_status: string; verified_at: string | null; last_requested_at: string | null; expires_at: string | null; attempt_count: number; };
 
-type LoginEntry = {
-  id: string;
-  login_method: string | null;
-  login_status: string;
-  ip_address: string | null;
-  user_agent: string | null;
-  country: string | null;
-  city: string | null;
-  latitude: number | null;
-  longitude: number | null;
-  location_accuracy_meters: number | null;
-  location_source: string | null;
-  login_at: string;
-  logout_at: string | null;
-  user_devices: {
-    device_name: string | null;
-    device_type: string | null;
-    operating_system: string | null;
-    os_version: string | null;
-    browser: string | null;
-    browser_version: string | null;
-  } | null;
-};
+const containerCls = "relative z-10 mx-auto w-full max-w-6xl space-y-5 px-3 py-5 sm:space-y-6 sm:px-5 sm:py-8";
 
-type ActivityEntry = {
-  id: string;
-  activity_type: string;
-  activity_description: string | null;
-  ip_address: string | null;
-  created_at: string;
-};
-
-type AuthMethod = {
-  id: string;
-  provider: string;
-  auth_method: string;
-  provider_email: string | null;
-  first_seen_at: string;
-  last_sign_in_at: string | null;
-  login_count: number;
-  last_event: string | null;
-};
-
-type Verification = {
-  id: string;
-  verification_type: string;
-  verification_status: string;
-  verified_at: string | null;
-  last_requested_at: string | null;
-  expires_at: string | null;
-  attempt_count: number;
-};
-
-/* ================================================================== */
-/*  Liquid glass                                                       */
-/* ================================================================== */
-const liquidGlass = {
-  background:
-    "radial-gradient(120% 120% at 30% 12%, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0.40) 45%, rgba(255,255,255,0.28) 100%)",
-  backdropFilter: "blur(26px) saturate(180%)",
-  WebkitBackdropFilter: "blur(26px) saturate(180%)",
-  boxShadow:
-    "inset 0 1px 0 0 rgba(255,255,255,0.85), inset 0 0 0 1px rgba(255,255,255,0.35), 0 2px 4px rgba(0,0,0,0.04), 0 18px 42px -22px rgba(0,0,0,0.28)",
-} as const;
-
-const containerCls =
-  "relative z-10 mx-auto w-full max-w-6xl space-y-5 px-3 py-5 sm:space-y-6 sm:px-5 sm:py-8";
-
-/* ================================================================== */
-/*  Background                                                         */
-/* ================================================================== */
-
-
-/* ================================================================== */
-/*  Icons                                                              */
-/* ================================================================== */
 function LockIcon({ className = "h-4 w-4" }: { className?: string }) {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className={className}
-      aria-hidden="true"
-    >
-      <rect x="3" y="11" width="18" height="11" rx="2" />
-      <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-    </svg>
-  );
+  return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>;
 }
 
-/* ================================================================== */
-/*  Time helper                                                        */
-/* ================================================================== */
 function timeAgo(iso: string | null) {
   if (!iso) return "—";
   const diff = Date.now() - new Date(iso).getTime();
@@ -2404,154 +837,37 @@ function timeAgo(iso: string | null) {
   return new Date(iso).toLocaleDateString();
 }
 
-/* ================================================================== */
-/*  Section heading                                                    */
-/* ================================================================== */
 function SectionHeading({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="mb-4 flex items-center gap-3">
-      <span className="whitespace-nowrap text-[10px] font-semibold uppercase tracking-[0.18em] text-black/55">
-        {children}
-      </span>
-      <span
-        aria-hidden="true"
-        className="h-px flex-1"
-        style={{
-          background:
-            "linear-gradient(90deg, rgba(255,255,255,0.6), rgba(255,255,255,0))",
-        }}
-      />
-    </div>
-  );
+  return <div className="mb-4 flex items-center gap-3"><span className="whitespace-nowrap text-[10px] font-semibold uppercase tracking-[0.18em] text-gray-500">{children}</span><span aria-hidden="true" className="h-px flex-1 bg-gradient-to-r from-gray-200 to-transparent" /></div>;
 }
 
-/* ================================================================== */
-/*  Status pill                                                        */
-/* ================================================================== */
 function StatusPill({ status }: { status: string }) {
-  const map: Record<string, string> = {
-    success: "border-emerald-300/70 bg-emerald-100/60 text-emerald-800",
-    verified: "border-emerald-300/70 bg-emerald-100/60 text-emerald-800",
-    failed: "border-red-300/70 bg-red-100/60 text-red-800",
-    blocked: "border-amber-300/70 bg-amber-100/60 text-amber-800",
-    pending: "border-amber-300/70 bg-amber-100/60 text-amber-800",
-  };
-  const cls = map[status] ?? "border-white/40 bg-white/40 text-black/70";
-  return (
-    <span
-      className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] backdrop-blur-md ${cls}`}
-    >
-      {status}
-    </span>
-  );
+  const map: Record<string, string> = { success: "border-emerald-200 bg-emerald-50 text-emerald-700", verified: "border-emerald-200 bg-emerald-50 text-emerald-700", failed: "border-red-200 bg-red-50 text-red-700", blocked: "border-amber-200 bg-amber-50 text-amber-700", pending: "border-amber-200 bg-amber-50 text-amber-700" };
+  const cls = map[status] ?? "border-gray-200 bg-gray-50 text-gray-700";
+  return <span className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] ${cls}`}>{status}</span>;
 }
 
-/* ================================================================== */
-/*  Primary button — always white text                                 */
-/* ================================================================== */
-function PrimaryButton({
-  href,
-  children,
-  icon,
-}: {
-  href?: string;
-  children: React.ReactNode;
-  icon?: React.ReactNode;
-}) {
-  const cls =
-    "group relative inline-flex items-center gap-2 overflow-hidden rounded-full border border-black px-4 py-2.5 text-[12.5px] font-medium transition-all duration-500 hover:-translate-y-0.5";
-  const style: React.CSSProperties = {
-    background: "#0a0a0a",
-    color: "#ffffff",
-    boxShadow:
-      "inset 0 1px 0 0 rgba(255,255,255,0.14), 0 2px 4px rgba(0,0,0,0.08), 0 12px 28px -12px rgba(0,0,0,0.5)",
-  };
-  const inner = (
-    <>
-      <span
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
-        style={{
-          background:
-            "radial-gradient(circle at 30% 30%, rgba(255,255,255,0.2), transparent 60%)",
-        }}
-      />
-      {icon && <span className="relative flex items-center">{icon}</span>}
-      <span className="relative" style={{ color: "#ffffff" }}>
-        {children}
-      </span>
-    </>
-  );
-  if (href) {
-    return (
-      <Link href={href} className={cls} style={style}>
-        {inner}
-      </Link>
-    );
-  }
-  return (
-    <button type="button" className={cls} style={style}>
-      {inner}
-    </button>
-  );
+function PrimaryButton({ href, children, icon }: { href?: string; children: React.ReactNode; icon?: React.ReactNode }) {
+  const cls = "group relative inline-flex items-center gap-2 overflow-hidden rounded-full border border-black px-4 py-2.5 text-[12.5px] font-medium transition-all duration-500 hover:-translate-y-0.5 shadow-lg shadow-black/10";
+  const style: React.CSSProperties = { background: "#0a0a0a", color: "#ffffff" };
+  const inner = (<><span aria-hidden="true" className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100" style={{ background: "radial-gradient(circle at 30% 30%, rgba(255,255,255,0.2), transparent 60%)" }} />{icon && <span className="relative flex items-center">{icon}</span>}<span className="relative" style={{ color: "#ffffff" }}>{children}</span></>);
+  if (href) return <Link href={href} className={cls} style={style}>{inner}</Link>;
+  return <button type="button" className={cls} style={style}>{inner}</button>;
 }
 
-/* ================================================================== */
-/*  Empty state                                                        */
-/* ================================================================== */
 function EmptyState({ icon, text }: { icon: string; text: string }) {
   return (
-    <div
-      className="relative overflow-hidden rounded-3xl border border-white/[0.4] p-10 text-center"
-      style={{
-        background:
-          "radial-gradient(120% 120% at 30% 12%, rgba(255,255,255,0.58) 0%, rgba(255,255,255,0.42) 45%, rgba(255,255,255,0.30) 100%)",
-        backdropFilter: "blur(32px) saturate(180%)",
-        WebkitBackdropFilter: "blur(32px) saturate(180%)",
-        boxShadow:
-          "inset 0 1px 0 0 rgba(255,255,255,0.9), inset 0 0 0 1px rgba(255,255,255,0.35), 0 2px 4px rgba(0,0,0,0.04), 0 30px 64px -28px rgba(0,0,0,0.34)",
-      }}
-    >
-      <div
-        className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl border border-white/40"
-        style={{
-          background:
-            "radial-gradient(120% 120% at 30% 15%, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0.5) 100%)",
-          backdropFilter: "blur(14px)",
-          WebkitBackdropFilter: "blur(14px)",
-          boxShadow:
-            "inset 0 1px 0 0 rgba(255,255,255,1), 0 6px 16px -8px rgba(0,0,0,0.10)",
-          animation: "sec-float-soft 4s ease-in-out infinite",
-        }}
-      >
-        <Image
-          src={icon}
-          alt=""
-          width={24}
-          height={24}
-          className="opacity-70"
-        />
+    <div className="relative overflow-hidden rounded-3xl border border-gray-100 bg-white/80 backdrop-blur-xl p-10 text-center shadow-sm">
+      <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl border border-gray-100 bg-gray-50 shadow-sm">
+        <Image src={icon} alt="" width={24} height={24} className="opacity-60" />
       </div>
-      <p className="text-[13px] text-black/65">{text}</p>
+      <p className="text-[13px] text-gray-500">{text}</p>
     </div>
   );
 }
 
-/* ================================================================== */
-/*  Tabs                                                               */
-/* ================================================================== */
-const TABS = [
-  { id: "logins", label: "Login History" },
-  { id: "activity", label: "Activity" },
-  { id: "methods", label: "Auth Methods" },
-  { id: "verifications", label: "Verifications" },
-] as const;
-
+const TABS = [{ id: "logins", label: "Login History" }, { id: "activity", label: "Activity" }, { id: "methods", label: "Auth Methods" }, { id: "verifications", label: "Verifications" }] as const;
 type TabId = (typeof TABS)[number]["id"];
-
-/* ================================================================== */
-/*  Page                                                               */
-/* ================================================================== */
 
   const [tab, setTab] = useState<TabId>("logins");
   const [logins, setLogins] = useState<LoginEntry[]>([]);
@@ -2562,16 +878,7 @@ type TabId = (typeof TABS)[number]["id"];
 
   useEffect(() => {
     (async () => {
-      const [a, b, c, d] = await Promise.all([
-        apiFetch<{ history: LoginEntry[] }>("/api/user/login-history?limit=50"),
-        apiFetch<{ activities: ActivityEntry[] }>(
-          "/api/user/activity-logs?limit=50"
-        ),
-        apiFetch<{ auth_methods: AuthMethod[] }>("/api/user/auth-methods"),
-        apiFetch<{ verifications: Verification[] }>(
-          "/api/user/verification-records"
-        ),
-      ]);
+      const [a, b, c, d] = await Promise.all([apiFetch<{ history: LoginEntry[] }>("/api/user/login-history?limit=50"), apiFetch<{ activities: ActivityEntry[] }>("/api/user/activity-logs?limit=50"), apiFetch<{ auth_methods: AuthMethod[] }>("/api/user/auth-methods"), apiFetch<{ verifications: Verification[] }>("/api/user/verification-records")]);
       if (a.success) setLogins(a.data.history);
       if (b.success) setActivities(b.data.activities);
       if (c.success) setMethods(c.data.auth_methods);
@@ -2584,775 +891,131 @@ type TabId = (typeof TABS)[number]["id"];
 
   return (
     <div className="relative isolate min-h-[80vh] w-full overflow-x-hidden">
-      {/* ============================================================ */}
-      {/*  KEYFRAMES + SCOPED OVERRIDES FOR EMBEDDED COMPONENTS         */}
-      {/* ============================================================ */}
       <style jsx global>{`
-        @keyframes sec-item-in {
-          from { opacity: 0; transform: translateY(20px) scale(0.99); filter: blur(8px); }
-          to   { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
-        }
-        @keyframes sec-banner-in {
-          from { opacity: 0; transform: translateY(24px); filter: blur(10px); }
-          to   { opacity: 1; transform: translateY(0); filter: blur(0); }
-        }
-        @keyframes sec-float-soft {
-          0%, 100% { transform: translateY(0); }
-          50%      { transform: translateY(-5px); }
-        }
-        @keyframes sec-kenburns {
-          0%, 100% { transform: scale(1.04) translate(0, 0); }
-          50%      { transform: scale(1.12) translate(-1%, -0.8%); }
-        }
-
-        /* ============================================================ */
-        /*  SCOPED OVERRIDES — [data-sec-tool] wrapper                   */
-        /*  Forces TemporaryLoginTokens / PasskeyManager / 2FA          */
-        /*  to fit into the liquid glass theme without overflow         */
-        /* ============================================================ */
-
-        [data-sec-tool],
-        [data-sec-tool] * {
-          box-sizing: border-box;
-          max-width: 100%;
-        }
-
-        [data-sec-tool] {
-          width: 100% !important;
-          overflow-x: hidden;
-          text-align: left;
-        }
-
-        [data-sec-tool] > * {
-          width: 100% !important;
-          margin-left: 0 !important;
-          margin-right: 0 !important;
-          max-width: 100% !important;
-        }
-
-        /* Flatten any nested outer containers (double card / borders) */
-        [data-sec-tool] > div,
-        [data-sec-tool] > section,
-        [data-sec-tool] > article {
-          background: transparent !important;
-          border: none !important;
-          box-shadow: none !important;
-          padding: 0 !important;
-          border-radius: 0 !important;
-          width: 100% !important;
-        }
-
-        /* All inputs → liquid glass */
-        [data-sec-tool] input:not([type="checkbox"]):not([type="radio"]):not([type="submit"]):not([type="button"]):not([type="hidden"]),
-        [data-sec-tool] select,
-        [data-sec-tool] textarea {
-          width: 100% !important;
-          padding: 12px 14px !important;
-          border-radius: 12px !important;
-          border: 1px solid rgba(255,255,255,0.4) !important;
-          background: rgba(255,255,255,0.4) !important;
-          backdrop-filter: blur(14px) saturate(180%);
-          -webkit-backdrop-filter: blur(14px) saturate(180%);
-          color: rgba(0,0,0,0.9) !important;
-          font-size: 14px !important;
-          line-height: 1.4 !important;
-          outline: none !important;
-          box-shadow:
-            inset 0 1px 0 0 rgba(255,255,255,0.9),
-            0 1px 2px rgba(0,0,0,0.03) !important;
-          transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
-        }
-
-        [data-sec-tool] input::placeholder,
-        [data-sec-tool] textarea::placeholder {
-          color: rgba(0,0,0,0.35) !important;
-        }
-
-        [data-sec-tool] input:focus,
-        [data-sec-tool] select:focus,
-        [data-sec-tool] textarea:focus {
-          border-color: rgba(255,255,255,0.7) !important;
-          background: rgba(255,255,255,0.6) !important;
-          box-shadow:
-            inset 0 1px 0 0 rgba(255,255,255,1),
-            0 0 0 4px rgba(255,255,255,0.3) !important;
-        }
-
-        /* All labels */
-        [data-sec-tool] label {
-          display: block !important;
-          font-size: 10px !important;
-          font-weight: 600 !important;
-          text-transform: uppercase !important;
-          letter-spacing: 0.16em !important;
-          color: rgba(0,0,0,0.6) !important;
-          margin-bottom: 8px !important;
-        }
-
-        /* Secondary buttons → liquid glass pill */
-        [data-sec-tool] button:not([type="submit"]):not([data-primary]) {
-          border-radius: 999px !important;
-          border: 1px solid rgba(255,255,255,0.4) !important;
-          background: rgba(255,255,255,0.4) !important;
-          backdrop-filter: blur(14px) saturate(180%);
-          -webkit-backdrop-filter: blur(14px) saturate(180%);
-          color: rgba(0,0,0,0.75) !important;
-          font-weight: 500 !important;
-          padding: 10px 18px !important;
-          font-size: 12.5px !important;
-          transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
-          box-shadow:
-            inset 0 1px 0 0 rgba(255,255,255,0.85),
-            0 2px 4px rgba(0,0,0,0.04) !important;
-          max-width: 100% !important;
-          white-space: normal !important;
-        }
-
-        [data-sec-tool] button:not([type="submit"]):not([data-primary]):hover {
-          background: rgba(255,255,255,0.65) !important;
-          border-color: rgba(255,255,255,0.7) !important;
-          color: rgba(0,0,0,0.95) !important;
-          transform: translateY(-2px);
-        }
-
-        /* Primary / submit buttons → BLACK with WHITE text (forced) */
-        [data-sec-tool] button[type="submit"],
-        [data-sec-tool] button[data-primary] {
-          border-radius: 999px !important;
-          border: 1px solid #0a0a0a !important;
-          background: #0a0a0a !important;
-          color: #ffffff !important;
-          font-weight: 500 !important;
-          font-size: 12.5px !important;
-          padding: 12px 22px !important;
-          box-shadow:
-            inset 0 1px 0 0 rgba(255,255,255,0.14),
-            0 2px 4px rgba(0,0,0,0.08),
-            0 12px 28px -12px rgba(0,0,0,0.5) !important;
-          transition: all 0.5s cubic-bezier(0.22, 1, 0.36, 1);
-          cursor: pointer;
-          max-width: 100% !important;
-          white-space: normal !important;
-        }
-
-        [data-sec-tool] button[type="submit"] *,
-        [data-sec-tool] button[data-primary] * {
-          color: #ffffff !important;
-        }
-
-        [data-sec-tool] button[type="submit"]:hover,
-        [data-sec-tool] button[data-primary]:hover {
-          transform: translateY(-2px);
-          box-shadow:
-            inset 0 1px 0 0 rgba(255,255,255,0.2),
-            0 4px 8px rgba(0,0,0,0.1),
-            0 18px 36px -12px rgba(0,0,0,0.55) !important;
-        }
-
-        [data-sec-tool] button[type="submit"]:disabled,
-        [data-sec-tool] button[data-primary]:disabled {
-          opacity: 0.6 !important;
-          cursor: not-allowed !important;
-          transform: none !important;
-        }
-
-        /* Heading / text inside tools */
-        [data-sec-tool] h1,
-        [data-sec-tool] h2,
-        [data-sec-tool] h3,
-        [data-sec-tool] h4 {
-          color: rgba(0,0,0,0.9) !important;
-          font-weight: 600 !important;
-          letter-spacing: -0.01em !important;
-        }
-
-        [data-sec-tool] p,
-        [data-sec-tool] small,
-        [data-sec-tool] span {
-          color: rgba(0,0,0,0.65);
-        }
-
-        [data-sec-tool] a {
-          color: rgba(0,0,0,0.75) !important;
-          text-decoration: underline;
-          text-underline-offset: 2px;
-          transition: color 0.3s;
-        }
-
-        [data-sec-tool] a:hover {
-          color: #000 !important;
-        }
-
-        /* Nested grids — responsive */
-        [data-sec-tool] .grid,
-        [data-sec-tool] [class*="grid-cols"] {
-          gap: 12px !important;
-          width: 100% !important;
-        }
-
-        [data-sec-tool] [class*="flex"],
-        [data-sec-tool] [class*="grid"] {
-          min-width: 0 !important;
-        }
-
-        /* Any inner card-like element → keep it inside bounds */
-        [data-sec-tool] [class*="rounded"],
-        [data-sec-tool] [class*="border"] {
-          max-width: 100% !important;
-        }
-
-        /* Code / OTP / mono inputs — keep compact */
-        [data-sec-tool] input[inputmode="numeric"],
-        [data-sec-tool] input[autocomplete="one-time-code"] {
-          text-align: center !important;
-          font-size: 16px !important;
-          font-weight: 600 !important;
-        }
-
-        /* Error / success */
-        [data-sec-tool] [class*="error"],
-        [data-sec-tool] [class*="Error"] {
-          background: rgba(254, 226, 226, 0.6) !important;
-          border: 1px solid rgba(252, 165, 165, 0.7) !important;
-          color: #991b1b !important;
-          border-radius: 12px !important;
-          padding: 10px 14px !important;
-          backdrop-filter: blur(14px);
-          max-width: 100% !important;
-        }
-
-        [data-sec-tool] [class*="success"],
-        [data-sec-tool] [class*="Success"] {
-          background: rgba(209, 250, 229, 0.6) !important;
-          border: 1px solid rgba(110, 231, 183, 0.7) !important;
-          color: #065f46 !important;
-          border-radius: 12px !important;
-          padding: 10px 14px !important;
-          backdrop-filter: blur(14px);
-          max-width: 100% !important;
-        }
-
-        /* ============================================================ */
-        /*  WRAPPER for each tool — a liquid glass section              */
-        /* ============================================================ */
-        .sec-tool-wrap {
-          position: relative;
-          overflow: hidden;
-          border-radius: 24px;
-          border: 1px solid rgba(255,255,255,0.35);
-          padding: 20px;
-          transition: border-color 0.5s cubic-bezier(0.22, 1, 0.36, 1),
-                      box-shadow 0.5s cubic-bezier(0.22, 1, 0.36, 1);
-        }
-
-        @media (min-width: 640px) {
-          .sec-tool-wrap { padding: 24px; }
-        }
-
-        .sec-tool-wrap:hover {
-          border-color: rgba(255,255,255,0.5);
-          box-shadow:
-            inset 0 1px 0 0 rgba(255,255,255,0.9),
-            inset 0 0 0 1px rgba(255,255,255,0.4),
-            0 2px 4px rgba(0,0,0,0.04),
-            0 22px 48px -22px rgba(0,0,0,0.32) !important;
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-          [data-sec-anim],
-          [data-sec-tool] * {
-            animation: none !important;
-            transition: none !important;
-          }
-        }
+        @keyframes sec-item-in { from { opacity: 0; transform: translateY(20px) scale(0.99); filter: blur(8px); } to { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); } }
+        [data-sec-tool], [data-sec-tool] * { box-sizing: border-box; max-width: 100%; }
+        [data-sec-tool] { width: 100% !important; overflow-x: hidden; text-align: left; }
+        [data-sec-tool] > * { width: 100% !important; margin-left: 0 !important; margin-right: 0 !important; max-width: 100% !important; }
+        [data-sec-tool] > div, [data-sec-tool] > section, [data-sec-tool] > article { background: transparent !important; border: none !important; box-shadow: none !important; padding: 0 !important; border-radius: 0 !important; width: 100% !important; }
+        [data-sec-tool] input:not([type="checkbox"]):not([type="radio"]):not([type="submit"]):not([type="button"]):not([type="hidden"]), [data-sec-tool] select, [data-sec-tool] textarea { width: 100% !important; padding: 12px 14px !important; border-radius: 12px !important; border: 1px solid rgba(0,0,0,0.1) !important; background: rgba(255,255,255,0.8) !important; color: rgba(0,0,0,0.9) !important; font-size: 14px !important; line-height: 1.4 !important; outline: none !important; transition: all 0.3s; }
+        [data-sec-tool] input:focus, [data-sec-tool] select:focus, [data-sec-tool] textarea:focus { border-color: rgba(0,0,0,0.3) !important; background: #fff !important; box-shadow: 0 0 0 4px rgba(0,0,0,0.05) !important; }
+        [data-sec-tool] label { display: block !important; font-size: 10px !important; font-weight: 600 !important; text-transform: uppercase !important; letter-spacing: 0.16em !important; color: rgba(0,0,0,0.6) !important; margin-bottom: 8px !important; }
+        [data-sec-tool] button:not([type="submit"]):not([data-primary]) { border-radius: 999px !important; border: 1px solid rgba(0,0,0,0.1) !important; background: rgba(255,255,255,0.8) !important; color: rgba(0,0,0,0.75) !important; font-weight: 500 !important; padding: 10px 18px !important; font-size: 12.5px !important; transition: all 0.4s !important; max-width: 100% !important; white-space: normal !important; }
+        [data-sec-tool] button:not([type="submit"]):not([data-primary]):hover { background: #fff !important; border-color: rgba(0,0,0,0.2) !important; color: rgba(0,0,0,0.95) !important; transform: translateY(-2px); }
+        [data-sec-tool] button[type="submit"], [data-sec-tool] button[data-primary] { border-radius: 999px !important; border: 1px solid #0a0a0a !important; background: #0a0a0a !important; color: #ffffff !important; font-weight: 500 !important; font-size: 12.5px !important; padding: 12px 22px !important; box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important; transition: all 0.5s !important; cursor: pointer; max-width: 100% !important; white-space: normal !important; }
+        [data-sec-tool] button[type="submit"] *, [data-sec-tool] button[data-primary] * { color: #ffffff !important; }
+        [data-sec-tool] button[type="submit"]:hover, [data-sec-tool] button[data-primary]:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.15) !important; }
+        [data-sec-tool] h1, [data-sec-tool] h2, [data-sec-tool] h3, [data-sec-tool] h4 { color: rgba(0,0,0,0.9) !important; font-weight: 600 !important; letter-spacing: -0.01em !important; }
+        [data-sec-tool] p, [data-sec-tool] small, [data-sec-tool] span { color: rgba(0,0,0,0.65); }
+        [data-sec-tool] a { color: rgba(0,0,0,0.75) !important; text-decoration: underline; text-underline-offset: 2px; transition: color 0.3s; }
+        [data-sec-tool] a:hover { color: #000 !important; }
+        .sec-tool-wrap { position: relative; overflow: hidden; border-radius: 24px; border: 1px solid rgba(0,0,0,0.05); padding: 20px; transition: border-color 0.5s, box-shadow 0.5s; background: rgba(255,255,255,0.8); backdrop-filter: blur(20px); box-shadow: 0 8px 30px rgba(0,0,0,0.04); }
+        @media (min-width: 640px) { .sec-tool-wrap { padding: 24px; } }
+        .sec-tool-wrap:hover { border-color: rgba(0,0,0,0.1); box-shadow: 0 20px 40px -20px rgba(0,0,0,0.1) !important; }
       `}</style>
 
-
       <div className={containerCls}>
-        {/* ============================================================ */}
-        {/*  HERO BANNER                                                  */}
-        {/* ============================================================ */}
-        <div
-          data-sec-anim
-          className="relative w-full overflow-hidden rounded-3xl border border-white/[0.4] p-6 sm:p-9"
-          style={{
-            background:
-              "radial-gradient(120% 120% at 30% 12%, rgba(255,255,255,0.58) 0%, rgba(255,255,255,0.42) 45%, rgba(255,255,255,0.30) 100%)",
-            backdropFilter: "blur(32px) saturate(180%)",
-            WebkitBackdropFilter: "blur(32px) saturate(180%)",
-            boxShadow:
-              "inset 0 1px 0 0 rgba(255,255,255,0.9), inset 0 0 0 1px rgba(255,255,255,0.35), 0 2px 4px rgba(0,0,0,0.04), 0 30px 64px -28px rgba(0,0,0,0.34)",
-            animation:
-              "sec-banner-in 0.85s cubic-bezier(0.22, 1, 0.36, 1) 0.05s both",
-          }}
-        >
-          <div
-            aria-hidden="true"
-            className="pointer-events-none absolute inset-x-0 top-0 h-px"
-            style={{
-              background:
-                "linear-gradient(90deg, transparent, rgba(255,255,255,1), transparent)",
-            }}
-          />
-          <div
-            aria-hidden="true"
-            className="pointer-events-none absolute -left-16 -top-16 h-52 w-52 rounded-full opacity-70"
-            style={{
-              background:
-                "radial-gradient(circle, rgba(180,200,255,0.5) 0%, rgba(180,200,255,0) 70%)",
-              filter: "blur(36px)",
-              animation: "sec-float-soft 7s ease-in-out infinite",
-            }}
-          />
-          <div
-            aria-hidden="true"
-            className="pointer-events-none absolute -right-16 -bottom-16 h-52 w-52 rounded-full opacity-70"
-            style={{
-              background:
-                "radial-gradient(circle, rgba(255,200,180,0.45) 0%, rgba(255,200,180,0) 70%)",
-              filter: "blur(36px)",
-              animation: "sec-float-soft 7s ease-in-out 1.4s infinite",
-            }}
-          />
-
-          <div className="relative">
-            <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-white/40 bg-white/40 px-3 py-1.5 backdrop-blur-md">
-              <span
-                className="h-1.5 w-1.5 rounded-full bg-black/80"
-                style={{ animation: "sec-float-soft 2.4s ease-in-out infinite" }}
-              />
-              <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-black/70">
-                Safety
-              </span>
-            </div>
-
-            <div className="flex flex-wrap items-start justify-between gap-5">
-              <div className="min-w-0">
-                <h1
-                  className="mb-3 text-2xl font-semibold tracking-[-0.02em] text-black sm:text-3xl"
-                  style={{
-                    textShadow:
-                      "0 1px 12px rgba(255,255,255,0.85), 0 1px 2px rgba(255,255,255,0.6)",
-                  }}
-                >
-                  Security
-                </h1>
-                <p className="max-w-lg text-[13.5px] leading-6 text-black/70">
-                  Monitor your account activity and manage security settings.
-                </p>
-              </div>
-
-              <PrimaryButton
-                href="/dashboard/security/password"
-                icon={<LockIcon className="h-4 w-4" />}
-              >
-                Change password
-              </PrimaryButton>
-            </div>
+        <div className="flex flex-wrap items-start justify-between gap-5 mb-6">
+          <div className="min-w-0">
+            <h1 className="mb-2 text-2xl font-semibold tracking-[-0.02em] text-gray-900">Security</h1>
+            <p className="max-w-lg text-[13.5px] leading-6 text-gray-500">Monitor your account activity and manage security settings.</p>
           </div>
+          <PrimaryButton href="/dashboard/security/password" icon={<LockIcon className="h-4 w-4" />}>Change password</PrimaryButton>
         </div>
 
-        {/* ============================================================ */}
-        {/*  SECURITY TOOLS — each wrapped in its own liquid glass card   */}
-        {/* ============================================================ */}
-
-        <div
-          className="sec-tool-wrap"
-          style={{
-            ...liquidGlass,
-            animation:
-              "sec-item-in 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.15s both",
-          }}
-        >
-          <span
-            aria-hidden="true"
-            className="pointer-events-none absolute inset-x-0 top-0 h-px"
-            style={{
-              background:
-                "linear-gradient(90deg, transparent, rgba(255,255,255,1), transparent)",
-            }}
-          />
-          <div data-sec-tool className="relative w-full">
-            <TemporaryLoginTokens />
-          </div>
+        <div className="sec-tool-wrap mb-5" style={{ animation: "sec-item-in 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.15s both" }}>
+          <div data-sec-tool className="relative w-full"><TemporaryLoginTokens /></div>
         </div>
 
-        <div
-          className="sec-tool-wrap"
-          style={{
-            ...liquidGlass,
-            animation:
-              "sec-item-in 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.2s both",
-          }}
-        >
-          <span
-            aria-hidden="true"
-            className="pointer-events-none absolute inset-x-0 top-0 h-px"
-            style={{
-              background:
-                "linear-gradient(90deg, transparent, rgba(255,255,255,1), transparent)",
-            }}
-          />
-          <div data-sec-tool className="relative w-full">
-            <PasskeyManager />
-          </div>
+        <div className="sec-tool-wrap mb-5" style={{ animation: "sec-item-in 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.2s both" }}>
+          <div data-sec-tool className="relative w-full"><PasskeyManager /></div>
         </div>
 
-        <div
-          className="sec-tool-wrap"
-          style={{
-            ...liquidGlass,
-            animation:
-              "sec-item-in 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.25s both",
-          }}
-        >
-          <span
-            aria-hidden="true"
-            className="pointer-events-none absolute inset-x-0 top-0 h-px"
-            style={{
-              background:
-                "linear-gradient(90deg, transparent, rgba(255,255,255,1), transparent)",
-            }}
-          />
-          <div data-sec-tool className="relative w-full">
-            <TwoFactorSettings />
-          </div>
+        <div className="sec-tool-wrap mb-5" style={{ animation: "sec-item-in 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.25s both" }}>
+          <div data-sec-tool className="relative w-full"><TwoFactorSettings /></div>
         </div>
 
-        {/* ============================================================ */}
-        {/*  AUDIT LOGS — tabs inside liquid glass card                   */}
-        {/* ============================================================ */}
-        <section
-          className="relative w-full overflow-hidden rounded-3xl border border-white/[0.35] p-5 sm:p-7"
-          style={{
-            ...liquidGlass,
-            animation:
-              "sec-item-in 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.3s both",
-          }}
-        >
-          <span
-            aria-hidden="true"
-            className="pointer-events-none absolute inset-x-0 top-0 h-px"
-            style={{
-              background:
-                "linear-gradient(90deg, transparent, rgba(255,255,255,1), transparent)",
-            }}
-          />
-
+        <section className="relative w-full overflow-hidden rounded-3xl border border-gray-100 bg-white/80 backdrop-blur-xl p-5 sm:p-7 shadow-sm" style={{ animation: "sec-item-in 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.3s both" }}>
           <div className="relative">
             <SectionHeading>Account Activity</SectionHeading>
-
-            {/* Tabs */}
             <div className="mb-5 flex flex-wrap gap-2">
               {TABS.map((t) => {
                 const active = tab === t.id;
                 return (
-                  <button
-                    key={t.id}
-                    type="button"
-                    onClick={() => setTab(t.id)}
-                    className={`group relative inline-flex items-center gap-2 overflow-hidden rounded-full border px-3.5 py-2 text-[12px] font-medium transition-all duration-500 ${
-                      active
-                        ? "border-black"
-                        : "border-white/40 bg-white/40 text-black/70 backdrop-blur-md hover:-translate-y-0.5 hover:border-white/60 hover:bg-white/60 hover:text-black"
-                    }`}
-                    style={
-                      active
-                        ? {
-                            background: "#0a0a0a",
-                            color: "#ffffff",
-                            boxShadow:
-                              "inset 0 1px 0 0 rgba(255,255,255,0.14), 0 2px 4px rgba(0,0,0,0.08), 0 12px 28px -12px rgba(0,0,0,0.5)",
-                          }
-                        : undefined
-                    }
-                  >
-                    {active && (
-                      <span
-                        aria-hidden="true"
-                        className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
-                        style={{
-                          background:
-                            "radial-gradient(circle at 30% 30%, rgba(255,255,255,0.2), transparent 60%)",
-                        }}
-                      />
-                    )}
-                    <span
-                      className="relative"
-                      style={active ? { color: "#ffffff" } : undefined}
-                    >
-                      {t.label}
-                    </span>
+                  <button key={t.id} type="button" onClick={() => setTab(t.id)} className={`group relative inline-flex items-center gap-2 overflow-hidden rounded-full border px-3.5 py-2 text-[12px] font-medium transition-all duration-500 ${active ? "border-black bg-black text-white shadow-md shadow-black/10" : "border-gray-200 bg-white text-gray-600 hover:bg-gray-50 hover:text-black"}`}>
+                    <span className="relative">{t.label}</span>
                   </button>
                 );
               })}
             </div>
 
-            {/* ---------- Login History ---------- */}
             {tab === "logins" && (
               <div className="space-y-3">
-                {logins.length === 0 ? (
-                  <EmptyState
-                    icon="/icons/lock.svg"
-                    text="No login history yet."
-                  />
-                ) : (
-                  logins.map((l, i) => (
-                    <article
-                      key={l.id}
-                      className="group relative overflow-hidden rounded-2xl border border-white/[0.35] p-4 transition-all duration-500 hover:-translate-y-0.5 hover:border-white/[0.5] hover:shadow-[0_18px_40px_-22px_rgba(0,0,0,0.28)] sm:p-5"
-                      style={{
-                        ...liquidGlass,
-                        animation: `sec-item-in 0.55s cubic-bezier(0.22, 1, 0.36, 1) ${
-                          0.05 + i * 0.03
-                        }s both`,
-                      }}
-                    >
-                      <span
-                        aria-hidden="true"
-                        className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
-                        style={{
-                          background:
-                            "radial-gradient(circle at 25% 15%, rgba(255,255,255,0.35), transparent 60%)",
-                        }}
-                      />
-
-                      <div className="relative flex items-start justify-between gap-3">
-                        <div className="min-w-0 flex-1">
-                          <div className="mb-2 flex flex-wrap items-center gap-2">
-                            <StatusPill status={l.login_status} />
-                            <span className="rounded-full border border-white/40 bg-white/40 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-black/65 backdrop-blur-md">
-                              {l.login_method ?? "password"}
-                            </span>
-                          </div>
-
-                          <div className="truncate text-[12.5px] text-black/70">
-                            {l.ip_address ?? "No IP"} ·{" "}
-                            {[l.city, l.country].filter(Boolean).join(", ") ||
-                              "Unknown location"}
-                          </div>
-
-                          {l.latitude !== null && l.longitude !== null && (
-                            <div className="mt-0.5 text-[11px] text-black/50">
-                              {Number(l.latitude).toFixed(6)},{" "}
-                              {Number(l.longitude).toFixed(6)}
-                              {l.location_accuracy_meters !== null &&
-                                ` · ±${Math.round(
-                                  l.location_accuracy_meters
-                                )}m`}
-                              {l.location_source &&
-                                ` · ${l.location_source.replace(/_/g, " ")}`}
-                            </div>
-                          )}
-
-                          {l.user_devices && (
-                            <div className="mt-1 text-[11.5px] text-black/55">
-                              {l.user_devices.device_name ??
-                                l.user_devices.device_type ??
-                                "Unknown device"}
-                              {l.user_devices.operating_system &&
-                                ` · ${l.user_devices.operating_system}${
-                                  l.user_devices.os_version
-                                    ? ` ${l.user_devices.os_version}`
-                                    : ""
-                                }`}
-                              {l.user_devices.browser &&
-                                ` · ${l.user_devices.browser}${
-                                  l.user_devices.browser_version
-                                    ? ` ${l.user_devices.browser_version}`
-                                    : ""
-                                }`}
-                            </div>
-                          )}
-
-                          {l.user_agent && (
-                            <div
-                              className="mt-1 truncate text-[10.5px] text-black/40"
-                              title={l.user_agent}
-                            >
-                              {l.user_agent}
-                            </div>
-                          )}
+                {logins.length === 0 ? <EmptyState icon="/icons/lock.svg" text="No login history yet." /> : logins.map((l, i) => (
+                  <article key={l.id} className="group relative overflow-hidden rounded-2xl border border-gray-100 bg-white p-4 transition-all duration-500 hover:shadow-[0_18px_40px_-22px_rgba(0,0,0,0.1)] sm:p-5" style={{ animation: `sec-item-in 0.55s cubic-bezier(0.22, 1, 0.36, 1) ${0.05 + i * 0.03}s both` }}>
+                    <div className="relative flex items-start justify-between gap-3">
+                      <div className="min-w-0 flex-1">
+                        <div className="mb-2 flex flex-wrap items-center gap-2">
+                          <StatusPill status={l.login_status} />
+                          <span className="rounded-full border border-gray-200 bg-gray-50 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-gray-600">{l.login_method ?? "password"}</span>
                         </div>
-
-                        <div className="shrink-0 text-[11px] font-medium text-black/55">
-                          {timeAgo(l.login_at)}
-                        </div>
+                        <div className="truncate text-[12.5px] text-gray-600">{l.ip_address ?? "No IP"} · {[l.city, l.country].filter(Boolean).join(", ") || "Unknown location"}</div>
+                        {l.user_devices && <div className="mt-1 text-[11.5px] text-gray-500">{l.user_devices.device_name ?? l.user_devices.device_type ?? "Unknown device"}{l.user_devices.operating_system && ` · ${l.user_devices.operating_system}`}{l.user_devices.browser && ` · ${l.user_devices.browser}`}</div>}
                       </div>
-                    </article>
-                  ))
-                )}
+                      <div className="shrink-0 text-[11px] font-medium text-gray-400">{timeAgo(l.login_at)}</div>
+                    </div>
+                  </article>
+                ))}
               </div>
             )}
 
-            {/* ---------- Activity ---------- */}
             {tab === "activity" && (
               <div className="space-y-3">
-                {activities.length === 0 ? (
-                  <EmptyState
-                    icon="/icons/history.svg"
-                    text="No activity recorded yet."
-                  />
-                ) : (
-                  activities.map((a, i) => (
-                    <article
-                      key={a.id}
-                      className="group relative overflow-hidden rounded-2xl border border-white/[0.35] p-4 transition-all duration-500 hover:-translate-y-0.5 hover:border-white/[0.5] hover:shadow-[0_18px_40px_-22px_rgba(0,0,0,0.28)] sm:p-5"
-                      style={{
-                        ...liquidGlass,
-                        animation: `sec-item-in 0.55s cubic-bezier(0.22, 1, 0.36, 1) ${
-                          0.05 + i * 0.03
-                        }s both`,
-                      }}
-                    >
-                      <span
-                        aria-hidden="true"
-                        className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
-                        style={{
-                          background:
-                            "radial-gradient(circle at 25% 15%, rgba(255,255,255,0.35), transparent 60%)",
-                        }}
-                      />
-
-                      <div className="relative flex items-start justify-between gap-3">
-                        <div className="min-w-0 flex-1">
-                          <div className="mb-0.5 text-[13px] font-semibold capitalize text-black/90">
-                            {a.activity_type.replace(/_/g, " ")}
-                          </div>
-                          {a.activity_description && (
-                            <div className="text-[12px] text-black/60">
-                              {a.activity_description}
-                            </div>
-                          )}
-                          {a.ip_address && (
-                            <div className="mt-1 text-[11px] text-black/45">
-                              IP: {a.ip_address}
-                            </div>
-                          )}
-                        </div>
-                        <div className="shrink-0 text-[11px] font-medium text-black/55">
-                          {timeAgo(a.created_at)}
-                        </div>
+                {activities.length === 0 ? <EmptyState icon="/icons/history.svg" text="No activity recorded yet." /> : activities.map((a, i) => (
+                  <article key={a.id} className="group relative overflow-hidden rounded-2xl border border-gray-100 bg-white p-4 transition-all duration-500 hover:shadow-[0_18px_40px_-22px_rgba(0,0,0,0.1)] sm:p-5" style={{ animation: `sec-item-in 0.55s cubic-bezier(0.22, 1, 0.36, 1) ${0.05 + i * 0.03}s both` }}>
+                    <div className="relative flex items-start justify-between gap-3">
+                      <div className="min-w-0 flex-1">
+                        <div className="mb-0.5 text-[13px] font-semibold capitalize text-gray-900">{a.activity_type.replace(/_/g, " ")}</div>
+                        {a.activity_description && <div className="text-[12px] text-gray-500">{a.activity_description}</div>}
+                        {a.ip_address && <div className="mt-1 text-[11px] text-gray-400">IP: {a.ip_address}</div>}
                       </div>
-                    </article>
-                  ))
-                )}
+                      <div className="shrink-0 text-[11px] font-medium text-gray-400">{timeAgo(a.created_at)}</div>
+                    </div>
+                  </article>
+                ))}
               </div>
             )}
 
-            {/* ---------- Auth Methods ---------- */}
             {tab === "methods" && (
               <div className="space-y-3">
-                {methods.length === 0 ? (
-                  <EmptyState
-                    icon="/icons/lock.svg"
-                    text="No auth methods linked yet."
-                  />
-                ) : (
-                  methods.map((m, i) => (
-                    <article
-                      key={m.id}
-                      className="group relative overflow-hidden rounded-2xl border border-white/[0.35] p-4 transition-all duration-500 hover:-translate-y-0.5 hover:border-white/[0.5] hover:shadow-[0_18px_40px_-22px_rgba(0,0,0,0.28)] sm:p-5"
-                      style={{
-                        ...liquidGlass,
-                        animation: `sec-item-in 0.55s cubic-bezier(0.22, 1, 0.36, 1) ${
-                          0.05 + i * 0.03
-                        }s both`,
-                      }}
-                    >
-                      <span
-                        aria-hidden="true"
-                        className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
-                        style={{
-                          background:
-                            "radial-gradient(circle at 25% 15%, rgba(255,255,255,0.35), transparent 60%)",
-                        }}
-                      />
-
-                      <div className="relative flex items-start justify-between gap-3">
-                        <div className="min-w-0 flex-1">
-                          <div className="mb-1 flex flex-wrap items-center gap-2">
-                            <span className="text-[13px] font-semibold capitalize text-black/90">
-                              {m.auth_method.replace(/_/g, " ")}
-                            </span>
-                            <span className="text-[11px] text-black/55">
-                              via {m.provider}
-                            </span>
-                          </div>
-                          {m.provider_email && (
-                            <div className="text-[12px] text-black/60">
-                              {m.provider_email}
-                            </div>
-                          )}
-                          <div className="mt-1 text-[11px] text-black/50">
-                            Signed in {m.login_count} time
-                            {m.login_count !== 1 ? "s" : ""}
-                            {m.last_sign_in_at &&
-                              ` · Last: ${timeAgo(m.last_sign_in_at)}`}
-                          </div>
-                        </div>
-                        <span className="shrink-0 rounded-full border border-white/40 bg-white/40 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-black/70 backdrop-blur-md">
-                          {m.last_event ?? "linked"}
-                        </span>
+                {methods.length === 0 ? <EmptyState icon="/icons/lock.svg" text="No auth methods linked yet." /> : methods.map((m, i) => (
+                  <article key={m.id} className="group relative overflow-hidden rounded-2xl border border-gray-100 bg-white p-4 transition-all duration-500 hover:shadow-[0_18px_40px_-22px_rgba(0,0,0,0.1)] sm:p-5" style={{ animation: `sec-item-in 0.55s cubic-bezier(0.22, 1, 0.36, 1) ${0.05 + i * 0.03}s both` }}>
+                    <div className="relative flex items-start justify-between gap-3">
+                      <div className="min-w-0 flex-1">
+                        <div className="mb-1 flex flex-wrap items-center gap-2"><span className="text-[13px] font-semibold capitalize text-gray-900">{m.auth_method.replace(/_/g, " ")}</span><span className="text-[11px] text-gray-500">via {m.provider}</span></div>
+                        {m.provider_email && <div className="text-[12px] text-gray-500">{m.provider_email}</div>}
+                        <div className="mt-1 text-[11px] text-gray-400">Signed in {m.login_count} time{m.login_count !== 1 ? "s" : ""}{m.last_sign_in_at && ` · Last: ${timeAgo(m.last_sign_in_at)}`}</div>
                       </div>
-                    </article>
-                  ))
-                )}
+                      <span className="shrink-0 rounded-full border border-gray-200 bg-gray-50 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-gray-600">{m.last_event ?? "linked"}</span>
+                    </div>
+                  </article>
+                ))}
               </div>
             )}
 
-            {/* ---------- Verifications ---------- */}
             {tab === "verifications" && (
               <div className="space-y-3">
-                {verifications.length === 0 ? (
-                  <EmptyState
-                    icon="/icons/check.svg"
-                    text="No verification records yet."
-                  />
-                ) : (
-                  verifications.map((v, i) => (
-                    <article
-                      key={v.id}
-                      className="group relative overflow-hidden rounded-2xl border border-white/[0.35] p-4 transition-all duration-500 hover:-translate-y-0.5 hover:border-white/[0.5] hover:shadow-[0_18px_40px_-22px_rgba(0,0,0,0.28)] sm:p-5"
-                      style={{
-                        ...liquidGlass,
-                        animation: `sec-item-in 0.55s cubic-bezier(0.22, 1, 0.36, 1) ${
-                          0.05 + i * 0.03
-                        }s both`,
-                      }}
-                    >
-                      <span
-                        aria-hidden="true"
-                        className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
-                        style={{
-                          background:
-                            "radial-gradient(circle at 25% 15%, rgba(255,255,255,0.35), transparent 60%)",
-                        }}
-                      />
-
-                      <div className="relative flex items-start justify-between gap-3">
-                        <div className="min-w-0 flex-1">
-                          <div className="mb-1 flex flex-wrap items-center gap-2">
-                            <span className="text-[13px] font-semibold capitalize text-black/90">
-                              {v.verification_type}
-                            </span>
-                            <StatusPill status={v.verification_status} />
-                          </div>
-                          <div className="text-[11.5px] text-black/60">
-                            {v.verified_at
-                              ? `Verified ${timeAgo(v.verified_at)}`
-                              : v.last_requested_at
-                              ? `Requested ${timeAgo(v.last_requested_at)}`
-                              : "No activity"}
-                          </div>
-                          <div className="mt-0.5 text-[11px] text-black/45">
-                            Attempts: {v.attempt_count}
-                          </div>
-                        </div>
+                {verifications.length === 0 ? <EmptyState icon="/icons/check.svg" text="No verification records yet." /> : verifications.map((v, i) => (
+                  <article key={v.id} className="group relative overflow-hidden rounded-2xl border border-gray-100 bg-white p-4 transition-all duration-500 hover:shadow-[0_18px_40px_-22px_rgba(0,0,0,0.1)] sm:p-5" style={{ animation: `sec-item-in 0.55s cubic-bezier(0.22, 1, 0.36, 1) ${0.05 + i * 0.03}s both` }}>
+                    <div className="relative flex items-start justify-between gap-3">
+                      <div className="min-w-0 flex-1">
+                        <div className="mb-1 flex flex-wrap items-center gap-2"><span className="text-[13px] font-semibold capitalize text-gray-900">{v.verification_type}</span><StatusPill status={v.verification_status} /></div>
+                        <div className="text-[11.5px] text-gray-500">{v.verified_at ? `Verified ${timeAgo(v.verified_at)}` : v.last_requested_at ? `Requested ${timeAgo(v.last_requested_at)}` : "No activity"}</div>
+                        <div className="mt-0.5 text-[11px] text-gray-400">Attempts: {v.attempt_count}</div>
                       </div>
-                    </article>
-                  ))
-                )}
+                    </div>
+                  </article>
+                ))}
               </div>
             )}
           </div>
@@ -3504,48 +1167,10 @@ export default function ProfilePage() {
           <Icons.Back />
         </button>
         <h1 className="text-[17px] font-semibold text-gray-900 absolute left-1/2 -translate-x-1/2 tracking-tight">Profile</h1>
-        <div className="w-6" /> {/* Spacer for centering */}
+        <div className="w-6" />
       </div>
 
-      <div className="mx-auto max-w-6xl px-3 pt-2 sm:px-5">
-        <div className="mx-auto max-w-md space-y-4" aria-label="Account Center">
-          <div className="px-1 pt-3">
-            <p className="text-[12px] font-semibold uppercase tracking-[0.14em] text-gray-400">Account Center</p>
-            <p className="mt-1 text-[13px] leading-5 text-gray-500">Manage your BINZEO account, security and personal information in one place.</p>
-          </div>
-          <div className="overflow-hidden rounded-[18px] border border-gray-100 bg-[#F8F9FA] shadow-sm" role="list">
-            {sectionTabs.map(([key, label], index) => (
-              <button
-                key={key}
-                type="button"
-                role="listitem"
-                onClick={() => selectSection(key)}
-                className={`flex w-full items-center gap-3.5 px-4 py-3.5 text-left transition-colors hover:bg-white active:bg-gray-100 ${index < sectionTabs.length - 1 ? "border-b border-gray-200/70" : ""} ${activeSection === key ? "bg-white" : ""}`}
-              >
-                <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ${activeSection === key ? "bg-black text-white" : "bg-white text-gray-600"}`}>
-                  {key === "profile" && <Icons.User />}
-                  {key === "security" && <Icons.Lock />}
-                  {key === "contacts" && <Icons.Info />}
-                  {key === "addresses" && <Icons.Globe />}
-                  {key === "devices" && <Icons.Agents />}
-                  {key === "sectors" && <Icons.Explore />}
-                </span>
-                <span className="min-w-0 flex-1">
-                  <span className="block text-[14px] font-semibold text-gray-900">{label}</span>
-                  <span className="mt-0.5 block text-[12px] text-gray-500">{key === "profile" ? "Personal information" : `Manage ${label.toLowerCase()}`}</span>
-                </span>
-                <span className="text-xl leading-none text-gray-300">›</span>
-              </button>
-            ))}
-            <button type="button" onClick={handleLogout} className="flex w-full items-center gap-3.5 px-4 py-3.5 text-left text-rose-600 transition-colors hover:bg-rose-50 active:bg-rose-100">
-              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-rose-50 text-rose-600"><Icons.Info /></span>
-              <span className="flex-1 text-[14px] font-semibold">Log out</span>
-              <span className="text-xl leading-none text-rose-300">›</span>
-            </button>
-          </div>
-        </div>
-      </div>
-      {activeSection === "profile" ? <form onSubmit={handleSubmit} className="mx-auto max-w-md px-4 space-y-7 pt-5">
+      <form onSubmit={handleSubmit} className="mx-auto max-w-md px-4 space-y-7 pt-5">
         
         {/* Message Banner */}
         {message && (
@@ -3554,7 +1179,7 @@ export default function ProfilePage() {
           </div>
         )}
 
-        {/* Profile Header Card */}
+        {/* Profile Header Card (Always at the top) */}
         <div className={`${cardCls} p-4 flex items-center gap-4 animate-in fade-in slide-in-from-bottom-4 duration-500`}>
           <div className="relative h-[68px] w-[68px] shrink-0 overflow-hidden rounded-full border-2 border-white shadow-sm bg-gray-100">
             {form.profile_photo_url ? (
@@ -3574,227 +1199,156 @@ export default function ProfilePage() {
             <h2 className="text-[17px] font-semibold text-gray-900 truncate leading-tight tracking-tight">{displayName}</h2>
             <p className="text-[13px] text-gray-500 truncate mt-0.5">{userEmail}</p>
             <label className="mt-1.5 inline-flex cursor-pointer items-center gap-1.5 text-[12px] font-medium text-blue-600 hover:text-blue-700 active:scale-95 transition-all duration-200 bg-blue-50 px-3 py-1 rounded-full">
-              <Icons.Edit /> Edit Profile
+              <Icons.Edit /> Edit Photo
               <input type="file" accept="image/*" onChange={handlePhotoUpload} disabled={photoUploading} className="sr-only" />
             </label>
           </div>
         </div>
 
-        {/* SECTION: Account details */}
+        {/* Account Center Navigation (Icons moved down, arranged in a beautiful grid) */}
         <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 delay-100">
-          <h3 className="mb-2 px-4 text-[13px] font-medium text-gray-500 tracking-wide uppercase">Account details</h3>
-          <div className={cardCls}>
-            {/* First Name */}
-            <div className={listRowCls}>
-              <div className="flex items-center gap-3">
-                <Icons.User />
-                <span className="text-[15px] font-normal text-gray-900">First Name</span>
-              </div>
-              <input type="text" value={form.first_name ?? ""} onChange={(e) => update("first_name", e.target.value)} className={inputCls} placeholder="Enter first name" />
-            </div>
-            {/* Last Name */}
-            <div className={listRowCls}>
-              <div className="flex items-center gap-3">
-                <Icons.User />
-                <span className="text-[15px] font-normal text-gray-900">Last Name</span>
-              </div>
-              <input type="text" value={form.last_name ?? ""} onChange={(e) => update("last_name", e.target.value)} className={inputCls} placeholder="Enter last name" />
-            </div>
-            {/* Username */}
-            <div className={listRowCls}>
-              <div className="flex items-center gap-3">
-                <Icons.User />
-                <span className="text-[15px] font-normal text-gray-900">Username</span>
-              </div>
-              <div className="flex flex-col items-end max-w-[60%] w-full">
-                <input type="text" value={form.username ?? ""} onChange={(e) => update("username", e.target.value)} className={`${inputCls} max-w-full`} placeholder="username" />
-                {usernameCheck.message && (
-                  <span className={`text-[10px] mt-0.5 text-right w-full font-medium ${usernameCheck.available ? "text-emerald-600" : "text-rose-500"}`}>{usernameCheck.message}</span>
-                )}
-              </div>
-            </div>
-            {/* Gender */}
-            <div className={listRowCls}>
-              <div className="flex items-center gap-3">
-                <Icons.User />
-                <span className="text-[15px] font-normal text-gray-900">Gender</span>
-              </div>
-              <select value={form.gender ?? ""} onChange={(e) => update("gender", e.target.value || null)} className={`${inputCls} appearance-none`}>
-                <option value="">Not specified</option>
-                <option value="male">Male</option>
-                <option value="female">Female</option>
-                <option value="non_binary">Non-binary</option>
-                <option value="prefer_not_to_say">Prefer not to say</option>
-                <option value="other">Other</option>
-              </select>
-            </div>
-            {/* Date of Birth */}
-            <div className={listRowCls}>
-              <div className="flex items-center gap-3">
-                <Icons.Calendar />
-                <span className="text-[15px] font-normal text-gray-900">Date of Birth</span>
-              </div>
-              <input type="date" value={form.date_of_birth ?? ""} onChange={(e) => update("date_of_birth", e.target.value)} className={inputCls} />
-            </div>
+          <h3 className="mb-3 px-4 text-[13px] font-medium text-gray-500 tracking-wide uppercase">Account Center</h3>
+          <div className="grid grid-cols-2 gap-3 px-1">
+            {sectionTabs.map(([key, label]) => (
+              <button
+                key={key}
+                type="button"
+                onClick={() => selectSection(key)}
+                className={`flex flex-col items-center justify-center gap-2 rounded-[16px] border p-4 transition-all duration-300 ${
+                  activeSection === key
+                    ? "border-black bg-black text-white shadow-lg shadow-black/10"
+                    : "border-gray-100 bg-white/80 backdrop-blur-xl text-gray-600 hover:bg-gray-50"
+                }`}
+              >
+                <span className={`flex h-10 w-10 items-center justify-center rounded-full ${activeSection === key ? "bg-white/20" : "bg-gray-50"}`}>
+                  {key === "profile" && <Icons.User />}
+                  {key === "security" && <Icons.Lock />}
+                  {key === "contacts" && <Icons.Info />}
+                  {key === "addresses" && <Icons.Globe />}
+                  {key === "devices" && <Icons.Agents />}
+                  {key === "sectors" && <Icons.Explore />}
+                </span>
+                <span className="text-[13px] font-semibold">{label}</span>
+              </button>
+            ))}
           </div>
         </div>
 
-        {/* SECTION: Preferences */}
-        <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 delay-200">
-          <h3 className="mb-2 px-4 text-[13px] font-medium text-gray-500 tracking-wide uppercase">Preferences</h3>
-          <div className={cardCls}>
-            {/* Language */}
-            <div className={listRowCls}>
-              <div className="flex items-center gap-3">
-                <Icons.Globe />
-                <span className="text-[15px] font-normal text-gray-900">Language</span>
+        {/* Conditional Rendering of the Active Section */}
+        {activeSection === "profile" ? (
+          <>
+            {/* SECTION: Account details */}
+            <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 delay-200">
+              <h3 className="mb-2 px-4 text-[13px] font-medium text-gray-500 tracking-wide uppercase">Account details</h3>
+              <div className={cardCls}>
+                <div className={listRowCls}>
+                  <div className="flex items-center gap-3"><Icons.User /><span className="text-[15px] font-normal text-gray-900">First Name</span></div>
+                  <input type="text" value={form.first_name ?? ""} onChange={(e) => update("first_name", e.target.value)} className={inputCls} placeholder="Enter first name" />
+                </div>
+                <div className={listRowCls}>
+                  <div className="flex items-center gap-3"><Icons.User /><span className="text-[15px] font-normal text-gray-900">Last Name</span></div>
+                  <input type="text" value={form.last_name ?? ""} onChange={(e) => update("last_name", e.target.value)} className={inputCls} placeholder="Enter last name" />
+                </div>
+                <div className={listRowCls}>
+                  <div className="flex items-center gap-3"><Icons.User /><span className="text-[15px] font-normal text-gray-900">Username</span></div>
+                  <div className="flex flex-col items-end max-w-[60%] w-full">
+                    <input type="text" value={form.username ?? ""} onChange={(e) => update("username", e.target.value)} className={`${inputCls} max-w-full`} placeholder="username" />
+                    {usernameCheck.message && <span className={`text-[10px] mt-0.5 text-right w-full font-medium ${usernameCheck.available ? "text-emerald-600" : "text-rose-500"}`}>{usernameCheck.message}</span>}
+                  </div>
+                </div>
+                <div className={listRowCls}>
+                  <div className="flex items-center gap-3"><Icons.User /><span className="text-[15px] font-normal text-gray-900">Gender</span></div>
+                  <select value={form.gender ?? ""} onChange={(e) => update("gender", e.target.value || null)} className={`${inputCls} appearance-none`}>
+                    <option value="">Not specified</option><option value="male">Male</option><option value="female">Female</option><option value="non_binary">Non-binary</option><option value="prefer_not_to_say">Prefer not to say</option><option value="other">Other</option>
+                  </select>
+                </div>
+                <div className={listRowCls}>
+                  <div className="flex items-center gap-3"><Icons.Calendar /><span className="text-[15px] font-normal text-gray-900">Date of Birth</span></div>
+                  <input type="date" value={form.date_of_birth ?? ""} onChange={(e) => update("date_of_birth", e.target.value)} className={inputCls} />
+                </div>
               </div>
-              <input type="text" value={form.preferred_language ?? ""} onChange={(e) => update("preferred_language", e.target.value)} className={inputCls} placeholder="English" />
             </div>
-            {/* Timezone */}
-            <div className={listRowCls}>
-              <div className="flex items-center gap-3">
-                <Icons.Globe />
-                <span className="text-[15px] font-normal text-gray-900">Timezone</span>
-              </div>
-              <input type="text" value={form.timezone ?? ""} onChange={(e) => update("timezone", e.target.value)} className={inputCls} placeholder="UTC" />
-            </div>
-            {/* Currency */}
-            <div className={listRowCls}>
-              <div className="flex items-center gap-3">
-                <Icons.Info />
-                <span className="text-[15px] font-normal text-gray-900">Currency</span>
-              </div>
-              <input type="text" value={form.currency ?? ""} onChange={(e) => update("currency", e.target.value)} className={inputCls} placeholder="USD" />
-            </div>
-            {/* Time Format */}
-            <div className={listRowCls}>
-              <div className="flex items-center gap-3">
-                <Icons.Sun />
-                <span className="text-[15px] font-normal text-gray-900">Light/Dark Mode</span>
-              </div>
-              <select value={form.time_format ?? "24h"} onChange={(e) => update("time_format", e.target.value)} className={`${inputCls} appearance-none`}>
-                <option value="24h">24-hour</option>
-                <option value="12h">12-hour</option>
-              </select>
-            </div>
-          </div>
-        </div>
 
-        {/* SECTION: Notifications (Toggles) */}
-        <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 delay-300">
-          <h3 className="mb-2 px-4 text-[13px] font-medium text-gray-500 tracking-wide uppercase">Notifications</h3>
-          <div className={cardCls}>
-            {/* Marketing Emails */}
-            <div className={listRowCls}>
-              <div className="flex items-center gap-3">
-                <Icons.Bell />
-                <span className="text-[15px] font-normal text-gray-900">Marketing Emails</span>
+            {/* SECTION: Preferences */}
+            <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 delay-300">
+              <h3 className="mb-2 px-4 text-[13px] font-medium text-gray-500 tracking-wide uppercase">Preferences</h3>
+              <div className={cardCls}>
+                <div className={listRowCls}><div className="flex items-center gap-3"><Icons.Globe /><span className="text-[15px] font-normal text-gray-900">Language</span></div><input type="text" value={form.preferred_language ?? ""} onChange={(e) => update("preferred_language", e.target.value)} className={inputCls} placeholder="English" /></div>
+                <div className={listRowCls}><div className="flex items-center gap-3"><Icons.Globe /><span className="text-[15px] font-normal text-gray-900">Timezone</span></div><input type="text" value={form.timezone ?? ""} onChange={(e) => update("timezone", e.target.value)} className={inputCls} placeholder="UTC" /></div>
+                <div className={listRowCls}><div className="flex items-center gap-3"><Icons.Info /><span className="text-[15px] font-normal text-gray-900">Currency</span></div><input type="text" value={form.currency ?? ""} onChange={(e) => update("currency", e.target.value)} className={inputCls} placeholder="USD" /></div>
+                <div className={listRowCls}>
+                  <div className="flex items-center gap-3"><Icons.Sun /><span className="text-[15px] font-normal text-gray-900">Light/Dark Mode</span></div>
+                  <select value={form.time_format ?? "24h"} onChange={(e) => update("time_format", e.target.value)} className={`${inputCls} appearance-none`}><option value="24h">24-hour</option><option value="12h">12-hour</option></select>
+                </div>
               </div>
-              <label className="relative inline-flex cursor-pointer items-center">
-                <input type="checkbox" checked={!!form.marketing_email} onChange={(e) => update("marketing_email", e.target.checked)} className="peer sr-only" />
-                <div className="h-[31px] w-[51px] rounded-full bg-gray-200 peer-checked:bg-black transition-colors duration-300"></div>
-                <div className="absolute left-[2px] top-[2px] h-[27px] w-[27px] rounded-full bg-white shadow-md transition-transform duration-300 ease-[cubic-bezier(0.175,0.885,0.32,1.275)] peer-checked:translate-x-[20px]"></div>
-              </label>
             </div>
-            {/* Push Notifications */}
-            <div className={listRowCls}>
-              <div className="flex items-center gap-3">
-                <Icons.Bell />
-                <span className="text-[15px] font-normal text-gray-900">Push Notifications</span>
-              </div>
-              <label className="relative inline-flex cursor-pointer items-center">
-                <input type="checkbox" checked={!!form.push_notifications} onChange={(e) => update("push_notifications", e.target.checked)} className="peer sr-only" />
-                <div className="h-[31px] w-[51px] rounded-full bg-gray-200 peer-checked:bg-black transition-colors duration-300"></div>
-                <div className="absolute left-[2px] top-[2px] h-[27px] w-[27px] rounded-full bg-white shadow-md transition-transform duration-300 ease-[cubic-bezier(0.175,0.885,0.32,1.275)] peer-checked:translate-x-[20px]"></div>
-              </label>
-            </div>
-            {/* Security Notifications */}
-            <div className={listRowCls}>
-              <div className="flex items-center gap-3">
-                <Icons.Lock />
-                <span className="text-[15px] font-normal text-gray-900">Security Alerts</span>
-              </div>
-              <label className="relative inline-flex cursor-pointer items-center">
-                <input type="checkbox" checked={!!form.security_notifications} onChange={(e) => update("security_notifications", e.target.checked)} className="peer sr-only" />
-                <div className="h-[31px] w-[51px] rounded-full bg-gray-200 peer-checked:bg-black transition-colors duration-300"></div>
-                <div className="absolute left-[2px] top-[2px] h-[27px] w-[27px] rounded-full bg-white shadow-md transition-transform duration-300 ease-[cubic-bezier(0.175,0.885,0.32,1.275)] peer-checked:translate-x-[20px]"></div>
-              </label>
-            </div>
-          </div>
-        </div>
 
-        {/* SECTION: Support */}
-        <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 delay-400">
-          <h3 className="mb-2 px-4 text-[13px] font-medium text-gray-500 tracking-wide uppercase">Support</h3>
-          <div className={cardCls}>
-            <div className={listRowCls}>
-              <div className="flex items-center gap-3">
-                <Icons.Help />
-                <span className="text-[15px] font-normal text-gray-900">Recovery Email</span>
+            {/* SECTION: Notifications (Toggles) */}
+            <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 delay-400">
+              <h3 className="mb-2 px-4 text-[13px] font-medium text-gray-500 tracking-wide uppercase">Notifications</h3>
+              <div className={cardCls}>
+                <div className={listRowCls}>
+                  <div className="flex items-center gap-3"><Icons.Bell /><span className="text-[15px] font-normal text-gray-900">Marketing Emails</span></div>
+                  <label className="relative inline-flex cursor-pointer items-center">
+                    <input type="checkbox" checked={!!form.marketing_email} onChange={(e) => update("marketing_email", e.target.checked)} className="peer sr-only" />
+                    <div className="h-[31px] w-[51px] rounded-full bg-gray-200 peer-checked:bg-black transition-colors duration-300"></div>
+                    <div className="absolute left-[2px] top-[2px] h-[27px] w-[27px] rounded-full bg-white shadow-md transition-transform duration-300 ease-[cubic-bezier(0.175,0.885,0.32,1.275)] peer-checked:translate-x-[20px]"></div>
+                  </label>
+                </div>
+                <div className={listRowCls}>
+                  <div className="flex items-center gap-3"><Icons.Bell /><span className="text-[15px] font-normal text-gray-900">Push Notifications</span></div>
+                  <label className="relative inline-flex cursor-pointer items-center">
+                    <input type="checkbox" checked={!!form.push_notifications} onChange={(e) => update("push_notifications", e.target.checked)} className="peer sr-only" />
+                    <div className="h-[31px] w-[51px] rounded-full bg-gray-200 peer-checked:bg-black transition-colors duration-300"></div>
+                    <div className="absolute left-[2px] top-[2px] h-[27px] w-[27px] rounded-full bg-white shadow-md transition-transform duration-300 ease-[cubic-bezier(0.175,0.885,0.32,1.275)] peer-checked:translate-x-[20px]"></div>
+                  </label>
+                </div>
+                <div className={listRowCls}>
+                  <div className="flex items-center gap-3"><Icons.Lock /><span className="text-[15px] font-normal text-gray-900">Security Alerts</span></div>
+                  <label className="relative inline-flex cursor-pointer items-center">
+                    <input type="checkbox" checked={!!form.security_notifications} onChange={(e) => update("security_notifications", e.target.checked)} className="peer sr-only" />
+                    <div className="h-[31px] w-[51px] rounded-full bg-gray-200 peer-checked:bg-black transition-colors duration-300"></div>
+                    <div className="absolute left-[2px] top-[2px] h-[27px] w-[27px] rounded-full bg-white shadow-md transition-transform duration-300 ease-[cubic-bezier(0.175,0.885,0.32,1.275)] peer-checked:translate-x-[20px]"></div>
+                  </label>
+                </div>
               </div>
-              <input type="email" value={form.recovery_email ?? ""} onChange={(e) => update("recovery_email", e.target.value)} className={inputCls} placeholder="backup@example.com" />
             </div>
-            <div className={listRowCls}>
-              <div className="flex items-center gap-3">
-                <Icons.Info />
-                <span className="text-[15px] font-normal text-gray-900">Help Center</span>
-              </div>
-              <Icons.Chevron />
-            </div>
-          </div>
-        </div>
 
-        {/* Save Button */}
-        <div className="pt-2 pb-6 animate-in fade-in slide-in-from-bottom-4 duration-500 delay-500">
-          <button
-            type="submit"
-            disabled={saving}
-            className="w-full rounded-[16px] bg-black py-4 text-[15px] font-semibold text-white transition-all duration-300 hover:bg-gray-800 active:scale-[0.97] disabled:opacity-50 shadow-lg shadow-black/10 flex items-center justify-center gap-2"
-          >
-            {saving ? (
-              <>
-                <svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                Saving...
-              </>
-            ) : (
-              "Save Changes"
-            )}
-          </button>
-        </div>
-      </form> : (
-        <section className="mx-auto max-w-6xl px-3 pb-28 pt-4 sm:px-5">
-          {activeSection === "security" && <SecuritySection />}
-          {activeSection === "contacts" && <ContactsSection />}
-          {activeSection === "addresses" && <AddressesSection />}
-          {activeSection === "devices" && <DevicesSection />}
-          {activeSection === "sectors" && <SectorsSection />}
-        </section>
-      )}
+            {/* SECTION: Support */}
+            <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 delay-500">
+              <h3 className="mb-2 px-4 text-[13px] font-medium text-gray-500 tracking-wide uppercase">Support</h3>
+              <div className={cardCls}>
+                <div className={listRowCls}><div className="flex items-center gap-3"><Icons.Help /><span className="text-[15px] font-normal text-gray-900">Recovery Email</span></div><input type="email" value={form.recovery_email ?? ""} onChange={(e) => update("recovery_email", e.target.value)} className={inputCls} placeholder="backup@example.com" /></div>
+                <div className={listRowCls}><div className="flex items-center gap-3"><Icons.Info /><span className="text-[15px] font-normal text-gray-900">Help Center</span></div><Icons.Chevron /></div>
+              </div>
+            </div>
+
+            {/* Save Button */}
+            <div className="pt-2 pb-6 animate-in fade-in slide-in-from-bottom-4 duration-500 delay-500">
+              <button type="submit" disabled={saving} className="w-full rounded-[16px] bg-black py-4 text-[15px] font-semibold text-white transition-all duration-300 hover:bg-gray-800 active:scale-[0.97] disabled:opacity-50 shadow-lg shadow-black/10 flex items-center justify-center gap-2">
+                {saving ? (<><svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>Saving...</>) : ("Save Changes")}
+              </button>
+            </div>
+          </>
+        ) : (
+          <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 pt-2">
+            {activeSection === "security" && <SecuritySection />}
+            {activeSection === "contacts" && <ContactsSection />}
+            {activeSection === "addresses" && <AddressesSection />}
+            {activeSection === "devices" && <DevicesSection />}
+            {activeSection === "sectors" && <SectorsSection />}
+          </div>
+        )}
+      </form>
 
       {/* Bottom Navigation Bar (Strictly Matching Image 2) */}
       <div className="fixed bottom-0 left-0 right-0 z-50 border-t border-gray-100 bg-white/80 backdrop-blur-xl pb-safe pt-2 shadow-[0_-4px_20px_rgba(0,0,0,0.03)]">
         <div className="mx-auto flex max-w-md items-center justify-around px-2 pb-3">
-          <button type="button" className="flex flex-col items-center gap-1.5 text-gray-400 transition-all duration-300 hover:text-black active:scale-95">
-            <Icons.Home />
-            <span className="text-[10px] font-medium tracking-wide">Home</span>
-          </button>
-          <button type="button" className="flex flex-col items-center gap-1.5 text-gray-400 transition-all duration-300 hover:text-black active:scale-95">
-            <Icons.Explore />
-            <span className="text-[10px] font-medium tracking-wide">Explore</span>
-          </button>
-          <button type="button" className="flex flex-col items-center gap-1.5 text-gray-400 transition-all duration-300 hover:text-black active:scale-95">
-            <Icons.Heart />
-            <span className="text-[10px] font-medium tracking-wide">Favorites</span>
-          </button>
-          <button type="button" className="flex flex-col items-center gap-1.5 text-gray-400 transition-all duration-300 hover:text-black active:scale-95">
-            <Icons.Agents />
-            <span className="text-[10px] font-medium tracking-wide">Agents</span>
-          </button>
-          <button type="button" className="flex flex-col items-center gap-1.5 text-black scale-105">
-            <Icons.Profile />
-            <span className="text-[10px] font-semibold tracking-wide">Profile</span>
-          </button>
+          <button type="button" className="flex flex-col items-center gap-1.5 text-gray-400 transition-all duration-300 hover:text-black active:scale-95"><Icons.Home /><span className="text-[10px] font-medium tracking-wide">Home</span></button>
+          <button type="button" className="flex flex-col items-center gap-1.5 text-gray-400 transition-all duration-300 hover:text-black active:scale-95"><Icons.Explore /><span className="text-[10px] font-medium tracking-wide">Explore</span></button>
+          <button type="button" className="flex flex-col items-center gap-1.5 text-gray-400 transition-all duration-300 hover:text-black active:scale-95"><Icons.Heart /><span className="text-[10px] font-medium tracking-wide">Favorites</span></button>
+          <button type="button" className="flex flex-col items-center gap-1.5 text-gray-400 transition-all duration-300 hover:text-black active:scale-95"><Icons.Agents /><span className="text-[10px] font-medium tracking-wide">Agents</span></button>
+          <button type="button" className="flex flex-col items-center gap-1.5 text-black scale-105"><Icons.Profile /><span className="text-[10px] font-semibold tracking-wide">Profile</span></button>
         </div>
       </div>
     </div>
