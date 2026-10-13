@@ -46,7 +46,7 @@ type UsernameCheck = {
 /* ================================================================== */
 const Icons = {
   Back: () => (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6 text-black"><path d="m15 18-6-6 6-6"/></svg>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6 text-black"><path d="m15 18-6-6 6-6"/></svg>
   ),
   User: () => (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-[18px] h-[18px] text-gray-700"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
@@ -73,22 +73,22 @@ const Icons = {
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-[18px] h-[18px] text-gray-700"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>
   ),
   Chevron: () => (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4 text-gray-400"><path d="m9 18 6-6-6-6"/></svg>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="w-[18px] h-[18px] text-gray-300"><path d="m9 18 6-6-6-6"/></svg>
   ),
   Home: () => (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-[22px] h-[22px]"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
   ),
   Explore: () => (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-[22px] h-[22px]"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
   ),
   Heart: () => (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-[22px] h-[22px]"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
   ),
   Agents: () => (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-[22px] h-[22px]"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
   ),
   Profile: () => (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-[22px] h-[22px]"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
   ),
   Edit: () => (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-3.5 h-3.5"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>
@@ -98,9 +98,8 @@ const Icons = {
 /* ================================================================== */
 /*  SHARED STYLES (Advanced & Professional iOS feel)                   */
 /* ================================================================== */
-// সাদার উপর হালকা সেকশন তৈরি করার জন্য bg-[#F8F9FA] এবং হালকা বর্ডার ব্যবহার করা হয়েছে
-const cardCls = "bg-[#F8F9FA] rounded-[16px] overflow-hidden border border-gray-100 transition-all duration-300";
-const listRowCls = "flex items-center justify-between px-4 py-3.5 border-b border-gray-200/60 last:border-0";
+const cardCls = "bg-[#F8F9FA] rounded-[16px] overflow-hidden border border-gray-100/80 transition-all duration-300";
+const listRowCls = "group flex items-center justify-between px-4 py-3.5 border-b border-gray-200/60 last:border-0 active:bg-gray-100 transition-colors duration-200 cursor-pointer";
 const inputCls = "text-right bg-transparent border-none outline-none text-[15px] font-medium text-gray-900 placeholder-gray-400 w-full max-w-[60%] focus:ring-0 transition-colors";
 
 /* ================================================================== */
@@ -219,46 +218,46 @@ export default function ProfilePage() {
   const userEmail = data?.user?.email || "user@example.com";
 
   return (
-    <div className="min-h-screen bg-white pb-28 font-sans text-gray-900 selection:bg-black selection:text-white">
+    <div className="min-h-screen bg-white pb-32 font-sans text-gray-900 selection:bg-black selection:text-white antialiased">
       
       {/* Top Header (Sticky & Professional) */}
-      <div className="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-gray-100 flex items-center justify-between px-4 py-3.5">
-        <button type="button" className="p-1 -ml-2 rounded-full hover:bg-gray-100 transition-colors">
+      <div className="sticky top-0 z-40 bg-white/80 backdrop-blur-xl border-b border-gray-100/80 flex items-center justify-between px-4 py-3.5 transition-all duration-300">
+        <button type="button" className="p-1 -ml-2 rounded-full active:bg-gray-100 transition-colors">
           <Icons.Back />
         </button>
-        <h1 className="text-[17px] font-semibold text-gray-900 absolute left-1/2 -translate-x-1/2">Profile</h1>
+        <h1 className="text-[17px] font-semibold text-gray-900 absolute left-1/2 -translate-x-1/2 tracking-tight">Profile</h1>
         <div className="w-6" /> {/* Spacer for centering */}
       </div>
 
-      <form onSubmit={handleSubmit} className="mx-auto max-w-md px-4 space-y-6 pt-4">
+      <form onSubmit={handleSubmit} className="mx-auto max-w-md px-4 space-y-7 pt-5">
         
         {/* Message Banner */}
         {message && (
-          <div className={`rounded-xl px-4 py-3 text-[13px] font-medium animate-in fade-in slide-in-from-top-2 duration-300 ${message.type === "success" ? "bg-emerald-50 text-emerald-700 border border-emerald-100" : "bg-rose-50 text-rose-700 border border-rose-100"}`}>
+          <div className={`rounded-[14px] px-4 py-3.5 text-[13px] font-medium animate-in fade-in slide-in-from-top-4 duration-500 ${message.type === "success" ? "bg-emerald-50 text-emerald-700 border border-emerald-100" : "bg-rose-50 text-rose-700 border border-rose-100"}`}>
             {message.text}
           </div>
         )}
 
         {/* Profile Header Card */}
-        <div className={`${cardCls} p-4 flex items-center gap-4`}>
-          <div className="relative h-[64px] w-[64px] shrink-0 overflow-hidden rounded-full border-2 border-white shadow-sm bg-gray-100">
+        <div className={`${cardCls} p-4 flex items-center gap-4 animate-in fade-in slide-in-from-bottom-4 duration-500`}>
+          <div className="relative h-[68px] w-[68px] shrink-0 overflow-hidden rounded-full border-2 border-white shadow-sm bg-gray-100">
             {form.profile_photo_url ? (
               <img src={form.profile_photo_url} alt="Profile" className="h-full w-full object-cover" />
             ) : (
-              <div className="flex h-full w-full items-center justify-center text-xl font-semibold text-gray-400">
+              <div className="flex h-full w-full items-center justify-center text-2xl font-semibold text-gray-400">
                 {displayName.charAt(0).toUpperCase()}
               </div>
             )}
             {photoUploading && (
               <div className="absolute inset-0 flex items-center justify-center bg-black/40 text-[10px] text-white">
-                ...
+                <span className="animate-pulse">...</span>
               </div>
             )}
           </div>
           <div className="min-w-0 flex-1">
             <h2 className="text-[17px] font-semibold text-gray-900 truncate leading-tight tracking-tight">{displayName}</h2>
             <p className="text-[13px] text-gray-500 truncate mt-0.5">{userEmail}</p>
-            <label className="mt-1.5 inline-flex cursor-pointer items-center gap-1.5 text-[12px] font-medium text-blue-600 hover:text-blue-700 transition-colors bg-blue-50 px-2.5 py-1 rounded-full">
+            <label className="mt-1.5 inline-flex cursor-pointer items-center gap-1.5 text-[12px] font-medium text-blue-600 hover:text-blue-700 active:scale-95 transition-all duration-200 bg-blue-50 px-3 py-1 rounded-full">
               <Icons.Edit /> Edit Profile
               <input type="file" accept="image/*" onChange={handlePhotoUpload} disabled={photoUploading} className="sr-only" />
             </label>
@@ -266,7 +265,7 @@ export default function ProfilePage() {
         </div>
 
         {/* SECTION: Account details */}
-        <div>
+        <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 delay-100">
           <h3 className="mb-2 px-4 text-[13px] font-medium text-gray-500 tracking-wide uppercase">Account details</h3>
           <div className={cardCls}>
             {/* First Name */}
@@ -294,7 +293,7 @@ export default function ProfilePage() {
               <div className="flex flex-col items-end max-w-[60%] w-full">
                 <input type="text" value={form.username ?? ""} onChange={(e) => update("username", e.target.value)} className={`${inputCls} max-w-full`} placeholder="username" />
                 {usernameCheck.message && (
-                  <span className={`text-[10px] mt-0.5 text-right w-full ${usernameCheck.available ? "text-emerald-600" : "text-rose-500"}`}>{usernameCheck.message}</span>
+                  <span className={`text-[10px] mt-0.5 text-right w-full font-medium ${usernameCheck.available ? "text-emerald-600" : "text-rose-500"}`}>{usernameCheck.message}</span>
                 )}
               </div>
             </div>
@@ -325,7 +324,7 @@ export default function ProfilePage() {
         </div>
 
         {/* SECTION: Preferences */}
-        <div>
+        <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 delay-200">
           <h3 className="mb-2 px-4 text-[13px] font-medium text-gray-500 tracking-wide uppercase">Preferences</h3>
           <div className={cardCls}>
             {/* Language */}
@@ -367,7 +366,7 @@ export default function ProfilePage() {
         </div>
 
         {/* SECTION: Notifications (Toggles) */}
-        <div>
+        <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 delay-300">
           <h3 className="mb-2 px-4 text-[13px] font-medium text-gray-500 tracking-wide uppercase">Notifications</h3>
           <div className={cardCls}>
             {/* Marketing Emails */}
@@ -378,8 +377,8 @@ export default function ProfilePage() {
               </div>
               <label className="relative inline-flex cursor-pointer items-center">
                 <input type="checkbox" checked={!!form.marketing_email} onChange={(e) => update("marketing_email", e.target.checked)} className="peer sr-only" />
-                <div className="h-[28px] w-[48px] rounded-full bg-gray-200 peer-checked:bg-black transition-colors duration-300"></div>
-                <div className="absolute left-[2px] top-[2px] h-[24px] w-[24px] rounded-full bg-white shadow-sm transition-transform duration-300 peer-checked:translate-x-[20px]"></div>
+                <div className="h-[31px] w-[51px] rounded-full bg-gray-200 peer-checked:bg-black transition-colors duration-300"></div>
+                <div className="absolute left-[2px] top-[2px] h-[27px] w-[27px] rounded-full bg-white shadow-md transition-transform duration-300 ease-[cubic-bezier(0.175,0.885,0.32,1.275)] peer-checked:translate-x-[20px]"></div>
               </label>
             </div>
             {/* Push Notifications */}
@@ -390,8 +389,8 @@ export default function ProfilePage() {
               </div>
               <label className="relative inline-flex cursor-pointer items-center">
                 <input type="checkbox" checked={!!form.push_notifications} onChange={(e) => update("push_notifications", e.target.checked)} className="peer sr-only" />
-                <div className="h-[28px] w-[48px] rounded-full bg-gray-200 peer-checked:bg-black transition-colors duration-300"></div>
-                <div className="absolute left-[2px] top-[2px] h-[24px] w-[24px] rounded-full bg-white shadow-sm transition-transform duration-300 peer-checked:translate-x-[20px]"></div>
+                <div className="h-[31px] w-[51px] rounded-full bg-gray-200 peer-checked:bg-black transition-colors duration-300"></div>
+                <div className="absolute left-[2px] top-[2px] h-[27px] w-[27px] rounded-full bg-white shadow-md transition-transform duration-300 ease-[cubic-bezier(0.175,0.885,0.32,1.275)] peer-checked:translate-x-[20px]"></div>
               </label>
             </div>
             {/* Security Notifications */}
@@ -402,15 +401,15 @@ export default function ProfilePage() {
               </div>
               <label className="relative inline-flex cursor-pointer items-center">
                 <input type="checkbox" checked={!!form.security_notifications} onChange={(e) => update("security_notifications", e.target.checked)} className="peer sr-only" />
-                <div className="h-[28px] w-[48px] rounded-full bg-gray-200 peer-checked:bg-black transition-colors duration-300"></div>
-                <div className="absolute left-[2px] top-[2px] h-[24px] w-[24px] rounded-full bg-white shadow-sm transition-transform duration-300 peer-checked:translate-x-[20px]"></div>
+                <div className="h-[31px] w-[51px] rounded-full bg-gray-200 peer-checked:bg-black transition-colors duration-300"></div>
+                <div className="absolute left-[2px] top-[2px] h-[27px] w-[27px] rounded-full bg-white shadow-md transition-transform duration-300 ease-[cubic-bezier(0.175,0.885,0.32,1.275)] peer-checked:translate-x-[20px]"></div>
               </label>
             </div>
           </div>
         </div>
 
         {/* SECTION: Support */}
-        <div>
+        <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 delay-400">
           <h3 className="mb-2 px-4 text-[13px] font-medium text-gray-500 tracking-wide uppercase">Support</h3>
           <div className={cardCls}>
             <div className={listRowCls}>
@@ -431,37 +430,44 @@ export default function ProfilePage() {
         </div>
 
         {/* Save Button */}
-        <div className="pt-2 pb-6">
+        <div className="pt-2 pb-6 animate-in fade-in slide-in-from-bottom-4 duration-500 delay-500">
           <button
             type="submit"
             disabled={saving}
-            className="w-full rounded-[16px] bg-black py-4 text-[15px] font-semibold text-white transition-all duration-300 hover:bg-gray-800 active:scale-[0.98] disabled:opacity-50 shadow-md shadow-black/10"
+            className="w-full rounded-[16px] bg-black py-4 text-[15px] font-semibold text-white transition-all duration-300 hover:bg-gray-800 active:scale-[0.97] disabled:opacity-50 shadow-lg shadow-black/10 flex items-center justify-center gap-2"
           >
-            {saving ? "Saving..." : "Save Changes"}
+            {saving ? (
+              <>
+                <svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                Saving...
+              </>
+            ) : (
+              "Save Changes"
+            )}
           </button>
         </div>
       </form>
 
       {/* Bottom Navigation Bar (Strictly Matching Image 2) */}
-      <div className="fixed bottom-0 left-0 right-0 z-50 border-t border-gray-100 bg-white pb-safe pt-2 shadow-[0_-4px_10px_rgba(0,0,0,0.02)]">
+      <div className="fixed bottom-0 left-0 right-0 z-50 border-t border-gray-100 bg-white/80 backdrop-blur-xl pb-safe pt-2 shadow-[0_-4px_20px_rgba(0,0,0,0.03)]">
         <div className="mx-auto flex max-w-md items-center justify-around px-2 pb-3">
-          <button type="button" className="flex flex-col items-center gap-1 text-gray-400 transition-colors hover:text-black">
+          <button type="button" className="flex flex-col items-center gap-1.5 text-gray-400 transition-all duration-300 hover:text-black active:scale-95">
             <Icons.Home />
             <span className="text-[10px] font-medium tracking-wide">Home</span>
           </button>
-          <button type="button" className="flex flex-col items-center gap-1 text-gray-400 transition-colors hover:text-black">
+          <button type="button" className="flex flex-col items-center gap-1.5 text-gray-400 transition-all duration-300 hover:text-black active:scale-95">
             <Icons.Explore />
             <span className="text-[10px] font-medium tracking-wide">Explore</span>
           </button>
-          <button type="button" className="flex flex-col items-center gap-1 text-gray-400 transition-colors hover:text-black">
+          <button type="button" className="flex flex-col items-center gap-1.5 text-gray-400 transition-all duration-300 hover:text-black active:scale-95">
             <Icons.Heart />
             <span className="text-[10px] font-medium tracking-wide">Favorites</span>
           </button>
-          <button type="button" className="flex flex-col items-center gap-1 text-gray-400 transition-colors hover:text-black">
+          <button type="button" className="flex flex-col items-center gap-1.5 text-gray-400 transition-all duration-300 hover:text-black active:scale-95">
             <Icons.Agents />
             <span className="text-[10px] font-medium tracking-wide">Agents</span>
           </button>
-          <button type="button" className="flex flex-col items-center gap-1 text-black">
+          <button type="button" className="flex flex-col items-center gap-1.5 text-black scale-105">
             <Icons.Profile />
             <span className="text-[10px] font-semibold tracking-wide">Profile</span>
           </button>
