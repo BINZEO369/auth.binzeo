@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
 
-export default function DevicesPage() {
-  redirect("/dashboard/profile?section=devices");
+export default function LegacyDashboardSectionPage() {
+  redirect("/dashboard/profile");
 }

@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
 
-export default function AddressesPage() {
-  redirect("/dashboard/profile?section=addresses");
+export default function LegacyDashboardSectionPage() {
+  redirect("/dashboard/profile");
 }

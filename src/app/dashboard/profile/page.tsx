@@ -7,7 +7,7 @@ import TwoFactorSettings from "@/components/security/TwoFactorSettings";
 /* eslint-disable react-hooks/set-state-in-effect, react-hooks/static-components, react-hooks/purity, react-hooks/exhaustive-deps, @typescript-eslint/no-explicit-any */
 import Loader from "@/components/ui/Loader";
 import { useEffect, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { apiFetch } from "@/lib/api/client";
 
 type Profile = {
@@ -176,25 +176,7 @@ const TYPE_LABEL: Record<string, string> = {
 /* ================================================================== */
 /*  Background layer — full viewport, no gaps                          */
 /* ================================================================== */
-function PageBackground() {
-  return (
-    <div
-      aria-hidden="true"
-      className="pointer-events-none fixed inset-0 z-0 overflow-hidden"
-    >
-      <div
-        className="absolute -inset-[6%]"
-        style={{
-          backgroundImage: "url('/images/img3.jpg')",
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          backgroundRepeat: "no-repeat",
-          animation: "addr-kenburns 32s ease-in-out infinite",
-        }}
-      />
-    </div>
-  );
-}
+
 
 /* ================================================================== */
 /*  Field wrapper                                                      */
@@ -353,7 +335,6 @@ function Field({
       `}</style>
 
       {/* Background */}
-      <PageBackground />
 
       {/* ============================================================ */}
       {/*  CONTENT — wider container (max-w-6xl)                        */}
@@ -1059,25 +1040,7 @@ const TYPE_LABEL: Record<string, string> = {
 /* ================================================================== */
 /*  Background layer — full viewport                                   */
 /* ================================================================== */
-function PageBackground() {
-  return (
-    <div
-      aria-hidden="true"
-      className="pointer-events-none fixed inset-0 z-0 overflow-hidden"
-    >
-      <div
-        className="absolute -inset-[6%]"
-        style={{
-          backgroundImage: "url('/images/img3.jpg')",
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          backgroundRepeat: "no-repeat",
-          animation: "cont-kenburns 32s ease-in-out infinite",
-        }}
-      />
-    </div>
-  );
-}
+
 
 /* ================================================================== */
 /*  Field wrapper                                                      */
@@ -1259,7 +1222,6 @@ function SectionHeading({ children }: { children: React.ReactNode }) {
       `}</style>
 
       {/* Background */}
-      <PageBackground />
 
       {/* ============================================================ */}
       {/*  CONTENT                                                      */}
@@ -2403,25 +2365,7 @@ const containerCls =
 /* ================================================================== */
 /*  Background                                                         */
 /* ================================================================== */
-function PageBackground() {
-  return (
-    <div
-      aria-hidden="true"
-      className="pointer-events-none fixed inset-0 z-0 overflow-hidden"
-    >
-      <div
-        className="absolute -inset-[6%]"
-        style={{
-          backgroundImage: "url('/images/img3.jpg')",
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          backgroundRepeat: "no-repeat",
-          animation: "sec-kenburns 32s ease-in-out infinite",
-        }}
-      />
-    </div>
-  );
-}
+
 
 /* ================================================================== */
 /*  Icons                                                              */
@@ -2923,7 +2867,6 @@ type TabId = (typeof TABS)[number]["id"];
         }
       `}</style>
 
-      <PageBackground />
 
       <div className={containerCls}>
         {/* ============================================================ */}
@@ -3420,12 +3363,8 @@ type TabId = (typeof TABS)[number]["id"];
 }
 
 export default function ProfilePage() {
-  const searchParams = useSearchParams();
   const router = useRouter();
-  const requestedSection = searchParams.get("section");
-  const [activeSection, setActiveSection] = useState<"profile" | "security" | "contacts" | "addresses" | "devices" | "sectors">(
-    requestedSection === "security" || requestedSection === "contacts" || requestedSection === "addresses" || requestedSection === "devices" || requestedSection === "sectors" ? requestedSection : "profile",
-  );
+  const [activeSection, setActiveSection] = useState<"profile" | "security" | "contacts" | "addresses" | "devices" | "sectors">("profile");
   const [data, setData] = useState<Data | null>(null);
   const [form, setForm] = useState<Partial<Profile>>({});
   const [loading, setLoading] = useState(true);
@@ -3448,7 +3387,6 @@ export default function ProfilePage() {
 
   const selectSection = (section: typeof sectionTabs[number][0]) => {
     setActiveSection(section);
-    window.history.replaceState(null, "", section === "profile" ? "/dashboard/profile" : `/dashboard/profile?section=${section}`);
   };
 
   const handleLogout = async () => {
@@ -3570,25 +3508,43 @@ export default function ProfilePage() {
       </div>
 
       <div className="mx-auto max-w-6xl px-3 pt-2 sm:px-5">
-        <div className="mx-auto flex max-w-4xl gap-2 overflow-x-auto rounded-2xl border border-gray-200/70 bg-white/70 p-1.5 shadow-sm backdrop-blur-md" role="tablist" aria-label="Profile sections">
-          {sectionTabs.map(([key, label]) => (
-            <button
-              key={key}
-              type="button"
-              role="tab"
-              aria-selected={activeSection === key}
-              onClick={() => selectSection(key)}
-              className={`shrink-0 rounded-xl px-3.5 py-2 text-[13px] font-medium transition-colors ${activeSection === key ? "bg-black text-white shadow-sm" : "text-gray-500 hover:bg-gray-100 hover:text-gray-900"}`}
-            >
-              {label}
+        <div className="mx-auto max-w-md space-y-4" aria-label="Account Center">
+          <div className="px-1 pt-3">
+            <p className="text-[12px] font-semibold uppercase tracking-[0.14em] text-gray-400">Account Center</p>
+            <p className="mt-1 text-[13px] leading-5 text-gray-500">Manage your BINZEO account, security and personal information in one place.</p>
+          </div>
+          <div className="overflow-hidden rounded-[18px] border border-gray-100 bg-[#F8F9FA] shadow-sm" role="list">
+            {sectionTabs.map(([key, label], index) => (
+              <button
+                key={key}
+                type="button"
+                role="listitem"
+                onClick={() => selectSection(key)}
+                className={`flex w-full items-center gap-3.5 px-4 py-3.5 text-left transition-colors hover:bg-white active:bg-gray-100 ${index < sectionTabs.length - 1 ? "border-b border-gray-200/70" : ""} ${activeSection === key ? "bg-white" : ""}`}
+              >
+                <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ${activeSection === key ? "bg-black text-white" : "bg-white text-gray-600"}`}>
+                  {key === "profile" && <Icons.User />}
+                  {key === "security" && <Icons.Lock />}
+                  {key === "contacts" && <Icons.Info />}
+                  {key === "addresses" && <Icons.Globe />}
+                  {key === "devices" && <Icons.Agents />}
+                  {key === "sectors" && <Icons.Explore />}
+                </span>
+                <span className="min-w-0 flex-1">
+                  <span className="block text-[14px] font-semibold text-gray-900">{label}</span>
+                  <span className="mt-0.5 block text-[12px] text-gray-500">{key === "profile" ? "Personal information" : `Manage ${label.toLowerCase()}`}</span>
+                </span>
+                <span className="text-xl leading-none text-gray-300">›</span>
+              </button>
+            ))}
+            <button type="button" onClick={handleLogout} className="flex w-full items-center gap-3.5 px-4 py-3.5 text-left text-rose-600 transition-colors hover:bg-rose-50 active:bg-rose-100">
+              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-rose-50 text-rose-600"><Icons.Info /></span>
+              <span className="flex-1 text-[14px] font-semibold">Log out</span>
+              <span className="text-xl leading-none text-rose-300">›</span>
             </button>
-          ))}
-          <button type="button" onClick={handleLogout} className="ml-auto shrink-0 rounded-xl px-3.5 py-2 text-[13px] font-medium text-rose-600 transition-colors hover:bg-rose-50">
-            Log out
-          </button>
+          </div>
         </div>
       </div>
-
       {activeSection === "profile" ? <form onSubmit={handleSubmit} className="mx-auto max-w-md px-4 space-y-7 pt-5">
         
         {/* Message Banner */}
