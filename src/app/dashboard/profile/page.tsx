@@ -1,7 +1,14 @@
 "use client";
+/* eslint-disable react-hooks/set-state-in-effect, @typescript-eslint/no-explicit-any */
 import Loader from "@/components/ui/Loader";
 import { useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { apiFetch } from "@/lib/api/client";
+import SecuritySection from "@/components/dashboard/sections/SecuritySection";
+import ContactsSection from "@/components/dashboard/sections/ContactsSection";
+import AddressesSection from "@/components/dashboard/sections/AddressesSection";
+import DevicesSection from "@/components/dashboard/sections/DevicesSection";
+import SectorsSection from "@/components/dashboard/sections/SectorsSection";
 
 type Profile = {
   binzeo_user_id: string | null;
@@ -106,6 +113,12 @@ const inputCls = "text-right bg-transparent border-none outline-none text-[15px]
 /*  MAIN COMPONENT                                                     */
 /* ================================================================== */
 export default function ProfilePage() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const requestedSection = searchParams.get("section");
+  const [activeSection, setActiveSection] = useState<"profile" | "security" | "contacts" | "addresses" | "devices" | "sectors">(
+    requestedSection === "security" || requestedSection === "contacts" || requestedSection === "addresses" || requestedSection === "devices" || requestedSection === "sectors" ? requestedSection : "profile",
+  );
   const [data, setData] = useState<Data | null>(null);
   const [form, setForm] = useState<Partial<Profile>>({});
   const [loading, setLoading] = useState(true);
@@ -116,6 +129,26 @@ export default function ProfilePage() {
   const [usernameCheck, setUsernameCheck] = useState<UsernameCheck>({
     checking: false, available: false, checked: "", message: "", suggestions: [],
   });
+
+  const sectionTabs = [
+    ["profile", "Profile"],
+    ["security", "Security"],
+    ["contacts", "Contacts"],
+    ["addresses", "Addresses"],
+    ["devices", "Devices"],
+    ["sectors", "Sectors"],
+  ] as const;
+
+  const selectSection = (section: typeof sectionTabs[number][0]) => {
+    setActiveSection(section);
+    window.history.replaceState(null, "", section === "profile" ? "/dashboard/profile" : `/dashboard/profile?section=${section}`);
+  };
+
+  const handleLogout = async () => {
+    await fetch("/api/auth/logout", { method: "POST" });
+    router.push("/signin");
+    router.refresh();
+  };
 
   useEffect(() => {
     (async () => {
@@ -229,7 +262,27 @@ export default function ProfilePage() {
         <div className="w-6" /> {/* Spacer for centering */}
       </div>
 
-      <form onSubmit={handleSubmit} className="mx-auto max-w-md px-4 space-y-7 pt-5">
+      <div className="mx-auto max-w-6xl px-3 pt-2 sm:px-5">
+        <div className="mx-auto flex max-w-4xl gap-2 overflow-x-auto rounded-2xl border border-gray-200/70 bg-white/70 p-1.5 shadow-sm backdrop-blur-md" role="tablist" aria-label="Profile sections">
+          {sectionTabs.map(([key, label]) => (
+            <button
+              key={key}
+              type="button"
+              role="tab"
+              aria-selected={activeSection === key}
+              onClick={() => selectSection(key)}
+              className={`shrink-0 rounded-xl px-3.5 py-2 text-[13px] font-medium transition-colors ${activeSection === key ? "bg-black text-white shadow-sm" : "text-gray-500 hover:bg-gray-100 hover:text-gray-900"}`}
+            >
+              {label}
+            </button>
+          ))}
+          <button type="button" onClick={handleLogout} className="ml-auto shrink-0 rounded-xl px-3.5 py-2 text-[13px] font-medium text-rose-600 transition-colors hover:bg-rose-50">
+            Log out
+          </button>
+        </div>
+      </div>
+
+      {activeSection === "profile" ? <form onSubmit={handleSubmit} className="mx-auto max-w-md px-4 space-y-7 pt-5">
         
         {/* Message Banner */}
         {message && (
@@ -446,7 +499,15 @@ export default function ProfilePage() {
             )}
           </button>
         </div>
-      </form>
+      </form> : (
+        <section className="mx-auto max-w-6xl px-3 pb-28 pt-4 sm:px-5">
+          {activeSection === "security" && <SecuritySection />}
+          {activeSection === "contacts" && <ContactsSection />}
+          {activeSection === "addresses" && <AddressesSection />}
+          {activeSection === "devices" && <DevicesSection />}
+          {activeSection === "sectors" && <SectorsSection />}
+        </section>
+      )}
 
       {/* Bottom Navigation Bar (Strictly Matching Image 2) */}
       <div className="fixed bottom-0 left-0 right-0 z-50 border-t border-gray-100 bg-white/80 backdrop-blur-xl pb-safe pt-2 shadow-[0_-4px_20px_rgba(0,0,0,0.03)]">

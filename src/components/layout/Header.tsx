@@ -23,11 +23,6 @@ const siteNavigation = [
 const dashboardNavigation = [
   { href: "/dashboard", label: "Overview", sub: "Your dashboard", icon: "/icons/grid.svg" },
   { href: "/dashboard/profile", label: "Profile", sub: "Personal information", icon: "/icons/user.svg" },
-  { href: "/dashboard/addresses", label: "Addresses", sub: "Saved locations", icon: "/icons/location.svg" },
-  { href: "/dashboard/contacts", label: "Contacts", sub: "Ways to reach you", icon: "/icons/message.svg" },
-  { href: "/dashboard/sectors", label: "Sectors", sub: "Industry access", icon: "/icons/building.svg" },
-  { href: "/dashboard/devices", label: "Devices", sub: "Logged-in devices", icon: "/icons/device.svg" },
-  { href: "/dashboard/security", label: "Security", sub: "Activity & sessions", icon: "/icons/shield.svg" },
 ] as const;
 
 /* Menu dropdown-এ শুধু এই আইটেমগুলো দেখাবে */

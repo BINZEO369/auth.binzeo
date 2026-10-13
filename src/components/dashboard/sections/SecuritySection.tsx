@@ -1,0 +1,1097 @@
+/* eslint-disable react-hooks/set-state-in-effect */
+"use client";
+import Loader from "@/components/ui/Loader";
+import Image from "next/image";
+import Link from "next/link";
+import { useEffect, useState } from "react";
+import { apiFetch } from "@/lib/api/client";
+import TemporaryLoginTokens from "@/components/security/TemporaryLoginTokens";
+import PasskeyManager from "@/components/security/PasskeyManager";
+import TwoFactorSettings from "@/components/security/TwoFactorSettings";
+
+type LoginEntry = {
+  id: string;
+  login_method: string | null;
+  login_status: string;
+  ip_address: string | null;
+  user_agent: string | null;
+  country: string | null;
+  city: string | null;
+  latitude: number | null;
+  longitude: number | null;
+  location_accuracy_meters: number | null;
+  location_source: string | null;
+  login_at: string;
+  logout_at: string | null;
+  user_devices: {
+    device_name: string | null;
+    device_type: string | null;
+    operating_system: string | null;
+    os_version: string | null;
+    browser: string | null;
+    browser_version: string | null;
+  } | null;
+};
+
+type ActivityEntry = {
+  id: string;
+  activity_type: string;
+  activity_description: string | null;
+  ip_address: string | null;
+  created_at: string;
+};
+
+type AuthMethod = {
+  id: string;
+  provider: string;
+  auth_method: string;
+  provider_email: string | null;
+  first_seen_at: string;
+  last_sign_in_at: string | null;
+  login_count: number;
+  last_event: string | null;
+};
+
+type Verification = {
+  id: string;
+  verification_type: string;
+  verification_status: string;
+  verified_at: string | null;
+  last_requested_at: string | null;
+  expires_at: string | null;
+  attempt_count: number;
+};
+
+/* ================================================================== */
+/*  Liquid glass                                                       */
+/* ================================================================== */
+const liquidGlass = {
+  background:
+    "radial-gradient(120% 120% at 30% 12%, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0.40) 45%, rgba(255,255,255,0.28) 100%)",
+  backdropFilter: "blur(26px) saturate(180%)",
+  WebkitBackdropFilter: "blur(26px) saturate(180%)",
+  boxShadow:
+    "inset 0 1px 0 0 rgba(255,255,255,0.85), inset 0 0 0 1px rgba(255,255,255,0.35), 0 2px 4px rgba(0,0,0,0.04), 0 18px 42px -22px rgba(0,0,0,0.28)",
+} as const;
+
+const containerCls =
+  "relative z-10 mx-auto w-full max-w-6xl space-y-5 px-3 py-5 sm:space-y-6 sm:px-5 sm:py-8";
+
+/* ================================================================== */
+/*  Background                                                         */
+/* ================================================================== */
+function PageBackground() {
+  return (
+    <div
+      aria-hidden="true"
+      className="pointer-events-none fixed inset-0 z-0 overflow-hidden"
+    >
+      <div
+        className="absolute -inset-[6%]"
+        style={{
+          backgroundImage: "url('/images/img3.jpg')",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat",
+          animation: "sec-kenburns 32s ease-in-out infinite",
+        }}
+      />
+    </div>
+  );
+}
+
+/* ================================================================== */
+/*  Icons                                                              */
+/* ================================================================== */
+function LockIcon({ className = "h-4 w-4" }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+      aria-hidden="true"
+    >
+      <rect x="3" y="11" width="18" height="11" rx="2" />
+      <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+    </svg>
+  );
+}
+
+/* ================================================================== */
+/*  Time helper                                                        */
+/* ================================================================== */
+function timeAgo(iso: string | null) {
+  if (!iso) return "—";
+  const diff = Date.now() - new Date(iso).getTime();
+  const mins = Math.floor(diff / 60000);
+  if (mins < 1) return "Just now";
+  if (mins < 60) return `${mins}m ago`;
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24) return `${hrs}h ago`;
+  const days = Math.floor(hrs / 24);
+  if (days < 30) return `${days}d ago`;
+  return new Date(iso).toLocaleDateString();
+}
+
+/* ================================================================== */
+/*  Section heading                                                    */
+/* ================================================================== */
+function SectionHeading({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="mb-4 flex items-center gap-3">
+      <span className="whitespace-nowrap text-[10px] font-semibold uppercase tracking-[0.18em] text-black/55">
+        {children}
+      </span>
+      <span
+        aria-hidden="true"
+        className="h-px flex-1"
+        style={{
+          background:
+            "linear-gradient(90deg, rgba(255,255,255,0.6), rgba(255,255,255,0))",
+        }}
+      />
+    </div>
+  );
+}
+
+/* ================================================================== */
+/*  Status pill                                                        */
+/* ================================================================== */
+function StatusPill({ status }: { status: string }) {
+  const map: Record<string, string> = {
+    success: "border-emerald-300/70 bg-emerald-100/60 text-emerald-800",
+    verified: "border-emerald-300/70 bg-emerald-100/60 text-emerald-800",
+    failed: "border-red-300/70 bg-red-100/60 text-red-800",
+    blocked: "border-amber-300/70 bg-amber-100/60 text-amber-800",
+    pending: "border-amber-300/70 bg-amber-100/60 text-amber-800",
+  };
+  const cls = map[status] ?? "border-white/40 bg-white/40 text-black/70";
+  return (
+    <span
+      className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] backdrop-blur-md ${cls}`}
+    >
+      {status}
+    </span>
+  );
+}
+
+/* ================================================================== */
+/*  Primary button — always white text                                 */
+/* ================================================================== */
+function PrimaryButton({
+  href,
+  children,
+  icon,
+}: {
+  href?: string;
+  children: React.ReactNode;
+  icon?: React.ReactNode;
+}) {
+  const cls =
+    "group relative inline-flex items-center gap-2 overflow-hidden rounded-full border border-black px-4 py-2.5 text-[12.5px] font-medium transition-all duration-500 hover:-translate-y-0.5";
+  const style: React.CSSProperties = {
+    background: "#0a0a0a",
+    color: "#ffffff",
+    boxShadow:
+      "inset 0 1px 0 0 rgba(255,255,255,0.14), 0 2px 4px rgba(0,0,0,0.08), 0 12px 28px -12px rgba(0,0,0,0.5)",
+  };
+  const inner = (
+    <>
+      <span
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+        style={{
+          background:
+            "radial-gradient(circle at 30% 30%, rgba(255,255,255,0.2), transparent 60%)",
+        }}
+      />
+      {icon && <span className="relative flex items-center">{icon}</span>}
+      <span className="relative" style={{ color: "#ffffff" }}>
+        {children}
+      </span>
+    </>
+  );
+  if (href) {
+    return (
+      <Link href={href} className={cls} style={style}>
+        {inner}
+      </Link>
+    );
+  }
+  return (
+    <button type="button" className={cls} style={style}>
+      {inner}
+    </button>
+  );
+}
+
+/* ================================================================== */
+/*  Empty state                                                        */
+/* ================================================================== */
+function EmptyState({ icon, text }: { icon: string; text: string }) {
+  return (
+    <div
+      className="relative overflow-hidden rounded-3xl border border-white/[0.4] p-10 text-center"
+      style={{
+        background:
+          "radial-gradient(120% 120% at 30% 12%, rgba(255,255,255,0.58) 0%, rgba(255,255,255,0.42) 45%, rgba(255,255,255,0.30) 100%)",
+        backdropFilter: "blur(32px) saturate(180%)",
+        WebkitBackdropFilter: "blur(32px) saturate(180%)",
+        boxShadow:
+          "inset 0 1px 0 0 rgba(255,255,255,0.9), inset 0 0 0 1px rgba(255,255,255,0.35), 0 2px 4px rgba(0,0,0,0.04), 0 30px 64px -28px rgba(0,0,0,0.34)",
+      }}
+    >
+      <div
+        className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl border border-white/40"
+        style={{
+          background:
+            "radial-gradient(120% 120% at 30% 15%, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0.5) 100%)",
+          backdropFilter: "blur(14px)",
+          WebkitBackdropFilter: "blur(14px)",
+          boxShadow:
+            "inset 0 1px 0 0 rgba(255,255,255,1), 0 6px 16px -8px rgba(0,0,0,0.10)",
+          animation: "sec-float-soft 4s ease-in-out infinite",
+        }}
+      >
+        <Image
+          src={icon}
+          alt=""
+          width={24}
+          height={24}
+          className="opacity-70"
+        />
+      </div>
+      <p className="text-[13px] text-black/65">{text}</p>
+    </div>
+  );
+}
+
+/* ================================================================== */
+/*  Tabs                                                               */
+/* ================================================================== */
+const TABS = [
+  { id: "logins", label: "Login History" },
+  { id: "activity", label: "Activity" },
+  { id: "methods", label: "Auth Methods" },
+  { id: "verifications", label: "Verifications" },
+] as const;
+
+type TabId = (typeof TABS)[number]["id"];
+
+/* ================================================================== */
+/*  Page                                                               */
+/* ================================================================== */
+export default function SecurityPage() {
+  const [tab, setTab] = useState<TabId>("logins");
+  const [logins, setLogins] = useState<LoginEntry[]>([]);
+  const [activities, setActivities] = useState<ActivityEntry[]>([]);
+  const [methods, setMethods] = useState<AuthMethod[]>([]);
+  const [verifications, setVerifications] = useState<Verification[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    (async () => {
+      const [a, b, c, d] = await Promise.all([
+        apiFetch<{ history: LoginEntry[] }>("/api/user/login-history?limit=50"),
+        apiFetch<{ activities: ActivityEntry[] }>(
+          "/api/user/activity-logs?limit=50"
+        ),
+        apiFetch<{ auth_methods: AuthMethod[] }>("/api/user/auth-methods"),
+        apiFetch<{ verifications: Verification[] }>(
+          "/api/user/verification-records"
+        ),
+      ]);
+      if (a.success) setLogins(a.data.history);
+      if (b.success) setActivities(b.data.activities);
+      if (c.success) setMethods(c.data.auth_methods);
+      if (d.success) setVerifications(d.data.verifications);
+      setLoading(false);
+    })();
+  }, []);
+
+  if (loading) return <Loader variant="security" />;
+
+  return (
+    <div className="relative isolate min-h-[80vh] w-full overflow-x-hidden">
+      {/* ============================================================ */}
+      {/*  KEYFRAMES + SCOPED OVERRIDES FOR EMBEDDED COMPONENTS         */}
+      {/* ============================================================ */}
+      <style jsx global>{`
+        @keyframes sec-item-in {
+          from { opacity: 0; transform: translateY(20px) scale(0.99); filter: blur(8px); }
+          to   { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+        }
+        @keyframes sec-banner-in {
+          from { opacity: 0; transform: translateY(24px); filter: blur(10px); }
+          to   { opacity: 1; transform: translateY(0); filter: blur(0); }
+        }
+        @keyframes sec-float-soft {
+          0%, 100% { transform: translateY(0); }
+          50%      { transform: translateY(-5px); }
+        }
+        @keyframes sec-kenburns {
+          0%, 100% { transform: scale(1.04) translate(0, 0); }
+          50%      { transform: scale(1.12) translate(-1%, -0.8%); }
+        }
+
+        /* ============================================================ */
+        /*  SCOPED OVERRIDES — [data-sec-tool] wrapper                   */
+        /*  Forces TemporaryLoginTokens / PasskeyManager / 2FA          */
+        /*  to fit into the liquid glass theme without overflow         */
+        /* ============================================================ */
+
+        [data-sec-tool],
+        [data-sec-tool] * {
+          box-sizing: border-box;
+          max-width: 100%;
+        }
+
+        [data-sec-tool] {
+          width: 100% !important;
+          overflow-x: hidden;
+          text-align: left;
+        }
+
+        [data-sec-tool] > * {
+          width: 100% !important;
+          margin-left: 0 !important;
+          margin-right: 0 !important;
+          max-width: 100% !important;
+        }
+
+        /* Flatten any nested outer containers (double card / borders) */
+        [data-sec-tool] > div,
+        [data-sec-tool] > section,
+        [data-sec-tool] > article {
+          background: transparent !important;
+          border: none !important;
+          box-shadow: none !important;
+          padding: 0 !important;
+          border-radius: 0 !important;
+          width: 100% !important;
+        }
+
+        /* All inputs → liquid glass */
+        [data-sec-tool] input:not([type="checkbox"]):not([type="radio"]):not([type="submit"]):not([type="button"]):not([type="hidden"]),
+        [data-sec-tool] select,
+        [data-sec-tool] textarea {
+          width: 100% !important;
+          padding: 12px 14px !important;
+          border-radius: 12px !important;
+          border: 1px solid rgba(255,255,255,0.4) !important;
+          background: rgba(255,255,255,0.4) !important;
+          backdrop-filter: blur(14px) saturate(180%);
+          -webkit-backdrop-filter: blur(14px) saturate(180%);
+          color: rgba(0,0,0,0.9) !important;
+          font-size: 14px !important;
+          line-height: 1.4 !important;
+          outline: none !important;
+          box-shadow:
+            inset 0 1px 0 0 rgba(255,255,255,0.9),
+            0 1px 2px rgba(0,0,0,0.03) !important;
+          transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        [data-sec-tool] input::placeholder,
+        [data-sec-tool] textarea::placeholder {
+          color: rgba(0,0,0,0.35) !important;
+        }
+
+        [data-sec-tool] input:focus,
+        [data-sec-tool] select:focus,
+        [data-sec-tool] textarea:focus {
+          border-color: rgba(255,255,255,0.7) !important;
+          background: rgba(255,255,255,0.6) !important;
+          box-shadow:
+            inset 0 1px 0 0 rgba(255,255,255,1),
+            0 0 0 4px rgba(255,255,255,0.3) !important;
+        }
+
+        /* All labels */
+        [data-sec-tool] label {
+          display: block !important;
+          font-size: 10px !important;
+          font-weight: 600 !important;
+          text-transform: uppercase !important;
+          letter-spacing: 0.16em !important;
+          color: rgba(0,0,0,0.6) !important;
+          margin-bottom: 8px !important;
+        }
+
+        /* Secondary buttons → liquid glass pill */
+        [data-sec-tool] button:not([type="submit"]):not([data-primary]) {
+          border-radius: 999px !important;
+          border: 1px solid rgba(255,255,255,0.4) !important;
+          background: rgba(255,255,255,0.4) !important;
+          backdrop-filter: blur(14px) saturate(180%);
+          -webkit-backdrop-filter: blur(14px) saturate(180%);
+          color: rgba(0,0,0,0.75) !important;
+          font-weight: 500 !important;
+          padding: 10px 18px !important;
+          font-size: 12.5px !important;
+          transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+          box-shadow:
+            inset 0 1px 0 0 rgba(255,255,255,0.85),
+            0 2px 4px rgba(0,0,0,0.04) !important;
+          max-width: 100% !important;
+          white-space: normal !important;
+        }
+
+        [data-sec-tool] button:not([type="submit"]):not([data-primary]):hover {
+          background: rgba(255,255,255,0.65) !important;
+          border-color: rgba(255,255,255,0.7) !important;
+          color: rgba(0,0,0,0.95) !important;
+          transform: translateY(-2px);
+        }
+
+        /* Primary / submit buttons → BLACK with WHITE text (forced) */
+        [data-sec-tool] button[type="submit"],
+        [data-sec-tool] button[data-primary] {
+          border-radius: 999px !important;
+          border: 1px solid #0a0a0a !important;
+          background: #0a0a0a !important;
+          color: #ffffff !important;
+          font-weight: 500 !important;
+          font-size: 12.5px !important;
+          padding: 12px 22px !important;
+          box-shadow:
+            inset 0 1px 0 0 rgba(255,255,255,0.14),
+            0 2px 4px rgba(0,0,0,0.08),
+            0 12px 28px -12px rgba(0,0,0,0.5) !important;
+          transition: all 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+          cursor: pointer;
+          max-width: 100% !important;
+          white-space: normal !important;
+        }
+
+        [data-sec-tool] button[type="submit"] *,
+        [data-sec-tool] button[data-primary] * {
+          color: #ffffff !important;
+        }
+
+        [data-sec-tool] button[type="submit"]:hover,
+        [data-sec-tool] button[data-primary]:hover {
+          transform: translateY(-2px);
+          box-shadow:
+            inset 0 1px 0 0 rgba(255,255,255,0.2),
+            0 4px 8px rgba(0,0,0,0.1),
+            0 18px 36px -12px rgba(0,0,0,0.55) !important;
+        }
+
+        [data-sec-tool] button[type="submit"]:disabled,
+        [data-sec-tool] button[data-primary]:disabled {
+          opacity: 0.6 !important;
+          cursor: not-allowed !important;
+          transform: none !important;
+        }
+
+        /* Heading / text inside tools */
+        [data-sec-tool] h1,
+        [data-sec-tool] h2,
+        [data-sec-tool] h3,
+        [data-sec-tool] h4 {
+          color: rgba(0,0,0,0.9) !important;
+          font-weight: 600 !important;
+          letter-spacing: -0.01em !important;
+        }
+
+        [data-sec-tool] p,
+        [data-sec-tool] small,
+        [data-sec-tool] span {
+          color: rgba(0,0,0,0.65);
+        }
+
+        [data-sec-tool] a {
+          color: rgba(0,0,0,0.75) !important;
+          text-decoration: underline;
+          text-underline-offset: 2px;
+          transition: color 0.3s;
+        }
+
+        [data-sec-tool] a:hover {
+          color: #000 !important;
+        }
+
+        /* Nested grids — responsive */
+        [data-sec-tool] .grid,
+        [data-sec-tool] [class*="grid-cols"] {
+          gap: 12px !important;
+          width: 100% !important;
+        }
+
+        [data-sec-tool] [class*="flex"],
+        [data-sec-tool] [class*="grid"] {
+          min-width: 0 !important;
+        }
+
+        /* Any inner card-like element → keep it inside bounds */
+        [data-sec-tool] [class*="rounded"],
+        [data-sec-tool] [class*="border"] {
+          max-width: 100% !important;
+        }
+
+        /* Code / OTP / mono inputs — keep compact */
+        [data-sec-tool] input[inputmode="numeric"],
+        [data-sec-tool] input[autocomplete="one-time-code"] {
+          text-align: center !important;
+          font-size: 16px !important;
+          font-weight: 600 !important;
+        }
+
+        /* Error / success */
+        [data-sec-tool] [class*="error"],
+        [data-sec-tool] [class*="Error"] {
+          background: rgba(254, 226, 226, 0.6) !important;
+          border: 1px solid rgba(252, 165, 165, 0.7) !important;
+          color: #991b1b !important;
+          border-radius: 12px !important;
+          padding: 10px 14px !important;
+          backdrop-filter: blur(14px);
+          max-width: 100% !important;
+        }
+
+        [data-sec-tool] [class*="success"],
+        [data-sec-tool] [class*="Success"] {
+          background: rgba(209, 250, 229, 0.6) !important;
+          border: 1px solid rgba(110, 231, 183, 0.7) !important;
+          color: #065f46 !important;
+          border-radius: 12px !important;
+          padding: 10px 14px !important;
+          backdrop-filter: blur(14px);
+          max-width: 100% !important;
+        }
+
+        /* ============================================================ */
+        /*  WRAPPER for each tool — a liquid glass section              */
+        /* ============================================================ */
+        .sec-tool-wrap {
+          position: relative;
+          overflow: hidden;
+          border-radius: 24px;
+          border: 1px solid rgba(255,255,255,0.35);
+          padding: 20px;
+          transition: border-color 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+                      box-shadow 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        @media (min-width: 640px) {
+          .sec-tool-wrap { padding: 24px; }
+        }
+
+        .sec-tool-wrap:hover {
+          border-color: rgba(255,255,255,0.5);
+          box-shadow:
+            inset 0 1px 0 0 rgba(255,255,255,0.9),
+            inset 0 0 0 1px rgba(255,255,255,0.4),
+            0 2px 4px rgba(0,0,0,0.04),
+            0 22px 48px -22px rgba(0,0,0,0.32) !important;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+          [data-sec-anim],
+          [data-sec-tool] * {
+            animation: none !important;
+            transition: none !important;
+          }
+        }
+      `}</style>
+
+      <PageBackground />
+
+      <div className={containerCls}>
+        {/* ============================================================ */}
+        {/*  HERO BANNER                                                  */}
+        {/* ============================================================ */}
+        <div
+          data-sec-anim
+          className="relative w-full overflow-hidden rounded-3xl border border-white/[0.4] p-6 sm:p-9"
+          style={{
+            background:
+              "radial-gradient(120% 120% at 30% 12%, rgba(255,255,255,0.58) 0%, rgba(255,255,255,0.42) 45%, rgba(255,255,255,0.30) 100%)",
+            backdropFilter: "blur(32px) saturate(180%)",
+            WebkitBackdropFilter: "blur(32px) saturate(180%)",
+            boxShadow:
+              "inset 0 1px 0 0 rgba(255,255,255,0.9), inset 0 0 0 1px rgba(255,255,255,0.35), 0 2px 4px rgba(0,0,0,0.04), 0 30px 64px -28px rgba(0,0,0,0.34)",
+            animation:
+              "sec-banner-in 0.85s cubic-bezier(0.22, 1, 0.36, 1) 0.05s both",
+          }}
+        >
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-x-0 top-0 h-px"
+            style={{
+              background:
+                "linear-gradient(90deg, transparent, rgba(255,255,255,1), transparent)",
+            }}
+          />
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute -left-16 -top-16 h-52 w-52 rounded-full opacity-70"
+            style={{
+              background:
+                "radial-gradient(circle, rgba(180,200,255,0.5) 0%, rgba(180,200,255,0) 70%)",
+              filter: "blur(36px)",
+              animation: "sec-float-soft 7s ease-in-out infinite",
+            }}
+          />
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute -right-16 -bottom-16 h-52 w-52 rounded-full opacity-70"
+            style={{
+              background:
+                "radial-gradient(circle, rgba(255,200,180,0.45) 0%, rgba(255,200,180,0) 70%)",
+              filter: "blur(36px)",
+              animation: "sec-float-soft 7s ease-in-out 1.4s infinite",
+            }}
+          />
+
+          <div className="relative">
+            <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-white/40 bg-white/40 px-3 py-1.5 backdrop-blur-md">
+              <span
+                className="h-1.5 w-1.5 rounded-full bg-black/80"
+                style={{ animation: "sec-float-soft 2.4s ease-in-out infinite" }}
+              />
+              <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-black/70">
+                Safety
+              </span>
+            </div>
+
+            <div className="flex flex-wrap items-start justify-between gap-5">
+              <div className="min-w-0">
+                <h1
+                  className="mb-3 text-2xl font-semibold tracking-[-0.02em] text-black sm:text-3xl"
+                  style={{
+                    textShadow:
+                      "0 1px 12px rgba(255,255,255,0.85), 0 1px 2px rgba(255,255,255,0.6)",
+                  }}
+                >
+                  Security
+                </h1>
+                <p className="max-w-lg text-[13.5px] leading-6 text-black/70">
+                  Monitor your account activity and manage security settings.
+                </p>
+              </div>
+
+              <PrimaryButton
+                href="/dashboard/security/password"
+                icon={<LockIcon className="h-4 w-4" />}
+              >
+                Change password
+              </PrimaryButton>
+            </div>
+          </div>
+        </div>
+
+        {/* ============================================================ */}
+        {/*  SECURITY TOOLS — each wrapped in its own liquid glass card   */}
+        {/* ============================================================ */}
+
+        <div
+          className="sec-tool-wrap"
+          style={{
+            ...liquidGlass,
+            animation:
+              "sec-item-in 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.15s both",
+          }}
+        >
+          <span
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-x-0 top-0 h-px"
+            style={{
+              background:
+                "linear-gradient(90deg, transparent, rgba(255,255,255,1), transparent)",
+            }}
+          />
+          <div data-sec-tool className="relative w-full">
+            <TemporaryLoginTokens />
+          </div>
+        </div>
+
+        <div
+          className="sec-tool-wrap"
+          style={{
+            ...liquidGlass,
+            animation:
+              "sec-item-in 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.2s both",
+          }}
+        >
+          <span
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-x-0 top-0 h-px"
+            style={{
+              background:
+                "linear-gradient(90deg, transparent, rgba(255,255,255,1), transparent)",
+            }}
+          />
+          <div data-sec-tool className="relative w-full">
+            <PasskeyManager />
+          </div>
+        </div>
+
+        <div
+          className="sec-tool-wrap"
+          style={{
+            ...liquidGlass,
+            animation:
+              "sec-item-in 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.25s both",
+          }}
+        >
+          <span
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-x-0 top-0 h-px"
+            style={{
+              background:
+                "linear-gradient(90deg, transparent, rgba(255,255,255,1), transparent)",
+            }}
+          />
+          <div data-sec-tool className="relative w-full">
+            <TwoFactorSettings />
+          </div>
+        </div>
+
+        {/* ============================================================ */}
+        {/*  AUDIT LOGS — tabs inside liquid glass card                   */}
+        {/* ============================================================ */}
+        <section
+          className="relative w-full overflow-hidden rounded-3xl border border-white/[0.35] p-5 sm:p-7"
+          style={{
+            ...liquidGlass,
+            animation:
+              "sec-item-in 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.3s both",
+          }}
+        >
+          <span
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-x-0 top-0 h-px"
+            style={{
+              background:
+                "linear-gradient(90deg, transparent, rgba(255,255,255,1), transparent)",
+            }}
+          />
+
+          <div className="relative">
+            <SectionHeading>Account Activity</SectionHeading>
+
+            {/* Tabs */}
+            <div className="mb-5 flex flex-wrap gap-2">
+              {TABS.map((t) => {
+                const active = tab === t.id;
+                return (
+                  <button
+                    key={t.id}
+                    type="button"
+                    onClick={() => setTab(t.id)}
+                    className={`group relative inline-flex items-center gap-2 overflow-hidden rounded-full border px-3.5 py-2 text-[12px] font-medium transition-all duration-500 ${
+                      active
+                        ? "border-black"
+                        : "border-white/40 bg-white/40 text-black/70 backdrop-blur-md hover:-translate-y-0.5 hover:border-white/60 hover:bg-white/60 hover:text-black"
+                    }`}
+                    style={
+                      active
+                        ? {
+                            background: "#0a0a0a",
+                            color: "#ffffff",
+                            boxShadow:
+                              "inset 0 1px 0 0 rgba(255,255,255,0.14), 0 2px 4px rgba(0,0,0,0.08), 0 12px 28px -12px rgba(0,0,0,0.5)",
+                          }
+                        : undefined
+                    }
+                  >
+                    {active && (
+                      <span
+                        aria-hidden="true"
+                        className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+                        style={{
+                          background:
+                            "radial-gradient(circle at 30% 30%, rgba(255,255,255,0.2), transparent 60%)",
+                        }}
+                      />
+                    )}
+                    <span
+                      className="relative"
+                      style={active ? { color: "#ffffff" } : undefined}
+                    >
+                      {t.label}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* ---------- Login History ---------- */}
+            {tab === "logins" && (
+              <div className="space-y-3">
+                {logins.length === 0 ? (
+                  <EmptyState
+                    icon="/icons/lock.svg"
+                    text="No login history yet."
+                  />
+                ) : (
+                  logins.map((l, i) => (
+                    <article
+                      key={l.id}
+                      className="group relative overflow-hidden rounded-2xl border border-white/[0.35] p-4 transition-all duration-500 hover:-translate-y-0.5 hover:border-white/[0.5] hover:shadow-[0_18px_40px_-22px_rgba(0,0,0,0.28)] sm:p-5"
+                      style={{
+                        ...liquidGlass,
+                        animation: `sec-item-in 0.55s cubic-bezier(0.22, 1, 0.36, 1) ${
+                          0.05 + i * 0.03
+                        }s both`,
+                      }}
+                    >
+                      <span
+                        aria-hidden="true"
+                        className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+                        style={{
+                          background:
+                            "radial-gradient(circle at 25% 15%, rgba(255,255,255,0.35), transparent 60%)",
+                        }}
+                      />
+
+                      <div className="relative flex items-start justify-between gap-3">
+                        <div className="min-w-0 flex-1">
+                          <div className="mb-2 flex flex-wrap items-center gap-2">
+                            <StatusPill status={l.login_status} />
+                            <span className="rounded-full border border-white/40 bg-white/40 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-black/65 backdrop-blur-md">
+                              {l.login_method ?? "password"}
+                            </span>
+                          </div>
+
+                          <div className="truncate text-[12.5px] text-black/70">
+                            {l.ip_address ?? "No IP"} ·{" "}
+                            {[l.city, l.country].filter(Boolean).join(", ") ||
+                              "Unknown location"}
+                          </div>
+
+                          {l.latitude !== null && l.longitude !== null && (
+                            <div className="mt-0.5 text-[11px] text-black/50">
+                              {Number(l.latitude).toFixed(6)},{" "}
+                              {Number(l.longitude).toFixed(6)}
+                              {l.location_accuracy_meters !== null &&
+                                ` · ±${Math.round(
+                                  l.location_accuracy_meters
+                                )}m`}
+                              {l.location_source &&
+                                ` · ${l.location_source.replace(/_/g, " ")}`}
+                            </div>
+                          )}
+
+                          {l.user_devices && (
+                            <div className="mt-1 text-[11.5px] text-black/55">
+                              {l.user_devices.device_name ??
+                                l.user_devices.device_type ??
+                                "Unknown device"}
+                              {l.user_devices.operating_system &&
+                                ` · ${l.user_devices.operating_system}${
+                                  l.user_devices.os_version
+                                    ? ` ${l.user_devices.os_version}`
+                                    : ""
+                                }`}
+                              {l.user_devices.browser &&
+                                ` · ${l.user_devices.browser}${
+                                  l.user_devices.browser_version
+                                    ? ` ${l.user_devices.browser_version}`
+                                    : ""
+                                }`}
+                            </div>
+                          )}
+
+                          {l.user_agent && (
+                            <div
+                              className="mt-1 truncate text-[10.5px] text-black/40"
+                              title={l.user_agent}
+                            >
+                              {l.user_agent}
+                            </div>
+                          )}
+                        </div>
+
+                        <div className="shrink-0 text-[11px] font-medium text-black/55">
+                          {timeAgo(l.login_at)}
+                        </div>
+                      </div>
+                    </article>
+                  ))
+                )}
+              </div>
+            )}
+
+            {/* ---------- Activity ---------- */}
+            {tab === "activity" && (
+              <div className="space-y-3">
+                {activities.length === 0 ? (
+                  <EmptyState
+                    icon="/icons/history.svg"
+                    text="No activity recorded yet."
+                  />
+                ) : (
+                  activities.map((a, i) => (
+                    <article
+                      key={a.id}
+                      className="group relative overflow-hidden rounded-2xl border border-white/[0.35] p-4 transition-all duration-500 hover:-translate-y-0.5 hover:border-white/[0.5] hover:shadow-[0_18px_40px_-22px_rgba(0,0,0,0.28)] sm:p-5"
+                      style={{
+                        ...liquidGlass,
+                        animation: `sec-item-in 0.55s cubic-bezier(0.22, 1, 0.36, 1) ${
+                          0.05 + i * 0.03
+                        }s both`,
+                      }}
+                    >
+                      <span
+                        aria-hidden="true"
+                        className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+                        style={{
+                          background:
+                            "radial-gradient(circle at 25% 15%, rgba(255,255,255,0.35), transparent 60%)",
+                        }}
+                      />
+
+                      <div className="relative flex items-start justify-between gap-3">
+                        <div className="min-w-0 flex-1">
+                          <div className="mb-0.5 text-[13px] font-semibold capitalize text-black/90">
+                            {a.activity_type.replace(/_/g, " ")}
+                          </div>
+                          {a.activity_description && (
+                            <div className="text-[12px] text-black/60">
+                              {a.activity_description}
+                            </div>
+                          )}
+                          {a.ip_address && (
+                            <div className="mt-1 text-[11px] text-black/45">
+                              IP: {a.ip_address}
+                            </div>
+                          )}
+                        </div>
+                        <div className="shrink-0 text-[11px] font-medium text-black/55">
+                          {timeAgo(a.created_at)}
+                        </div>
+                      </div>
+                    </article>
+                  ))
+                )}
+              </div>
+            )}
+
+            {/* ---------- Auth Methods ---------- */}
+            {tab === "methods" && (
+              <div className="space-y-3">
+                {methods.length === 0 ? (
+                  <EmptyState
+                    icon="/icons/lock.svg"
+                    text="No auth methods linked yet."
+                  />
+                ) : (
+                  methods.map((m, i) => (
+                    <article
+                      key={m.id}
+                      className="group relative overflow-hidden rounded-2xl border border-white/[0.35] p-4 transition-all duration-500 hover:-translate-y-0.5 hover:border-white/[0.5] hover:shadow-[0_18px_40px_-22px_rgba(0,0,0,0.28)] sm:p-5"
+                      style={{
+                        ...liquidGlass,
+                        animation: `sec-item-in 0.55s cubic-bezier(0.22, 1, 0.36, 1) ${
+                          0.05 + i * 0.03
+                        }s both`,
+                      }}
+                    >
+                      <span
+                        aria-hidden="true"
+                        className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+                        style={{
+                          background:
+                            "radial-gradient(circle at 25% 15%, rgba(255,255,255,0.35), transparent 60%)",
+                        }}
+                      />
+
+                      <div className="relative flex items-start justify-between gap-3">
+                        <div className="min-w-0 flex-1">
+                          <div className="mb-1 flex flex-wrap items-center gap-2">
+                            <span className="text-[13px] font-semibold capitalize text-black/90">
+                              {m.auth_method.replace(/_/g, " ")}
+                            </span>
+                            <span className="text-[11px] text-black/55">
+                              via {m.provider}
+                            </span>
+                          </div>
+                          {m.provider_email && (
+                            <div className="text-[12px] text-black/60">
+                              {m.provider_email}
+                            </div>
+                          )}
+                          <div className="mt-1 text-[11px] text-black/50">
+                            Signed in {m.login_count} time
+                            {m.login_count !== 1 ? "s" : ""}
+                            {m.last_sign_in_at &&
+                              ` · Last: ${timeAgo(m.last_sign_in_at)}`}
+                          </div>
+                        </div>
+                        <span className="shrink-0 rounded-full border border-white/40 bg-white/40 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-black/70 backdrop-blur-md">
+                          {m.last_event ?? "linked"}
+                        </span>
+                      </div>
+                    </article>
+                  ))
+                )}
+              </div>
+            )}
+
+            {/* ---------- Verifications ---------- */}
+            {tab === "verifications" && (
+              <div className="space-y-3">
+                {verifications.length === 0 ? (
+                  <EmptyState
+                    icon="/icons/check.svg"
+                    text="No verification records yet."
+                  />
+                ) : (
+                  verifications.map((v, i) => (
+                    <article
+                      key={v.id}
+                      className="group relative overflow-hidden rounded-2xl border border-white/[0.35] p-4 transition-all duration-500 hover:-translate-y-0.5 hover:border-white/[0.5] hover:shadow-[0_18px_40px_-22px_rgba(0,0,0,0.28)] sm:p-5"
+                      style={{
+                        ...liquidGlass,
+                        animation: `sec-item-in 0.55s cubic-bezier(0.22, 1, 0.36, 1) ${
+                          0.05 + i * 0.03
+                        }s both`,
+                      }}
+                    >
+                      <span
+                        aria-hidden="true"
+                        className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+                        style={{
+                          background:
+                            "radial-gradient(circle at 25% 15%, rgba(255,255,255,0.35), transparent 60%)",
+                        }}
+                      />
+
+                      <div className="relative flex items-start justify-between gap-3">
+                        <div className="min-w-0 flex-1">
+                          <div className="mb-1 flex flex-wrap items-center gap-2">
+                            <span className="text-[13px] font-semibold capitalize text-black/90">
+                              {v.verification_type}
+                            </span>
+                            <StatusPill status={v.verification_status} />
+                          </div>
+                          <div className="text-[11.5px] text-black/60">
+                            {v.verified_at
+                              ? `Verified ${timeAgo(v.verified_at)}`
+                              : v.last_requested_at
+                              ? `Requested ${timeAgo(v.last_requested_at)}`
+                              : "No activity"}
+                          </div>
+                          <div className="mt-0.5 text-[11px] text-black/45">
+                            Attempts: {v.attempt_count}
+                          </div>
+                        </div>
+                      </div>
+                    </article>
+                  ))
+                )}
+              </div>
+            )}
+          </div>
+        </section>
+      </div>
+    </div>
+  );
+}
