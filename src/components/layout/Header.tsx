@@ -507,30 +507,7 @@ export default function Header({ isLoggedIn = false, onMenu }: HeaderProps) {
         {/* ============================================================ */}
         {/*  KEYFRAMES                                                    */}
         {/* ============================================================ */}
-        <style jsx global>{`
-          @keyframes hdr-drop-in {
-            from {
-              opacity: 0;
-              transform: translateY(-12px);
-              filter: blur(6px);
-            }
-            to {
-              opacity: 1;
-              transform: translateY(0);
-              filter: blur(0);
-            }
-          }
-          @keyframes hdr-item-in {
-            from {
-              opacity: 0;
-              transform: translateY(10px);
-            }
-            to {
-              opacity: 1;
-              transform: translateY(0);
-            }
-          }
-        `}</style>
+        
       </header>
     </div>
   );

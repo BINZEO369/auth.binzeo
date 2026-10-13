@@ -1,3 +1,4 @@
+@import "./extracted-inline.css";
 @import "tailwindcss";
 
 @theme {

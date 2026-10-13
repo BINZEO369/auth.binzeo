@@ -1,0 +1,941 @@
+/* Extracted from src/app/dashboard/page.tsx style block 1 */
+            .bz-blur-range::-webkit-slider-thumb {
+              -webkit-appearance: none;
+              appearance: none;
+              width: 16px;
+              height: 16px;
+              border-radius: 999px;
+              margin-top: -5px;
+              background: radial-gradient(
+                120% 120% at 30% 20%,
+                rgba(255, 255, 255, 1) 0%,
+                rgba(250, 250, 250, 0.98) 55%,
+                rgba(235, 235, 235, 1) 100%
+              );
+              border: 1px solid rgba(0, 0, 0, 0.15);
+              box-shadow:
+                0 1px 0 0 rgba(255, 255, 255, 1) inset,
+                0 4px 10px -2px rgba(0, 0, 0, 0.35),
+                0 1px 2px rgba(0, 0, 0, 0.15);
+              cursor: grab;
+              transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+            }
+            .bz-blur-range:hover::-webkit-slider-thumb {
+              transform: scale(1.12);
+            }
+            .bz-blur-range:active::-webkit-slider-thumb {
+              cursor: grabbing;
+              transform: scale(1.02);
+            }
+            .bz-blur-range::-webkit-slider-runnable-track {
+              height: 6px;
+              border-radius: 999px;
+              background: transparent;
+            }
+
+            .bz-blur-range::-moz-range-thumb {
+              width: 16px;
+              height: 16px;
+              border-radius: 999px;
+              background: radial-gradient(
+                120% 120% at 30% 20%,
+                rgba(255, 255, 255, 1) 0%,
+                rgba(250, 250, 250, 0.98) 55%,
+                rgba(235, 235, 235, 1) 100%
+              );
+              border: 1px solid rgba(0, 0, 0, 0.15);
+              box-shadow:
+                0 1px 0 0 rgba(255, 255, 255, 1) inset,
+                0 4px 10px -2px rgba(0, 0, 0, 0.35),
+                0 1px 2px rgba(0, 0, 0, 0.15);
+              cursor: grab;
+              transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+            }
+            .bz-blur-range:hover::-moz-range-thumb {
+              transform: scale(1.12);
+            }
+            .bz-blur-range::-moz-range-track {
+              height: 6px;
+              border-radius: 999px;
+              background: transparent;
+            }
+
+            .bz-blur-range:focus-visible {
+              outline: none;
+              box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.6);
+            }
+
+
+/* Extracted from src/app/dashboard/page.tsx style block 2 */
+        @keyframes db-item-in {
+          from {
+            opacity: 0;
+            transform: translateY(24px) scale(0.99);
+            filter: blur(10px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+            filter: blur(0);
+          }
+        }
+        @keyframes db-sub-in {
+          0% {
+            opacity: 0;
+            transform: translateY(-10px);
+            filter: blur(8px);
+          }
+          100% {
+            opacity: 1;
+            transform: translateY(0);
+            filter: blur(0);
+          }
+        }
+        @keyframes db-float-soft {
+          0%, 100% { transform: translateY(0); }
+          50%      { transform: translateY(-4px); }
+        }
+        @keyframes db-kenburns {
+          0%, 100% { transform: scale(1.04) translate(0, 0); }
+          50%      { transform: scale(1.1) translate(-1%, -0.6%); }
+        }
+        @keyframes db-shimmer {
+          0%   { transform: translateX(-8%); opacity: 0.55; }
+          50%  { transform: translateX(8%); opacity: 0.8; }
+          100% { transform: translateX(-8%); opacity: 0.55; }
+        }
+        @keyframes blur-pop-in {
+          from {
+            opacity: 0;
+            transform: translateY(6px) scale(0.96);
+            filter: blur(6px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+            filter: blur(0);
+          }
+        }
+        @media (prefers-reduced-motion: reduce) {
+          [data-db-anim],
+          [data-db-anim] * {
+            animation: none !important;
+            opacity: 1 !important;
+            transform: none !important;
+            filter: none !important;
+          }
+        }
+
+
+/* Extracted from src/app/dashboard/profile/page.tsx style block 1 */
+        [data-sec-tool], [data-sec-tool] * { box-sizing: border-box; max-width: 100%; }
+        [data-sec-tool] { width: 100% !important; overflow-x: hidden; text-align: left; }
+        [data-sec-tool] > * { width: 100% !important; margin-left: 0 !important; margin-right: 0 !important; max-width: 100% !important; }
+        [data-sec-tool] > div, [data-sec-tool] > section, [data-sec-tool] > article { background: transparent !important; border: none !important; box-shadow: none !important; padding: 0 !important; border-radius: 0 !important; width: 100% !important; }
+        [data-sec-tool] input:not([type="checkbox"]):not([type="radio"]):not([type="submit"]):not([type="button"]):not([type="hidden"]), [data-sec-tool] select, [data-sec-tool] textarea { width: 100% !important; padding: 12px 14px !important; border-radius: 12px !important; border: 1px solid rgba(0,0,0,0.1) !important; background: #fff !important; color: rgba(0,0,0,0.9) !important; font-size: 14px !important; line-height: 1.4 !important; outline: none !important; }
+        [data-sec-tool] input:focus, [data-sec-tool] select:focus, [data-sec-tool] textarea:focus { border-color: rgba(0,0,0,0.3) !important; background: #fff !important; box-shadow: 0 0 0 4px rgba(0,0,0,0.05) !important; }
+        [data-sec-tool] label { display: block !important; font-size: 10px !important; font-weight: 600 !important; text-transform: uppercase !important; letter-spacing: 0.16em !important; color: rgba(0,0,0,0.6) !important; margin-bottom: 8px !important; }
+        [data-sec-tool] button:not([type="submit"]):not([data-primary]) { border-radius: 999px !important; border: 1px solid rgba(0,0,0,0.1) !important; background: #fff !important; color: rgba(0,0,0,0.75) !important; font-weight: 500 !important; padding: 10px 18px !important; font-size: 12.5px !important; max-width: 100% !important; white-space: normal !important; }
+        [data-sec-tool] button:not([type="submit"]):not([data-primary]):hover { background: #f9fafb !important; border-color: rgba(0,0,0,0.2) !important; color: rgba(0,0,0,0.95) !important; }
+        [data-sec-tool] button[type="submit"], [data-sec-tool] button[data-primary] { border-radius: 999px !important; border: 1px solid #0a0a0a !important; background: #0a0a0a !important; color: #ffffff !important; font-weight: 500 !important; font-size: 12.5px !important; padding: 12px 22px !important; cursor: pointer; max-width: 100% !important; white-space: normal !important; }
+        [data-sec-tool] button[type="submit"] *, [data-sec-tool] button[data-primary] * { color: #ffffff !important; }
+        [data-sec-tool] h1, [data-sec-tool] h2, [data-sec-tool] h3, [data-sec-tool] h4 { color: rgba(0,0,0,0.9) !important; font-weight: 600 !important; letter-spacing: -0.01em !important; }
+        [data-sec-tool] p, [data-sec-tool] small, [data-sec-tool] span { color: rgba(0,0,0,0.65); }
+        [data-sec-tool] a { color: rgba(0,0,0,0.75) !important; text-decoration: underline; text-underline-offset: 2px; }
+        [data-sec-tool] a:hover { color: #000 !important; }
+        .sec-tool-wrap { position: relative; overflow: hidden; border-radius: 24px; border: 1px solid #f3f4f6; padding: 20px; background: #ffffff; box-shadow: 0 2px 10px rgba(0,0,0,0.03); }
+        @media (min-width: 640px) { .sec-tool-wrap { padding: 24px; } }
+
+
+/* Extracted from src/app/page.tsx style block 1 */
+        /* ============================================================ */
+        /*  CINEMATIC REVEAL SYSTEM                                      */
+        /* ============================================================ */
+        [data-reveal] {
+          animation: bz-reveal-in 0.85s cubic-bezier(0.22, 1, 0.36, 1) var(--rd, 0s) both;
+          will-change: opacity, transform, filter;
+        }
+        [data-reveal].is-visible {
+          opacity: 1;
+          transform: none;
+          filter: none;
+        }
+
+        .bz-letter {
+          display: inline-block;
+          transform-origin: 50% 100%;
+          animation: bz-letter-in 0.9s cubic-bezier(0.22, 1, 0.36, 1) var(--rd, 0s) both;
+          will-change: opacity, transform, filter;
+        }
+
+        .bz-word {
+          display: inline-block;
+          animation: bz-word-in 0.85s cubic-bezier(0.22, 1, 0.36, 1) var(--rd, 0s) both;
+          will-change: opacity, transform, filter;
+        }
+
+        [data-reveal-group].is-visible .bz-letter,
+        [data-reveal-group].is-visible .bz-word {
+          opacity: 1;
+          transform: none;
+          filter: none;
+        }
+
+        @keyframes bz-reveal-in {
+          from { opacity: 0; transform: translateY(28px) scale(0.99); filter: blur(10px); }
+          to   { opacity: 1; transform: none; filter: none; }
+        }
+        @keyframes bz-letter-in {
+          from { opacity: 0; transform: translateY(60%) rotateX(-50deg) scale(1.05); filter: blur(12px); }
+          to   { opacity: 1; transform: none; filter: none; }
+        }
+        @keyframes bz-word-in {
+          from { opacity: 0; transform: translateY(48%) scale(0.97); filter: blur(13px); }
+          to   { opacity: 1; transform: none; filter: none; }
+        }
+
+        @keyframes bz-kenburns {
+          0%, 100% { transform: scale(1.05) translate(0, 0); }
+          50%      { transform: scale(1.15) translate(-1.5%, -1%); }
+        }
+        @keyframes bz-float-soft {
+          0%, 100% { transform: translateY(0); }
+          50%      { transform: translateY(-6px); }
+        }
+
+        /* ============================================================ */
+        /*  LIQUID MERGE — সাদা শ্যাডো                                   */
+        /* ============================================================ */
+        .liquid-section { position: relative; isolation: isolate; }
+        .liquid-shadow-top {
+          box-shadow: inset 0 60px 80px -50px rgba(255,255,255,0.95);
+        }
+        .liquid-shadow-bottom {
+          box-shadow: inset 0 -60px 80px -50px rgba(255,255,255,0.95);
+        }
+        .liquid-shadow-both {
+          box-shadow:
+            inset 0 60px 80px -50px rgba(255,255,255,0.9),
+            inset 0 -60px 80px -50px rgba(255,255,255,0.9);
+        }
+
+        /* ============================================================ */
+        /*  LIQUID GLASS SOUND BUTTON                                    */
+        /* ============================================================ */
+        .bz-sound-btn {
+          position: absolute;
+          bottom: clamp(20px, 4vh, 40px);
+          right: clamp(20px, 4vw, 40px);
+          z-index: 6;
+          width: clamp(36px, 3.6vw, 44px);
+          height: clamp(36px, 3.6vw, 44px);
+          padding: 0;
+          border: none;
+          border-radius: 999px;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          isolation: isolate;
+          overflow: hidden;
+          color: #0a0a0a;
+          background:
+            radial-gradient(
+              120% 120% at 30% 15%,
+              rgba(255,255,255,0.98) 0%,
+              rgba(255,255,255,0.78) 35%,
+              rgba(255,255,255,0.55) 65%,
+              rgba(255,255,255,0.42) 100%
+            );
+          backdrop-filter: blur(22px) saturate(190%);
+          -webkit-backdrop-filter: blur(22px) saturate(190%);
+          box-shadow:
+            inset 0 1px 0 0 rgba(255,255,255,1),
+            inset 0 -1px 0 0 rgba(255,255,255,0.5),
+            inset 0 0 0 1px rgba(255,255,255,0.35),
+            0 1px 2px rgba(0,0,0,0.06),
+            0 8px 22px -8px rgba(0,0,0,0.22),
+            0 2px 6px -2px rgba(0,0,0,0.08);
+          transition:
+            transform 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+            box-shadow 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+          will-change: transform, box-shadow;
+          -webkit-tap-highlight-color: transparent;
+          touch-action: manipulation;
+          user-select: none;
+        }
+
+        /* Specular highlight on top */
+        .bz-sound-btn::before {
+          content: "";
+          position: absolute;
+          top: 3px;
+          left: 12%;
+          right: 12%;
+          height: 42%;
+          border-radius: 999px;
+          background: linear-gradient(
+            180deg,
+            rgba(255,255,255,0.95) 0%,
+            rgba(255,255,255,0.15) 70%,
+            rgba(255,255,255,0) 100%
+          );
+          pointer-events: none;
+          filter: blur(0.5px);
+          z-index: 1;
+        }
+
+        /* Soft inner liquid shadow */
+        .bz-sound-btn::after {
+          content: "";
+          position: absolute;
+          bottom: -8px;
+          left: 50%;
+          transform: translateX(-50%);
+          width: 82%;
+          height: 55%;
+          border-radius: 999px;
+          background: radial-gradient(
+            60% 100% at 50% 100%,
+            rgba(0,0,0,0.08) 0%,
+            rgba(0,0,0,0) 70%
+          );
+          pointer-events: none;
+          z-index: 0;
+        }
+
+        .bz-sound-btn:hover {
+          transform: translateY(-1.5px) scale(1.05);
+          box-shadow:
+            inset 0 1px 0 0 rgba(255,255,255,1),
+            inset 0 -1px 0 0 rgba(255,255,255,0.55),
+            inset 0 0 0 1px rgba(255,255,255,0.45),
+            0 2px 4px rgba(0,0,0,0.08),
+            0 14px 30px -10px rgba(0,0,0,0.28),
+            0 4px 10px -3px rgba(0,0,0,0.12);
+        }
+
+        .bz-sound-btn:active {
+          transform: translateY(0) scale(0.96);
+          box-shadow:
+            inset 0 2px 4px rgba(0,0,0,0.08),
+            inset 0 1px 0 0 rgba(255,255,255,0.85),
+            inset 0 0 0 1px rgba(255,255,255,0.3),
+            0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .bz-sound-btn:focus-visible {
+          outline: none;
+          box-shadow:
+            inset 0 1px 0 0 rgba(255,255,255,1),
+            inset 0 0 0 1px rgba(255,255,255,0.5),
+            0 0 0 3px rgba(10,10,10,0.18),
+            0 10px 26px -10px rgba(0,0,0,0.25);
+        }
+
+        /* Both icons sit absolutely centered, only opacity/scale change */
+        .bz-sound-btn svg {
+          position: absolute;
+          inset: 0;
+          margin: auto;
+          width: 44%;
+          height: 44%;
+          display: block;
+          color: #0a0a0a;
+          pointer-events: none;
+          z-index: 2;
+          opacity: 0;
+          transform: scale(0.6);
+          transition:
+            opacity 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+            transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+          will-change: opacity, transform;
+        }
+
+        /* Muted state → show muted (crossed) icon */
+        .bz-sound-btn[data-muted="true"] .bz-icon-muted {
+          opacity: 1;
+          transform: scale(1);
+        }
+        /* Unmuted state → show speaker-with-waves icon */
+        .bz-sound-btn[data-muted="false"] .bz-icon-unmuted {
+          opacity: 1;
+          transform: scale(1);
+        }
+
+        /* ============================================================ */
+        /*  PHONE CASE GRIDS                                             */
+        /* ============================================================ */
+        .phone-case-1-grid,
+        .phone-case-2-grid,
+        .phone-case-4-grid,
+        .phone-case-5-grid {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          height: 100vh;
+          min-height: 100vh;
+        }
+
+        @media (max-width: 900px) {
+          .phone-case-1-grid,
+          .phone-case-2-grid,
+          .phone-case-4-grid,
+          .phone-case-5-grid { grid-template-columns: 1fr 1fr; }
+        }
+
+        @media (max-width: 640px) {
+          .phone-case-1-grid,
+          .phone-case-4-grid {
+            grid-template-columns: 42% 58%;
+            height: auto;
+            min-height: 100vh;
+          }
+          .phone-case-2-grid,
+          .phone-case-5-grid {
+            grid-template-columns: 58% 42%;
+            height: auto;
+            min-height: 100vh;
+          }
+          .phone-case-1-image,
+          .phone-case-2-image,
+          .phone-case-4-image,
+          .phone-case-5-image { min-height: 100vh !important; }
+          .phone-case-text-content { padding: 32px 18px !important; }
+          .phone-case-kicker {
+            padding: 6px 12px !important;
+            font-size: 9.5px !important;
+            letter-spacing: 0.14em !important;
+            margin-bottom: 16px !important;
+          }
+          .phone-case-title {
+            font-size: 26px !important;
+            line-height: 1.05 !important;
+            margin-bottom: 12px !important;
+          }
+          .phone-case-desc {
+            font-size: 12px !important;
+            line-height: 1.6 !important;
+            margin-bottom: 18px !important;
+          }
+          .phone-case-list { margin-bottom: 18px !important; gap: 8px !important; }
+          .phone-case-list li { font-size: 11.5px !important; gap: 8px !important; }
+          .phone-case-list .phone-case-check {
+            width: 16px !important; height: 16px !important; font-size: 8px !important;
+          }
+          .phone-case-cta { padding: 10px 18px !important; font-size: 12px !important; }
+          .phone-case-seam { height: 40px !important; }
+          .liquid-shadow-top,
+          .liquid-shadow-bottom,
+          .liquid-shadow-both { box-shadow: none !important; }
+        }
+
+        @media (max-width: 380px) {
+          .phone-case-1-grid, .phone-case-4-grid { grid-template-columns: 40% 60%; }
+          .phone-case-2-grid, .phone-case-5-grid { grid-template-columns: 60% 40%; }
+          .phone-case-text-content { padding: 24px 14px !important; }
+          .phone-case-title { font-size: 22px !important; }
+          .phone-case-desc { font-size: 11px !important; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+          [data-reveal], .bz-letter, .bz-word {
+            opacity: 1 !important;
+            transform: none !important;
+            filter: none !important;
+            animation: none !important;
+            transition: none !important;
+          }
+          .bz-sound-btn { transition: none !important; }
+        }
+
+
+/* Extracted from src/components/auth/LoginForm.tsx style block 1 */
+        /* ============================================ */
+        /*  LOGO CINEMATIC ANIMATIONS                    */
+        /* ============================================ */
+        @keyframes bn-logo-fade-in {
+          0% {
+            opacity: 0;
+            transform: scale(0.82) translateY(8px);
+            filter: blur(16px);
+          }
+          35% {
+            opacity: 0.5;
+            transform: scale(0.94) translateY(4px);
+            filter: blur(6px);
+          }
+          65% {
+            opacity: 0.95;
+            transform: scale(1.03) translateY(0);
+            filter: blur(1px);
+          }
+          85% {
+            opacity: 1;
+            transform: scale(0.995) translateY(0);
+            filter: blur(0);
+          }
+          100% {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+            filter: blur(0);
+          }
+        }
+        @keyframes bn-logo-fade-out {
+          0% {
+            opacity: 1;
+            transform: scale(1);
+            filter: blur(0);
+          }
+          40% {
+            opacity: 0.6;
+            transform: scale(1.04);
+            filter: blur(3px);
+          }
+          100% {
+            opacity: 0;
+            transform: scale(1.16);
+            filter: blur(14px);
+          }
+        }
+        @keyframes bn-logo-halo-in {
+          0% { opacity: 0; transform: scale(0.6); }
+          50% { opacity: 0.55; transform: scale(1.05); }
+          100% { opacity: 0.4; transform: scale(1); }
+        }
+        @keyframes bn-logo-halo-out {
+          0% { opacity: 0.4; transform: scale(1); }
+          100% { opacity: 0; transform: scale(1.5); }
+        }
+        @keyframes bn-conic-in {
+          0% {
+            opacity: 0;
+            transform: rotate(-90deg) scale(0.7);
+          }
+          100% {
+            opacity: 0.28;
+            transform: rotate(0deg) scale(1);
+          }
+        }
+        @keyframes bn-conic-out {
+          0% { opacity: 0.28; }
+          100% { opacity: 0; transform: rotate(60deg) scale(1.2); }
+        }
+        @keyframes bn-halo-breathe {
+          0%, 100% { opacity: 0.35; transform: scale(1); }
+          50%      { opacity: 0.75; transform: scale(1.15); }
+        }
+        @keyframes bn-halo-rotate {
+          from { transform: rotate(0deg); }
+          to   { transform: rotate(360deg); }
+        }
+        @keyframes bn-orbit {
+          0%, 100% { transform: translate(0, 0); opacity: 0.5; }
+          50%      { transform: translate(18px, -14px); opacity: 1; }
+        }
+        @keyframes bn-dot-pulse {
+          0%, 100% { transform: scale(1); opacity: 0.6; }
+          50%      { transform: scale(1.4); opacity: 1; }
+        }
+
+        /* ============================================ */
+        /*  WELCOME FADE ANIMATIONS                      */
+        /* ============================================ */
+        @keyframes bn-welcome-in {
+          0% {
+            opacity: 0;
+            transform: translateY(30px);
+            filter: blur(8px);
+          }
+          100% {
+            opacity: 1;
+            transform: translateY(0);
+            filter: blur(0);
+          }
+        }
+        @keyframes bn-welcome-out {
+          0% {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+            filter: blur(0);
+          }
+          100% {
+            opacity: 0;
+            transform: translateY(-24px) scale(0.98);
+            filter: blur(10px);
+          }
+        }
+        @keyframes bn-word-in {
+          from {
+            opacity: 0;
+            transform: translateY(28px);
+            filter: blur(6px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+            filter: blur(0);
+          }
+        }
+        @keyframes bn-fade-up {
+          from { opacity: 0; transform: translateY(22px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes bn-fade-in {
+          from { opacity: 0; }
+          to   { opacity: 1; }
+        }
+        @keyframes bn-underline {
+          from { transform: scaleX(0); }
+          to   { transform: scaleX(1); }
+        }
+
+        /* ============================================ */
+        /*  CARD TRANSITIONS                             */
+        /* ============================================ */
+        @keyframes bn-slide-in-right {
+          from {
+            opacity: 0;
+            transform: translateX(40px) scale(0.98);
+            filter: blur(4px);
+          }
+          to {
+            opacity: 1;
+            transform: translateX(0) scale(1);
+            filter: blur(0);
+          }
+        }
+        @keyframes bn-card-in {
+          0% {
+            opacity: 0;
+            transform: translateY(32px) scale(0.94);
+            filter: blur(10px);
+          }
+          100% {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+            filter: blur(0);
+          }
+        }
+        @keyframes bn-method-in {
+          0% {
+            opacity: 0;
+            transform: translateY(24px) scale(0.96);
+          }
+          100% {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+          }
+        }
+
+        /* ============================================ */
+        /*  SUCCESS                                      */
+        /* ============================================ */
+        @keyframes bn-pop {
+          0% { opacity: 0; transform: scale(0.5); }
+          60% { opacity: 1; transform: scale(1.08); }
+          100% { opacity: 1; transform: scale(1); }
+        }
+        @keyframes bn-ring {
+          0% { transform: scale(0.85); opacity: 0.7; }
+          100% { transform: scale(2); opacity: 0; }
+        }
+        @keyframes bn-ring-2 {
+          0% { transform: scale(0.85); opacity: 0.5; }
+          100% { transform: scale(2.4); opacity: 0; }
+        }
+        @keyframes bn-dot {
+          0%, 100% { transform: translateY(0); opacity: 0.5; }
+          50% { transform: translateY(-6px); opacity: 1; }
+        }
+
+        .bn-ease {
+          animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+
+/* Extracted from src/components/auth/RegisterForm.tsx style block 1 */
+        /* ---------- Logo cinematic ---------- */
+        @keyframes bn-logo-fade-in {
+          0% {
+            opacity: 0;
+            transform: scale(0.82) translateY(8px);
+            filter: blur(16px);
+          }
+          35% {
+            opacity: 0.5;
+            transform: scale(0.94) translateY(4px);
+            filter: blur(6px);
+          }
+          65% {
+            opacity: 0.95;
+            transform: scale(1.03) translateY(0);
+            filter: blur(1px);
+          }
+          100% {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+            filter: blur(0);
+          }
+        }
+        @keyframes bn-logo-fade-out {
+          0% { opacity: 1; transform: scale(1); filter: blur(0); }
+          100% { opacity: 0; transform: scale(1.16); filter: blur(14px); }
+        }
+        @keyframes bn-logo-halo-in {
+          0% { opacity: 0; transform: scale(0.6); }
+          100% { opacity: 0.4; transform: scale(1); }
+        }
+        @keyframes bn-logo-halo-out {
+          0% { opacity: 0.4; transform: scale(1); }
+          100% { opacity: 0; transform: scale(1.5); }
+        }
+        @keyframes bn-conic-in {
+          0% { opacity: 0; transform: rotate(-90deg) scale(0.7); }
+          100% { opacity: 0.28; transform: rotate(0deg) scale(1); }
+        }
+        @keyframes bn-conic-out {
+          0% { opacity: 0.28; }
+          100% { opacity: 0; transform: rotate(60deg) scale(1.2); }
+        }
+        @keyframes bn-halo-breathe {
+          0%, 100% { opacity: 0.35; transform: scale(1); }
+          50%      { opacity: 0.75; transform: scale(1.15); }
+        }
+        @keyframes bn-halo-rotate {
+          from { transform: rotate(0deg); }
+          to   { transform: rotate(360deg); }
+        }
+        @keyframes bn-orbit {
+          0%, 100% { transform: translate(0, 0); opacity: 0.5; }
+          50%      { transform: translate(18px, -14px); opacity: 1; }
+        }
+        @keyframes bn-dot-pulse {
+          0%, 100% { transform: scale(1); opacity: 0.6; }
+          50%      { transform: scale(1.4); opacity: 1; }
+        }
+
+        /* ---------- Welcome ---------- */
+        @keyframes bn-welcome-in {
+          0% { opacity: 0; transform: translateY(30px); filter: blur(8px); }
+          100% { opacity: 1; transform: translateY(0); filter: blur(0); }
+        }
+        @keyframes bn-welcome-out {
+          0% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+          100% { opacity: 0; transform: translateY(-24px) scale(0.98); filter: blur(10px); }
+        }
+        @keyframes bn-word-in {
+          from { opacity: 0; transform: translateY(28px); filter: blur(6px); }
+          to   { opacity: 1; transform: translateY(0); filter: blur(0); }
+        }
+        @keyframes bn-fade-up {
+          from { opacity: 0; transform: translateY(22px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes bn-fade-in {
+          from { opacity: 0; }
+          to   { opacity: 1; }
+        }
+        @keyframes bn-underline {
+          from { transform: scaleX(0); }
+          to   { transform: scaleX(1); }
+        }
+
+        /* ---------- Card fade crossfade ---------- */
+        @keyframes bn-card-fade-in {
+          0% {
+            opacity: 0;
+            transform: translateY(18px) scale(0.985);
+            filter: blur(8px);
+          }
+          60% {
+            opacity: 0.9;
+            filter: blur(1px);
+          }
+          100% {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+            filter: blur(0);
+          }
+        }
+        @keyframes bn-card-fade-out {
+          0% {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+            filter: blur(0);
+          }
+          100% {
+            opacity: 0;
+            transform: translateY(-14px) scale(0.985);
+            filter: blur(8px);
+          }
+        }
+        @keyframes bn-card-shell-in {
+          0% {
+            opacity: 0;
+            transform: translateY(32px) scale(0.94);
+            filter: blur(10px);
+          }
+          100% {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+            filter: blur(0);
+          }
+        }
+        @keyframes bn-method-in {
+          0% { opacity: 0; transform: translateY(24px) scale(0.96); }
+          100% { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        /* ---------- Success ---------- */
+        @keyframes bn-pop {
+          0% { opacity: 0; transform: scale(0.5); }
+          60% { opacity: 1; transform: scale(1.08); }
+          100% { opacity: 1; transform: scale(1); }
+        }
+        @keyframes bn-ring {
+          0% { transform: scale(0.85); opacity: 0.7; }
+          100% { transform: scale(2); opacity: 0; }
+        }
+        @keyframes bn-ring-2 {
+          0% { transform: scale(0.85); opacity: 0.5; }
+          100% { transform: scale(2.4); opacity: 0; }
+        }
+        @keyframes bn-dot {
+          0%, 100% { transform: translateY(0); opacity: 0.5; }
+          50% { transform: translateY(-6px); opacity: 1; }
+        }
+
+        .bn-ease {
+          animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+
+/* Extracted from src/components/layout/Header.tsx style block 1 */
+          @keyframes hdr-drop-in {
+            from {
+              opacity: 0;
+              transform: translateY(-12px);
+              filter: blur(6px);
+            }
+            to {
+              opacity: 1;
+              transform: translateY(0);
+              filter: blur(0);
+            }
+          }
+          @keyframes hdr-item-in {
+            from {
+              opacity: 0;
+              transform: translateY(10px);
+            }
+            to {
+              opacity: 1;
+              transform: translateY(0);
+            }
+          }
+
+
+
+/* Extracted from src/app/dashboard/security/password/page.tsx */
+@keyframes pw-item-in {
+                from { opacity: 0; transform: translateY(20px) scale(0.99); filter: blur(8px); }
+                to   { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+              }
+              @keyframes pw-banner-in {
+                from { opacity: 0; transform: translateY(24px); filter: blur(10px); }
+                to   { opacity: 1; transform: translateY(0); filter: blur(0); }
+              }
+              @keyframes pw-step-in {
+                from { opacity: 0; transform: translateY(14px); filter: blur(6px); }
+                to   { opacity: 1; transform: translateY(0); filter: blur(0); }
+              }
+              @keyframes pw-float-soft {
+                0%, 100% { transform: translateY(0); }
+                50%      { transform: translateY(-5px); }
+              }
+              @keyframes pw-kenburns {
+                0%, 100% { transform: scale(1.04) translate(0, 0); }
+                50%      { transform: scale(1.12) translate(-1%, -0.8%); }
+              }
+              @keyframes spin {
+                to { transform: rotate(360deg); }
+              }
+
+              /* ============================================================ */
+              /*  LIQUID GLASS INPUT — no solid white                          */
+              /* ============================================================ */
+              .bz-input {
+                width: 100%;
+                padding: 14px 16px;
+                border-radius: 14px;
+                border: 1px solid rgba(255,255,255,0.4);
+                background: radial-gradient(
+                  120% 120% at 30% 12%,
+                  rgba(255,255,255,0.28) 0%,
+                  rgba(255,255,255,0.15) 55%,
+                  rgba(255,255,255,0.08) 100%
+                );
+                backdrop-filter: blur(20px) saturate(180%);
+                -webkit-backdrop-filter: blur(20px) saturate(180%);
+                box-shadow:
+                  inset 0 1px 0 0 rgba(255,255,255,0.9),
+                  inset 0 0 0 1px rgba(255,255,255,0.15),
+                  0 2px 6px -2px rgba(0,0,0,0.06);
+                color: rgba(0,0,0,0.92);
+                font-size: 15px;
+                line-height: 1.4;
+                outline: none;
+                transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+                box-sizing: border-box;
+                max-width: 100%;
+              }
+              .bz-input::placeholder {
+                color: rgba(0,0,0,0.35);
+              }
+              .bz-input:hover:not(:disabled) {
+                border-color: rgba(255,255,255,0.55);
+              }
+              .bz-input:focus {
+                border-color: rgba(255,255,255,0.75);
+                background: radial-gradient(
+                  120% 120% at 30% 12%,
+                  rgba(255,255,255,0.45) 0%,
+                  rgba(255,255,255,0.28) 55%,
+                  rgba(255,255,255,0.16) 100%
+                );
+                box-shadow:
+                  inset 0 1px 0 0 rgba(255,255,255,1),
+                  inset 0 0 0 1px rgba(255,255,255,0.3),
+                  0 0 0 4px rgba(255,255,255,0.28),
+                  0 4px 12px -4px rgba(0,0,0,0.1);
+              }
+              .bz-input:disabled {
+                opacity: 0.6;
+                cursor: not-allowed;
+              }
+
+              /* OTP input — big, centered, mono */
+              .bz-otp {
+                font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+                font-size: 26px;
+                font-weight: 600;
+                letter-spacing: 0.5em;
+                text-align: center;
+                padding: 18px 12px 18px calc(0.5em + 12px);
+                color: rgba(0,0,0,0.92);
+              }
+              .bz-otp::placeholder {
+                color: rgba(0,0,0,0.18);
+                letter-spacing: 0.5em;
+              }
+
+              .bz-step {
+                animation: pw-step-in 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+              }
+
+              @media (prefers-reduced-motion: reduce) {
+                [data-pw-anim], .bz-step, .bz-input, * {
+                  animation: none !important;
+                  transition: none !important;
+                }
+              }

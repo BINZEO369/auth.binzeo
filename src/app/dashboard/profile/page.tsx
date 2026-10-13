@@ -541,25 +541,7 @@ function SecuritySection() {
 
   return (
     <div className="relative isolate min-h-[80vh] w-full overflow-x-hidden">
-      <style jsx global>{`
-        [data-sec-tool], [data-sec-tool] * { box-sizing: border-box; max-width: 100%; }
-        [data-sec-tool] { width: 100% !important; overflow-x: hidden; text-align: left; }
-        [data-sec-tool] > * { width: 100% !important; margin-left: 0 !important; margin-right: 0 !important; max-width: 100% !important; }
-        [data-sec-tool] > div, [data-sec-tool] > section, [data-sec-tool] > article { background: transparent !important; border: none !important; box-shadow: none !important; padding: 0 !important; border-radius: 0 !important; width: 100% !important; }
-        [data-sec-tool] input:not([type="checkbox"]):not([type="radio"]):not([type="submit"]):not([type="button"]):not([type="hidden"]), [data-sec-tool] select, [data-sec-tool] textarea { width: 100% !important; padding: 12px 14px !important; border-radius: 12px !important; border: 1px solid rgba(0,0,0,0.1) !important; background: #fff !important; color: rgba(0,0,0,0.9) !important; font-size: 14px !important; line-height: 1.4 !important; outline: none !important; }
-        [data-sec-tool] input:focus, [data-sec-tool] select:focus, [data-sec-tool] textarea:focus { border-color: rgba(0,0,0,0.3) !important; background: #fff !important; box-shadow: 0 0 0 4px rgba(0,0,0,0.05) !important; }
-        [data-sec-tool] label { display: block !important; font-size: 10px !important; font-weight: 600 !important; text-transform: uppercase !important; letter-spacing: 0.16em !important; color: rgba(0,0,0,0.6) !important; margin-bottom: 8px !important; }
-        [data-sec-tool] button:not([type="submit"]):not([data-primary]) { border-radius: 999px !important; border: 1px solid rgba(0,0,0,0.1) !important; background: #fff !important; color: rgba(0,0,0,0.75) !important; font-weight: 500 !important; padding: 10px 18px !important; font-size: 12.5px !important; max-width: 100% !important; white-space: normal !important; }
-        [data-sec-tool] button:not([type="submit"]):not([data-primary]):hover { background: #f9fafb !important; border-color: rgba(0,0,0,0.2) !important; color: rgba(0,0,0,0.95) !important; }
-        [data-sec-tool] button[type="submit"], [data-sec-tool] button[data-primary] { border-radius: 999px !important; border: 1px solid #0a0a0a !important; background: #0a0a0a !important; color: #ffffff !important; font-weight: 500 !important; font-size: 12.5px !important; padding: 12px 22px !important; cursor: pointer; max-width: 100% !important; white-space: normal !important; }
-        [data-sec-tool] button[type="submit"] *, [data-sec-tool] button[data-primary] * { color: #ffffff !important; }
-        [data-sec-tool] h1, [data-sec-tool] h2, [data-sec-tool] h3, [data-sec-tool] h4 { color: rgba(0,0,0,0.9) !important; font-weight: 600 !important; letter-spacing: -0.01em !important; }
-        [data-sec-tool] p, [data-sec-tool] small, [data-sec-tool] span { color: rgba(0,0,0,0.65); }
-        [data-sec-tool] a { color: rgba(0,0,0,0.75) !important; text-decoration: underline; text-underline-offset: 2px; }
-        [data-sec-tool] a:hover { color: #000 !important; }
-        .sec-tool-wrap { position: relative; overflow: hidden; border-radius: 24px; border: 1px solid #f3f4f6; padding: 20px; background: #ffffff; box-shadow: 0 2px 10px rgba(0,0,0,0.03); }
-        @media (min-width: 640px) { .sec-tool-wrap { padding: 24px; } }
-      `}</style>
+      
 
       <div className="relative z-10 mx-auto w-full max-w-6xl space-y-5 px-3 py-5 sm:space-y-6 sm:px-5 sm:py-8">
         <div className="flex flex-wrap items-start justify-between gap-5 mb-6">

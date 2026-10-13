@@ -9,6 +9,7 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
+  productionBrowserSourceMaps: false,
   async headers() {
     return [{ source: "/(.*)", headers: securityHeaders }];
   },

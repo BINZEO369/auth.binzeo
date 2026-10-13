@@ -265,73 +265,7 @@ function BlurControl({
             <span>Soft</span>
           </div>
 
-          <style jsx>{`
-            .bz-blur-range::-webkit-slider-thumb {
-              -webkit-appearance: none;
-              appearance: none;
-              width: 16px;
-              height: 16px;
-              border-radius: 999px;
-              margin-top: -5px;
-              background: radial-gradient(
-                120% 120% at 30% 20%,
-                rgba(255, 255, 255, 1) 0%,
-                rgba(250, 250, 250, 0.98) 55%,
-                rgba(235, 235, 235, 1) 100%
-              );
-              border: 1px solid rgba(0, 0, 0, 0.15);
-              box-shadow:
-                0 1px 0 0 rgba(255, 255, 255, 1) inset,
-                0 4px 10px -2px rgba(0, 0, 0, 0.35),
-                0 1px 2px rgba(0, 0, 0, 0.15);
-              cursor: grab;
-              transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1);
-            }
-            .bz-blur-range:hover::-webkit-slider-thumb {
-              transform: scale(1.12);
-            }
-            .bz-blur-range:active::-webkit-slider-thumb {
-              cursor: grabbing;
-              transform: scale(1.02);
-            }
-            .bz-blur-range::-webkit-slider-runnable-track {
-              height: 6px;
-              border-radius: 999px;
-              background: transparent;
-            }
-
-            .bz-blur-range::-moz-range-thumb {
-              width: 16px;
-              height: 16px;
-              border-radius: 999px;
-              background: radial-gradient(
-                120% 120% at 30% 20%,
-                rgba(255, 255, 255, 1) 0%,
-                rgba(250, 250, 250, 0.98) 55%,
-                rgba(235, 235, 235, 1) 100%
-              );
-              border: 1px solid rgba(0, 0, 0, 0.15);
-              box-shadow:
-                0 1px 0 0 rgba(255, 255, 255, 1) inset,
-                0 4px 10px -2px rgba(0, 0, 0, 0.35),
-                0 1px 2px rgba(0, 0, 0, 0.15);
-              cursor: grab;
-              transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1);
-            }
-            .bz-blur-range:hover::-moz-range-thumb {
-              transform: scale(1.12);
-            }
-            .bz-blur-range::-moz-range-track {
-              height: 6px;
-              border-radius: 999px;
-              background: transparent;
-            }
-
-            .bz-blur-range:focus-visible {
-              outline: none;
-              box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.6);
-            }
-          `}</style>
+          
         </div>,
         document.body
       )
@@ -529,66 +463,7 @@ export default function DashboardOverviewPage() {
       {/* ============================================================ */}
       {/*  KEYFRAMES                                                    */}
       {/* ============================================================ */}
-      <style jsx global>{`
-        @keyframes db-item-in {
-          from {
-            opacity: 0;
-            transform: translateY(24px) scale(0.99);
-            filter: blur(10px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0) scale(1);
-            filter: blur(0);
-          }
-        }
-        @keyframes db-sub-in {
-          0% {
-            opacity: 0;
-            transform: translateY(-10px);
-            filter: blur(8px);
-          }
-          100% {
-            opacity: 1;
-            transform: translateY(0);
-            filter: blur(0);
-          }
-        }
-        @keyframes db-float-soft {
-          0%, 100% { transform: translateY(0); }
-          50%      { transform: translateY(-4px); }
-        }
-        @keyframes db-kenburns {
-          0%, 100% { transform: scale(1.04) translate(0, 0); }
-          50%      { transform: scale(1.1) translate(-1%, -0.6%); }
-        }
-        @keyframes db-shimmer {
-          0%   { transform: translateX(-8%); opacity: 0.55; }
-          50%  { transform: translateX(8%); opacity: 0.8; }
-          100% { transform: translateX(-8%); opacity: 0.55; }
-        }
-        @keyframes blur-pop-in {
-          from {
-            opacity: 0;
-            transform: translateY(6px) scale(0.96);
-            filter: blur(6px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0) scale(1);
-            filter: blur(0);
-          }
-        }
-        @media (prefers-reduced-motion: reduce) {
-          [data-db-anim],
-          [data-db-anim] * {
-            animation: none !important;
-            opacity: 1 !important;
-            transform: none !important;
-            filter: none !important;
-          }
-        }
-      `}</style>
+      
 
       {/* ============================================================ */}
       {/*  BACKGROUND                                                   */}
