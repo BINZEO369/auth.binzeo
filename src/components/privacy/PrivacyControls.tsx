@@ -67,9 +67,27 @@ const CATEGORIES: { key: keyof CookiePreferences; title: string; description: st
   },
 ];
 
+type PageTrackingState = { path: string; pageViewId: string; startedAt: number; maxScroll: number };
+
+function readScrollDepth() {
+  const root = document.documentElement;
+  if (root.scrollHeight <= window.innerHeight) return 100;
+  return Math.min(100, Math.round(((window.scrollY + window.innerHeight) / root.scrollHeight) * 100));
+}
+
+function sendPageEngagement(state: PageTrackingState, title: string) {
+  return fetch("/api/privacy/events", {
+    method: "POST",
+    credentials: "same-origin",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ event_type: "engagement", page_path: state.path, page_view_id: state.pageViewId, page_title: title, scroll_depth_percent: state.maxScroll, time_on_page_seconds: Math.max(0, Math.floor((Date.now() - state.startedAt) / 1000)) }),
+    keepalive: true,
+  }).catch(() => undefined);
+}
+
 export default function PrivacyControls() {
   const pathname = usePathname() || "/";
-  const lastTrackedPath = useRef<string | null>(null);
+  const trackingState = useRef<PageTrackingState | null>(null);
   const [ready, setReady] = useState(false);
   const [hasDecision, setHasDecision] = useState(false);
   const [preferences, setPreferences] = useState<CookiePreferences>(DEFAULT_PREFERENCES);
@@ -114,25 +132,51 @@ export default function PrivacyControls() {
 
   useEffect(() => {
     if (!ready || !hasDecision || !preferences.analytics_enabled) {
-      lastTrackedPath.current = null;
+      trackingState.current = null;
       return;
     }
-    if (lastTrackedPath.current === pathname) return;
-    lastTrackedPath.current = pathname;
 
+    const previous = trackingState.current;
+    if (previous) void sendPageEngagement(previous, document.title);
+    const pageViewId = crypto.randomUUID();
+    const state: PageTrackingState = { path: pathname, pageViewId, startedAt: Date.now(), maxScroll: readScrollDepth() };
+    trackingState.current = state;
+    const updateScroll = () => { state.maxScroll = Math.max(state.maxScroll, readScrollDepth()); };
     let referrerOrigin: string | null = null;
     try {
       if (document.referrer) referrerOrigin = new URL(document.referrer).origin;
     } catch {
       referrerOrigin = null;
     }
+    const query = new URLSearchParams(window.location.search);
     void fetch("/api/privacy/events", {
       method: "POST",
       credentials: "same-origin",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ page_path: pathname, page_view_id: crypto.randomUUID(), referrer_origin: referrerOrigin }),
+      body: JSON.stringify({
+        page_path: pathname,
+        page_view_id: pageViewId,
+        page_title: document.title,
+        referrer_origin: referrerOrigin,
+        utm_source: query.get("utm_source"),
+        utm_medium: query.get("utm_medium"),
+        utm_campaign: query.get("utm_campaign"),
+        utm_term: query.get("utm_term"),
+        utm_content: query.get("utm_content"),
+      }),
       keepalive: true,
     }).catch(() => undefined);
+
+    const persist = () => {
+      if (trackingState.current?.pageViewId === pageViewId) void sendPageEngagement(state, document.title);
+    };
+    window.addEventListener("scroll", updateScroll, { passive: true });
+    window.addEventListener("pagehide", persist);
+    return () => {
+      persist();
+      window.removeEventListener("scroll", updateScroll);
+      window.removeEventListener("pagehide", persist);
+    };
   }, [hasDecision, pathname, preferences.analytics_enabled, ready]);
 
   async function savePreferences(method: Action, next: CookiePreferences) {

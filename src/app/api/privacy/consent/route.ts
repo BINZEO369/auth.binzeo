@@ -3,6 +3,7 @@ import { randomUUID } from "node:crypto";
 import { NextRequest } from "next/server";
 import { fail, ok } from "@/lib/api/response";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
+import { createClient } from "@/lib/supabase/server";
 import { allowPrivacyRequest } from "@/lib/privacy-consent";
 import { collectPrivacyVisitorMetadata } from "@/lib/privacy-visitor-metadata";
 import {
@@ -102,6 +103,8 @@ export async function POST(request: NextRequest) {
   try {
     const metadata = preferences.analytics_enabled ? collectPrivacyVisitorMetadata(request.headers) : null;
     const admin = getSupabaseAdmin();
+    const sessionClient = await createClient();
+    const { data: { user } } = await sessionClient.auth.getUser();
     const result = await (admin as any).rpc("record_cookie_consent_with_metadata", {
       p_visitor_id: visitorId,
       p_consent_version: COOKIE_CONSENT_VERSION,
@@ -113,6 +116,17 @@ export async function POST(request: NextRequest) {
       p_user_agent_hash: metadata?.userAgentHash ?? null,
     });
     error = result.error;
+    if (!error && user?.id) {
+      const latest = await (admin as any).from("consent_records").select("id").eq("visitor_id", visitorId).order("created_at", { ascending: false }).limit(1).maybeSingle();
+      const preferenceResult = await (admin as any).from("consent_preferences").update({ user_id: user.id }).eq("visitor_id", visitorId);
+      const recordResult = latest.data?.id
+        ? await (admin as any).from("consent_records").update({ user_id: user.id }).eq("id", latest.data.id)
+        : { error: latest.error };
+      if (latest.error || preferenceResult.error || recordResult.error) {
+        console.error("[COOKIE_CONSENT_USER_LINK_FAILED]", { latest: latest.error?.message, preference: preferenceResult.error?.message, record: recordResult.error?.message });
+        error = latest.error ?? preferenceResult.error ?? recordResult.error;
+      }
+    }
   } catch (caught) {
     console.error("[COOKIE_CONSENT_CONFIG_ERROR]", caught);
     return noStore(fail("Consent storage is temporarily unavailable", 503, "CONSENT_STORE_FAILED"));
