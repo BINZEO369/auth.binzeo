@@ -13,6 +13,7 @@ export const dynamic = "force-dynamic";
 function noStore<T extends Response>(response: T): T { response.headers.set("Cache-Control", "private, no-store, max-age=0"); return response; }
 function cleanText(value: unknown, max: number): string | null { return typeof value === "string" && value.trim().length > 0 ? value.trim().slice(0, max) : null; }
 function boundedNumber(value: unknown, min: number, max: number): number | null { const number = typeof value === "number" ? value : Number(value); return Number.isFinite(number) ? Math.min(max, Math.max(min, number)) : null; }
+function clientText(value: unknown, max: number): string | null { return typeof value === "string" && value.length <= max ? value : null; }
 function sanitizePagePath(input: unknown): string | null {
   if (typeof input !== "string" || input.length > 2048 || !input.startsWith("/") || input.startsWith("//")) return null;
   let path: string;
@@ -47,6 +48,33 @@ export async function POST(request: NextRequest) {
   const referrerOrigin = sanitizeReferrerOrigin(input.referrer_origin);
   const db = await createClient();
   const { data: { user } } = await db.auth.getUser();
+  const metadata = collectPrivacyVisitorMetadata(request.headers);
+  const sensitiveExpiry = new Date(Date.now() + 180 * 24 * 60 * 60 * 1000).toISOString();
+  const locationData = consent.preferences.precise_location_enabled ? {
+    gps_latitude: boundedNumber(input.gps_latitude, -90, 90),
+    gps_longitude: boundedNumber(input.gps_longitude, -180, 180),
+    gps_accuracy_meters: boundedNumber(input.gps_accuracy_meters, 0, 100000),
+    gps_altitude_meters: boundedNumber(input.gps_altitude_meters, -1000, 100000),
+    gps_heading: boundedNumber(input.gps_heading, 0, 360),
+    gps_speed_mps: boundedNumber(input.gps_speed_mps, 0, 1000),
+    gps_captured_at: clientText(input.gps_captured_at, 40),
+    location_permission_status: clientText(input.location_permission_status, 32),
+    location_source: clientText(input.location_source, 64),
+  } : {};
+  const deviceData = consent.preferences.device_diagnostics_enabled ? {
+    screen_width: boundedNumber(input.screen_width, 1, 10000), screen_height: boundedNumber(input.screen_height, 1, 10000),
+    viewport_width: boundedNumber(input.viewport_width, 1, 10000), viewport_height: boundedNumber(input.viewport_height, 1, 10000),
+    device_pixel_ratio: boundedNumber(input.device_pixel_ratio, 0.1, 20), touch_points: boundedNumber(input.touch_points, 0, 100),
+    hardware_concurrency: boundedNumber(input.hardware_concurrency, 1, 512), device_memory_gb: boundedNumber(input.device_memory_gb, 0, 1024),
+    network_type: clientText(input.network_type, 32), network_downlink_mbps: boundedNumber(input.network_downlink_mbps, 0, 100000),
+    webgl_vendor: clientText(input.webgl_vendor, 255), webgl_renderer: clientText(input.webgl_renderer, 255),
+  } : {};
+  const fingerprintData = consent.preferences.fingerprint_enabled ? { device_fingerprint_hash: /^[0-9a-f]{64}$/i.test(String(input.device_fingerprint_hash ?? "")) ? String(input.device_fingerprint_hash) : null } : {};
+  const sensitiveData = {
+    ...(consent.preferences.raw_ip_enabled ? { raw_ip_address: metadata.rawIpAddress, ip_version: metadata.ipVersion } : {}),
+    ...locationData, ...deviceData, ...fingerprintData,
+    sensitive_data_expires_at: sensitiveExpiry,
+  };
 
   try {
     const admin = getSupabaseAdmin();
@@ -58,16 +86,17 @@ export async function POST(request: NextRequest) {
         page_title: pageTitle,
         scroll_depth_percent: scrollDepth,
         time_on_page_seconds: duration,
+        ...sensitiveData,
       }).eq("page_view_id", pageViewId).eq("visitor_id", consent.visitor_id).eq("session_id", sessionId);
       const { error: sessionError } = await (admin as any).from("visitor_sessions").update({
         session_duration_seconds: duration,
         updated_at: new Date().toISOString(),
+        ...sensitiveData,
       }).eq("session_id", sessionId).eq("visitor_id", consent.visitor_id);
       if (pageError || sessionError) return noStore(fail("Page engagement could not be stored", 503, "ANALYTICS_ENGAGEMENT_FAILED"));
       return noStore(ok({ accepted: true, event_type: eventType }));
     }
 
-    const metadata = collectPrivacyVisitorMetadata(request.headers);
     const optional = Object.values(consent.preferences).filter((value) => typeof value === "boolean");
     const { error } = await (admin as any).rpc("record_first_party_page_view_enriched", {
       p_visitor_id: consent.visitor_id,
@@ -104,6 +133,7 @@ export async function POST(request: NextRequest) {
       device_category: metadata.deviceCategory,
       browser_name: metadata.browserName,
       country_code: metadata.countryCode,
+      ...sensitiveData,
     };
     const eventUpdate = {
       user_id: userId,
@@ -114,6 +144,7 @@ export async function POST(request: NextRequest) {
       country_code: metadata.countryCode,
       is_anonymized: !userId,
       event_properties: { ...utm },
+      ...sensitiveData,
     };
     const sessionUpdate = {
       user_id: userId,
@@ -123,6 +154,7 @@ export async function POST(request: NextRequest) {
       operating_system: metadata.operatingSystem,
       country_code: metadata.countryCode,
       ...utm,
+      ...sensitiveData,
     };
     const visitorUpdate = {
       is_registered: Boolean(userId),
@@ -138,6 +170,7 @@ export async function POST(request: NextRequest) {
       language_code: metadata.languageCode,
       timezone: metadata.timezone,
       updated_at: new Date().toISOString(),
+      ...sensitiveData,
     };
     const [pageResult, eventResult, sessionResult, visitorResult] = await Promise.all([
       (admin as any).from("page_views").update(pageUpdate).eq("page_view_id", pageViewId).eq("visitor_id", consent.visitor_id),

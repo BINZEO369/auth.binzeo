@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 
-export const COOKIE_CONSENT_VERSION = "2026-10-12.2";
+export const COOKIE_CONSENT_VERSION = "2026-10-14.1";
 export const COOKIE_CONSENT_COOKIE = "binzeo_consent";
 export const ANALYTICS_SESSION_COOKIE = "binzeo_session_id";
 export const CONSENT_MAX_AGE_SECONDS = 180 * 24 * 60 * 60;
@@ -13,6 +13,10 @@ export type CookiePreferences = {
   experience_enabled: boolean;
   marketing_enabled: boolean;
   cross_site_enabled: boolean;
+  precise_location_enabled: boolean;
+  raw_ip_enabled: boolean;
+  device_diagnostics_enabled: boolean;
+  fingerprint_enabled: boolean;
 };
 
 export type StoredConsent = {
@@ -30,6 +34,10 @@ const OPTIONAL_KEYS = [
   "experience_enabled",
   "marketing_enabled",
   "cross_site_enabled",
+  "precise_location_enabled",
+  "raw_ip_enabled",
+  "device_diagnostics_enabled",
+  "fingerprint_enabled",
 ] as const;
 
 export function isUuid(value: unknown): value is string {
@@ -62,6 +70,10 @@ export function parseConsentCookie(value: string | undefined): StoredConsent | n
         experience_enabled: preferences.experience_enabled as boolean,
         marketing_enabled: preferences.marketing_enabled as boolean,
         cross_site_enabled: preferences.cross_site_enabled as boolean,
+        precise_location_enabled: preferences.precise_location_enabled as boolean,
+        raw_ip_enabled: preferences.raw_ip_enabled as boolean,
+        device_diagnostics_enabled: preferences.device_diagnostics_enabled as boolean,
+        fingerprint_enabled: preferences.fingerprint_enabled as boolean,
       },
     };
   } catch {

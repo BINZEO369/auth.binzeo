@@ -27,6 +27,10 @@ const OPTIONAL_KEYS = [
   "experience_enabled",
   "marketing_enabled",
   "cross_site_enabled",
+  "precise_location_enabled",
+  "raw_ip_enabled",
+  "device_diagnostics_enabled",
+  "fingerprint_enabled",
 ] as const;
 
 function noStore<T extends Response>(response: T): T {
@@ -88,6 +92,10 @@ export async function POST(request: NextRequest) {
     experience_enabled: supplied.experience_enabled as boolean,
     marketing_enabled: supplied.marketing_enabled as boolean,
     cross_site_enabled: supplied.cross_site_enabled as boolean,
+    precise_location_enabled: supplied.precise_location_enabled as boolean,
+    raw_ip_enabled: supplied.raw_ip_enabled as boolean,
+    device_diagnostics_enabled: supplied.device_diagnostics_enabled as boolean,
+    fingerprint_enabled: supplied.fingerprint_enabled as boolean,
   };
   if (method === "accept_all" && OPTIONAL_KEYS.some((key) => !preferences[key])) {
     return noStore(fail("Accept all must enable all optional categories", 422, "CONSENT_ACTION_MISMATCH"));
@@ -116,6 +124,18 @@ export async function POST(request: NextRequest) {
       p_user_agent_hash: metadata?.userAgentHash ?? null,
     });
     error = result.error;
+    if (!error) {
+      const sensitiveConsent = {
+        precise_location_consent: preferences.precise_location_enabled,
+        raw_ip_consent: preferences.raw_ip_enabled,
+        device_diagnostics_consent: preferences.device_diagnostics_enabled,
+        fingerprint_consent: preferences.fingerprint_enabled,
+      };
+      const latest = await (admin as any).from("consent_records").select("id").eq("visitor_id", visitorId).order("created_at", { ascending: false }).limit(1).maybeSingle();
+      const preferenceResult = await (admin as any).from("consent_preferences").update(sensitiveConsent).eq("visitor_id", visitorId);
+      const recordResult = latest.data?.id ? await (admin as any).from("consent_records").update(sensitiveConsent).eq("id", latest.data.id) : { error: latest.error };
+      if (latest.error || preferenceResult.error || recordResult.error) error = latest.error ?? preferenceResult.error ?? recordResult.error;
+    }
     if (!error && user?.id) {
       const latest = await (admin as any).from("consent_records").select("id").eq("visitor_id", visitorId).order("created_at", { ascending: false }).limit(1).maybeSingle();
       const preferenceResult = await (admin as any).from("consent_preferences").update({ user_id: user.id }).eq("visitor_id", visitorId);

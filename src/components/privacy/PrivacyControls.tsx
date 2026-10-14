@@ -10,12 +10,16 @@ type CookiePreferences = {
   experience_enabled: boolean;
   marketing_enabled: boolean;
   cross_site_enabled: boolean;
+  precise_location_enabled: boolean;
+  raw_ip_enabled: boolean;
+  device_diagnostics_enabled: boolean;
+  fingerprint_enabled: boolean;
 };
 
 type OptionalKey = Exclude<keyof CookiePreferences, "necessary_enabled">;
 type Action = "accept_all" | "reject_optional" | "save_settings";
 
-const CONSENT_VERSION = "2026-10-12.2";
+const CONSENT_VERSION = "2026-10-14.1";
 const DEFAULT_PREFERENCES: CookiePreferences = {
   necessary_enabled: true,
   functional_enabled: false,
@@ -23,6 +27,10 @@ const DEFAULT_PREFERENCES: CookiePreferences = {
   experience_enabled: false,
   marketing_enabled: false,
   cross_site_enabled: false,
+  precise_location_enabled: false,
+  raw_ip_enabled: false,
+  device_diagnostics_enabled: false,
+  fingerprint_enabled: false,
 };
 const ACCEPT_ALL: CookiePreferences = {
   necessary_enabled: true,
@@ -31,6 +39,10 @@ const ACCEPT_ALL: CookiePreferences = {
   experience_enabled: true,
   marketing_enabled: true,
   cross_site_enabled: true,
+  precise_location_enabled: true,
+  raw_ip_enabled: true,
+  device_diagnostics_enabled: true,
+  fingerprint_enabled: true,
 };
 
 const CATEGORIES: { key: keyof CookiePreferences; title: string; description: string; required?: boolean }[] = [
@@ -48,7 +60,7 @@ const CATEGORIES: { key: keyof CookiePreferences; title: string; description: st
   {
     key: "analytics_enabled",
     title: "Analytics",
-    description: "One-way keyed IP and browser-signature hashes; approximate IP-based country, region, city and time zone; derived device/browser/OS and language; sanitized page paths, referring-site origin and session counts. No raw IP, GPS, full URL, query strings, or form contents are stored.",
+    description: "With your selected permissions, BINZEO stores the server-observed IP, browser/device diagnostics, GPS coordinates and accuracy, sanitized page paths, referrer origin and session measurements for up to 180 days.",
   },
   {
     key: "experience_enabled",
@@ -65,6 +77,10 @@ const CATEGORIES: { key: keyof CookiePreferences; title: string; description: st
     title: "Cross-site",
     description: "No cross-site trackers are currently configured.",
   },
+  { key: "precise_location_enabled", title: "Precise location", description: "With browser location permission, store GPS coordinates and accuracy for each page view." },
+  { key: "raw_ip_enabled", title: "Raw IP and network diagnostics", description: "Store the server-observed IP address and network metadata for up to 180 days." },
+  { key: "device_diagnostics_enabled", title: "Device diagnostics", description: "Store screen, viewport, network, hardware and rendering capability details." },
+  { key: "fingerprint_enabled", title: "Device fingerprint", description: "Store a hashed device signal fingerprint for up to 180 days." },
 ];
 
 type PageTrackingState = { path: string; pageViewId: string; startedAt: number; maxScroll: number };
@@ -83,6 +99,31 @@ function sendPageEngagement(state: PageTrackingState, title: string) {
     body: JSON.stringify({ event_type: "engagement", page_path: state.path, page_view_id: state.pageViewId, page_title: title, scroll_depth_percent: state.maxScroll, time_on_page_seconds: Math.max(0, Math.floor((Date.now() - state.startedAt) / 1000)) }),
     keepalive: true,
   }).catch(() => undefined);
+}
+
+async function collectClientSignals(preferences: CookiePreferences) {
+  const nav = navigator as Navigator & { connection?: { effectiveType?: string; downlink?: number }; deviceMemory?: number; hardwareConcurrency?: number };
+  const canvas = document.createElement("canvas");
+  const gl = canvas.getContext("webgl") as WebGLRenderingContext | null;
+  const debug = gl?.getExtension("WEBGL_debug_renderer_info") as { UNMASKED_VENDOR_WEBGL: number; UNMASKED_RENDERER_WEBGL: number } | null;
+  const webglVendor = debug && gl ? gl.getParameter(debug.UNMASKED_VENDOR_WEBGL) : null;
+  const webglRenderer = debug && gl ? gl.getParameter(debug.UNMASKED_RENDERER_WEBGL) : null;
+  const diagnostics = preferences.device_diagnostics_enabled ? {
+    screen_width: window.screen.width, screen_height: window.screen.height,
+    viewport_width: window.innerWidth, viewport_height: window.innerHeight,
+    device_pixel_ratio: window.devicePixelRatio, touch_points: navigator.maxTouchPoints,
+    hardware_concurrency: nav.hardwareConcurrency ?? null, device_memory_gb: nav.deviceMemory ?? null,
+    network_type: nav.connection?.effectiveType ?? null, network_downlink_mbps: nav.connection?.downlink ?? null,
+    webgl_vendor: typeof webglVendor === "string" ? webglVendor.slice(0, 255) : null,
+    webgl_renderer: typeof webglRenderer === "string" ? webglRenderer.slice(0, 255) : null,
+  } : {};
+  const fingerprintInput = JSON.stringify({ ua: navigator.userAgent, language: navigator.language, platform: navigator.platform, screen: [window.screen.width, window.screen.height, window.devicePixelRatio], cores: nav.hardwareConcurrency ?? null, memory: nav.deviceMemory ?? null, webglVendor, webglRenderer });
+  const fingerprint = preferences.fingerprint_enabled && crypto.subtle ? Array.from(new Uint8Array(await crypto.subtle.digest("SHA-256", new TextEncoder().encode(fingerprintInput)))).map((byte) => byte.toString(16).padStart(2, "0")).join("") : null;
+  const location = await new Promise<Record<string, unknown>>((resolve) => {
+    if (!preferences.precise_location_enabled || !navigator.geolocation) { resolve({ location_permission_status: "unavailable" }); return; }
+    navigator.geolocation.getCurrentPosition((position) => resolve({ gps_latitude: position.coords.latitude, gps_longitude: position.coords.longitude, gps_accuracy_meters: position.coords.accuracy, gps_altitude_meters: position.coords.altitude, gps_heading: position.coords.heading, gps_speed_mps: position.coords.speed, gps_captured_at: new Date(position.timestamp).toISOString(), location_permission_status: "granted", location_source: "browser_geolocation" }), () => resolve({ location_permission_status: "denied" }), { enableHighAccuracy: true, maximumAge: 0, timeout: 10000 });
+  });
+  return { ...diagnostics, device_fingerprint_hash: fingerprint, ...location };
 }
 
 export default function PrivacyControls() {
@@ -149,23 +190,17 @@ export default function PrivacyControls() {
       referrerOrigin = null;
     }
     const query = new URLSearchParams(window.location.search);
-    void fetch("/api/privacy/events", {
-      method: "POST",
-      credentials: "same-origin",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        page_path: pathname,
-        page_view_id: pageViewId,
-        page_title: document.title,
-        referrer_origin: referrerOrigin,
-        utm_source: query.get("utm_source"),
-        utm_medium: query.get("utm_medium"),
-        utm_campaign: query.get("utm_campaign"),
-        utm_term: query.get("utm_term"),
-        utm_content: query.get("utm_content"),
-      }),
-      keepalive: true,
-    }).catch(() => undefined);
+    void (async () => {
+      const signals = await collectClientSignals(preferences);
+      if (trackingState.current?.pageViewId !== pageViewId) return;
+      await fetch("/api/privacy/events", {
+        method: "POST",
+        credentials: "same-origin",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ page_path: pathname, page_view_id: pageViewId, page_title: document.title, referrer_origin: referrerOrigin, ...signals, utm_source: query.get("utm_source"), utm_medium: query.get("utm_medium"), utm_campaign: query.get("utm_campaign"), utm_term: query.get("utm_term"), utm_content: query.get("utm_content") }),
+        keepalive: true,
+      });
+    })().catch(() => undefined);
 
     const persist = () => {
       if (trackingState.current?.pageViewId === pageViewId) void sendPageEngagement(state, document.title);
@@ -256,7 +291,7 @@ export default function PrivacyControls() {
             {view === "notice" ? (
               <>
                 <p className="mt-3 text-sm leading-6 text-black/65">
-                  Essential cookies keep sign-in and security working and remember your choice with a random consent reference. Optional analytics are off unless you enable them. If enabled, BINZEO records one-way keyed hashes of the IP address and browser signature, approximate IP-based country/region/city/time zone, derived device/browser/OS and language, sanitized page paths, referring-site origin and session counts. Location can be inaccurate and is not GPS. Raw IPs, raw user-agent strings, full URLs, query strings and form contents are not stored. The analytics session cookie expires after 30 minutes of inactivity.
+                  Essential cookies keep sign-in and security working and remember your choice with a random consent reference. Optional analytics are off unless you enable them. If enabled, BINZEO records the server-observed IP address, browser/device diagnostics, GPS coordinates and accuracy when your browser grants location access, sanitized page paths, referrer origin, campaign data and session measurements for up to 180 days. GPS may be inaccurate. Passwords, OTPs, raw user-agent strings, full URLs, query strings and form contents are not stored. The analytics session cookie expires after 30 minutes of inactivity.
                 </p>
                 <p className="mt-2 text-xs leading-5 text-black/50">
                   No advertising or cross-site tracking scripts are currently configured. Optional categories without an active integration will not load a script.

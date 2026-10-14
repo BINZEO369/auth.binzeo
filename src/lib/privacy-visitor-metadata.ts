@@ -5,6 +5,8 @@ import { parseUserAgent } from "@/lib/device-tracking";
 type HeaderReader = { get(name: string): string | null };
 
 export type PrivacyVisitorMetadata = {
+  rawIpAddress: string | null;
+  ipVersion: string | null;
   ipAddressHash: string | null;
   userAgentHash: string | null;
   countryCode: string | null;
@@ -20,7 +22,7 @@ export type PrivacyVisitorMetadata = {
 };
 
 function firstValidIp(headers: HeaderReader): string | null {
-  const raw = headers.get("x-vercel-forwarded-for") ?? headers.get("x-forwarded-for");
+  const raw = headers.get("x-vercel-forwarded-for") ?? headers.get("x-forwarded-for") ?? headers.get("x-real-ip");
   if (!raw) return null;
   const candidate = raw.split(",")[0]?.trim();
   return candidate && isIP(candidate) ? candidate : null;
@@ -65,6 +67,8 @@ export function collectPrivacyVisitorMetadata(headers: HeaderReader): PrivacyVis
   const rawLanguage = safeHeader(headers, "accept-language", 128)?.split(",")[0]?.split(";")[0]?.trim().slice(0, 16) ?? null;
 
   return {
+    rawIpAddress: ip,
+    ipVersion: ip ? (isIP(ip) === 6 ? "IPv6" : "IPv4") : null,
     ipAddressHash: hashIdentifier("ip", ip),
     userAgentHash: hashIdentifier("ua", userAgent),
     countryCode: rawCountry && /^[A-Z]{2}$/.test(rawCountry) ? rawCountry : null,

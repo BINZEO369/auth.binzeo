@@ -24,14 +24,14 @@ export const TRACKING_COLUMNS = {
     'consent_version', 'consent_status', 'consent_source', 'consent_method',
     'necessary_consent', 'functional_consent', 'analytics_consent', 'experience_consent',
     'marketing_consent', 'cross_site_consent', 'ip_address_hash', 'country_code',
-    'user_agent_hash', 'policy_version', 'consent_timestamp', 'withdrawn_at',
+    'user_agent_hash', 'precise_location_consent', 'raw_ip_consent', 'device_diagnostics_consent', 'fingerprint_consent', 'policy_version', 'consent_timestamp', 'withdrawn_at',
     'expires_at', 'created_at',
   ],
   consent_preferences: [
     'id', 'visitor_id', 'user_id', 'website_id',
     'necessary_enabled', 'functional_enabled', 'analytics_enabled', 'experience_enabled',
     'marketing_enabled', 'cross_site_enabled', 'custom_preferences', 'consent_version',
-    'last_action', 'last_updated_at', 'created_at',
+    'last_action', 'precise_location_enabled', 'raw_ip_enabled', 'device_diagnostics_enabled', 'fingerprint_enabled', 'last_updated_at', 'created_at',
   ],
   anonymous_visitors: [
     'id', 'visitor_id', 'website_id', 'first_seen_at',
@@ -39,7 +39,7 @@ export const TRACKING_COLUMNS = {
     'region_code', 'city_name', 'device_category', 'browser_name',
     'browser_version', 'operating_system', 'operating_system_version', 'language_code',
     'timezone', 'consent_status', 'is_registered', 'linked_user_id',
-    'visitor_status', 'created_at', 'updated_at', 'expires_at',
+    'visitor_status', 'raw_ip_address', 'ip_version', 'gps_latitude', 'gps_longitude', 'gps_accuracy_meters', 'gps_altitude_meters', 'gps_heading', 'gps_speed_mps', 'gps_captured_at', 'location_permission_status', 'location_source', 'screen_width', 'screen_height', 'viewport_width', 'viewport_height', 'device_pixel_ratio', 'touch_points', 'hardware_concurrency', 'device_memory_gb', 'network_type', 'network_downlink_mbps', 'webgl_vendor', 'webgl_renderer', 'device_fingerprint_hash', 'sensitive_data_expires_at', 'created_at', 'updated_at', 'expires_at',
   ],
   visitor_sessions: [
     'id', 'session_id', 'visitor_id', 'user_id',
@@ -48,14 +48,14 @@ export const TRACKING_COLUMNS = {
     'utm_campaign', 'utm_term', 'utm_content', 'page_view_count',
     'event_count', 'session_duration_seconds', 'device_category', 'browser_name',
     'operating_system', 'country_code', 'consent_state', 'is_authenticated',
-    'created_at', 'updated_at',
+    'raw_ip_address', 'ip_version', 'gps_latitude', 'gps_longitude', 'gps_accuracy_meters', 'gps_altitude_meters', 'gps_heading', 'gps_speed_mps', 'gps_captured_at', 'location_permission_status', 'location_source', 'screen_width', 'screen_height', 'viewport_width', 'viewport_height', 'device_pixel_ratio', 'touch_points', 'hardware_concurrency', 'device_memory_gb', 'network_type', 'network_downlink_mbps', 'webgl_vendor', 'webgl_renderer', 'device_fingerprint_hash', 'sensitive_data_expires_at', 'created_at', 'updated_at',
   ],
   analytics_events: [
     'id', 'event_id', 'event_name', 'event_category',
     'visitor_id', 'user_id', 'session_id', 'website_id',
     'page_url', 'page_path', 'page_title', 'referrer_url',
     'event_source', 'event_timestamp', 'event_properties', 'device_category',
-    'browser_name', 'operating_system', 'country_code', 'consent_category',
+    'browser_name', 'operating_system', 'country_code', 'raw_ip_address', 'ip_version', 'gps_latitude', 'gps_longitude', 'gps_accuracy_meters', 'gps_altitude_meters', 'gps_heading', 'gps_speed_mps', 'gps_captured_at', 'location_permission_status', 'location_source', 'screen_width', 'screen_height', 'viewport_width', 'viewport_height', 'device_pixel_ratio', 'touch_points', 'hardware_concurrency', 'device_memory_gb', 'network_type', 'network_downlink_mbps', 'webgl_vendor', 'webgl_renderer', 'device_fingerprint_hash', 'sensitive_data_expires_at', 'consent_category',
     'consent_version', 'is_anonymized', 'created_at',
   ],
   page_views: [
@@ -63,7 +63,7 @@ export const TRACKING_COLUMNS = {
     'session_id', 'website_id', 'page_url', 'page_path',
     'page_title', 'referrer_url', 'entry_page', 'exit_page',
     'scroll_depth_percent', 'time_on_page_seconds', 'device_category', 'browser_name',
-    'country_code', 'viewed_at', 'created_at',
+    'country_code', 'raw_ip_address', 'ip_version', 'gps_latitude', 'gps_longitude', 'gps_accuracy_meters', 'gps_altitude_meters', 'gps_heading', 'gps_speed_mps', 'gps_captured_at', 'location_permission_status', 'location_source', 'screen_width', 'screen_height', 'viewport_width', 'viewport_height', 'device_pixel_ratio', 'touch_points', 'hardware_concurrency', 'device_memory_gb', 'network_type', 'network_downlink_mbps', 'webgl_vendor', 'webgl_renderer', 'device_fingerprint_hash', 'sensitive_data_expires_at', 'viewed_at', 'created_at',
   ],
   tracking_integrations: [
     'id', 'integration_name', 'integration_type', 'website_id',
