@@ -132,9 +132,8 @@ export async function POST(request: NextRequest) {
         fingerprint_consent: preferences.fingerprint_enabled,
       };
       const latest = await (admin as any).from("consent_records").select("id").eq("visitor_id", visitorId).order("created_at", { ascending: false }).limit(1).maybeSingle();
-      const preferenceResult = await (admin as any).from("consent_preferences").update(sensitiveConsent).eq("visitor_id", visitorId);
       const recordResult = latest.data?.id ? await (admin as any).from("consent_records").update(sensitiveConsent).eq("id", latest.data.id) : { error: latest.error };
-      if (latest.error || preferenceResult.error || recordResult.error) error = latest.error ?? preferenceResult.error ?? recordResult.error;
+      if (latest.error || recordResult.error) error = latest.error ?? recordResult.error;
     }
     if (!error && user?.id) {
       const latest = await (admin as any).from("consent_records").select("id").eq("visitor_id", visitorId).order("created_at", { ascending: false }).limit(1).maybeSingle();
