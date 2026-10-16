@@ -1,4 +1,24 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# BINZEO Auth
+
+BINZEO authentication and user-account frontend. This is a UI-only Next.js client for the BINZEO Central API.
+
+## Architecture
+
+All authentication, identity, profile, security, database, email, upload and scheduled-job operations are owned by `api.binzeo`. This frontend has no local API backend and must not contain Supabase clients, Supabase keys, service-role keys or provider secrets.
+
+Requests under `/api/*` are rewritten to `${CENTRAL_API_BASE_URL}/v1/*`. If the Central API is unavailable, the frontend fails closed with HTTP 503.
+
+## Local setup
+
+```bash
+cp .env.example .env.local
+npm install
+npm run dev
+```
+
+Required variables are `CENTRAL_API_BASE_URL`, `NEXT_PUBLIC_ADMIN_APP_URL`, and `NEXT_PUBLIC_SITE_URL`.
+
+Do not add Supabase, OAuth, SMTP, ImageKit, cron or service-role secrets to this project. Those belong only in the Central API environment.
 
 ## Getting Started
 
