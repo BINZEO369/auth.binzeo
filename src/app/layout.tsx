@@ -4,7 +4,7 @@ import "./globals.css";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import PrivacyControls from "@/components/privacy/PrivacyControls";
-import { createClient } from "@/lib/supabase/server";
+import { getCentralSession } from "@/lib/central-session";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -36,10 +36,7 @@ export const metadata: Metadata = {
 export default async function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getCentralSession();
 
   return (
     <html lang="en" className={inter.variable}>

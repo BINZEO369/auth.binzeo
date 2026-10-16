@@ -1,5 +1,4 @@
 import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
 import { centralApiGet } from "@/lib/central-api";
 import DashboardShell from "@/components/dashboard/DashboardShell";
 
@@ -17,27 +16,14 @@ export default async function DashboardLayout({ children }: { children: React.Re
   let profile: DashboardProfile | null = null;
   let verificationStatus: string | null = null;
 
-  if (process.env.CENTRAL_API_ENABLED === "true") {
-    const [profileResult, verificationResult] = await Promise.all([
-      centralApiGet<{ user: { id: string; email?: string | null }; profile: DashboardProfile | null }>("/v1/user/profile"),
-      centralApiGet<{ verifications: Verification[] }>("/v1/user/verification-records"),
-    ]);
-    if (!profileResult.ok || !verificationResult.ok) redirect("/signin?error=service_unavailable");
-    email = profileResult.data.user.email ?? null;
-    profile = profileResult.data.profile;
-    verificationStatus = verificationResult.data.verifications.find((item) => item.verification_type === "email")?.verification_status ?? null;
-  } else {
-    const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) redirect("/signin?next=/dashboard");
-    email = user.email ?? null;
-    const [{ data: profileData }, { data: verification }] = await Promise.all([
-      supabase.from("profiles").select("binzeo_user_id,first_name,last_name,display_name,account_status").eq("id", user.id).maybeSingle(),
-      supabase.from("user_verification_records").select("verification_status").eq("user_id", user.id).eq("verification_type", "email").maybeSingle(),
-    ]);
-    profile = profileData;
-    verificationStatus = verification?.verification_status ?? null;
-  }
+  const [profileResult, verificationResult] = await Promise.all([
+    centralApiGet<{ user: { id: string; email?: string | null }; profile: DashboardProfile | null }>("/v1/user/profile"),
+    centralApiGet<{ verifications: Verification[] }>("/v1/user/verification-records"),
+  ]);
+  if (!profileResult.ok || !verificationResult.ok) redirect("/signin?error=service_unavailable");
+  email = profileResult.data.user.email ?? null;
+  profile = profileResult.data.profile;
+  verificationStatus = verificationResult.data.verifications.find((item) => item.verification_type === "email")?.verification_status ?? null;
 
   const isPendingVerification = profile?.account_status === "pending" && verificationStatus !== "verified";
   const emailVerified = verificationStatus === "verified";

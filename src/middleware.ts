@@ -1,104 +1,140 @@
-import { createServerClient } from '@supabase/ssr'
-import { NextResponse, type NextRequest } from 'next/server'
+import { NextResponse, type NextRequest } from "next/server";
 
-const PROTECTED = ['/dashboard']
-const AUTH_ONLY = ['/signin', '/signup']
+const PROTECTED = ["/dashboard"];
+const AUTH_ONLY = ["/signin", "/signup"];
+const API_TIMEOUT_MS = 5_000;
 
-function createRateLimitClient(req: NextRequest) {
-  return createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll: () => req.cookies.getAll(),
-        setAll: () => undefined,
-      },
-    },
-  )
+type ApiEnvelope = {
+  success?: boolean;
+  data?: { service?: string; status?: string; user?: { id?: string } | null };
+};
+
+function centralBase(): string | null {
+  const value = process.env.CENTRAL_API_BASE_URL?.trim().replace(/\/+$/, "");
+  if (!value) return null;
+  try {
+    return new URL(value).origin;
+  } catch {
+    return null;
+  }
 }
 
-async function consumeRateLimit(req: NextRequest, bucketKey: string, limit: number) {
-  const client = createRateLimitClient(req)
-  return client.rpc('consume_api_rate_limit', {
-    p_bucket_key: bucketKey,
-    p_limit: limit,
-    p_window_seconds: 60,
-  })
+function unavailable() {
+  return new NextResponse(
+    "<!doctype html><html lang=\"en\"><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><title>BINZEO temporarily unavailable</title><body style=\"font:16px system-ui;max-width:640px;margin:15vh auto;padding:24px;color:#111\"><h1>BINZEO is temporarily unavailable</h1><p>The central service is not reachable. Please try again shortly.</p></body></html>",
+    {
+      status: 503,
+      headers: {
+        "Content-Type": "text/html; charset=utf-8",
+        "Cache-Control": "no-store",
+        "Retry-After": "15",
+      },
+    },
+  );
+}
+
+async function centralGet(base: string, path: string, cookie?: string): Promise<Response> {
+  const headers = new Headers({ Accept: "application/json" });
+  if (cookie) headers.set("cookie", cookie);
+  return fetch(new URL(path, `${base}/`), {
+    method: "GET",
+    headers,
+    cache: "no-store",
+    redirect: "error",
+    signal: AbortSignal.timeout(API_TIMEOUT_MS),
+  });
+}
+
+function forwardCookies(upstream: Response, downstream: NextResponse) {
+  const headers = upstream.headers as Headers & { getSetCookie?: () => string[] };
+  const cookies = headers.getSetCookie?.() ?? (upstream.headers.get("set-cookie") ? [upstream.headers.get("set-cookie")!] : []);
+  for (const cookie of cookies) downstream.headers.append("set-cookie", cookie);
 }
 
 export async function middleware(req: NextRequest) {
-  const requestHeaders = new Headers(req.headers)
-  requestHeaders.set('x-pathname', req.nextUrl.pathname)
-  let res = NextResponse.next({ request: { headers: requestHeaders } })
-  const pathname = req.nextUrl.pathname
-  const isApiRequest = pathname.startsWith('/api/')
+  const pathname = req.nextUrl.pathname;
+  const isApiRequest = pathname.startsWith("/api/");
 
   if (isApiRequest) {
-    const origin = req.headers.get('origin')
-    const configuredOrigin = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, '')
-    if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(req.method) && origin && origin !== req.nextUrl.origin && origin !== configuredOrigin) {
+    const origin = req.headers.get("origin");
+    const configuredOrigin = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "");
+    if (
+      ["POST", "PUT", "PATCH", "DELETE"].includes(req.method) &&
+      origin &&
+      origin !== req.nextUrl.origin &&
+      origin !== configuredOrigin
+    ) {
       return NextResponse.json(
-        { success: false, error: { message: 'Cross-origin request rejected.', code: 'CSRF_ORIGIN_REJECTED' } },
-        { status: 403, headers: { 'Cache-Control': 'no-store' } },
-      )
+        { success: false, error: { message: "Cross-origin request rejected.", code: "CSRF_ORIGIN_REJECTED" } },
+        { status: 403, headers: { "Cache-Control": "no-store" } },
+      );
+    }
+    // API execution and rate limiting are owned exclusively by the Central API rewrite.
+    return NextResponse.next();
+  }
+
+  const base = centralBase();
+  if (!base) return unavailable();
+
+  let health: Response;
+  try {
+    health = await centralGet(base, "/v1/health");
+    const healthPayload = await health.json() as ApiEnvelope;
+    if (
+      !health.ok ||
+      healthPayload.success !== true ||
+      healthPayload.data?.service !== "api.binzeo" ||
+      healthPayload.data.status !== "ok"
+    ) return unavailable();
+  } catch {
+    return unavailable();
+  }
+
+  const requestHeaders = new Headers(req.headers);
+  requestHeaders.set("x-pathname", pathname);
+  const response = NextResponse.next({ request: { headers: requestHeaders } });
+  const protectedPath = PROTECTED.some((path) => pathname.startsWith(path));
+  const authOnlyPath = AUTH_ONLY.some((path) => pathname.startsWith(path));
+
+  if (protectedPath || authOnlyPath) {
+    let session: Response;
+    try {
+      session = await centralGet(base, "/v1/auth/session", req.headers.get("cookie") ?? undefined);
+      forwardCookies(session, response);
+    } catch {
+      return unavailable();
     }
 
-    // When the central API flag is enabled, rate limiting is enforced by the
-    // central API proxy. Keep the local limiter for an explicit rollback.
-    if (process.env.CENTRAL_API_ENABLED !== 'true') {
-      const ip = req.headers.get('x-real-ip') || req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown'
-      const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(`${ip}|${pathname}`))
-      const bucketKey = Array.from(new Uint8Array(digest)).map((byte) => byte.toString(16).padStart(2, '0')).join('')
-      const limit = pathname.startsWith('/api/auth/') ? 20 : 60
-      const { data: rateData, error: rateError } = await consumeRateLimit(req, bucketKey, limit)
-      if (rateError && pathname.startsWith('/api/auth/')) {
-        return NextResponse.json(
-          { success: false, error: { message: 'Authentication protection is temporarily unavailable. Please try again shortly.', code: 'RATE_LIMIT_UNAVAILABLE' } },
-          { status: 503, headers: { 'Retry-After': '30', 'Cache-Control': 'no-store' } },
-        )
+    let authenticated = false;
+    if (session.ok) {
+      try {
+        const payload = await session.json() as ApiEnvelope;
+        authenticated = payload.success === true && Boolean(payload.data?.user?.id);
+      } catch {
+        return unavailable();
       }
-      if (!rateError && rateData?.[0]?.allowed === false) {
-        return NextResponse.json(
-          { success: false, error: { message: 'Too many requests. Please try again later.', code: 'RATE_LIMITED' } },
-          { status: 429, headers: { 'Retry-After': String(rateData[0].retry_after_seconds ?? 60), 'Cache-Control': 'no-store' } },
-        )
-      }
+    } else if (session.status !== 401 && session.status !== 403) {
+      return unavailable();
+    }
+
+    if (!authenticated && protectedPath) {
+      const url = req.nextUrl.clone();
+      url.pathname = "/signin";
+      url.searchParams.set("next", pathname);
+      return NextResponse.redirect(url);
+    }
+
+    const googleSetup = pathname === "/signup" && req.nextUrl.searchParams.get("google_setup") === "1";
+    if (authenticated && authOnlyPath && !googleSetup) {
+      const url = req.nextUrl.clone();
+      url.pathname = "/dashboard";
+      return NextResponse.redirect(url);
     }
   }
 
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll: () => req.cookies.getAll(),
-        setAll: (list) => {
-          list.forEach(({ name, value }) => req.cookies.set(name, value))
-          res = NextResponse.next({ request: { headers: requestHeaders } })
-          list.forEach(({ name, value, options }) => res.cookies.set(name, value, options))
-        },
-      },
-    },
-  )
-  const { data: { user } } = await supabase.auth.getUser()
-
-  if (!user && PROTECTED.some((p) => pathname.startsWith(p))) {
-    const url = req.nextUrl.clone()
-    url.pathname = '/signin'
-    url.searchParams.set('next', pathname)
-    return NextResponse.redirect(url)
-  }
-
-  const isGoogleSetup = pathname === '/signup' && req.nextUrl.searchParams.get('google_setup') === '1'
-  if (user && AUTH_ONLY.some((p) => pathname.startsWith(p)) && !isGoogleSetup) {
-    const url = req.nextUrl.clone()
-    url.pathname = '/dashboard'
-    return NextResponse.redirect(url)
-  }
-
-  return res
+  return response;
 }
 
 export const config = {
-  matcher: ['/((?!_next/static|_next/image|favicon.ico).*)'],
-}
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|.*\\..*).*)"],
+};
