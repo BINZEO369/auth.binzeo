@@ -217,6 +217,30 @@ export default function RegisterForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const googleSetup = searchParams.get("google_setup") === "1";
+  const requestedReturnUrl = searchParams.get("redirect");
+  const completeSignupRedirect = useCallback(() => {
+    if (requestedReturnUrl) {
+      try {
+        const target = new URL(requestedReturnUrl);
+        const allowedOrigins = new Set([
+          "https://www.jayenware.shop",
+          "https://jayenware.shop",
+          "https://www.jabiyen.com",
+          "https://jabiyen.com",
+          "http://localhost:3000",
+          "http://127.0.0.1:3000",
+        ]);
+        if (allowedOrigins.has(target.origin)) {
+          window.location.assign(target.toString());
+          return;
+        }
+      } catch {
+        // Invalid or untrusted redirect: continue to the Central dashboard.
+      }
+    }
+    router.push("/dashboard");
+    router.refresh();
+  }, [requestedReturnUrl, router]);
 
   const [stage, setStage] = useState<Stage>(googleSetup ? "username" : "logo");
   const [logoExiting, setLogoExiting] = useState(false);
@@ -455,7 +479,7 @@ export default function RegisterForm() {
         }
         setLoading(false);
         setStage("success");
-        setTimeout(() => { router.push("/dashboard"); router.refresh(); }, 1200);
+        setTimeout(completeSignupRedirect, 1200);
         return;
       }
       const res = await fetch("/api/auth/signup", {
@@ -492,7 +516,7 @@ export default function RegisterForm() {
       } else {
         setLoading(false);
         setStage("success");
-        setTimeout(() => { router.push("/dashboard"); router.refresh(); }, 1800);
+        setTimeout(completeSignupRedirect, 1800);
       }
     } catch (err) {
       setError(
@@ -523,7 +547,7 @@ export default function RegisterForm() {
         return;
       }
       setStage("success");
-      setTimeout(() => { router.push("/dashboard"); router.refresh(); }, 1800);
+      setTimeout(completeSignupRedirect, 1800);
     } catch {
       setError("Verification failed. Please try again.");
       setLoading(false);
