@@ -447,6 +447,14 @@ export default function LoginForm() {
       const verifyData = await verifyRes.json();
       if (!verifyData.success)
         throw new Error(verifyData.error?.message ?? "Passkey login failed");
+      if (verifyData.data?.requires_two_factor) {
+        if (!verifyData.data.challenge_id)
+          throw new Error("The 2FA challenge could not be started. Please try again.");
+        setTwoFactorChallengeId(verifyData.data.challenge_id);
+        setTwoFactorCode("");
+        setStage("two_factor");
+        return;
+      }
       handleSuccess();
     } catch (err) {
       setError(
