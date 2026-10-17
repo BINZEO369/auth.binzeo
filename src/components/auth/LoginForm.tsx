@@ -176,7 +176,9 @@ export default function LoginForm() {
   const requestedMethod = searchParams.get("method");
   const passkeyStageAutoSelected = useRef(false);
 
-  const [stage, setStage] = useState<Stage>("logo");
+  const [stage, setStage] = useState<Stage>(
+    handoffToJabiyen && requestedMethod === "passkey" ? "passkey" : "logo",
+  );
   const [logoExiting, setLogoExiting] = useState(false);
   const [welcomeExiting, setWelcomeExiting] = useState(false);
 
@@ -442,11 +444,21 @@ export default function LoginForm() {
           challenge_id: optionsData.data.challenge_id,
           challenge: optionsData.data.challenge,
           response,
+          handoff_to_jabiyen: handoffToJabiyen,
         }),
       });
       const verifyData = await verifyRes.json();
       if (!verifyData.success)
         throw new Error(verifyData.error?.message ?? "Passkey login failed");
+      if (handoffToJabiyen) {
+        const token = verifyData.data?.handoff_token;
+        if (typeof token !== "string" || token.length < 20)
+          throw new Error("The verified passkey could not be handed back to JABIYEN.");
+        const destination = new URL(JABIYEN_HANDOFF_RETURN_URL);
+        destination.hash = new URLSearchParams({ temporary_token: token }).toString();
+        window.location.replace(destination.toString());
+        return;
+      }
       if (verifyData.data?.requires_two_factor) {
         if (!verifyData.data.challenge_id)
           throw new Error("The 2FA challenge could not be started. Please try again.");
@@ -899,15 +911,15 @@ export default function LoginForm() {
 
             {stage === "two_factor" && (
               <div style={{ animation: "bn-slide-in-right 0.55s cubic-bezier(0.22, 1, 0.36, 1) both" }}>
-                <button type="button" onClick={() => { setStage("email"); setError(""); }} className="flex items-center gap-1.5 px-2.5 py-1.5 -ml-2.5 rounded-full text-white/60 hover:text-white hover:bg-white/5 transition-all duration-300 mb-5">
-                  <IconArrowLeft /><span className="text-[12px]">Back</span>
+                <button type="button" onClick={() => { if (handoffToJabiyen) window.close(); else { setStage("email"); setError(""); } }} className="flex items-center gap-1.5 px-2.5 py-1.5 -ml-2.5 rounded-full text-white/60 hover:text-white hover:bg-white/5 transition-all duration-300 mb-5">
+                  <IconArrowLeft /><span className="text-[12px]">{handoffToJabiyen ? "Cancel" : "Back"}</span>
                 </button>
-                <h2 className="text-[24px] font-semibold tracking-[-0.03em]">Verify your sign-in</h2>
-                <p className="mt-1.5 text-[13px] text-white/55">Enter the 6-digit code sent to your email. It expires in 30 seconds.</p>
+                <h2 className="text-[24px] font-semibold tracking-[-0.03em]">{handoffToJabiyen ? "Verify JABIYEN sign-in" : "Verify your sign-in"}</h2>
+                <p className="mt-1.5 text-[13px] text-white/55">{handoffToJabiyen ? "Enter the 6-digit code sent to your email to finish signing in to JABIYEN. It expires in 30 seconds." : "Enter the 6-digit code sent to your email. It expires in 30 seconds."}</p>
                 {error && <div className="mt-5 rounded-2xl border border-red-400/25 bg-red-500/10 backdrop-blur-xl px-4 py-3 text-sm text-red-200">{error}</div>}
                 <form onSubmit={handleTwoFactorSubmit} className="mt-6 space-y-3">
                   <input type="text" inputMode="numeric" pattern="[0-9]{6}" maxLength={6} value={twoFactorCode} onChange={(e) => setTwoFactorCode(e.target.value.replace(/\D/g, "").slice(0, 6))} required autoFocus autoComplete="one-time-code" placeholder="000000" aria-label="2FA code" className={`${fieldClass} text-center text-2xl tracking-[0.35em]`} />
-                  <button type="submit" disabled={loading || twoFactorCode.length !== 6} className="mt-2 w-full rounded-full bg-white py-3.5 text-sm font-semibold text-black transition-all duration-300 hover:bg-white/90 disabled:cursor-not-allowed disabled:opacity-60">{loading ? "Verifying..." : "Verify and sign in"}</button>
+                  <button type="submit" disabled={loading || twoFactorCode.length !== 6} className="mt-2 w-full rounded-full bg-white py-3.5 text-sm font-semibold text-black transition-all duration-300 hover:bg-white/90 disabled:cursor-not-allowed disabled:opacity-60">{loading ? "Verifying..." : handoffToJabiyen ? "Verify and return to JABIYEN" : "Verify and sign in"}</button>
                 </form>
               </div>
             )}
@@ -992,15 +1004,17 @@ export default function LoginForm() {
                     "bn-slide-in-right 0.55s cubic-bezier(0.22, 1, 0.36, 1) both",
                 }}
               >
-                <button
-                  type="button"
-                  onClick={goBack}
-                  aria-label="Back"
-                  className="flex items-center gap-1.5 px-2.5 py-1.5 -ml-2.5 rounded-full text-white/60 hover:text-white hover:bg-white/5 transition-all duration-300 mb-5"
-                >
-                  <IconArrowLeft />
-                  <span className="text-[12px]">Back</span>
-                </button>
+                {!handoffToJabiyen && (
+                  <button
+                    type="button"
+                    onClick={goBack}
+                    aria-label="Back"
+                    className="flex items-center gap-1.5 px-2.5 py-1.5 -ml-2.5 rounded-full text-white/60 hover:text-white hover:bg-white/5 transition-all duration-300 mb-5"
+                  >
+                    <IconArrowLeft />
+                    <span className="text-[12px]">Back</span>
+                  </button>
+                )}
 
                 <div className="text-center">
                   <div
@@ -1016,11 +1030,12 @@ export default function LoginForm() {
                   </div>
 
                   <h2 className="mt-6 text-[24px] font-semibold tracking-[-0.03em]">
-                    Sign in with Passkey
+                    {handoffToJabiyen ? "Verify your JABIYEN sign-in" : "Sign in with Passkey"}
                   </h2>
                   <p className="mt-2 text-[13px] text-white/55 max-w-xs mx-auto leading-relaxed">
-                    Use your fingerprint, face, or security key to sign in
-                    securely.
+                    {handoffToJabiyen
+                      ? "Confirm with your saved passkey. This secure verification window will return you to JABIYEN automatically."
+                      : "Use your fingerprint, face, or security key to sign in securely."}
                   </p>
 
                   {error && (
@@ -1035,7 +1050,7 @@ export default function LoginForm() {
                     disabled={passkeyLoading}
                     className="mt-7 w-full rounded-full bg-white py-3.5 text-sm font-semibold text-black transition-all duration-300 hover:bg-white/90 hover:shadow-[0_16px_40px_-10px_rgba(255,255,255,0.4)] hover:-translate-y-px disabled:cursor-not-allowed disabled:opacity-60"
                   >
-                    {passkeyLoading ? "Checking passkey..." : "Continue"}
+                    {passkeyLoading ? "Checking passkey..." : handoffToJabiyen ? "Verify with passkey" : "Continue"}
                   </button>
                 </div>
               </div>
