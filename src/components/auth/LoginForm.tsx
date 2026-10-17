@@ -175,6 +175,11 @@ export default function LoginForm() {
   const handoffToJabiyen = searchParams.get("handoff") === "jabiyen";
   const requestedMethod = searchParams.get("method");
   const passkeyStageAutoSelected = useRef(false);
+  const ssoClientId = searchParams.get("client_id");
+  const ssoRedirectUri = searchParams.get("redirect_uri");
+  const ssoState = searchParams.get("state");
+  const ssoCodeChallenge = searchParams.get("code_challenge");
+  const isSsoLogin = Boolean(ssoClientId && ssoRedirectUri && ssoState && ssoCodeChallenge);
 
   const [stage, setStage] = useState<Stage>(
     handoffToJabiyen && requestedMethod === "passkey" ? "passkey" : "logo",
@@ -242,35 +247,46 @@ export default function LoginForm() {
   /* ------------------------------------------------------------- */
   /*  Success                                                       */
   /* ------------------------------------------------------------- */
-  const handleSuccess = useCallback(() => {
-    if (!handoffToJabiyen) {
-      setStage("success");
-      setTimeout(() => {
-        router.push(next);
-        router.refresh();
-      }, 1800);
+  const completeSsoLogin = useCallback(async () => {
+    if (!isSsoLogin) return false;
+    const res = await fetch("/api/auth/authorize/session", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ client_id: ssoClientId, redirect_uri: ssoRedirectUri, state: ssoState, code_challenge: ssoCodeChallenge }),
+    });
+    const data = await res.json();
+    if (!res.ok || !data.success) throw new Error(data.error?.message ?? "Central authorization failed");
+    const redirectUrl = data.data?.redirect_url;
+    if (!redirectUrl) throw new Error("Central authorization did not return a callback");
+    window.location.assign(redirectUrl);
+    return true;
+  }, [isSsoLogin, ssoClientId, ssoRedirectUri, ssoState, ssoCodeChallenge]);
+
+  useEffect(() => {
+    if (searchParams.get("sso_return") !== "1") return;
+    void completeSsoLogin().catch((error) => setError(error instanceof Error ? error.message : "Central authorization failed"));
+  }, [completeSsoLogin, searchParams]);
+
+  const handleSuccess = useCallback(async () => {
+    if (isSsoLogin) {
+      try { await completeSsoLogin(); }
+      catch (error) { setError(error instanceof Error ? error.message : "Central authorization failed"); }
       return;
     }
-
+    if (!handoffToJabiyen) {
+      setStage("success");
+      setTimeout(() => { router.push(next); router.refresh(); }, 1800);
+      return;
+    }
     setStage("success");
     void (async () => {
-      const tokenResult = await apiFetch<{ token: string }>(
-        "/api/user/temporary-login-tokens",
-        { method: "POST", body: JSON.stringify({ duration_minutes: 1 }) },
-      );
-      if (!tokenResult.success) {
-        setError(`Sign-in succeeded, but the JABIYEN handoff could not be created: ${tokenResult.error.message}`);
-        setStage("methods");
-        return;
-      }
+      const tokenResult = await apiFetch<{ token: string }>("/api/user/temporary-login-tokens", { method: "POST", body: JSON.stringify({ duration_minutes: 1 }) });
+      if (!tokenResult.success) { setError(`Sign-in succeeded, but the JABIYEN handoff could not be created: ${tokenResult.error.message}`); setStage("methods"); return; }
       const destination = new URL(JABIYEN_HANDOFF_RETURN_URL);
       destination.hash = new URLSearchParams({ temporary_token: tokenResult.data.token }).toString();
       window.location.replace(destination.toString());
-    })().catch(() => {
-      setError("Sign-in succeeded, but the JABIYEN handoff could not be created. Please try again.");
-      setStage("methods");
-    });
-  }, [handoffToJabiyen, next, router]);
+    })().catch(() => { setError("Sign-in succeeded, but the JABIYEN handoff could not be created. Please try again."); setStage("methods"); });
+  }, [completeSsoLogin, handoffToJabiyen, isSsoLogin, next, router]);
 
   /* ------------------------------------------------------------- */
   /*  Email login                                                   */
@@ -481,7 +497,16 @@ export default function LoginForm() {
   /*  Navigation helpers                                            */
   /* ------------------------------------------------------------- */
   const handleGoogleLogin = async () => {
-    window.location.assign(`/api/auth/google?next=${encodeURIComponent(next)}`);
+    const googleNext = isSsoLogin
+      ? `/signin?${new URLSearchParams({
+          client_id: ssoClientId!,
+          redirect_uri: ssoRedirectUri!,
+          state: ssoState!,
+          code_challenge: ssoCodeChallenge!,
+          sso_return: "1",
+        }).toString()}`
+      : next;
+    window.location.assign(`/api/auth/google?next=${encodeURIComponent(googleNext)}`);
   };
 
   const selectMethod = (m: Stage) => {
