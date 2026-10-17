@@ -5,6 +5,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { getClientDeviceId, requestPreciseLocation } from "@/lib/client-device";
+import { apiFetch } from "@/lib/api/client";
 import { startAuthentication } from "@simplewebauthn/browser";
 
 /* ================================================================== */
@@ -25,6 +26,8 @@ type Stage =
 /* ================================================================== */
 /*  Field class                                                        */
 /* ================================================================== */
+const JABIYEN_HANDOFF_RETURN_URL = "https://jabiyen-website.vercel.app/auth/signin";
+
 const fieldClass =
   "w-full rounded-2xl border border-white/15 bg-white/5 px-4 py-3.5 text-sm text-white placeholder-white/40 outline-none transition-all duration-300 focus:border-white/40 focus:bg-white/10 focus:ring-2 focus:ring-white/10";
 
@@ -169,6 +172,9 @@ export default function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const next = searchParams.get("next") ?? "/dashboard";
+  const handoffToJabiyen = searchParams.get("handoff") === "jabiyen";
+  const requestedMethod = searchParams.get("method");
+  const passkeyStageAutoSelected = useRef(false);
 
   const [stage, setStage] = useState<Stage>("logo");
   const [logoExiting, setLogoExiting] = useState(false);
@@ -225,16 +231,44 @@ export default function LoginForm() {
     }
   }, [stage]);
 
+  useEffect(() => {
+    if (stage !== "methods" || requestedMethod !== "passkey" || passkeyStageAutoSelected.current) return;
+    passkeyStageAutoSelected.current = true;
+    setStage("passkey");
+  }, [stage, requestedMethod]);
+
   /* ------------------------------------------------------------- */
   /*  Success                                                       */
   /* ------------------------------------------------------------- */
   const handleSuccess = useCallback(() => {
+    if (!handoffToJabiyen) {
+      setStage("success");
+      setTimeout(() => {
+        router.push(next);
+        router.refresh();
+      }, 1800);
+      return;
+    }
+
     setStage("success");
-    setTimeout(() => {
-      router.push(next);
-      router.refresh();
-    }, 1800);
-  }, [next, router]);
+    void (async () => {
+      const tokenResult = await apiFetch<{ token: string }>(
+        "/api/user/temporary-login-tokens",
+        { method: "POST", body: JSON.stringify({ duration_minutes: 1 }) },
+      );
+      if (!tokenResult.success) {
+        setError(`Sign-in succeeded, but the JABIYEN handoff could not be created: ${tokenResult.error.message}`);
+        setStage("methods");
+        return;
+      }
+      const destination = new URL(JABIYEN_HANDOFF_RETURN_URL);
+      destination.hash = new URLSearchParams({ temporary_token: tokenResult.data.token }).toString();
+      window.location.replace(destination.toString());
+    })().catch(() => {
+      setError("Sign-in succeeded, but the JABIYEN handoff could not be created. Please try again.");
+      setStage("methods");
+    });
+  }, [handoffToJabiyen, next, router]);
 
   /* ------------------------------------------------------------- */
   /*  Email login                                                   */
