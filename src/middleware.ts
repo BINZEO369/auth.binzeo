@@ -1,7 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 
 const PROTECTED = ["/dashboard"];
-const AUTH_ONLY = ["/signin", "/signup"];
+const AUTH_ONLY = ["/signin", "/signup", "/oauth/authorize"];
 const API_TIMEOUT_MS = 5_000;
 
 type ApiEnvelope = {
@@ -73,6 +73,16 @@ export async function middleware(req: NextRequest) {
     return NextResponse.next();
   }
 
+  if (pathname === "/oauth/authorize" && !req.nextUrl.searchParams.has("client_id")) {
+    return new NextResponse("Invalid Central Auth request: client_id is required.", {
+      status: 400,
+      headers: {
+        "Content-Type": "text/plain; charset=utf-8",
+        "Cache-Control": "no-store",
+      },
+    });
+  }
+
   const base = centralBase();
   if (!base) return unavailable();
 
@@ -125,7 +135,7 @@ export async function middleware(req: NextRequest) {
     }
 
     const googleSetup = pathname === "/signup" && req.nextUrl.searchParams.get("google_setup") === "1";
-    const oauthClientHandoff = pathname === "/signin" && req.nextUrl.searchParams.has("client_id");
+    const oauthClientHandoff = (pathname === "/signin" || pathname === "/oauth/authorize") && req.nextUrl.searchParams.has("client_id");
     if (authenticated && authOnlyPath && !googleSetup && !oauthClientHandoff) {
       const url = req.nextUrl.clone();
       url.pathname = "/dashboard";
