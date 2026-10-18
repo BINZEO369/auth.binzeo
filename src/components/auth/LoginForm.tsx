@@ -29,6 +29,19 @@ type Stage =
 const fieldClass =
   "w-full rounded-2xl border border-white/15 bg-white/5 px-4 py-3.5 text-sm text-white placeholder-white/40 outline-none transition-all duration-300 focus:border-white/40 focus:bg-white/10 focus:ring-2 focus:ring-white/10";
 
+type AuthSession = { access_token?: unknown; refresh_token?: unknown };
+
+function extractAuthSession(payload: unknown, depth = 0): AuthSession | null {
+  if (!payload || typeof payload !== "object" || depth > 4) return null;
+  const value = payload as Record<string, unknown>;
+  const accessToken = value.access_token ?? value.accessToken;
+  const refreshToken = value.refresh_token ?? value.refreshToken;
+  if (accessToken !== undefined || refreshToken !== undefined) {
+    return { access_token: accessToken, refresh_token: refreshToken };
+  }
+  return extractAuthSession(value.session, depth + 1) ?? extractAuthSession(value.data, depth + 1);
+}
+
 /* ================================================================== */
 /*  Icons                                                              */
 /* ================================================================== */
@@ -355,7 +368,11 @@ export default function LoginForm() {
   /* ------------------------------------------------------------- */
   /*  Success                                                       */
   /* ------------------------------------------------------------- */
-  const handleSuccess = useCallback(async (session?: { access_token?: string; refresh_token?: string } | null) => {
+  const handleSuccess = useCallback(async (
+    payload?: unknown,
+    source = "unknown",
+    requestId?: string | null,
+  ) => {
     if (!oauthHandoff) {
       setStage("success");
       setTimeout(() => {
@@ -370,8 +387,13 @@ export default function LoginForm() {
       setStage("methods");
       return;
     }
+    const session = extractAuthSession(payload);
     const accessToken = session?.access_token;
     const refreshToken = session?.refresh_token;
+    const missingFields: string[] = [];
+    if (typeof accessToken !== "string" || accessToken.length === 0) missingFields.push("access_token");
+    if (typeof refreshToken !== "string") missingFields.push("refresh_token");
+    else if (refreshToken.length < 16 || refreshToken.length > 16_384) missingFields.push("refresh_token_length");
     if (
       typeof accessToken !== "string" ||
       accessToken.length === 0 ||
@@ -379,7 +401,9 @@ export default function LoginForm() {
       refreshToken.length < 16 ||
       refreshToken.length > 16_384
     ) {
-      setError("Authentication completed, but a secure application session was not returned. Please sign in again.");
+      const fields = missingFields.length ? ` Missing/invalid: ${missingFields.join(", ")}.` : "";
+      const reference = requestId ? ` Reference: ${requestId}.` : "";
+      setError(`Authentication completed, but a secure application session was not returned. Please sign in again. [${source}]${fields}${reference}`);
       setStage("methods");
       return;
     }
@@ -448,7 +472,7 @@ export default function LoginForm() {
         setLoading(false);
         return;
       }
-      void handleSuccess(data.data?.session);
+      void handleSuccess(data, "email_password", res.headers.get("x-request-id"));
     } catch (err) {
       setError(
         err instanceof Error
@@ -475,7 +499,7 @@ export default function LoginForm() {
       });
       const data = await res.json();
       if (!data.success) { setError(data.error?.message ?? "2FA verification failed"); setLoading(false); return; }
-      void handleSuccess(data.data?.session);
+      void handleSuccess(data, "email_otp", res.headers.get("x-request-id"));
     } catch { setError("2FA verification failed. Please request a new code."); setLoading(false); }
   };
 
@@ -515,7 +539,7 @@ export default function LoginForm() {
           setStage("two_factor");
           return;
         }
-        void handleSuccess(data.data?.session);
+        void handleSuccess(data, "temporary_token", res.headers.get("x-request-id"));
       } catch {
         setError("Temporary login failed. Please try again.");
       } finally {
@@ -625,7 +649,7 @@ export default function LoginForm() {
         setStage("two_factor");
         return;
       }
-      void handleSuccess(verifyData.data?.session);
+      void handleSuccess(verifyData, "passkey", verifyRes.headers.get("x-request-id"));
     } catch (err) {
       setError(
         err instanceof Error ? err.message : "Passkey login was cancelled"
