@@ -392,13 +392,13 @@ export default function LoginForm() {
     const refreshToken = session?.refresh_token;
     const missingFields: string[] = [];
     if (typeof accessToken !== "string" || accessToken.length === 0) missingFields.push("access_token");
-    if (typeof refreshToken !== "string") missingFields.push("refresh_token");
-    else if (refreshToken.length < 16 || refreshToken.length > 16_384) missingFields.push("refresh_token_length");
+    if (typeof refreshToken !== "string" || refreshToken.length === 0) missingFields.push("refresh_token");
+    else if (refreshToken.length > 16_384) missingFields.push("refresh_token_length");
     if (
       typeof accessToken !== "string" ||
       accessToken.length === 0 ||
       typeof refreshToken !== "string" ||
-      refreshToken.length < 16 ||
+      refreshToken.length === 0 ||
       refreshToken.length > 16_384
     ) {
       const fields = missingFields.length ? ` Missing/invalid: ${missingFields.join(", ")}.` : "";
