@@ -127,6 +127,78 @@ function BrandLogo({ big = false }: { big?: boolean }) {
   );
 }
 
+function OAuthConnectionMark({
+  clientName,
+  logoUrl,
+}: {
+  clientName: string;
+  logoUrl: string | null;
+}) {
+  const [logoFailed, setLogoFailed] = useState(false);
+  const name = clientName.trim() || "Application";
+
+  return (
+    <div className="mx-auto w-full max-w-[360px] rounded-2xl border border-white/12 bg-white/[0.035] px-4 py-3">
+      <div className="text-[10px] uppercase tracking-[0.14em] text-white/45">
+        Secure sign-in request
+      </div>
+      <div className="mt-3 grid grid-cols-[minmax(0,1fr)_64px_minmax(0,1fr)] items-center gap-2">
+        <div className="flex h-12 items-center justify-center rounded-xl border border-white/10 bg-white/[0.07] px-2">
+          <Image
+            src="/logo.svg"
+            alt="BINZEO"
+            width={92}
+            height={24}
+            className="h-5 w-auto invert"
+          />
+        </div>
+        <svg
+          viewBox="0 0 64 32"
+          fill="none"
+          className="h-8 w-16 text-white/70"
+          aria-label="Secure connection"
+          role="img"
+        >
+          <path d="M1 16h17M46 16h17" stroke="currentColor" strokeWidth="1.4" strokeDasharray="2 3" />
+          <path d="M27 10h-2a6 6 0 0 0 0 12h4M37 10h2a6 6 0 0 1 0 12h-4M28 16h8" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+        </svg>
+        <div className="flex h-12 items-center justify-center overflow-hidden rounded-xl border border-white/15 bg-white p-1.5">
+          {logoUrl && !logoFailed ? (
+            <Image
+              src={logoUrl}
+              alt={`${name} logo`}
+              width={40}
+              height={40}
+              unoptimized
+              loading="eager"
+              referrerPolicy="no-referrer"
+              className="h-10 w-10 object-contain"
+              onError={() => setLogoFailed(true)}
+            />
+          ) : (
+            <span
+              aria-label={`${name} logo placeholder`}
+              className="flex h-10 w-10 items-center justify-center rounded-lg bg-slate-100 text-lg font-semibold text-slate-700"
+            >
+              {name.charAt(0).toUpperCase() || "A"}
+            </span>
+          )}
+        </div>
+      </div>
+      <div className="mt-2 grid grid-cols-[minmax(0,1fr)_64px_minmax(0,1fr)] items-center gap-2 text-[11px] text-white/65">
+        <span className="truncate text-center font-medium">BINZEO</span>
+        <span aria-hidden="true" />
+        <span className="truncate text-center font-medium" title={name}>
+          {name}
+        </span>
+      </div>
+      <p className="mt-2 text-center text-[11px] text-white/45">
+        Your identity is verified by BINZEO and securely returned to this website.
+      </p>
+    </div>
+  );
+}
+
 /* ================================================================== */
 /*  Method definitions                                                 */
 /* ================================================================== */
@@ -194,6 +266,7 @@ export default function LoginForm() {
   const [logoExiting, setLogoExiting] = useState(false);
   const [welcomeExiting, setWelcomeExiting] = useState(false);
   const [oauthClientName, setOAuthClientName] = useState("");
+  const [oauthClientLogoUrl, setOAuthClientLogoUrl] = useState<string | null>(null);
   const [oauthMetadataStatus, setOAuthMetadataStatus] = useState<"none" | "loading" | "valid" | "invalid">(
     oauthHandoff ? (oauthRequestShapeValid ? "loading" : "invalid") : "none",
   );
@@ -259,7 +332,7 @@ export default function LoginForm() {
 
     let cancelled = false;
     const query = new URLSearchParams({ client_id: oauthClientId, redirect_uri: oauthRedirectUri });
-    void apiFetch<{ client_id: string; client_name: string; brand_name: string; project_name: string }>(`/api/auth/oauth-client?${query.toString()}`)
+    void apiFetch<{ client_id: string; client_name: string; brand_name: string; project_name: string; logo_url: string | null }>(`/api/auth/oauth-client?${query.toString()}`)
       .then((result) => {
         if (cancelled) return;
         if (!result.success || result.data.client_id !== oauthClientId) {
@@ -268,6 +341,7 @@ export default function LoginForm() {
           return;
         }
         setOAuthClientName(result.data.client_name || result.data.brand_name || result.data.project_name);
+        setOAuthClientLogoUrl(typeof result.data.logo_url === "string" ? result.data.logo_url : null);
         setOAuthMetadataStatus("valid");
       })
       .catch(() => {
@@ -296,7 +370,15 @@ export default function LoginForm() {
       setStage("methods");
       return;
     }
-    if (!session?.access_token || !session.refresh_token) {
+    const accessToken = session?.access_token;
+    const refreshToken = session?.refresh_token;
+    if (
+      typeof accessToken !== "string" ||
+      accessToken.length === 0 ||
+      typeof refreshToken !== "string" ||
+      refreshToken.length < 16 ||
+      refreshToken.length > 16_384
+    ) {
       setError("Authentication completed, but a secure application session was not returned. Please sign in again.");
       setStage("methods");
       return;
@@ -306,16 +388,19 @@ export default function LoginForm() {
     try {
       const result = await apiFetch<{ redirect_url: string; expires_in: number }>("/api/auth/authorize", {
         method: "POST",
-        headers: { Authorization: `Bearer ${session.access_token}` },
+        headers: { Authorization: `Bearer ${accessToken}` },
         body: JSON.stringify({
           client_id: oauthClientId,
           redirect_uri: oauthRedirectUri,
           state: oauthState,
           code_challenge: oauthCodeChallenge,
-          refresh_token: session.refresh_token,
+          refresh_token: refreshToken,
         }),
       });
-      if (!result.success) throw new Error(result.error.message);
+      if (!result.success) {
+        const reference = result.error.request_id ? ` (reference ${result.error.request_id})` : "";
+        throw new Error(`${result.error.message}${reference}`);
+      }
       const destination = new URL(result.data.redirect_url);
       const callback = new URL(oauthRedirectUri);
       if (destination.origin !== callback.origin || destination.pathname !== callback.pathname || destination.searchParams.get("state") !== oauthState || !destination.searchParams.get("code")) {
@@ -769,9 +854,11 @@ export default function LoginForm() {
             }}
           >
             {oauthHandoff && (
-              <div className="mb-6 rounded-2xl border border-white/12 bg-white/[0.04] px-4 py-3 text-center">
-                <div className="text-[10px] uppercase tracking-[0.14em] text-white/45">Secure sign-in request</div>
-                <div className="mt-1 text-sm font-medium text-white">{oauthClientName || "Verifying application…"}</div>
+              <div className="mb-6">
+                <OAuthConnectionMark
+                  clientName={oauthClientName || "Verifying application…"}
+                  logoUrl={oauthMetadataStatus === "valid" ? oauthClientLogoUrl : null}
+                />
               </div>
             )}
             {/* ============================================================ */}
@@ -1210,6 +1297,11 @@ export default function LoginForm() {
       {stage === "success" && (
         <div className="relative z-10 flex min-h-[100dvh] items-center justify-center px-6">
           <div className="text-center max-w-md">
+            {oauthHandoff && (
+              <div className="mb-6">
+                <OAuthConnectionMark clientName={oauthClientName || "your application"} logoUrl={oauthClientLogoUrl} />
+              </div>
+            )}
             <div className="relative mx-auto w-24 h-24 flex items-center justify-center">
               <div
                 className="absolute inset-0 rounded-full border border-white/40"

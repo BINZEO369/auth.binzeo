@@ -88,7 +88,7 @@ BEGIN
     ARRAY['https://shop.example.com'],
     ARRAY['https://shop.example.com/auth/callback'],
     ARRAY['profile'],
-    '{}'::jsonb
+    '{"branding":{"logo_url":"https://shop.example.com/logo.svg"}}'::jsonb
   )
   ON CONFLICT (project_id, client_key) DO UPDATE SET
     client_name = EXCLUDED.client_name,
@@ -103,7 +103,11 @@ END $$;
 
 এটি একটি **template**, সরাসরি production SQL editor-এ চালানোর নির্দেশ নয়। Project key, origin, callback এবং client type review করে version-controlled migration বানান। স্বাভাবিক public website-এর জন্য `client_type='frontend'`; admin client হলে `client_type='admin'` দিন—Central API admin authorization enforce করে। Password, client secret বা service-role key registry-তে কখনো রাখবেন না; PKCE public client-এ client secret লাগে না।
 
-> Redirect URI byte-for-byte exact match হয়। Scheme, hostname, path, port ও trailing slash-সহ সম্পূর্ণ URI নিবন্ধন করুন। Wildcard/prefix redirect নেই। Production callback HTTPS হতে হবে. Preview-এর জন্য wildcard domain না দিয়ে নির্দিষ্ট, স্থিতিশীল HTTPS callback register করুন; প্রয়োজনে আলাদা staging client ব্যবহার করুন।
+### Central Auth card-এ website logo
+
+Central Auth-এর OAuth card-এ BINZEO logo, secure-connection graphic এবং সংযুক্ত website-এর logo/name দেখানো হয়। Generic client-এর logo server-controlled registry-তে রাখুন—উপরের উদাহরণে `platform_clients.public_config.branding.logo_url` ব্যবহার করা হয়েছে। Client-specific logo না থাকলে `platform_projects.metadata.branding.logo_url` fallback হিসেবে ব্যবহার করা যায়। Logo URL অবশ্যই absolute HTTPS URL হতে হবে; query string/fragment গ্রহণ করা হয় না এবং host-টি project/client-এর `allowed_origins` অথবা registered callback origin-এর একটি হতে হবে। Central API শুধু যাচাইকৃত `logo_url` metadata response-এ প্রকাশ করে; browser/query parameter থেকে আসা logo URL বিশ্বাস করবেন না। বর্তমান legacy `jabiyen` client-এর জন্য canonical `https://jabiyen-website.vercel.app/logo.png` asset ব্যবহৃত হয়।
+
+> Redirect URI byte-for-byte exact match হয়। Scheme, hostname, path, port ও trailing slash-সহ সম্পূর্ণ URI নিবন্ধন করুন। Wildcard/prefix redirect নেই। Production-এ সব callback-এর জন্য HTTPS বাধ্যতামূলক; শুধু non-production local development-এ `localhost`, `127.0.0.1` বা `[::1]`-এর HTTP callback অনুমোদিত। Preview-এর জন্য wildcard domain না দিয়ে নির্দিষ্ট, স্থিতিশীল HTTPS callback register করুন; প্রয়োজনে আলাদা staging client ব্যবহার করুন।
 
 ### Registration যাচাই
 
