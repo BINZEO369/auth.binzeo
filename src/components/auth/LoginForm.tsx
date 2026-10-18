@@ -26,8 +26,6 @@ type Stage =
 /* ================================================================== */
 /*  Field class                                                        */
 /* ================================================================== */
-const JABIYEN_HANDOFF_RETURN_URL = "https://jabiyen-website.vercel.app/auth/signin";
-
 const fieldClass =
   "w-full rounded-2xl border border-white/15 bg-white/5 px-4 py-3.5 text-sm text-white placeholder-white/40 outline-none transition-all duration-300 focus:border-white/40 focus:bg-white/10 focus:ring-2 focus:ring-white/10";
 
@@ -172,20 +170,33 @@ export default function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const next = searchParams.get("next") ?? "/dashboard";
-  const handoffToJabiyen = searchParams.get("handoff") === "jabiyen";
+  const oauthClientId = searchParams.get("client_id") ?? "";
+  const oauthRedirectUri = searchParams.get("redirect_uri") ?? "";
+  const oauthState = searchParams.get("state") ?? "";
+  const oauthCodeChallenge = searchParams.get("code_challenge") ?? "";
+  const oauthCodeChallengeMethod = searchParams.get("code_challenge_method") ?? "";
   const requestedMethod = searchParams.get("method");
-  const passkeyStageAutoSelected = useRef(false);
-  const ssoClientId = searchParams.get("client_id");
-  const ssoRedirectUri = searchParams.get("redirect_uri");
-  const ssoState = searchParams.get("state");
-  const ssoCodeChallenge = searchParams.get("code_challenge");
-  const isSsoLogin = Boolean(ssoClientId && ssoRedirectUri && ssoState && ssoCodeChallenge);
+  const oauthHandoff = Boolean(oauthClientId);
+  const requestedStage: Stage = requestedMethod === "email" || requestedMethod === "token" || requestedMethod === "passkey" || requestedMethod === "qr"
+    ? requestedMethod
+    : "methods";
+  const oauthRequestShapeValid = Boolean(
+    oauthClientId &&
+    /^https:\/\//.test(oauthRedirectUri) &&
+    /^[A-Za-z0-9_-]{32,128}$/.test(oauthState) &&
+    /^[A-Za-z0-9_-]{43}$/.test(oauthCodeChallenge) &&
+    oauthCodeChallengeMethod === "S256",
+  );
 
   const [stage, setStage] = useState<Stage>(
-    handoffToJabiyen && requestedMethod === "passkey" ? "passkey" : "logo",
+    oauthHandoff ? requestedStage : "logo",
   );
   const [logoExiting, setLogoExiting] = useState(false);
   const [welcomeExiting, setWelcomeExiting] = useState(false);
+  const [oauthClientName, setOAuthClientName] = useState("");
+  const [oauthMetadataStatus, setOAuthMetadataStatus] = useState<"none" | "loading" | "valid" | "invalid">(
+    oauthHandoff ? (oauthRequestShapeValid ? "loading" : "invalid") : "none",
+  );
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -202,7 +213,11 @@ export default function LoginForm() {
   const [scanningQr, setScanningQr] = useState(false);
   const qrScannerRef = useRef<{ stop: () => Promise<void>; clear: () => void } | null>(null);
 
-  const [error, setError] = useState("");
+  const [error, setError] = useState(
+    oauthHandoff && !oauthRequestShapeValid
+      ? "This Central Auth request is incomplete or invalid. Return to the application and try again."
+      : "",
+  );
   const [loginLocked, setLoginLocked] = useState(false);
 
   /* ------------------------------------------------------------- */
@@ -239,60 +254,89 @@ export default function LoginForm() {
   }, [stage]);
 
   useEffect(() => {
-    if (stage !== "methods" || requestedMethod !== "passkey" || passkeyStageAutoSelected.current) return;
-    passkeyStageAutoSelected.current = true;
-    setStage("passkey");
-  }, [stage, requestedMethod]);
+    if (!oauthHandoff) return;
+    if (!oauthRequestShapeValid) return;
+
+    let cancelled = false;
+    const query = new URLSearchParams({ client_id: oauthClientId, redirect_uri: oauthRedirectUri });
+    void apiFetch<{ client_id: string; client_name: string; brand_name: string; project_name: string }>(`/api/auth/oauth-client?${query.toString()}`)
+      .then((result) => {
+        if (cancelled) return;
+        if (!result.success || result.data.client_id !== oauthClientId) {
+          setOAuthMetadataStatus("invalid");
+          setError(result.success ? "The application identity did not match." : result.error.message);
+          return;
+        }
+        setOAuthClientName(result.data.client_name || result.data.brand_name || result.data.project_name);
+        setOAuthMetadataStatus("valid");
+      })
+      .catch(() => {
+        if (cancelled) return;
+        setOAuthMetadataStatus("invalid");
+        setError("Could not verify the application return address. Please retry from the application.");
+      });
+    return () => { cancelled = true; };
+  }, [oauthHandoff, oauthRequestShapeValid, oauthClientId, oauthRedirectUri]);
 
   /* ------------------------------------------------------------- */
   /*  Success                                                       */
   /* ------------------------------------------------------------- */
-  const completeSsoLogin = useCallback(async () => {
-    if (!isSsoLogin) return false;
-    const res = await fetch("/api/auth/authorize/session", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ client_id: ssoClientId, redirect_uri: ssoRedirectUri, state: ssoState, code_challenge: ssoCodeChallenge }),
-    });
-    const data = await res.json();
-    if (!res.ok || !data.success) throw new Error(data.error?.message ?? "Central authorization failed");
-    const redirectUrl = data.data?.redirect_url;
-    if (!redirectUrl) throw new Error("Central authorization did not return a callback");
-    window.location.assign(redirectUrl);
-    return true;
-  }, [isSsoLogin, ssoClientId, ssoRedirectUri, ssoState, ssoCodeChallenge]);
-
-  useEffect(() => {
-    if (searchParams.get("sso_return") !== "1") return;
-    void completeSsoLogin().catch((error) => setError(error instanceof Error ? error.message : "Central authorization failed"));
-  }, [completeSsoLogin, searchParams]);
-
-  const handleSuccess = useCallback(async () => {
-    if (isSsoLogin) {
-      try { await completeSsoLogin(); }
-      catch (error) { setError(error instanceof Error ? error.message : "Central authorization failed"); }
-      return;
-    }
-    if (!handoffToJabiyen) {
+  const handleSuccess = useCallback(async (session?: { access_token?: string; refresh_token?: string } | null) => {
+    if (!oauthHandoff) {
       setStage("success");
-      setTimeout(() => { router.push(next); router.refresh(); }, 1800);
+      setTimeout(() => {
+        router.push(next);
+        router.refresh();
+      }, 1800);
       return;
     }
+
+    if (!oauthRequestShapeValid || oauthMetadataStatus !== "valid") {
+      setError("The application sign-in request could not be verified. Return to the application and try again.");
+      setStage("methods");
+      return;
+    }
+    if (!session?.access_token || !session.refresh_token) {
+      setError("Authentication completed, but a secure application session was not returned. Please sign in again.");
+      setStage("methods");
+      return;
+    }
+
     setStage("success");
-    void (async () => {
-      const tokenResult = await apiFetch<{ token: string }>("/api/user/temporary-login-tokens", { method: "POST", body: JSON.stringify({ duration_minutes: 1 }) });
-      if (!tokenResult.success) { setError(`Sign-in succeeded, but the JABIYEN handoff could not be created: ${tokenResult.error.message}`); setStage("methods"); return; }
-      const destination = new URL(JABIYEN_HANDOFF_RETURN_URL);
-      destination.hash = new URLSearchParams({ temporary_token: tokenResult.data.token }).toString();
+    try {
+      const result = await apiFetch<{ redirect_url: string; expires_in: number }>("/api/auth/authorize", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${session.access_token}` },
+        body: JSON.stringify({
+          client_id: oauthClientId,
+          redirect_uri: oauthRedirectUri,
+          state: oauthState,
+          code_challenge: oauthCodeChallenge,
+          refresh_token: session.refresh_token,
+        }),
+      });
+      if (!result.success) throw new Error(result.error.message);
+      const destination = new URL(result.data.redirect_url);
+      const callback = new URL(oauthRedirectUri);
+      if (destination.origin !== callback.origin || destination.pathname !== callback.pathname || destination.searchParams.get("state") !== oauthState || !destination.searchParams.get("code")) {
+        throw new Error("Central Auth returned an invalid application callback.");
+      }
       window.location.replace(destination.toString());
-    })().catch(() => { setError("Sign-in succeeded, but the JABIYEN handoff could not be created. Please try again."); setStage("methods"); });
-  }, [completeSsoLogin, handoffToJabiyen, isSsoLogin, next, router]);
+    } catch (error) {
+      setError(error instanceof Error ? error.message : "Application sign-in could not be completed. Please try again.");
+      setStage("methods");
+    }
+  }, [oauthHandoff, oauthRequestShapeValid, oauthMetadataStatus, oauthClientId, oauthRedirectUri, oauthState, oauthCodeChallenge, next, router]);
 
   /* ------------------------------------------------------------- */
   /*  Email login                                                   */
   /* ------------------------------------------------------------- */
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (oauthHandoff && oauthMetadataStatus !== "valid") {
+      setError("Please wait while Central Auth verifies the application return address.");
+      return;
+    }
     setLoading(true);
     setError("");
     try {
@@ -319,7 +363,7 @@ export default function LoginForm() {
         setLoading(false);
         return;
       }
-      handleSuccess();
+      void handleSuccess(data.data?.session);
     } catch (err) {
       setError(
         err instanceof Error
@@ -332,6 +376,10 @@ export default function LoginForm() {
 
   const handleTwoFactorSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (oauthHandoff && oauthMetadataStatus !== "valid") {
+      setError("The application return address could not be verified. Restart sign-in from the application.");
+      return;
+    }
     setLoading(true);
     setError("");
     try {
@@ -342,7 +390,7 @@ export default function LoginForm() {
       });
       const data = await res.json();
       if (!data.success) { setError(data.error?.message ?? "2FA verification failed"); setLoading(false); return; }
-      handleSuccess();
+      void handleSuccess(data.data?.session);
     } catch { setError("2FA verification failed. Please request a new code."); setLoading(false); }
   };
 
@@ -351,6 +399,10 @@ export default function LoginForm() {
   /* ------------------------------------------------------------- */
   const exchangeTemporaryToken = useCallback(
     async (token: string) => {
+      if (oauthHandoff && oauthMetadataStatus !== "valid") {
+        setError("Please wait while Central Auth verifies the application return address.");
+        return;
+      }
       setTokenLoading(true);
       setError("");
       try {
@@ -368,14 +420,24 @@ export default function LoginForm() {
           setTokenLoading(false);
           return;
         }
-        handleSuccess();
+        if (data.data?.requires_two_factor) {
+          if (!data.data.challenge_id) {
+            setError("The 2FA challenge could not be started. Please request a new token.");
+            return;
+          }
+          setTwoFactorChallengeId(data.data.challenge_id);
+          setTwoFactorCode("");
+          setStage("two_factor");
+          return;
+        }
+        void handleSuccess(data.data?.session);
       } catch {
         setError("Temporary login failed. Please try again.");
       } finally {
         setTokenLoading(false);
       }
     },
-    [handleSuccess]
+    [handleSuccess, oauthHandoff, oauthMetadataStatus]
   );
 
   useEffect(() => {
@@ -438,6 +500,10 @@ export default function LoginForm() {
   /*  Passkey                                                       */
   /* ------------------------------------------------------------- */
   const handlePasskeyLogin = async () => {
+    if (oauthHandoff && oauthMetadataStatus !== "valid") {
+      setError("Please wait while Central Auth verifies the application return address.");
+      return;
+    }
     setPasskeyLoading(true);
     setError("");
     try {
@@ -460,21 +526,12 @@ export default function LoginForm() {
           challenge_id: optionsData.data.challenge_id,
           challenge: optionsData.data.challenge,
           response,
-          handoff_to_jabiyen: handoffToJabiyen,
+          oauth_handoff: oauthHandoff,
         }),
       });
       const verifyData = await verifyRes.json();
       if (!verifyData.success)
         throw new Error(verifyData.error?.message ?? "Passkey login failed");
-      if (handoffToJabiyen) {
-        const token = verifyData.data?.handoff_token;
-        if (typeof token !== "string" || token.length < 20)
-          throw new Error("The verified passkey could not be handed back to JABIYEN.");
-        const destination = new URL(JABIYEN_HANDOFF_RETURN_URL);
-        destination.hash = new URLSearchParams({ temporary_token: token }).toString();
-        window.location.replace(destination.toString());
-        return;
-      }
       if (verifyData.data?.requires_two_factor) {
         if (!verifyData.data.challenge_id)
           throw new Error("The 2FA challenge could not be started. Please try again.");
@@ -483,7 +540,7 @@ export default function LoginForm() {
         setStage("two_factor");
         return;
       }
-      handleSuccess();
+      void handleSuccess(verifyData.data?.session);
     } catch (err) {
       setError(
         err instanceof Error ? err.message : "Passkey login was cancelled"
@@ -497,16 +554,7 @@ export default function LoginForm() {
   /*  Navigation helpers                                            */
   /* ------------------------------------------------------------- */
   const handleGoogleLogin = async () => {
-    const googleNext = isSsoLogin
-      ? `/signin?${new URLSearchParams({
-          client_id: ssoClientId!,
-          redirect_uri: ssoRedirectUri!,
-          state: ssoState!,
-          code_challenge: ssoCodeChallenge!,
-          sso_return: "1",
-        }).toString()}`
-      : next;
-    window.location.assign(`/api/auth/google?next=${encodeURIComponent(googleNext)}`);
+    window.location.assign(`/api/auth/google?next=${encodeURIComponent(next)}`);
   };
 
   const selectMethod = (m: Stage) => {
@@ -720,13 +768,19 @@ export default function LoginForm() {
                 "bn-card-in 0.9s cubic-bezier(0.22, 1, 0.36, 1) both",
             }}
           >
+            {oauthHandoff && (
+              <div className="mb-6 rounded-2xl border border-white/12 bg-white/[0.04] px-4 py-3 text-center">
+                <div className="text-[10px] uppercase tracking-[0.14em] text-white/45">Secure sign-in request</div>
+                <div className="mt-1 text-sm font-medium text-white">{oauthClientName || "Verifying application…"}</div>
+              </div>
+            )}
             {/* ============================================================ */}
             {/*  METHODS VIEW — ONLY options                                   */}
             {/* ============================================================ */}
             {stage === "methods" && (
               <div>
                 <div className="grid gap-2.5">
-                  {METHODS.map((m, i) => (
+                  {METHODS.filter((method) => !oauthHandoff || method.key !== "google").map((m, i) => (
                     <button
                       key={m.key}
                       type="button"
@@ -764,6 +818,8 @@ export default function LoginForm() {
                   ))}
                 </div>
 
+                {!oauthHandoff && (
+                  <>
                 {/* Social separator */}
                 <div
                   className="my-6 flex items-center gap-3 text-[10.5px] text-white/40 uppercase tracking-[0.12em]"
@@ -816,6 +872,8 @@ export default function LoginForm() {
                     Phone
                   </button>
                 </div>
+                  </>
+                )}
 
                 {error && (
                   <div
@@ -925,7 +983,7 @@ export default function LoginForm() {
 
                   <button
                     type="submit"
-                    disabled={loading || loginLocked}
+                    disabled={loading || loginLocked || (oauthHandoff && oauthMetadataStatus !== "valid")}
                     className="mt-2 w-full rounded-full bg-white py-3.5 text-sm font-semibold text-black transition-all duration-300 hover:bg-white/90 hover:shadow-[0_16px_40px_-10px_rgba(255,255,255,0.4)] hover:-translate-y-px active:translate-y-0 disabled:cursor-not-allowed disabled:opacity-60"
                   >
                     {loading ? "Signing in..." : "Sign in"}
@@ -936,15 +994,15 @@ export default function LoginForm() {
 
             {stage === "two_factor" && (
               <div style={{ animation: "bn-slide-in-right 0.55s cubic-bezier(0.22, 1, 0.36, 1) both" }}>
-                <button type="button" onClick={() => { if (handoffToJabiyen) window.close(); else { setStage("email"); setError(""); } }} className="flex items-center gap-1.5 px-2.5 py-1.5 -ml-2.5 rounded-full text-white/60 hover:text-white hover:bg-white/5 transition-all duration-300 mb-5">
-                  <IconArrowLeft /><span className="text-[12px]">{handoffToJabiyen ? "Cancel" : "Back"}</span>
+                <button type="button" onClick={() => { if (oauthHandoff) setStage(requestedStage); else setStage("email"); setError(""); }} className="flex items-center gap-1.5 px-2.5 py-1.5 -ml-2.5 rounded-full text-white/60 hover:text-white hover:bg-white/5 transition-all duration-300 mb-5">
+                  <IconArrowLeft /><span className="text-[12px]">Back</span>
                 </button>
-                <h2 className="text-[24px] font-semibold tracking-[-0.03em]">{handoffToJabiyen ? "Verify JABIYEN sign-in" : "Verify your sign-in"}</h2>
-                <p className="mt-1.5 text-[13px] text-white/55">{handoffToJabiyen ? "Enter the 6-digit code sent to your email to finish signing in to JABIYEN. It expires in 30 seconds." : "Enter the 6-digit code sent to your email. It expires in 30 seconds."}</p>
+                <h2 className="text-[24px] font-semibold tracking-[-0.03em]">{oauthHandoff ? `Verify ${oauthClientName || "application"} sign-in` : "Verify your sign-in"}</h2>
+                <p className="mt-1.5 text-[13px] text-white/55">{oauthHandoff ? `Enter the 6-digit code sent to your email to finish signing in to ${oauthClientName || "the application"}. It expires in 30 seconds.` : "Enter the 6-digit code sent to your email. It expires in 30 seconds."}</p>
                 {error && <div className="mt-5 rounded-2xl border border-red-400/25 bg-red-500/10 backdrop-blur-xl px-4 py-3 text-sm text-red-200">{error}</div>}
                 <form onSubmit={handleTwoFactorSubmit} className="mt-6 space-y-3">
                   <input type="text" inputMode="numeric" pattern="[0-9]{6}" maxLength={6} value={twoFactorCode} onChange={(e) => setTwoFactorCode(e.target.value.replace(/\D/g, "").slice(0, 6))} required autoFocus autoComplete="one-time-code" placeholder="000000" aria-label="2FA code" className={`${fieldClass} text-center text-2xl tracking-[0.35em]`} />
-                  <button type="submit" disabled={loading || twoFactorCode.length !== 6} className="mt-2 w-full rounded-full bg-white py-3.5 text-sm font-semibold text-black transition-all duration-300 hover:bg-white/90 disabled:cursor-not-allowed disabled:opacity-60">{loading ? "Verifying..." : handoffToJabiyen ? "Verify and return to JABIYEN" : "Verify and sign in"}</button>
+                  <button type="submit" disabled={loading || twoFactorCode.length !== 6 || (oauthHandoff && oauthMetadataStatus !== "valid")} className="mt-2 w-full rounded-full bg-white py-3.5 text-sm font-semibold text-black transition-all duration-300 hover:bg-white/90 disabled:cursor-not-allowed disabled:opacity-60">{loading ? "Verifying..." : oauthHandoff ? `Verify and continue to ${oauthClientName || "application"}` : "Verify and sign in"}</button>
                 </form>
               </div>
             )}
@@ -999,7 +1057,7 @@ export default function LoginForm() {
 
                   <button
                     type="submit"
-                    disabled={tokenLoading}
+                    disabled={tokenLoading || (oauthHandoff && oauthMetadataStatus !== "valid")}
                     className="w-full rounded-full bg-white py-3.5 text-sm font-semibold text-black transition-all duration-300 hover:bg-white/90 hover:shadow-[0_16px_40px_-10px_rgba(255,255,255,0.4)] hover:-translate-y-px disabled:cursor-not-allowed disabled:opacity-60"
                   >
                     {tokenLoading ? "Signing in..." : "Sign in with token"}
@@ -1029,7 +1087,7 @@ export default function LoginForm() {
                     "bn-slide-in-right 0.55s cubic-bezier(0.22, 1, 0.36, 1) both",
                 }}
               >
-                {!handoffToJabiyen && (
+                {!oauthHandoff && (
                   <button
                     type="button"
                     onClick={goBack}
@@ -1055,11 +1113,11 @@ export default function LoginForm() {
                   </div>
 
                   <h2 className="mt-6 text-[24px] font-semibold tracking-[-0.03em]">
-                    {handoffToJabiyen ? "Verify your JABIYEN sign-in" : "Sign in with Passkey"}
+                    {oauthHandoff ? `Verify ${oauthClientName || "application"} sign-in` : "Sign in with Passkey"}
                   </h2>
                   <p className="mt-2 text-[13px] text-white/55 max-w-xs mx-auto leading-relaxed">
-                    {handoffToJabiyen
-                      ? "Confirm with your saved passkey. This secure verification window will return you to JABIYEN automatically."
+                    {oauthHandoff
+                      ? `Confirm with your saved passkey. Central Auth will securely return you to ${oauthClientName || "the application"} after verification.`
                       : "Use your fingerprint, face, or security key to sign in securely."}
                   </p>
 
@@ -1072,10 +1130,10 @@ export default function LoginForm() {
                   <button
                     type="button"
                     onClick={handlePasskeyLogin}
-                    disabled={passkeyLoading}
+                    disabled={passkeyLoading || (oauthHandoff && oauthMetadataStatus !== "valid")}
                     className="mt-7 w-full rounded-full bg-white py-3.5 text-sm font-semibold text-black transition-all duration-300 hover:bg-white/90 hover:shadow-[0_16px_40px_-10px_rgba(255,255,255,0.4)] hover:-translate-y-px disabled:cursor-not-allowed disabled:opacity-60"
                   >
-                    {passkeyLoading ? "Checking passkey..." : handoffToJabiyen ? "Verify with passkey" : "Continue"}
+                    {passkeyLoading ? "Checking passkey..." : oauthHandoff ? "Verify with passkey" : "Continue"}
                   </button>
                 </div>
               </div>
@@ -1119,7 +1177,7 @@ export default function LoginForm() {
                     <button
                       type="button"
                       onClick={scanQrToken}
-                      disabled={tokenLoading}
+                      disabled={tokenLoading || (oauthHandoff && oauthMetadataStatus !== "valid")}
                       className="w-full rounded-full bg-white py-3.5 text-sm font-semibold text-black transition-all duration-300 hover:bg-white/90 hover:shadow-[0_16px_40px_-10px_rgba(255,255,255,0.4)] hover:-translate-y-px disabled:cursor-not-allowed disabled:opacity-60"
                     >
                       Open camera
@@ -1185,7 +1243,7 @@ export default function LoginForm() {
                   "bn-word-in 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.2s both",
               }}
             >
-              Welcome to BINZEO
+              {oauthHandoff ? `Sign-in verified for ${oauthClientName || "your application"}` : "Welcome to BINZEO"}
             </h1>
             <p
               className="mt-3 text-[14.5px] text-white/70"
@@ -1194,7 +1252,7 @@ export default function LoginForm() {
                   "bn-word-in 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.35s both",
               }}
             >
-              You&apos;re signed in. Taking you in…
+              {oauthHandoff ? "Returning to the application securely…" : "You&apos;re signed in. Taking you in…"}
             </p>
 
             <div

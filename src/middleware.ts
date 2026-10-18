@@ -125,7 +125,8 @@ export async function middleware(req: NextRequest) {
     }
 
     const googleSetup = pathname === "/signup" && req.nextUrl.searchParams.get("google_setup") === "1";
-    if (authenticated && authOnlyPath && !googleSetup) {
+    const oauthClientHandoff = pathname === "/signin" && req.nextUrl.searchParams.has("client_id");
+    if (authenticated && authOnlyPath && !googleSetup && !oauthClientHandoff) {
       const url = req.nextUrl.clone();
       url.pathname = "/dashboard";
       return NextResponse.redirect(url);
