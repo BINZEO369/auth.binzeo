@@ -1,6 +1,6 @@
 export type ApiResponse<T> =
   | { success: true; data: T }
-  | { success: false; error: { message: string; code?: string; retry_after_seconds?: number } };
+  | { success: false; error: { message: string; code?: string; request_id?: string; retry_after_seconds?: number } };
 
 function isApiResponse<T>(value: unknown): value is ApiResponse<T> {
   if (!value || typeof value !== "object") return false;
