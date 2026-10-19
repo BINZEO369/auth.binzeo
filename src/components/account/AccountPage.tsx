@@ -578,9 +578,9 @@ function SecuritySection() {
 }
 
 /* ================================================================== */
-/*  MAIN PROFILE PAGE                                                  */
+/*  MAIN ACCOUNT PAGE                                                  */
 /* ================================================================== */
-export default function ProfilePage() {
+export default function AccountPage() {
   const router = useRouter();
   const [activeSection, setActiveSection] = useState<"menu" | "profile" | "security" | "contacts" | "addresses" | "devices" | "sectors">("menu");
   const [data, setData] = useState<Data | null>(null);
@@ -595,7 +595,7 @@ export default function ProfilePage() {
   });
 
   const sectionTabs = [
-    ["profile", "Profile"],
+    ["profile", "Account"],
     ["security", "Security"],
     ["contacts", "Contacts"],
     ["addresses", "Addresses"],
@@ -672,7 +672,7 @@ export default function ProfilePage() {
     const res = await apiFetch<any>("/api/user/profile/photo", { method: "POST", body });
     if (res.success) {
       setForm((current) => ({ ...current, ...res.data.profile }));
-      setMessage({ type: "success", text: "Profile photo updated successfully" });
+      setMessage({ type: "success", text: "Account photo updated successfully" });
     } else {
       setMessage({ type: "error", text: res.error.message });
     }
@@ -696,7 +696,7 @@ export default function ProfilePage() {
     });
 
     if (res.success) {
-      setMessage({ type: "success", text: "Profile updated successfully" });
+      setMessage({ type: "success", text: "Account updated successfully" });
       setForm(res.data.profile);
     } else {
       setMessage({ type: "error", text: res.error.message });
@@ -731,11 +731,11 @@ export default function ProfilePage() {
         /* ================= MAIN MENU VIEW ================= */
         <div className="mx-auto max-w-md px-4 pt-2 pb-8 space-y-5">
 
-          {/* Profile Header Card */}
+          {/* Account Header Card */}
           <div className={`${cardCls} p-4 flex items-center gap-4`}>
             <div className="relative h-[64px] w-[64px] shrink-0 overflow-hidden rounded-full border-2 border-white shadow-sm bg-gray-100">
               {form.profile_photo_url ? (
-                <img src={form.profile_photo_url} alt="Profile" className="h-full w-full object-cover" />
+                <img src={form.profile_photo_url} alt="Account" className="h-full w-full object-cover" />
               ) : (
                 <div className="flex h-full w-full items-center justify-center text-2xl font-semibold text-gray-400">
                   {displayName.charAt(0).toUpperCase()}
@@ -746,7 +746,7 @@ export default function ProfilePage() {
               <h2 className="text-[16px] font-semibold text-gray-900 truncate leading-tight tracking-tight">{displayName}</h2>
               <p className="text-[13px] text-gray-500 truncate mt-0.5">{userEmail}</p>
               <button onClick={() => setActiveSection("profile")} className="mt-1.5 inline-flex items-center gap-1.5 text-[12px] font-medium text-blue-600 hover:text-blue-700 active:scale-95 transition-all duration-200 bg-blue-50 px-3 py-1 rounded-full">
-                <Icons.Edit /> Edit Profile
+                <Icons.Edit /> Edit Account
               </button>
             </div>
           </div>
@@ -755,7 +755,7 @@ export default function ProfilePage() {
           <div>
             <h3 className="mb-2 px-4 text-[12px] font-medium text-gray-500 tracking-wide uppercase">Account details</h3>
             <div className={cardCls}>
-              <MenuItem icon={<Icons.User />} label="Profile" onClick={() => setActiveSection("profile")} />
+              <MenuItem icon={<Icons.User />} label="Account" onClick={() => setActiveSection("profile")} />
             </div>
           </div>
 
@@ -800,7 +800,7 @@ export default function ProfilePage() {
               <div className={`${cardCls} p-4 flex items-center gap-4`}>
                 <div className="relative h-[64px] w-[64px] shrink-0 overflow-hidden rounded-full border-2 border-white shadow-sm bg-gray-100">
                   {form.profile_photo_url ? (
-                    <img src={form.profile_photo_url} alt="Profile" className="h-full w-full object-cover" />
+                    <img src={form.profile_photo_url} alt="Account" className="h-full w-full object-cover" />
                   ) : (
                     <div className="flex h-full w-full items-center justify-center text-2xl font-semibold text-gray-400">{displayName.charAt(0).toUpperCase()}</div>
                   )}

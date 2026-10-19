@@ -24,6 +24,12 @@ const nextConfig: NextConfig = {
   async headers() {
     return [{ source: "/(.*)", headers: securityHeaders }];
   },
+  async redirects() {
+    return [
+      { source: "/dashboard", destination: "/account", permanent: true },
+      { source: "/dashboard/profile", destination: "/account", permanent: true },
+    ];
+  },
   async rewrites() {
     return {
       beforeFiles: [

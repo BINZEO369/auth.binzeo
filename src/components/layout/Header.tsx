@@ -20,9 +20,8 @@ const siteNavigation = [
   { href: "/#security", label: "Security", sub: "Your data, protected", icon: "/icons/shield.svg" },
 ] as const;
 
-const dashboardNavigation = [
-  { href: "/dashboard", label: "Overview", sub: "Your dashboard", icon: "/icons/grid.svg" },
-  { href: "/dashboard/profile", label: "Profile", sub: "Personal information", icon: "/icons/user.svg" },
+const accountNavigation = [
+  { href: "/account", label: "Account", sub: "Personal information and settings", icon: "/icons/user.svg" },
 ] as const;
 
 /* Menu dropdown-এ শুধু এই আইটেমগুলো দেখাবে */
@@ -416,7 +415,7 @@ export default function Header({ isLoggedIn = false, onMenu }: HeaderProps) {
                       <div className="h-px flex-1 bg-black/[0.06]" />
                     </div>
                     <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
-                      {dashboardNavigation.map((item, i) => (
+                      {accountNavigation.map((item, i) => (
                         <MenuTile
                           key={item.href}
                           href={item.href}
@@ -437,7 +436,7 @@ export default function Header({ isLoggedIn = false, onMenu }: HeaderProps) {
                         className="group relative flex items-center gap-3.5 overflow-hidden rounded-2xl border border-red-200/70 bg-red-50/50 px-4 py-3.5 text-left transition-all duration-500 hover:-translate-y-0.5 hover:border-red-300 hover:bg-red-50 hover:shadow-[0_16px_40px_-18px_rgba(220,38,38,0.25)] disabled:opacity-50"
                         style={{
                           animation: `hdr-item-in 0.55s cubic-bezier(0.22, 1, 0.36, 1) ${
-                            0.12 + dashboardNavigation.length * 0.03
+                            0.12 + accountNavigation.length * 0.03
                           }s both`,
                         }}
                       >
