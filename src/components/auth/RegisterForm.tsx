@@ -235,10 +235,10 @@ export default function RegisterForm() {
           return;
         }
       } catch {
-        // Invalid or untrusted redirect: continue to the Central dashboard.
+        // Invalid or untrusted redirect: continue to the Account page.
       }
     }
-    router.push("/dashboard");
+    router.push("/account");
     router.refresh();
   }, [requestedReturnUrl, router]);
 
@@ -419,7 +419,7 @@ export default function RegisterForm() {
   }, []);
 
   const handleGoogleSignup = async () => {
-    window.location.assign(`/api/auth/google?next=${encodeURIComponent("/dashboard")}`);
+    window.location.assign(`/api/auth/google?next=${encodeURIComponent("/account")}`);
   };
 
   /* ------------------------------------------------------------- */
@@ -473,7 +473,7 @@ export default function RegisterForm() {
         });
         const data = await res.json();
         if (!data.success) {
-          setError(data.error?.message ?? "Profile setup failed");
+          setError(data.error?.message ?? "Account setup failed");
           setLoading(false);
           return;
         }
@@ -1477,7 +1477,7 @@ export default function RegisterForm() {
                   "bn-word-in 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.35s both",
               }}
             >
-              Your email has been verified. Redirecting to your dashboard…
+              Your email has been verified. Redirecting to your account…
             </p>
 
             <div

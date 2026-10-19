@@ -254,7 +254,7 @@ const METHODS = [
 export default function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const next = searchParams.get("next") ?? "/dashboard";
+  const next = searchParams.get("next") ?? "/account";
   const oauthClientId = searchParams.get("client_id") ?? "";
   const oauthRedirectUri = searchParams.get("redirect_uri") ?? "";
   const oauthState = searchParams.get("state") ?? "";

@@ -220,7 +220,7 @@ export default async function HomePage() {
               }}
             >
               <Link
-                href={isLoggedIn ? "/dashboard" : "/signup"}
+                href={isLoggedIn ? "/account" : "/signup"}
                 style={{
                   position: "relative",
                   display: "inline-flex",
@@ -241,7 +241,7 @@ export default async function HomePage() {
                   overflow: "hidden",
                 }}
               >
-                {isLoggedIn ? "Open dashboard" : "Create your ID"}
+                {isLoggedIn ? "Open account" : "Create your ID"}
                 <span aria-hidden="true">→</span>
               </Link>
             </div>
@@ -516,7 +516,7 @@ export default async function HomePage() {
 
                 <div data-reveal style={{ ["--rd" as any]: "0.95s" }}>
                   <Link
-                    href={isLoggedIn ? "/dashboard" : "/signup"}
+                    href={isLoggedIn ? "/account" : "/signup"}
                     className="phone-case-cta"
                     style={{
                       display: "inline-flex",
@@ -535,7 +535,7 @@ export default async function HomePage() {
                       transition: "all 0.35s cubic-bezier(0.22, 1, 0.36, 1)",
                     }}
                   >
-                    {isLoggedIn ? "Open dashboard" : "Create your ID"}
+                    {isLoggedIn ? "Open account" : "Create your ID"}
                     <span aria-hidden="true">→</span>
                   </Link>
                 </div>
@@ -711,7 +711,7 @@ export default async function HomePage() {
 
                 <div data-reveal style={{ ["--rd" as any]: "1s" }}>
                   <Link
-                    href={isLoggedIn ? "/dashboard" : "/signup"}
+                    href={isLoggedIn ? "/account" : "/signup"}
                     className="phone-case-cta"
                     style={{
                       display: "inline-flex",
@@ -730,7 +730,7 @@ export default async function HomePage() {
                       transition: "all 0.35s cubic-bezier(0.22, 1, 0.36, 1)",
                     }}
                   >
-                    {isLoggedIn ? "Open dashboard" : "Get started free"}
+                    {isLoggedIn ? "Open account" : "Get started free"}
                     <span aria-hidden="true">→</span>
                   </Link>
                 </div>
@@ -1178,7 +1178,7 @@ export default async function HomePage() {
 
                 <div data-reveal style={{ ["--rd" as any]: "0.95s" }}>
                   <Link
-                    href={isLoggedIn ? "/dashboard" : "/signup"}
+                    href={isLoggedIn ? "/account" : "/signup"}
                     className="phone-case-cta"
                     style={{
                       display: "inline-flex",
@@ -1197,7 +1197,7 @@ export default async function HomePage() {
                       transition: "all 0.35s cubic-bezier(0.22, 1, 0.36, 1)",
                     }}
                   >
-                    {isLoggedIn ? "Open dashboard" : "Discover more"}
+                    {isLoggedIn ? "Open account" : "Discover more"}
                     <span aria-hidden="true">→</span>
                   </Link>
                 </div>
@@ -1371,7 +1371,7 @@ export default async function HomePage() {
 
                 <div data-reveal style={{ ["--rd" as any]: "1s" }}>
                   <Link
-                    href={isLoggedIn ? "/dashboard" : "/signup"}
+                    href={isLoggedIn ? "/account" : "/signup"}
                     className="phone-case-cta"
                     style={{
                       display: "inline-flex",
@@ -1390,7 +1390,7 @@ export default async function HomePage() {
                       transition: "all 0.35s cubic-bezier(0.22, 1, 0.36, 1)",
                     }}
                   >
-                    {isLoggedIn ? "Open dashboard" : "Get started free"}
+                    {isLoggedIn ? "Open account" : "Get started free"}
                     <span aria-hidden="true">→</span>
                   </Link>
                 </div>
