@@ -326,30 +326,28 @@ export default function PrivacyControls() {
             {error && <p role="alert" className="mt-3 rounded-xl bg-red-50 px-3 py-2 text-xs text-red-800">{error}</p>}
 
             {view === "notice" ? (
-              <div className="mt-5 grid grid-cols-1 gap-2 sm:grid-cols-3">
-                <button type="button" disabled={saving} onClick={() => savePreferences("reject_optional", DEFAULT_PREFERENCES)} className="rounded-full border border-black/15 px-4 py-3 text-sm font-medium text-black transition hover:bg-black/[0.04] disabled:opacity-50">
+              <div className="mt-5 grid grid-cols-1 gap-2 sm:grid-cols-2">
+                <button type="button" disabled={saving} onClick={() => savePreferences("reject_optional", DEFAULT_PREFERENCES)} className="w-full min-w-0 whitespace-normal break-words rounded-full border border-black/15 px-3 py-3 text-sm font-medium text-black transition hover:bg-black/[0.04] disabled:opacity-50 sm:px-4">
                   Only essential
                 </button>
-                <button type="button" disabled={saving} onClick={() => { setPreferences(DEFAULT_PREFERENCES); setView("preferences"); }} className="rounded-full border border-black/15 px-4 py-3 text-sm font-medium text-black transition hover:bg-black/[0.04] disabled:opacity-50">
+                <button type="button" disabled={saving} onClick={() => { setPreferences(DEFAULT_PREFERENCES); setView("preferences"); }} className="w-full min-w-0 whitespace-normal break-words rounded-full border border-black/15 px-3 py-3 text-sm font-medium text-black transition hover:bg-black/[0.04] disabled:opacity-50 sm:px-4">
                   Customize
                 </button>
-                <button type="button" disabled={saving} onClick={() => savePreferences("accept_all", ACCEPT_ALL)} className="rounded-full bg-black px-4 py-3 text-sm font-medium text-white transition hover:bg-black/85 disabled:opacity-50">
+                <button type="button" disabled={saving} onClick={() => savePreferences("accept_all", ACCEPT_ALL)} className="w-full min-w-0 whitespace-normal break-words rounded-full bg-black px-3 py-3 text-sm font-medium text-white transition hover:bg-black/85 disabled:opacity-50 sm:col-span-2 sm:px-4">
                   Accept all
                 </button>
               </div>
             ) : (
-              <div className="mt-5 flex flex-col-reverse gap-2 sm:flex-row sm:justify-between">
-                <button type="button" disabled={saving} onClick={() => { setView("notice"); setError(""); }} className="rounded-full border border-black/15 px-4 py-3 text-sm font-medium text-black transition hover:bg-black/[0.04] disabled:opacity-50">
+              <div className="mt-5 grid grid-cols-1 gap-2 sm:grid-cols-2">
+                <button type="button" disabled={saving} onClick={() => { setView("notice"); setError(""); }} className="w-full min-w-0 whitespace-normal break-words rounded-full border border-black/15 px-3 py-3 text-sm font-medium text-black transition hover:bg-black/[0.04] disabled:opacity-50 sm:px-4">
                   Back
                 </button>
-                <div className="flex flex-col gap-2 sm:flex-row">
-                  <button type="button" disabled={saving} onClick={() => savePreferences("reject_optional", DEFAULT_PREFERENCES)} className="rounded-full border border-black/15 px-4 py-3 text-sm font-medium text-black transition hover:bg-black/[0.04] disabled:opacity-50">
-                    Only essential
-                  </button>
-                  <button type="button" disabled={saving} onClick={() => savePreferences("save_settings", preferences)} className="rounded-full bg-black px-5 py-3 text-sm font-medium text-white transition hover:bg-black/85 disabled:opacity-50">
-                    {saving ? "Saving…" : "Save choices"}
-                  </button>
-                </div>
+                <button type="button" disabled={saving} onClick={() => savePreferences("reject_optional", DEFAULT_PREFERENCES)} className="w-full min-w-0 whitespace-normal break-words rounded-full border border-black/15 px-3 py-3 text-sm font-medium text-black transition hover:bg-black/[0.04] disabled:opacity-50 sm:px-4">
+                  Only essential
+                </button>
+                <button type="button" disabled={saving} onClick={() => savePreferences("save_settings", preferences)} className="w-full min-w-0 whitespace-normal break-words rounded-full bg-black px-3 py-3 text-sm font-medium text-white transition hover:bg-black/85 disabled:opacity-50 sm:col-span-2 sm:px-5">
+                  {saving ? "Saving…" : "Save choices"}
+                </button>
               </div>
             )}
 

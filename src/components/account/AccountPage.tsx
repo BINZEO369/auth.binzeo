@@ -88,6 +88,15 @@ const Icons = {
   Agents: () => (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="w-[17px] h-[17px]"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
   ),
+  Eye: () => (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+  ),
+  EyeOff: () => (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4"><path d="m3 3 18 18"/><path d="M10.58 10.58a2 2 0 0 0 2.83 2.83"/><path d="M9.88 5.09A10.4 10.4 0 0 1 12 4.88c5.5 0 9 7.12 9 7.12a15.5 15.5 0 0 1-4.22 4.55"/><path d="M6.61 6.61C4.14 8.14 3 12 3 12s3.5 7.12 9 7.12a9.9 9.9 0 0 0 3.02-.47"/></svg>
+  ),
+  Copy: () => (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"/></svg>
+  ),
   Edit: () => (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-3.5 h-3.5"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>
   )
@@ -589,6 +598,8 @@ export default function AccountPage() {
   const [saving, setSaving] = useState(false);
   const [photoUploading, setPhotoUploading] = useState(false);
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
+  const [binzeoIdVisible, setBinzeoIdVisible] = useState(false);
+  const [binzeoIdCopyStatus, setBinzeoIdCopyStatus] = useState<"idle" | "copied" | "error">("idle");
 
   const [usernameCheck, setUsernameCheck] = useState<UsernameCheck>({
     checking: false, available: false, checked: "", message: "", suggestions: [],
@@ -608,6 +619,18 @@ export default function AccountPage() {
     await fetch("/api/auth/logout", { method: "POST" });
     router.push("/signin");
     router.refresh();
+  };
+
+  const handleCopyBinzeoId = async () => {
+    const binzeoId = data?.profile?.binzeo_user_id ?? form.binzeo_user_id;
+    if (!binzeoId) return;
+    try {
+      await navigator.clipboard.writeText(binzeoId);
+      setBinzeoIdCopyStatus("copied");
+    } catch {
+      setBinzeoIdCopyStatus("error");
+    }
+    window.setTimeout(() => setBinzeoIdCopyStatus("idle"), 1800);
   };
 
   useEffect(() => {
@@ -746,10 +769,25 @@ export default function AccountPage() {
             <div className="min-w-0 flex-1">
               <h2 className="text-[16px] font-semibold text-gray-900 truncate leading-tight tracking-tight">{displayName}</h2>
               <p className="text-[13px] text-gray-500 truncate mt-0.5">{userEmail}</p>
-              <p className="mt-1 flex flex-wrap items-center gap-x-2 text-[11px] text-gray-500">
+              <div className="mt-1 flex flex-wrap items-center gap-2 text-[11px] text-gray-500">
                 <span className="font-semibold uppercase tracking-[0.12em]">BZ ID</span>
-                <span className="font-mono text-gray-900">{form.binzeo_user_id || "Not assigned"}</span>
-              </p>
+                {form.binzeo_user_id ? (
+                  <>
+                    <span className="min-w-0 break-all font-mono text-gray-900">{binzeoIdVisible ? form.binzeo_user_id : "••••••••••"}</span>
+                    <div className="flex shrink-0 items-center gap-1">
+                      <button type="button" onClick={() => setBinzeoIdVisible((visible) => !visible)} className="inline-flex h-8 w-8 items-center justify-center rounded-full text-gray-500 hover:bg-gray-100 hover:text-gray-900" aria-label={binzeoIdVisible ? "Hide BZ ID" : "Show BZ ID"} title={binzeoIdVisible ? "Hide BZ ID" : "Show BZ ID"}>
+                        {binzeoIdVisible ? <Icons.EyeOff /> : <Icons.Eye />}
+                      </button>
+                      <button type="button" onClick={handleCopyBinzeoId} className="inline-flex h-8 items-center justify-center gap-1 rounded-full border border-gray-200 px-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900" aria-label={binzeoIdCopyStatus === "copied" ? "BZ ID copied" : "Copy BZ ID"}>
+                        <Icons.Copy />
+                        <span aria-live="polite">{binzeoIdCopyStatus === "copied" ? "Copied" : binzeoIdCopyStatus === "error" ? "Retry" : "Copy"}</span>
+                      </button>
+                    </div>
+                  </>
+                ) : (
+                  <span>Not assigned</span>
+                )}
+              </div>
               <button onClick={() => setActiveSection("profile")} className="mt-1.5 inline-flex items-center gap-1.5 text-[12px] font-medium text-blue-600 hover:text-blue-700 active:scale-95 transition-all duration-200 bg-blue-50 px-3 py-1 rounded-full">
                 <Icons.Edit /> Edit Account
               </button>
