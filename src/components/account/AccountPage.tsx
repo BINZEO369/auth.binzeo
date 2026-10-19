@@ -745,6 +745,10 @@ export default function AccountPage() {
             <div className="min-w-0 flex-1">
               <h2 className="text-[16px] font-semibold text-gray-900 truncate leading-tight tracking-tight">{displayName}</h2>
               <p className="text-[13px] text-gray-500 truncate mt-0.5">{userEmail}</p>
+              <p className="mt-1 flex flex-wrap items-center gap-x-2 text-[11px] text-gray-500">
+                <span className="font-semibold uppercase tracking-[0.12em]">BZ ID</span>
+                <span className="font-mono text-gray-900">{form.binzeo_user_id || "Not assigned"}</span>
+              </p>
               <button onClick={() => setActiveSection("profile")} className="mt-1.5 inline-flex items-center gap-1.5 text-[12px] font-medium text-blue-600 hover:text-blue-700 active:scale-95 transition-all duration-200 bg-blue-50 px-3 py-1 rounded-full">
                 <Icons.Edit /> Edit Account
               </button>
@@ -775,6 +779,14 @@ export default function AccountPage() {
             <div className={cardCls}>
               <MenuItem icon={<Icons.Agents />} label="Devices" onClick={() => setActiveSection("devices")} />
               <MenuItem icon={<Icons.Explore />} label="Sectors" onClick={() => setActiveSection("sectors")} />
+            </div>
+          </div>
+
+          {/* SECTION: Privacy */}
+          <div>
+            <h3 className="mb-2 px-4 text-[12px] font-medium text-gray-500 tracking-wide uppercase">Privacy</h3>
+            <div className={cardCls}>
+              <MenuItem icon={<Icons.Info />} label="Cookie controls" onClick={() => window.dispatchEvent(new Event("binzeo:open-cookie-controls"))} />
             </div>
           </div>
 

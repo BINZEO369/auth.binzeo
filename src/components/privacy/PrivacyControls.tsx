@@ -128,6 +128,7 @@ async function collectClientSignals(preferences: CookiePreferences) {
 
 export default function PrivacyControls() {
   const pathname = usePathname() || "/";
+  const showControls = pathname === "/account" || pathname.startsWith("/account/");
   const trackingState = useRef<PageTrackingState | null>(null);
   const [ready, setReady] = useState(false);
   const [hasDecision, setHasDecision] = useState(false);
@@ -170,6 +171,16 @@ export default function PrivacyControls() {
       active = false;
     };
   }, []);
+
+  useEffect(() => {
+    const openCookieControls = () => {
+      setView(hasDecision ? "preferences" : "notice");
+      setError("");
+      setOpen(true);
+    };
+    window.addEventListener("binzeo:open-cookie-controls", openCookieControls);
+    return () => window.removeEventListener("binzeo:open-cookie-controls", openCookieControls);
+  }, [hasDecision]);
 
   useEffect(() => {
     if (!ready || !hasDecision || !preferences.analytics_enabled) {
@@ -247,22 +258,7 @@ export default function PrivacyControls() {
 
   return (
     <>
-      {!open && (
-        <button
-          type="button"
-          onClick={() => {
-            setView("preferences");
-            setError("");
-            setOpen(true);
-          }}
-          className="fixed bottom-3 left-3 z-[9998] rounded-full border border-black/10 bg-white/95 px-3.5 py-2 text-xs font-medium text-black shadow-[0_8px_30px_rgba(0,0,0,0.12)] backdrop-blur transition hover:bg-white focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2"
-          aria-label="Open cookie settings"
-        >
-          Cookie settings
-        </button>
-      )}
-
-      {open && (
+      {showControls && open && (
         <div className="fixed inset-x-3 bottom-3 z-[9999] mx-auto w-auto sm:inset-x-auto sm:right-6 sm:bottom-6 sm:w-[min(36rem,calc(100vw-3rem))]">
           <section
             role="region"
