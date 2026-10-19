@@ -582,7 +582,7 @@ function SecuritySection() {
 /* ================================================================== */
 export default function AccountPage() {
   const router = useRouter();
-  const [activeSection, setActiveSection] = useState<"menu" | "profile" | "security" | "contacts" | "addresses" | "devices" | "sectors">("menu");
+  const [activeSection, setActiveSection] = useState<"menu" | "profile" | "security" | "contacts" | "addresses" | "devices" | "sectors" | "privacy">("menu");
   const [data, setData] = useState<Data | null>(null);
   const [form, setForm] = useState<Partial<Profile>>({});
   const [loading, setLoading] = useState(true);
@@ -601,6 +601,7 @@ export default function AccountPage() {
     ["addresses", "Addresses"],
     ["devices", "Devices"],
     ["sectors", "Sectors"],
+    ["privacy", "Privacy"],
   ] as const;
 
   const handleLogout = async () => {
@@ -786,7 +787,7 @@ export default function AccountPage() {
           <div>
             <h3 className="mb-2 px-4 text-[12px] font-medium text-gray-500 tracking-wide uppercase">Privacy</h3>
             <div className={cardCls}>
-              <MenuItem icon={<Icons.Info />} label="Cookie controls" onClick={() => window.dispatchEvent(new Event("binzeo:open-cookie-controls"))} />
+              <MenuItem icon={<Icons.Info />} label="Cookie controls" onClick={() => { setActiveSection("privacy"); window.dispatchEvent(new Event("binzeo:open-cookie-controls")); }} />
             </div>
           </div>
 
@@ -905,6 +906,13 @@ export default function AccountPage() {
             </form>
           )}
 
+          {activeSection === "privacy" && (
+            <div className="mx-auto max-w-md px-4 pt-2 pb-4">
+              <p className="rounded-2xl border border-gray-100 bg-white p-4 text-[13px] leading-6 text-gray-500">
+                Manage essential and optional cookie permissions for your BINZEO account here.
+              </p>
+            </div>
+          )}
           {activeSection === "security" && <SecuritySection />}
           {activeSection === "contacts" && <ContactsSection />}
           {activeSection === "addresses" && <AddressesSection />}
@@ -912,6 +920,7 @@ export default function AccountPage() {
           {activeSection === "sectors" && <SectorsSection />}
         </div>
       )}
+      <div id="cookie-controls-slot" className={activeSection === "privacy" ? "mx-auto max-w-md px-4 pb-8" : "hidden"} />
     </div>
   );
 }

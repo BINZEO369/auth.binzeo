@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { usePathname } from "next/navigation";
 
 type CookiePreferences = {
@@ -129,6 +130,7 @@ async function collectClientSignals(preferences: CookiePreferences) {
 export default function PrivacyControls() {
   const pathname = usePathname() || "/";
   const showControls = pathname === "/account" || pathname.startsWith("/account/");
+  const portalTarget = typeof document === "undefined" ? null : document.getElementById("cookie-controls-slot");
   const trackingState = useRef<PageTrackingState | null>(null);
   const [ready, setReady] = useState(false);
   const [hasDecision, setHasDecision] = useState(false);
@@ -155,7 +157,7 @@ export default function PrivacyControls() {
         } else {
           setPreferences(DEFAULT_PREFERENCES);
           setHasDecision(false);
-          setOpen(true);
+          setOpen(false);
           setView("notice");
         }
         setReady(true);
@@ -164,7 +166,7 @@ export default function PrivacyControls() {
         if (!active) return;
         setPreferences(DEFAULT_PREFERENCES);
         setHasDecision(false);
-        setOpen(true);
+        setOpen(false);
         setReady(true);
       });
     return () => {
@@ -254,16 +256,14 @@ export default function PrivacyControls() {
     setPreferences((current) => ({ ...current, [key]: value }));
   }
 
-  if (!ready) return null;
+  if (!ready || !showControls || !open || !portalTarget) return null;
 
-  return (
-    <>
-      {showControls && open && (
-        <div className="fixed inset-x-3 bottom-3 z-[9999] mx-auto w-auto sm:inset-x-auto sm:right-6 sm:bottom-6 sm:w-[min(36rem,calc(100vw-3rem))]">
-          <section
+  return createPortal(
+    <div className="w-full">
+      <section
             role="region"
             aria-label="Cookie and privacy choices"
-            className="max-h-[84dvh] overflow-y-auto rounded-[24px] border border-black/10 bg-white/95 p-5 shadow-[0_24px_80px_rgba(0,0,0,0.2)] backdrop-blur-2xl sm:p-6"
+            className="rounded-[18px] border border-gray-100 bg-white p-4 shadow-[0_2px_10px_rgba(0,0,0,0.03)] sm:p-5"
           >
             <div className="flex items-start justify-between gap-4">
               <div>
@@ -356,9 +356,8 @@ export default function PrivacyControls() {
             <p className="mt-4 text-[10px] leading-4 text-black/40">
               You can reopen Cookie settings at any time. Your browser will ask again after 180 days; the database consent record carries the same expiry marker.
             </p>
-          </section>
-        </div>
-      )}
-    </>
+      </section>
+    </div>,
+    portalTarget,
   );
 }
