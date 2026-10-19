@@ -148,6 +148,8 @@ url.searchParams.set('redirect_uri', REDIRECT_URI);
 url.searchParams.set('state', state);
 url.searchParams.set('code_challenge', codeChallenge);
 url.searchParams.set('code_challenge_method', 'S256');
+// Jabiyen-style app session handoff চাইলে one-time, PKCE-bound ticket ব্যবহার করুন।
+url.searchParams.set('handoff', 'one-time');
 // method না দিলে Central Auth নিজেই method chooser দেখায়।
 window.location.assign(url.toString());
 ```
@@ -170,13 +172,13 @@ method=passkey | email | token | qr
 - **QR:** scanner ও token redemption Central Auth UI-তে হয়; website QR data যাচাই করে না।
 - **OTP/2FA:** এটি passkey, email, temporary-token বা অন্য supported login-এর পর Central Auth-এ সম্পন্ন হয়; OTP app site-এ পাঠাবেন না।
 
-## 4. Callback-এ code যাচাই ও session তৈরি
+## 4. Callback-এ authorization code অথবা one-time handoff যাচাই
 
-Central Auth registered callback-এ `code` ও `state` query parameter দিয়ে ফেরে। Callback handler:
+Default OAuth/PKCE flow-তে Central Auth registered callback-এ `code` ও `state` query parameter দিয়ে ফেরে। App-session handoff mode চাইলে `handoff=one-time` যোগ করুন; তখন Central Auth registered callback-এর **URL fragment**-এ opaque `handoff_token` ও `state` দিয়ে ফেরে। Fragment server log/referrer-এ যায় না এবং callback script-কে তাৎক্ষণিকভাবে address bar থেকে সরাতে হবে। দুই mode-এর callback handler:
 
-1. URL থেকে `code` ও `state` পড়ে, তারপর address bar থেকে code সরিয়ে দেয়।
+1. Query-তে code অথবা fragment-এ handoff ticket/state পড়ে; code/ticket-সহ URL অবিলম্বে scrub করে। একই response-এ দুটো credential এলে প্রত্যাখ্যান করে।
 2. Stored state মিলিয়ে দেখে; verifier একই transaction/tab-এর হতে হবে এবং transaction 120 সেকেন্ডের বেশি পুরোনো হলে বাতিল করে।
-3. Code ও verifier Central API-তে পাঠায়:
+3. **Code mode:** code ও verifier Central API-তে পাঠায়:
 
 ```http
 POST https://api-binzeo.vercel.app/v1/auth/token
@@ -194,11 +196,25 @@ Content-Type: application/json
 
 Success response-এ `data.session` থাকে; invalid/expired/reused code, ভুল callback বা ভুল verifier হলে exchange প্রত্যাখ্যাত হয়। Authorization code প্রায় দুই মিনিটে expire হয় এবং একবারই redeem করা যায়।
 
+**One-time handoff mode:** callback fragment থেকে `handoff_token` ও `state` parse করে verifier-সহ নিচের body একই Central API-র `/v1/auth/handoff/redeem`-এ পাঠান:
+
+```json
+{
+  "client_id": "storefront:website",
+  "redirect_uri": "https://shop.example.com/auth/callback",
+  "state": "<Central Auth-এ পাঠা একই state>",
+  "token": "<fragment-এ পাওয়া handoff_token>",
+  "code_verifier": "<শুধু এই transaction-এর verifier>"
+}
+```
+
+Central Auth-এর final verification ও প্রয়োজনীয় OTP সম্পূর্ণ হওয়ার পরই `/v1/auth/handoff/issue` ticket দেয়। Ticket 60 সেকেন্ডে expire হয়; database-এ raw ticket নয়—শুধু SHA-256 hash এবং বর্তমান temporary-token schema-র masked preview/lifecycle metadata থাকে। Ticket-এর HMAC binding-এ user, registered client ID, byte-for-byte callback URI, state ও `BASE64URL(SHA256(code_verifier))` থাকে। Redeem route allowlist পুনরায় যাচাই করে, binding যাচাই শেষে বিদ্যমান atomic one-time consume RPC চালায় এবং app callback-এ session ফেরায়। Ticket re-use/expiry, mismatch বা wrong verifier প্রত্যাখ্যাত হয়। এই mode-এ দ্বিতীয় OTP prompt নেই—কারণ Central Auth-এ login/2FA ইতিমধ্যে সম্পন্ন। Manual temporary-token sign-in-এর নিজস্ব 2FA behavior অপরিবর্তিত থাকে।
+
 **Session storage recommendation:** নতুন website-এ token exchange server-side/BFF route দিয়ে করুন; refresh token-কে JavaScript-accessible `localStorage`-এ রাখবেন না। Server-side session-এ Secure, HttpOnly, SameSite cookie ব্যবহার করুন। Browser-only SPA হলে refresh token persist করার আগে Central API integration/security owner-এর সঙ্গে session refresh strategy ঠিক করুন। Jabiyen reference callback refresh token browser storage-এ রাখে না।
 
 ## 5. Central Auth/API-এর অভ্যন্তরীণ protocol (reference)
 
-Consuming website সাধারণত `/authorize` সরাসরি call করে না—Central Auth UI সফল sign-in-এর পরে এটি করে। Generic registered client-এর authorize request-এ থাকে `client_id`, exact `redirect_uri`, `state`, `code_challenge`, `refresh_token`, এবং authenticated user-এর bearer access token। API active registry ও callback যাচাই করে, session encrypted server-side রেখে short-lived code দেয়; callback-এ `/token` exchange PKCE যাচাই করে session ফেরায়। Authorization code table-এ client ID check constraint namespaced `project:client` format অনুমোদন করে—তার migration production Central API database-এ applied থাকতে হবে।
+Consuming website সাধারণত issue endpoint সরাসরি call করে না—Central Auth UI final sign-in (এবং প্রযোজ্য OTP) শেষে করে। Default OAuth authorize request-এ `client_id`, exact `redirect_uri`, `state`, `code_challenge`, `refresh_token`, এবং authenticated user-এর bearer access token থাকে। API active registry ও callback যাচাই করে, session encrypted server-side রেখে short-lived code দেয়; `/token` exchange PKCE যাচাই করে session ফেরায়। `handoff=one-time` mode-এ Central Auth শুধু verified bearer access token এবং `client_id`, exact callback, `state`, `code_challenge` দিয়ে `/handoff/issue` call করে; refresh token browser JavaScript দিয়ে পাঠায় না এবং `CENTRAL_OAUTH_ENCRYPTION_KEY` দিয়ে session encryption লাগে না। Handoff issue/redeem উভয় endpoint active generic client registry/callback (অথবা পুরোনো fixed Jabiyen callback) যাচাই করে। Authorization-code table-এর namespaced `project:client` constraint/migration শুধু code-mode-এর জন্য প্রয়োজন; handoff mode বিদ্যমান temporary-login-token storage ও atomic consume RPC ব্যবহার করে।
 
 ## 6. App site-এ কী থাকবে না
 
@@ -220,9 +236,10 @@ App-এর sign-in page একটি launcher হতে পারে; method ন
 - [ ] `method` বাদ দিয়ে Central Auth method chooser পরীক্ষা করা হয়েছে; দরকারে passkey/email/token/QR deep-link পরীক্ষা হয়েছে।
 - [ ] Passkey, 2FA OTP, one-time token ও QR-এর positive/negative flow Central Auth-এ পরীক্ষা হয়েছে।
 - [ ] Callback state mismatch, expired code, replayed code, wrong verifier ও wrong redirect test করা হয়েছে।
+- [ ] Handoff mode চালু করলে expired/replayed ticket, callback/client/state/verifier mismatch প্রত্যাখ্যাত হয়; successful ticket 60-second expiry-তে একবারই consume হয়।
 - [ ] Session secure cookie/BFF-এ রাখা হয়েছে; refresh token logs, URL বা localStorage-এ নেই।
 - [ ] Production callback alias, Vercel environment variables ও API/CORS/rewrites যাচাই করা হয়েছে।
 
 ## 8. বর্তমান Jabiyen integration
 
-Jabiyen integration `client_id=jabiyen` এবং callback `https://jabiyen-website.vercel.app/auth/callback` ব্যবহার করে। Updated UI-তে Jabiyen-এ একটি মাত্র “Continue with BINZEO Central Auth” action থাকবে; এটি method parameter ছাড়া `/oauth/authorize`-এ পাঠায়, ফলে method নির্বাচন ও সব verification Central Auth UI-তেই হয়। Jabiyen callback PKCE state/verifier যাচাই করে authorization code exchange করে। নতুন integration-এ এই legacy client ID পুনর্ব্যবহার না করে registry-ভিত্তিক namespaced client ID নিন।
+Jabiyen integration `client_id=jabiyen` এবং callback `https://jabiyen-website.vercel.app/auth/callback` ব্যবহার করে। Updated UI-তে Jabiyen-এ একটি মাত্র “Continue with BINZEO Central Auth” action থাকবে; এটি method parameter ছাড়া এবং `handoff=one-time` সহ `/oauth/authorize`-এ পাঠায়, ফলে method নির্বাচন ও সব verification Central Auth UI-তেই হয়। Jabiyen callback একই-tab PKCE state/verifier যাচাই করে 60-second handoff ticket redeem করে, refresh token browser storage-এ রাখে না। নতুন integration-এ এই legacy client ID পুনর্ব্যবহার না করে registry-ভিত্তিক namespaced client ID নিন।

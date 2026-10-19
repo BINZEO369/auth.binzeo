@@ -258,6 +258,7 @@ export default function LoginForm() {
   const oauthClientId = searchParams.get("client_id") ?? "";
   const oauthRedirectUri = searchParams.get("redirect_uri") ?? "";
   const oauthState = searchParams.get("state") ?? "";
+  const oauthOneTimeHandoff = searchParams.get("handoff") === "one-time";
   const oauthCodeChallenge = searchParams.get("code_challenge") ?? "";
   const oauthCodeChallengeMethod = searchParams.get("code_challenge_method") ?? "";
   const requestedMethod = searchParams.get("method");
@@ -389,27 +390,53 @@ export default function LoginForm() {
     }
     const session = extractAuthSession(payload);
     const accessToken = session?.access_token;
-    const refreshToken = session?.refresh_token;
-    const missingFields: string[] = [];
-    if (typeof accessToken !== "string" || accessToken.length === 0) missingFields.push("access_token");
-    if (typeof refreshToken !== "string" || refreshToken.length === 0) missingFields.push("refresh_token");
-    else if (refreshToken.length > 16_384) missingFields.push("refresh_token_length");
-    if (
-      typeof accessToken !== "string" ||
-      accessToken.length === 0 ||
-      typeof refreshToken !== "string" ||
-      refreshToken.length === 0 ||
-      refreshToken.length > 16_384
-    ) {
-      const fields = missingFields.length ? ` Missing/invalid: ${missingFields.join(", ")}.` : "";
+    if (typeof accessToken !== "string" || accessToken.length === 0) {
       const reference = requestId ? ` Reference: ${requestId}.` : "";
-      setError(`Authentication completed, but a secure application session was not returned. Please sign in again. [${source}]${fields}${reference}`);
+      setError(`Authentication completed, but a secure application handoff could not be created. Please sign in again. [${source}] Missing/invalid: access_token.${reference}`);
       setStage("methods");
       return;
     }
 
     setStage("success");
     try {
+      if (oauthOneTimeHandoff) {
+        const result = await apiFetch<{ redirect_url: string; expires_in: number }>("/api/auth/handoff/issue", {
+          method: "POST",
+          headers: { Authorization: `Bearer ${accessToken}` },
+          body: JSON.stringify({
+            client_id: oauthClientId,
+            redirect_uri: oauthRedirectUri,
+            state: oauthState,
+            code_challenge: oauthCodeChallenge,
+          }),
+        });
+        if (!result.success) {
+          const reference = result.error.request_id ? ` (reference ${result.error.request_id})` : "";
+          throw new Error(`${result.error.message}${reference}`);
+        }
+        const destination = new URL(result.data.redirect_url);
+        const callback = new URL(oauthRedirectUri);
+        const handoff = new URLSearchParams(destination.hash.replace(/^#/, ""));
+        if (
+          destination.origin !== callback.origin ||
+          destination.pathname !== callback.pathname ||
+          destination.search !== callback.search ||
+          handoff.get("state") !== oauthState ||
+          !/^h1\.[A-Za-z0-9_-]{43}\.\d{13}\.[A-Za-z0-9_-]{43}$/.test(handoff.get("handoff_token") ?? "")
+        ) {
+          throw new Error("Central Auth returned an invalid application handoff.");
+        }
+        window.location.replace(destination.toString());
+        return;
+      }
+
+      const refreshToken = session?.refresh_token;
+      if (typeof refreshToken !== "string" || refreshToken.length === 0 || refreshToken.length > 16_384) {
+        const reference = requestId ? ` Reference: ${requestId}.` : "";
+        setError(`Authentication completed, but a secure application session was not returned. Please sign in again. [${source}] Missing/invalid: refresh_token.${reference}`);
+        setStage("methods");
+        return;
+      }
       const result = await apiFetch<{ redirect_url: string; expires_in: number }>("/api/auth/authorize", {
         method: "POST",
         headers: { Authorization: `Bearer ${accessToken}` },
@@ -435,7 +462,7 @@ export default function LoginForm() {
       setError(error instanceof Error ? error.message : "Application sign-in could not be completed. Please try again.");
       setStage("methods");
     }
-  }, [oauthHandoff, oauthRequestShapeValid, oauthMetadataStatus, oauthClientId, oauthRedirectUri, oauthState, oauthCodeChallenge, next, router]);
+  }, [oauthHandoff, oauthRequestShapeValid, oauthMetadataStatus, oauthOneTimeHandoff, oauthClientId, oauthRedirectUri, oauthState, oauthCodeChallenge, next, router]);
 
   /* ------------------------------------------------------------- */
   /*  Email login                                                   */
