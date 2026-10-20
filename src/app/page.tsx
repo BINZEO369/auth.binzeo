@@ -16,143 +16,166 @@ const partnerLogos = [
 /*  - ফাইল থাকতে হবে: /public/frames/hero/frame_0001.webp ... 0300     */
 /*  - FRAME_COUNT / FPS নিচে নিজের মতো বদলাতে পারো                     */
 /* ================================================================== */
-const HERO_FRAME_ANIM_SCRIPT = `
-(function () {
-  var FRAME_COUNT = 300;
-  var FPS = 30;
-  var LOAD_AHEAD = 40;
-  var KEEP_BEHIND = 10;
-  var FRAME_DIR = '/frames/hero/';
-  var FRAME_PREFIX = 'frame_';
-  var FRAME_EXT = '.webp';
-  var FRAME_PAD = 4;
 
-  function framePath(i) {
-    var n = String(i + 1);
-    while (n.length < FRAME_PAD) n = '0' + n;
-    return FRAME_DIR + FRAME_PREFIX + n + FRAME_EXT;
+const HERO_FRAME_ANIM_SCRIPT = String.raw`(() => {
+  const canvas = document.getElementById("hero-frame-canvas");
+  if (!(canvas instanceof HTMLCanvasElement)) return;
+
+  const context = canvas.getContext("2d", { alpha: false });
+  if (!context) return;
+
+  const FRAME_COUNT = 300;
+  const FPS = 30;
+  const FRAME_DURATION = 1000 / FPS;
+  const CACHE_LIMIT = 24;
+  const PREFETCH_AHEAD = 8;
+  const frameCache = new Map();
+  const pendingFrames = new Map();
+  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  let frameIndex = 0;
+  let animationFrameId = 0;
+  let lastFrameTime = 0;
+  let isVisible = true;
+
+  function frameUrl(index) {
+    return "/frames/hero/frame_" + String(index + 1).padStart(4, "0") + ".webp";
   }
 
-  var canvas = null;
-  var ctx = null;
-  var cache = new Map();
-  var pending = new Set();
-  var failed = new Set();
-  var current = 0;
-  var started = false;
-
-  function init() {
-    canvas = document.getElementById('hero-frame-canvas');
-    if (!canvas) return false;
-    ctx = canvas.getContext('2d');
-    return !!ctx;
-  }
-
-  function loadFrame(i) {
-    if (cache.has(i) || pending.has(i) || failed.has(i)) return;
-    pending.add(i);
-    fetch(framePath(i))
-      .then(function (r) {
-        if (!r.ok) throw new Error('HTTP ' + r.status);
-        return r.blob();
-      })
-      .then(function (blob) { return createImageBitmap(blob); })
-      .then(function (bmp) {
-        cache.set(i, bmp);
-        pending.delete(i);
-        if (i === 0 && !started) begin();
-      })
-      .catch(function () {
-        pending.delete(i);
-        failed.add(i);
-      });
-  }
-
-  function unloadFrame(i) {
-    var bmp = cache.get(i);
-    if (bmp) { bmp.close(); cache.delete(i); }
-  }
-
-  function manageWindow() {
-    var keys = Array.from(cache.keys());
-    for (var k = 0; k < keys.length; k++) {
-      var idx = keys[k];
-      var ahead = (idx - current + FRAME_COUNT) % FRAME_COUNT;
-      var behind = (current - idx + FRAME_COUNT) % FRAME_COUNT;
-      if (ahead > LOAD_AHEAD && behind > KEEP_BEHIND) unloadFrame(idx);
-    }
-    for (var d = 1; d <= LOAD_AHEAD; d++) {
-      var target = (current + d) % FRAME_COUNT;
-      if (!cache.has(target) && !pending.has(target) && !failed.has(target)) {
-        loadFrame(target);
-      }
+  function touchFrame(index, image) {
+    frameCache.delete(index);
+    frameCache.set(index, image);
+    while (frameCache.size > CACHE_LIMIT) {
+      const leastRecentlyUsed = frameCache.keys().next().value;
+      if (leastRecentlyUsed === undefined) break;
+      frameCache.delete(leastRecentlyUsed);
     }
   }
 
-  function drawBitmap(img) {
-    if (!canvas || !ctx) return;
-    var dpr = Math.min(window.devicePixelRatio || 1, 2);
-    var cw = Math.round(canvas.clientWidth * dpr);
-    var ch = Math.round(canvas.clientHeight * dpr);
-    if (canvas.width !== cw) canvas.width = cw;
-    if (canvas.height !== ch) canvas.height = ch;
-    var scale = Math.max(cw / img.width, ch / img.height);
-    var w = img.width * scale;
-    var h = img.height * scale;
-    ctx.clearRect(0, 0, cw, ch);
-    ctx.drawImage(img, (cw - w) / 2, (ch - h) / 2, w, h);
-  }
-
-  function begin() {
-    if (started) return;
-    started = true;
-    var first = cache.get(0);
-    if (first) drawBitmap(first);
-
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-
-    var last = performance.now();
-    var interval = 1000 / FPS;
-
-    function tick(now) {
-      if (now - last >= interval) {
-        last = now;
-        var next = (current + 1) % FRAME_COUNT;
-        if (cache.has(next)) {
-          current = next;
-          drawBitmap(cache.get(next));
-        } else {
-          loadFrame(next);
-        }
-      }
-      requestAnimationFrame(tick);
+  function loadFrame(index) {
+    if (frameCache.has(index)) {
+      const cached = frameCache.get(index);
+      touchFrame(index, cached);
+      return Promise.resolve(cached);
     }
-    requestAnimationFrame(tick);
+    if (pendingFrames.has(index)) return pendingFrames.get(index);
 
-    manageWindow();
-    setInterval(manageWindow, 200);
+    const promise = new Promise((resolve) => {
+      const image = new Image();
+      image.decoding = "async";
+      image.onload = () => {
+        pendingFrames.delete(index);
+        touchFrame(index, image);
+        resolve(image);
+      };
+      image.onerror = () => {
+        pendingFrames.delete(index);
+        resolve(null);
+      };
+      image.src = frameUrl(index);
+    });
+    pendingFrames.set(index, promise);
+    return promise;
   }
 
-  function boot() {
-    loadFrame(0);
-    window.addEventListener('resize', function () {
-      if (cache.has(current)) drawBitmap(cache.get(current));
+  function drawImageCover(image) {
+    const rect = canvas.getBoundingClientRect();
+    const width = rect.width;
+    const height = rect.height;
+    if (!width || !height) return;
+
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const pixelWidth = Math.max(1, Math.round(width * dpr));
+    const pixelHeight = Math.max(1, Math.round(height * dpr));
+    if (canvas.width !== pixelWidth || canvas.height !== pixelHeight) {
+      canvas.width = pixelWidth;
+      canvas.height = pixelHeight;
+    }
+
+    context.setTransform(dpr, 0, 0, dpr, 0, 0);
+    context.fillStyle = "#0a0a0a";
+    context.fillRect(0, 0, width, height);
+
+    const scale = Math.max(width / image.naturalWidth, height / image.naturalHeight);
+    const drawWidth = image.naturalWidth * scale;
+    const drawHeight = image.naturalHeight * scale;
+    context.imageSmoothingEnabled = true;
+    context.imageSmoothingQuality = "high";
+    context.drawImage(image, (width - drawWidth) / 2, (height - drawHeight) / 2, drawWidth, drawHeight);
+  }
+
+  function drawFrame(index) {
+    loadFrame(index).then((image) => {
+      if (image && index === frameIndex) drawImageCover(image);
     });
   }
 
-  function startWhenReady() {
-    if (init()) { boot(); return; }
-    var tries = 0;
-    var wait = setInterval(function () {
-      tries++;
-      if (init()) { clearInterval(wait); boot(); }
-      else if (tries > 40) { clearInterval(wait); }
-    }, 100);
+  function prefetchFrames() {
+    for (let offset = 1; offset <= PREFETCH_AHEAD; offset += 1) {
+      if (pendingFrames.size >= CACHE_LIMIT) break;
+      const nextIndex = (frameIndex + offset) % FRAME_COUNT;
+      if (!frameCache.has(nextIndex) && !pendingFrames.has(nextIndex)) {
+        loadFrame(nextIndex);
+      }
+    }
   }
 
-  startWhenReady();
-})();
-`;
+  function animate(now) {
+    animationFrameId = 0;
+    if (!isVisible || document.hidden || reducedMotion) return;
+    if (!lastFrameTime) lastFrameTime = now;
+
+    const elapsed = now - lastFrameTime;
+    if (elapsed >= FRAME_DURATION) {
+      const framesToAdvance = Math.floor(elapsed / FRAME_DURATION);
+      frameIndex = (frameIndex + framesToAdvance) % FRAME_COUNT;
+      lastFrameTime += framesToAdvance * FRAME_DURATION;
+      drawFrame(frameIndex);
+      prefetchFrames();
+    }
+
+    animationFrameId = window.requestAnimationFrame(animate);
+  }
+
+  function startAnimation() {
+    if (!animationFrameId && isVisible && !document.hidden && !reducedMotion) {
+      animationFrameId = window.requestAnimationFrame(animate);
+    }
+  }
+
+  function stopAnimation() {
+    if (animationFrameId) window.cancelAnimationFrame(animationFrameId);
+    animationFrameId = 0;
+    lastFrameTime = 0;
+  }
+
+  function redrawCurrentFrame() {
+    const image = frameCache.get(frameIndex);
+    if (image) drawImageCover(image);
+  }
+
+  drawFrame(0);
+  prefetchFrames();
+  window.addEventListener("resize", redrawCurrentFrame, { passive: true });
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) stopAnimation();
+    else startAnimation();
+  });
+
+  if ("ResizeObserver" in window) {
+    new ResizeObserver(redrawCurrentFrame).observe(canvas);
+  }
+
+  if ("IntersectionObserver" in window) {
+    const observer = new IntersectionObserver(([entry]) => {
+      isVisible = Boolean(entry && entry.isIntersecting);
+      if (isVisible) startAnimation();
+      else stopAnimation();
+    }, { rootMargin: "100px" });
+    observer.observe(canvas);
+  } else {
+    startAnimation();
+  }
+})();`;
 
 /* ================================================================== */
 /*  Cinematic letter reveal                                            */
@@ -248,6 +271,9 @@ export default async function HomePage() {
               width: "100%",
               height: "100%",
               display: "block",
+              backgroundColor: "#0a0a0a",
+              pointerEvents: "none",
+              zIndex: 1,
             }}
           />
 
