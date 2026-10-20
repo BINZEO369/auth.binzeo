@@ -12,6 +12,149 @@ const partnerLogos = [
 ];
 
 /* ================================================================== */
+/*  Hero frame-sequence animation (inline, no separate file)           */
+/*  - ফাইল থাকতে হবে: /public/frames/hero/frame_0001.webp ... 0300     */
+/*  - FRAME_COUNT / FPS নিচে নিজের মতো বদলাতে পারো                     */
+/* ================================================================== */
+const HERO_FRAME_ANIM_SCRIPT = `
+(function () {
+  var FRAME_COUNT = 300;
+  var FPS = 30;
+  var LOAD_AHEAD = 40;
+  var KEEP_BEHIND = 10;
+  var FRAME_DIR = '/frames/hero/';
+  var FRAME_PREFIX = 'frame_';
+  var FRAME_EXT = '.webp';
+  var FRAME_PAD = 4;
+
+  function framePath(i) {
+    var n = String(i + 1);
+    while (n.length < FRAME_PAD) n = '0' + n;
+    return FRAME_DIR + FRAME_PREFIX + n + FRAME_EXT;
+  }
+
+  var canvas = null;
+  var ctx = null;
+  var cache = new Map();
+  var pending = new Set();
+  var failed = new Set();
+  var current = 0;
+  var started = false;
+
+  function init() {
+    canvas = document.getElementById('hero-frame-canvas');
+    if (!canvas) return false;
+    ctx = canvas.getContext('2d');
+    return !!ctx;
+  }
+
+  function loadFrame(i) {
+    if (cache.has(i) || pending.has(i) || failed.has(i)) return;
+    pending.add(i);
+    fetch(framePath(i))
+      .then(function (r) {
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        return r.blob();
+      })
+      .then(function (blob) { return createImageBitmap(blob); })
+      .then(function (bmp) {
+        cache.set(i, bmp);
+        pending.delete(i);
+        if (i === 0 && !started) begin();
+      })
+      .catch(function () {
+        pending.delete(i);
+        failed.add(i);
+      });
+  }
+
+  function unloadFrame(i) {
+    var bmp = cache.get(i);
+    if (bmp) { bmp.close(); cache.delete(i); }
+  }
+
+  function manageWindow() {
+    var keys = Array.from(cache.keys());
+    for (var k = 0; k < keys.length; k++) {
+      var idx = keys[k];
+      var ahead = (idx - current + FRAME_COUNT) % FRAME_COUNT;
+      var behind = (current - idx + FRAME_COUNT) % FRAME_COUNT;
+      if (ahead > LOAD_AHEAD && behind > KEEP_BEHIND) unloadFrame(idx);
+    }
+    for (var d = 1; d <= LOAD_AHEAD; d++) {
+      var target = (current + d) % FRAME_COUNT;
+      if (!cache.has(target) && !pending.has(target) && !failed.has(target)) {
+        loadFrame(target);
+      }
+    }
+  }
+
+  function drawBitmap(img) {
+    if (!canvas || !ctx) return;
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    var cw = Math.round(canvas.clientWidth * dpr);
+    var ch = Math.round(canvas.clientHeight * dpr);
+    if (canvas.width !== cw) canvas.width = cw;
+    if (canvas.height !== ch) canvas.height = ch;
+    var scale = Math.max(cw / img.width, ch / img.height);
+    var w = img.width * scale;
+    var h = img.height * scale;
+    ctx.clearRect(0, 0, cw, ch);
+    ctx.drawImage(img, (cw - w) / 2, (ch - h) / 2, w, h);
+  }
+
+  function begin() {
+    if (started) return;
+    started = true;
+    var first = cache.get(0);
+    if (first) drawBitmap(first);
+
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    var last = performance.now();
+    var interval = 1000 / FPS;
+
+    function tick(now) {
+      if (now - last >= interval) {
+        last = now;
+        var next = (current + 1) % FRAME_COUNT;
+        if (cache.has(next)) {
+          current = next;
+          drawBitmap(cache.get(next));
+        } else {
+          loadFrame(next);
+        }
+      }
+      requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+
+    manageWindow();
+    setInterval(manageWindow, 200);
+  }
+
+  function boot() {
+    loadFrame(0);
+    window.addEventListener('resize', function () {
+      if (cache.has(current)) drawBitmap(cache.get(current));
+    });
+  }
+
+  function startWhenReady() {
+    if (init()) { boot(); return; }
+    var tries = 0;
+    var wait = setInterval(function () {
+      tries++;
+      if (init()) { clearInterval(wait); boot(); }
+      else if (tries > 40) { clearInterval(wait); }
+    }, 100);
+  }
+
+  startWhenReady();
+})();
+`;
+
+/* ================================================================== */
 /*  Cinematic letter reveal                                            */
 /* ================================================================== */
 function Letters({
@@ -75,8 +218,6 @@ export default async function HomePage() {
 
   return (
     <main className="reference-home" style={{ backgroundColor: "#f7f7f5" }}>
-      
-
       <div className="reference-shell">
         {/* ============================================================ */}
         {/*  1. HERO BANNER                                                */}
@@ -97,16 +238,16 @@ export default async function HomePage() {
             backgroundColor: "#0a0a0a",
           }}
         >
-          <div
+          {/* === ফ্রেম-বাই-ফ্রেম অ্যানিমেশন (canvas) === */}
+          <canvas
+            id="hero-frame-canvas"
             aria-hidden="true"
             style={{
               position: "absolute",
               inset: 0,
-              backgroundImage: "url('/images/img3.jpg')",
-              backgroundSize: "cover",
-              backgroundPosition: "center",
-              backgroundRepeat: "no-repeat",
-              animation: "bz-kenburns 28s ease-in-out infinite",
+              width: "100%",
+              height: "100%",
+              display: "block",
             }}
           />
 
@@ -1447,6 +1588,11 @@ export default async function HomePage() {
       {/*  Scripts                                                      */}
       {/* ============================================================ */}
       <Script src="/home-interactions.js" strategy="afterInteractive" />
+      <Script
+        id="hero-frame-anim"
+        strategy="afterInteractive"
+        dangerouslySetInnerHTML={{ __html: HERO_FRAME_ANIM_SCRIPT }}
+      />
     </main>
   );
 }
