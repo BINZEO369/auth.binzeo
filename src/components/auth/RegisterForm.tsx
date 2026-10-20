@@ -329,16 +329,19 @@ export default function RegisterForm() {
     const normalized = email.trim().toLowerCase();
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(normalized)) {
-      setEmailChecking(false);
+      const resetTimer = window.setTimeout(() => {
+        setEmailChecking(false);
+        setEmailExists(false);
+        setEmailCheckError("");
+        setCheckedEmail("");
+      }, 0);
+      return () => window.clearTimeout(resetTimer);
+    }
+    const timer = setTimeout(async () => {
+      setEmailChecking(true);
       setEmailExists(false);
       setEmailCheckError("");
-      setCheckedEmail("");
-      return;
-    }
-    setEmailChecking(true);
-    setEmailExists(false);
-    setEmailCheckError("");
-    const timer = setTimeout(async () => {
+      setCheckedEmail(normalized);
       try {
         const response = await fetch("/api/auth/check-email", {
           method: "POST",
@@ -348,14 +351,12 @@ export default function RegisterForm() {
         const data = await response.json();
         if (!data.success) {
           setEmailCheckError(data.error?.message ?? "Could not check this email");
-          setCheckedEmail("");
           return;
         }
         setEmailExists(data.data.exists === true);
         setCheckedEmail(normalized);
       } catch {
         setEmailCheckError("Could not check this email right now. Please try again.");
-        setCheckedEmail("");
       } finally {
         setEmailChecking(false);
       }
@@ -366,18 +367,21 @@ export default function RegisterForm() {
   useEffect(() => {
     const normalized = username.trim().toLowerCase().replace(/^@/, "");
     if (!normalized) {
-      setUsernameChecking(false);
+      const resetTimer = window.setTimeout(() => {
+        setUsernameChecking(false);
+        setUsernameAvailable(false);
+        setUsernameSuggestions([]);
+        setUsernameCheckError("");
+        setCheckedUsername("");
+      }, 0);
+      return () => window.clearTimeout(resetTimer);
+    }
+    const timer = setTimeout(async () => {
+      setUsernameChecking(true);
       setUsernameAvailable(false);
       setUsernameSuggestions([]);
       setUsernameCheckError("");
-      setCheckedUsername("");
-      return;
-    }
-    setUsernameChecking(true);
-    setUsernameAvailable(false);
-    setUsernameSuggestions([]);
-    setUsernameCheckError("");
-    const timer = setTimeout(async () => {
+      setCheckedUsername(normalized);
       try {
         const response = await fetch("/api/auth/check-username", {
           method: "POST",
@@ -387,7 +391,6 @@ export default function RegisterForm() {
         const data = await response.json();
         if (!data.success) {
           setUsernameCheckError(data.error?.message ?? "Could not check this username");
-          setCheckedUsername("");
           return;
         }
         setUsernameAvailable(data.data.available === true);
@@ -396,7 +399,6 @@ export default function RegisterForm() {
         setCheckedUsername(normalized);
       } catch {
         setUsernameCheckError("Could not check this username right now. Please try again.");
-        setCheckedUsername("");
       } finally {
         setUsernameChecking(false);
       }
@@ -916,15 +918,15 @@ export default function RegisterForm() {
                       placeholder="you@example.com"
                       className={fieldClass}
                     />
-                    {emailChecking && (
+                    {checkedEmail === email.trim().toLowerCase() && emailChecking && (
                       <div className="text-xs text-white/50">Checking email availability...</div>
                     )}
-                    {!emailChecking && emailExists && (
+                    {checkedEmail === email.trim().toLowerCase() && !emailChecking && emailExists && (
                       <div className="rounded-2xl border border-red-400/25 bg-red-500/10 px-4 py-3 text-sm text-red-200">
                         An account with this email already exists. Please sign in instead.
                       </div>
                     )}
-                    {!emailChecking && !emailExists && emailCheckError && (
+                    {checkedEmail === email.trim().toLowerCase() && !emailChecking && !emailExists && emailCheckError && (
                       <div className="rounded-2xl border border-red-400/25 bg-red-500/10 px-4 py-3 text-sm text-red-200">
                         {emailCheckError}
                       </div>
@@ -952,10 +954,10 @@ export default function RegisterForm() {
                   <p className="mt-1.5 text-[13px] text-white/55">This becomes your permanent public BINZEO link.</p>
                   <form onSubmit={(e) => { e.preventDefault(); if (usernameAvailable && checkedUsername === username.trim().toLowerCase().replace(/^@/, "")) transitionTo(googleSetup ? "date_of_birth" : "first_name"); }} className="mt-7 space-y-3">
                     <div className="flex items-center rounded-2xl border border-white/15 bg-white/5 px-4 focus-within:border-white/40"><span className="text-white/50">@</span><input type="text" value={username} onChange={(e) => setUsername(e.target.value.toLowerCase().replace(/[^a-z0-9_@]/g, ""))} autoComplete="username" autoFocus placeholder="sharif" className="w-full bg-transparent px-2 py-3.5 text-sm text-white outline-none" /></div>
-                    {usernameChecking && <div className="text-xs text-white/50">Checking username availability...</div>}
-                    {!usernameChecking && usernameAvailable && <div className="text-sm text-white/75">@{checkedUsername} is available.</div>}
-                    {!usernameChecking && !usernameAvailable && usernameCheckError && <div className="rounded-2xl border border-red-400/25 bg-red-500/10 px-4 py-3 text-sm text-red-200">{usernameCheckError}</div>}
-                    {!usernameChecking && usernameSuggestions.length > 0 && <div className="space-y-2"><p className="text-xs text-white/50">Available suggestions</p><div className="flex flex-wrap gap-2">{usernameSuggestions.map((suggestion) => <button key={suggestion} type="button" onClick={() => setUsername(suggestion)} className="rounded-full border border-white/20 px-3 py-1.5 text-xs text-white/80 hover:bg-white/10">@{suggestion}</button>)}</div></div>}
+                    {checkedUsername === username.trim().toLowerCase().replace(/^@/, "") && usernameChecking && <div className="text-xs text-white/50">Checking username availability...</div>}
+                    {checkedUsername === username.trim().toLowerCase().replace(/^@/, "") && !usernameChecking && usernameAvailable && <div className="text-sm text-white/75">@{checkedUsername} is available.</div>}
+                    {checkedUsername === username.trim().toLowerCase().replace(/^@/, "") && !usernameChecking && !usernameAvailable && usernameCheckError && <div className="rounded-2xl border border-red-400/25 bg-red-500/10 px-4 py-3 text-sm text-red-200">{usernameCheckError}</div>}
+                    {checkedUsername === username.trim().toLowerCase().replace(/^@/, "") && !usernameChecking && usernameSuggestions.length > 0 && <div className="space-y-2"><p className="text-xs text-white/50">Available suggestions</p><div className="flex flex-wrap gap-2">{usernameSuggestions.map((suggestion) => <button key={suggestion} type="button" onClick={() => setUsername(suggestion)} className="rounded-full border border-white/20 px-3 py-1.5 text-xs text-white/80 hover:bg-white/10">@{suggestion}</button>)}</div></div>}
                     <button type="submit" disabled={usernameChecking || !usernameAvailable || checkedUsername !== username.trim().toLowerCase().replace(/^@/, "")} className="w-full rounded-full bg-white py-3.5 text-sm font-semibold text-black transition-all duration-300 hover:bg-white/90 disabled:cursor-not-allowed disabled:opacity-40">Continue</button>
                   </form>
                 </div>

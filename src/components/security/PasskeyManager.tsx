@@ -27,7 +27,10 @@ export default function PasskeyManager() {
     else setMessage({ type: "error", text: res.error.message });
   };
 
-  useEffect(() => { void load(); }, []);
+  useEffect(() => {
+    const timer = window.setTimeout(() => { void load(); }, 0);
+    return () => window.clearTimeout(timer);
+  }, []);
 
   const register = async () => {
     setWorking(true);

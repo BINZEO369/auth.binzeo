@@ -326,26 +326,26 @@ export default function PrivacyControls() {
             {error && <p role="alert" className="mt-3 max-w-full break-words rounded-xl bg-red-50 px-3 py-2 text-xs text-red-800">{error}</p>}
 
             {view === "notice" ? (
-              <div className="mt-5 flex w-full min-w-0 flex-col gap-2.5">
+              <div className="mt-5 grid w-full min-w-0 grid-cols-1 gap-2.5 sm:grid-cols-2">
                 <button type="button" disabled={saving} onClick={() => savePreferences("reject_optional", DEFAULT_PREFERENCES)} className="flex min-h-[44px] w-full min-w-0 max-w-full items-center justify-center whitespace-normal break-words rounded-xl border border-gray-200 bg-white px-4 py-3 text-center text-sm font-semibold leading-5 text-gray-800 transition hover:border-gray-300 hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
                   Only essential
                 </button>
                 <button type="button" disabled={saving} onClick={() => { setPreferences(DEFAULT_PREFERENCES); setView("preferences"); }} className="flex min-h-[44px] w-full min-w-0 max-w-full items-center justify-center whitespace-normal break-words rounded-xl border border-gray-200 bg-white px-4 py-3 text-center text-sm font-semibold leading-5 text-gray-800 transition hover:border-gray-300 hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
                   Customize
                 </button>
-                <button type="button" disabled={saving} onClick={() => savePreferences("accept_all", ACCEPT_ALL)} className="flex min-h-[44px] w-full min-w-0 max-w-full items-center justify-center whitespace-normal break-words rounded-xl bg-black px-4 py-3 text-center text-sm font-semibold leading-5 text-white transition hover:bg-gray-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
+                <button type="button" disabled={saving} onClick={() => savePreferences("accept_all", ACCEPT_ALL)} className="flex min-h-[44px] w-full min-w-0 max-w-full items-center justify-center whitespace-normal break-words rounded-xl bg-black px-4 py-3 text-center text-sm font-semibold leading-5 text-white transition hover:bg-gray-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 sm:col-span-2">
                   Accept all
                 </button>
               </div>
             ) : (
-              <div className="mt-5 flex w-full min-w-0 flex-col gap-2.5">
+              <div className="mt-5 grid w-full min-w-0 grid-cols-1 gap-2.5 sm:grid-cols-2">
                 <button type="button" disabled={saving} onClick={() => { setView("notice"); setError(""); }} className="flex min-h-[44px] w-full min-w-0 max-w-full items-center justify-center whitespace-normal break-words rounded-xl border border-gray-200 bg-white px-4 py-3 text-center text-sm font-semibold leading-5 text-gray-800 transition hover:border-gray-300 hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
                   Back
                 </button>
                 <button type="button" disabled={saving} onClick={() => savePreferences("reject_optional", DEFAULT_PREFERENCES)} className="flex min-h-[44px] w-full min-w-0 max-w-full items-center justify-center whitespace-normal break-words rounded-xl border border-gray-200 bg-white px-4 py-3 text-center text-sm font-semibold leading-5 text-gray-800 transition hover:border-gray-300 hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
                   Only essential
                 </button>
-                <button type="button" disabled={saving} onClick={() => savePreferences("save_settings", preferences)} className="flex min-h-[44px] w-full min-w-0 max-w-full items-center justify-center whitespace-normal break-words rounded-xl bg-black px-4 py-3 text-center text-sm font-semibold leading-5 text-white transition hover:bg-gray-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
+                <button type="button" disabled={saving} onClick={() => savePreferences("save_settings", preferences)} className="flex min-h-[44px] w-full min-w-0 max-w-full items-center justify-center whitespace-normal break-words rounded-xl bg-black px-4 py-3 text-center text-sm font-semibold leading-5 text-white transition hover:bg-gray-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 sm:col-span-2">
                   {saving ? "Saving…" : "Save choices"}
                 </button>
               </div>
