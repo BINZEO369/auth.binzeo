@@ -522,15 +522,25 @@ function SecuritySection() {
 
   function LockIcon({ className = "h-4 w-4" }: { className?: string }) { return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>; }
   function timeAgo(iso: string | null) { if (!iso) return "—"; const diff = Date.now() - new Date(iso).getTime(); const mins = Math.floor(diff / 60000); if (mins < 1) return "Just now"; if (mins < 60) return `${mins}m ago`; const hrs = Math.floor(mins / 60); if (hrs < 24) return `${hrs}h ago`; const days = Math.floor(hrs / 24); if (days < 30) return `${days}d ago`; return new Date(iso).toLocaleDateString(); }
-  function SectionHeading({ children }: { children: React.ReactNode }) { return <div className="mb-4 flex items-center gap-3"><span className="whitespace-nowrap text-[10px] font-semibold uppercase tracking-[0.18em] text-gray-500">{children}</span><span aria-hidden="true" className="h-px flex-1 bg-gradient-to-r from-gray-200 to-transparent" /></div>; }
-  function StatusPill({ status }: { status: string }) { const map: Record<string, string> = { success: "border-emerald-200 bg-emerald-50 text-emerald-700", verified: "border-emerald-200 bg-emerald-50 text-emerald-700", failed: "border-red-200 bg-red-50 text-red-700", blocked: "border-amber-200 bg-amber-50 text-amber-700", pending: "border-amber-200 bg-amber-50 text-amber-700" }; const cls = map[status] ?? "border-gray-200 bg-gray-50 text-gray-700"; return <span className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] ${cls}`}>{status}</span>; }
-  function PrimaryButton({ href, children, icon }: { href?: string; children: React.ReactNode; icon?: React.ReactNode }) { const cls = "group relative inline-flex items-center gap-2 overflow-hidden rounded-full border border-black px-4 py-2.5 text-[12.5px] font-medium transition-all duration-500 hover:-translate-y-0.5 shadow-lg shadow-black/10"; const style: React.CSSProperties = { background: "#0a0a0a", color: "#ffffff" }; const inner = (<><span aria-hidden="true" className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100" style={{ background: "radial-gradient(circle at 30% 30%, rgba(255,255,255,0.2), transparent 60%)" }} />{icon && <span className="relative flex items-center">{icon}</span>}<span className="relative" style={{ color: "#ffffff" }}>{children}</span></>); if (href) return <Link href={href} className={cls} style={style}>{inner}</Link>; return <button type="button" className={cls} style={style}>{inner}</button>; }
-  function EmptyState({ icon, text }: { icon: string; text: string }) { return (<div className="relative overflow-hidden rounded-3xl border border-gray-100 bg-white p-10 text-center shadow-sm"><div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl border border-gray-100 bg-gray-50 shadow-sm"><Image src={icon} alt="" width={24} height={24} className="opacity-60" /></div><p className="text-[13px] text-gray-500">{text}</p></div>); }
+  function SectionHeading({ children }: { children: React.ReactNode }) { return <div className="mb-2 flex items-center gap-3"><span className="whitespace-nowrap text-[11px] font-semibold uppercase tracking-[0.16em] text-gray-500">{children}</span><span aria-hidden="true" className="h-px flex-1 bg-gradient-to-r from-gray-200 to-transparent" /></div>; }
+  function StatusPill({ status }: { status: string }) { const map: Record<string, string> = { success: "border-emerald-200 bg-emerald-50 text-emerald-700", verified: "border-emerald-200 bg-emerald-50 text-emerald-700", failed: "border-red-200 bg-red-50 text-red-700", blocked: "border-amber-200 bg-amber-50 text-amber-700", pending: "border-amber-200 bg-amber-50 text-amber-700" }; const cls = map[status] ?? "border-gray-200 bg-gray-50 text-gray-700"; return <span className={`inline-flex max-w-full items-center rounded-full border px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] ${cls}`}>{status.replace(/_/g, " ")}</span>; }
+  function PrimaryButton({ href, children, icon }: { href?: string; children: React.ReactNode; icon?: React.ReactNode }) { const cls = "group relative inline-flex w-full items-center justify-center gap-2 overflow-hidden rounded-full border border-black px-4 py-3 text-[13px] font-medium shadow-lg shadow-black/10 transition-all duration-300 hover:-translate-y-0.5 sm:w-auto"; const style: React.CSSProperties = { background: "#0a0a0a", color: "#ffffff" }; const inner = (<><span aria-hidden="true" className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100" style={{ background: "radial-gradient(circle at 30% 30%, rgba(255,255,255,0.2), transparent 60%)" }} />{icon && <span className="relative flex items-center">{icon}</span>}<span className="relative" style={{ color: "#ffffff" }}>{children}</span></>); if (href) return <Link href={href} className={cls} style={style}>{inner}</Link>; return <button type="button" className={cls} style={style}>{inner}</button>; }
+  function EmptyState({ icon, text }: { icon: string; text: string }) { return <div className="rounded-2xl border border-dashed border-gray-200 bg-gray-50/70 px-5 py-8 text-center"><Image src={icon} alt="" width={28} height={28} className="mx-auto mb-3 opacity-50" /><p className="text-[13px] text-gray-500">{text}</p></div>; }
 
-  const TABS = [{ id: "logins", label: "Login History" }, { id: "activity", label: "Activity" }, { id: "applications", label: "Connected Applications" }, { id: "methods", label: "Auth Methods" }, { id: "verifications", label: "Verifications" }] as const;
+  const TABS = [
+    { id: "logins", label: "Logins", title: "Login history" },
+    { id: "activity", label: "Activity", title: "Activity log" },
+    { id: "applications", label: "Apps", title: "Connected apps" },
+    { id: "methods", label: "Auth methods", title: "Authentication methods" },
+    { id: "verifications", label: "Verifications", title: "Verifications" },
+  ] as const;
   type TabId = (typeof TABS)[number]["id"];
+  const PAGE_SIZE = 8;
 
   const [tab, setTab] = useState<TabId>("logins");
+  const [page, setPage] = useState(1);
+  const [applicationsPage, setApplicationsPage] = useState(1);
+  const [eventsPage, setEventsPage] = useState(1);
   const [logins, setLogins] = useState<LoginEntry[]>([]);
   const [activities, setActivities] = useState<ActivityEntry[]>([]);
   const [methods, setMethods] = useState<AuthMethod[]>([]);
@@ -540,48 +550,228 @@ function SecuritySection() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    (async () => {
-      const [a, b, c, d, e] = await Promise.all([apiFetch<{ history: LoginEntry[] }>("/api/user/login-history?limit=50"), apiFetch<{ activities: ActivityEntry[] }>("/api/user/activity-logs?limit=50"), apiFetch<{ auth_methods: AuthMethod[] }>("/api/user/auth-methods"), apiFetch<{ verifications: Verification[] }>("/api/user/verification-records"), apiFetch<{ applications: ProjectApplication[]; events: ProjectAccessEvent[] }>("/api/user/project-access")]);
-      if (a.success) setLogins(a.data.history);
-      if (b.success) setActivities(b.data.activities);
-      if (c.success) setMethods(c.data.auth_methods);
-      if (d.success) setVerifications(d.data.verifications);
-      if (e.success) { setApplications(e.data.applications); setProjectEvents(e.data.events); }
-      setLoading(false);
+    let active = true;
+    void (async () => {
+      try {
+        const [a, b, c, d, e] = await Promise.all([
+          apiFetch<{ history: LoginEntry[] }>("/api/user/login-history?limit=50"),
+          apiFetch<{ activities: ActivityEntry[] }>("/api/user/activity-logs?limit=50"),
+          apiFetch<{ auth_methods: AuthMethod[] }>("/api/user/auth-methods"),
+          apiFetch<{ verifications: Verification[] }>("/api/user/verification-records"),
+          apiFetch<{ applications: ProjectApplication[]; events: ProjectAccessEvent[] }>("/api/user/project-access"),
+        ]);
+        if (!active) return;
+        if (a.success) setLogins(a.data.history);
+        if (b.success) setActivities(b.data.activities);
+        if (c.success) setMethods(c.data.auth_methods);
+        if (d.success) setVerifications(d.data.verifications);
+        if (e.success) { setApplications(e.data.applications); setProjectEvents(e.data.events); }
+      } finally {
+        if (active) setLoading(false);
+      }
     })();
+    return () => { active = false; };
   }, []);
+
+  const pageControls = (total: number, currentPage: number, onChange: (nextPage: number) => void) => {
+    const totalPages = Math.ceil(total / PAGE_SIZE);
+    if (totalPages <= 1) return null;
+    const first = (currentPage - 1) * PAGE_SIZE + 1;
+    const last = Math.min(total, currentPage * PAGE_SIZE);
+    return (
+      <nav aria-label="Security history pagination" className="mt-4 flex flex-col gap-3 border-t border-gray-100 pt-3 sm:flex-row sm:items-center sm:justify-between">
+        <p className="text-xs text-gray-500">Showing {first}–{last} of {total} recent records</p>
+        <div className="flex flex-wrap items-center gap-2">
+          <button type="button" onClick={() => onChange(currentPage - 1)} disabled={currentPage <= 1} className="rounded-lg border border-gray-200 px-3 py-2 text-xs font-medium text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40">Previous</button>
+          <span className="min-w-[5rem] text-center text-xs text-gray-500">Page {currentPage} of {totalPages}</span>
+          <button type="button" onClick={() => onChange(currentPage + 1)} disabled={currentPage >= totalPages} className="rounded-lg border border-gray-200 px-3 py-2 text-xs font-medium text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40">Next</button>
+        </div>
+      </nav>
+    );
+  };
 
   if (loading) return <Loader variant="security" />;
 
-  return (
-    <div className="relative isolate min-h-[80vh] w-full overflow-x-hidden">
-      
+  const counts: Record<TabId, number> = {
+    logins: logins.length,
+    activity: activities.length,
+    applications: applications.length,
+    methods: methods.length,
+    verifications: verifications.length,
+  };
 
-      <div className="relative z-10 mx-auto w-full max-w-6xl space-y-5 px-3 py-5 sm:space-y-6 sm:px-5 sm:py-8">
-        <div className="flex flex-wrap items-start justify-between gap-5 mb-6">
-          <div className="min-w-0"><h1 className="mb-2 text-2xl font-semibold tracking-[-0.02em] text-gray-900">Security</h1><p className="max-w-lg text-[13.5px] leading-6 text-gray-500">Monitor your account activity and manage security settings.</p></div>
-          <PrimaryButton href="/dashboard/security/password" icon={<LockIcon className="h-4 w-4" />}>Change password</PrimaryButton>
+  return (
+    <div className="mx-auto w-full max-w-6xl space-y-8 px-3 py-5 sm:px-5 sm:py-8">
+      <header className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+        <div className="min-w-0">
+          <p className="mb-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-gray-400">Account settings</p>
+          <h1 className="text-2xl font-semibold tracking-tight text-gray-900 sm:text-3xl">Security</h1>
+          <p className="mt-2 max-w-xl text-sm leading-6 text-gray-500">Manage sign-in protection and review recent activity. Choose a section below to see its details.</p>
+        </div>
+        <PrimaryButton href="/dashboard/security/password" icon={<LockIcon className="h-4 w-4" />}>Change password</PrimaryButton>
+      </header>
+
+      <section aria-labelledby="protection-heading" className="space-y-3">
+        <div>
+          <SectionHeading>Protect your account</SectionHeading>
+          <p id="protection-heading" className="text-xs leading-5 text-gray-500">Open a control only when you need it; detailed setup and device lists stay tucked away until selected.</p>
+        </div>
+        <div className="grid gap-3 xl:grid-cols-2">
+          <details className="group min-w-0 overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
+            <summary className="flex min-h-20 cursor-pointer list-none items-center gap-3 p-4 sm:p-5">
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gray-50 text-gray-700"><LockIcon /></span>
+              <span className="min-w-0 flex-1"><span className="block text-sm font-semibold text-gray-900">Temporary access</span><span className="mt-1 block text-xs leading-5 text-gray-500">Create or revoke time-limited full-login tokens.</span></span>
+              <span className="shrink-0 rounded-full bg-gray-100 px-2.5 py-1 text-[10px] font-semibold text-gray-600 group-open:hidden">Manage</span>
+              <span aria-hidden="true" className="shrink-0 text-gray-400 transition-transform group-open:rotate-180">⌄</span>
+            </summary>
+            <div className="border-t border-gray-100 bg-gray-50/50 p-3 sm:p-4"><TemporaryLoginTokens /></div>
+          </details>
+          <details className="group min-w-0 overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
+            <summary className="flex min-h-20 cursor-pointer list-none items-center gap-3 p-4 sm:p-5">
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gray-50 text-gray-700"><LockIcon /></span>
+              <span className="min-w-0 flex-1"><span className="block text-sm font-semibold text-gray-900">Passkeys</span><span className="mt-1 block text-xs leading-5 text-gray-500">Manage fingerprint passkeys on your devices.</span></span>
+              <span className="shrink-0 rounded-full bg-gray-100 px-2.5 py-1 text-[10px] font-semibold text-gray-600 group-open:hidden">Manage</span>
+              <span aria-hidden="true" className="shrink-0 text-gray-400 transition-transform group-open:rotate-180">⌄</span>
+            </summary>
+            <div className="border-t border-gray-100 bg-gray-50/50 p-3 sm:p-4"><PasskeyManager /></div>
+          </details>
+          <details className="group min-w-0 overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
+            <summary className="flex min-h-20 cursor-pointer list-none items-center gap-3 p-4 sm:p-5">
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gray-50 text-gray-700"><LockIcon /></span>
+              <span className="min-w-0 flex-1"><span className="block text-sm font-semibold text-gray-900">Two-factor authentication</span><span className="mt-1 block text-xs leading-5 text-gray-500">Add an email verification step to password sign-ins.</span></span>
+              <span className="shrink-0 rounded-full bg-gray-100 px-2.5 py-1 text-[10px] font-semibold text-gray-600 group-open:hidden">Manage</span>
+              <span aria-hidden="true" className="shrink-0 text-gray-400 transition-transform group-open:rotate-180">⌄</span>
+            </summary>
+            <div className="border-t border-gray-100 bg-gray-50/50 p-3 sm:p-4"><TwoFactorSettings /></div>
+          </details>
+        </div>
+      </section>
+
+      <section aria-labelledby="activity-heading" className="space-y-4">
+        <div>
+          <SectionHeading>Recent account activity</SectionHeading>
+          <p id="activity-heading" className="text-xs leading-5 text-gray-500">Use the categories to focus on one type of record. Long histories are split into short pages for easier browsing.</p>
+        </div>
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-5">
+          {TABS.map((item) => (
+            <article key={item.id} className="min-w-0 rounded-xl border border-gray-100 bg-white p-3 shadow-[0_2px_10px_rgba(0,0,0,0.03)] sm:p-4">
+              <p className="truncate text-xs font-medium text-gray-500">{item.title}</p>
+              <p className="mt-2 text-2xl font-semibold tracking-tight text-gray-900">{counts[item.id]}</p>
+              <p className="mt-0.5 text-[10px] text-gray-400">recent records</p>
+            </article>
+          ))}
         </div>
 
-        <div className="sec-tool-wrap mb-5"><div data-sec-tool className="relative w-full"><TemporaryLoginTokens /></div></div>
-        <div className="sec-tool-wrap mb-5"><div data-sec-tool className="relative w-full"><PasskeyManager /></div></div>
-        <div className="sec-tool-wrap mb-5"><div data-sec-tool className="relative w-full"><TwoFactorSettings /></div></div>
-
-        <section className="relative w-full overflow-hidden rounded-3xl border border-gray-100 bg-white p-5 sm:p-7 shadow-sm">
-          <div className="relative">
-            <SectionHeading>Account Activity</SectionHeading>
-            <div className="mb-5 flex flex-wrap gap-2">
-              {TABS.map((t) => { const active = tab === t.id; return (<button key={t.id} type="button" onClick={() => setTab(t.id)} className={`group relative inline-flex items-center gap-2 overflow-hidden rounded-full border px-3.5 py-2 text-[12px] font-medium transition-all duration-500 ${active ? "border-black bg-black text-white shadow-md shadow-black/10" : "border-gray-200 bg-white text-gray-600 hover:bg-gray-50 hover:text-black"}`}><span className="relative">{t.label}</span></button>); })}
+        <div className="min-w-0 overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm">
+          <div className="border-b border-gray-100 p-3 sm:p-4">
+            <div role="tablist" aria-label="Security history categories" className="flex max-w-full gap-2 overflow-x-auto pb-1">
+              {TABS.map((item) => {
+                const active = tab === item.id;
+                return (
+                  <button key={item.id} id={`security-tab-${item.id}`} type="button" role="tab" aria-selected={active} aria-controls="security-tab-panel" onClick={() => { setTab(item.id); setPage(1); setApplicationsPage(1); setEventsPage(1); }} className={`inline-flex min-h-10 shrink-0 items-center gap-2 rounded-xl border px-3 py-2 text-xs font-medium transition-colors ${active ? "border-gray-900 bg-gray-900 text-white" : "border-gray-200 bg-white text-gray-600 hover:bg-gray-50"}`}>
+                    {item.label}<span className={`rounded-full px-1.5 py-0.5 text-[10px] ${active ? "bg-white/15 text-white" : "bg-gray-100 text-gray-500"}`}>{counts[item.id]}</span>
+                  </button>
+                );
+              })}
             </div>
-
-            {tab === "logins" && (<div className="space-y-3">{logins.length === 0 ? <EmptyState icon="/icons/lock.svg" text="No login history yet." /> : logins.map((l) => (<article key={l.id} className="group relative overflow-hidden rounded-2xl border border-gray-100 bg-white p-4 transition-all duration-500 hover:shadow-[0_18px_40px_-22px_rgba(0,0,0,0.1)] sm:p-5"><div className="relative flex items-start justify-between gap-3"><div className="min-w-0 flex-1"><div className="mb-2 flex flex-wrap items-center gap-2"><StatusPill status={l.login_status} /><span className="rounded-full border border-gray-200 bg-gray-50 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-gray-600">{l.login_method ?? "password"}</span></div><div className="truncate text-[12.5px] text-gray-600">{l.ip_address ?? "No IP"} · {[l.city, l.country].filter(Boolean).join(", ") || "Unknown location"}</div>{l.user_devices && <div className="mt-1 text-[11.5px] text-gray-500">{l.user_devices.device_name ?? l.user_devices.device_type ?? "Unknown device"}{l.user_devices.operating_system && ` · ${l.user_devices.operating_system}`}{l.user_devices.browser && ` · ${l.user_devices.browser}`}</div>}</div><div className="shrink-0 text-[11px] font-medium text-gray-400">{timeAgo(l.login_at)}</div></div></article>))}</div>)}
-            {tab === "activity" && (<div className="space-y-3">{activities.length === 0 ? <EmptyState icon="/icons/history.svg" text="No activity recorded yet." /> : activities.map((a) => (<article key={a.id} className="group relative overflow-hidden rounded-2xl border border-gray-100 bg-white p-4 transition-all duration-500 hover:shadow-[0_18px_40px_-22px_rgba(0,0,0,0.1)] sm:p-5"><div className="relative flex items-start justify-between gap-3"><div className="min-w-0 flex-1"><div className="mb-0.5 text-[13px] font-semibold capitalize text-gray-900">{a.activity_type.replace(/_/g, " ")}</div>{a.activity_description && <div className="text-[12px] text-gray-500">{a.activity_description}</div>}{a.ip_address && <div className="mt-1 text-[11px] text-gray-400">IP: {a.ip_address}</div>}</div><div className="shrink-0 text-[11px] font-medium text-gray-400">{timeAgo(a.created_at)}</div></div></article>))}</div>)}
-            {tab === "applications" && (<div className="space-y-5"><div className="rounded-2xl border border-blue-100 bg-blue-50/60 p-4 text-[12px] leading-5 text-blue-900">These applications use your BINZEO identity. Passwords and tokens are never shared with them; Central Auth only sends a verified identity token.</div>{applications.length === 0 ? <EmptyState icon="/icons/globe.svg" text="No connected application activity yet." /> : <><div className="grid gap-3 sm:grid-cols-2">{applications.map((app) => <article key={`${app.project_key}:${app.client_key}`} className="rounded-2xl border border-gray-100 bg-white p-4"><div className="flex items-start justify-between gap-3"><div><div className="text-[13px] font-semibold text-gray-900">{app.brand_name}</div><div className="mt-1 text-[12px] text-gray-500">{app.client_name ?? app.project_name}</div></div><StatusPill status="success" /></div><div className="mt-3 text-[11px] text-gray-500">Last used {timeAgo(app.last_used_at)} · {app.event_count} recorded event{app.event_count === 1 ? "" : "s"}</div><div className="mt-1 text-[11px] text-gray-400">{app.last_ip ?? "No IP"}{app.last_city ? ` · ${app.last_city}` : ""}</div></article>)}</div><SectionHeading>Detailed access history</SectionHeading><div className="space-y-3">{projectEvents.map((event) => { const project = Array.isArray(event.platform_projects) ? event.platform_projects[0] : event.platform_projects; const client = Array.isArray(event.platform_clients) ? event.platform_clients[0] : event.platform_clients; return <article key={event.id} className="rounded-2xl border border-gray-100 bg-white p-4"><div className="flex items-start justify-between gap-3"><div><div className="text-[13px] font-semibold capitalize text-gray-900">{event.event_type.replace(/_/g, " ")} · {project?.brand_name ?? "Application"}</div><div className="mt-1 text-[11px] text-gray-500">{client?.client_name ?? "Client"} · {event.outcome}</div><div className="mt-1 text-[11px] text-gray-400">{event.ip_address ?? "No IP"} · {[event.city, event.region, event.country].filter(Boolean).join(", ") || "Unknown location"}</div><div className="mt-1 text-[11px] text-gray-400">{[event.device_name, event.operating_system, event.browser].filter(Boolean).join(" · ") || "Unknown device"}</div></div><div className="shrink-0 text-[11px] text-gray-400">{timeAgo(event.occurred_at)}</div></div></article>; })}</div></> }</div>)}
-            {tab === "methods" && (<div className="space-y-3">{methods.length === 0 ? <EmptyState icon="/icons/lock.svg" text="No auth methods linked yet." /> : methods.map((m) => (<article key={m.id} className="group relative overflow-hidden rounded-2xl border border-gray-100 bg-white p-4 transition-all duration-500 hover:shadow-[0_18px_40px_-22px_rgba(0,0,0,0.1)] sm:p-5"><div className="relative flex items-start justify-between gap-3"><div className="min-w-0 flex-1"><div className="mb-1 flex flex-wrap items-center gap-2"><span className="text-[13px] font-semibold capitalize text-gray-900">{m.auth_method.replace(/_/g, " ")}</span><span className="text-[11px] text-gray-500">via {m.provider}</span></div>{m.provider_email && <div className="text-[12px] text-gray-500">{m.provider_email}</div>}<div className="mt-1 text-[11px] text-gray-400">Signed in {m.login_count} time{m.login_count !== 1 ? "s" : ""}{m.last_sign_in_at && ` · Last: ${timeAgo(m.last_sign_in_at)}`}</div></div><span className="shrink-0 rounded-full border border-gray-200 bg-gray-50 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-gray-600">{m.last_event ?? "linked"}</span></div></article>))}</div>)}
-            {tab === "verifications" && (<div className="space-y-3">{verifications.length === 0 ? <EmptyState icon="/icons/check.svg" text="No verification records yet." /> : verifications.map((v) => (<article key={v.id} className="group relative overflow-hidden rounded-2xl border border-gray-100 bg-white p-4 transition-all duration-500 hover:shadow-[0_18px_40px_-22px_rgba(0,0,0,0.1)] sm:p-5"><div className="relative flex items-start justify-between gap-3"><div className="min-w-0 flex-1"><div className="mb-1 flex flex-wrap items-center gap-2"><span className="text-[13px] font-semibold capitalize text-gray-900">{v.verification_type}</span><StatusPill status={v.verification_status} /></div><div className="text-[11.5px] text-gray-500">{v.verified_at ? `Verified ${timeAgo(v.verified_at)}` : v.last_requested_at ? `Requested ${timeAgo(v.last_requested_at)}` : "No activity"}</div><div className="mt-0.5 text-[11px] text-gray-400">Attempts: {v.attempt_count}</div></div></div></article>))}</div>)}
           </div>
-        </section>
-      </div>
+
+          <div id="security-tab-panel" role="tabpanel" aria-labelledby={`security-tab-${tab}`} className="min-w-0 p-3 sm:p-5">
+            {tab === "logins" && (logins.length === 0 ? <EmptyState icon="/icons/lock.svg" text="No login history yet." /> : <>
+              <div className="space-y-2">
+                {logins.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE).map((login) => (
+                  <article key={login.id} className="rounded-xl border border-gray-100 p-3 sm:p-4">
+                    <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+                      <div className="min-w-0 flex-1">
+                        <div className="mb-2 flex flex-wrap items-center gap-2"><StatusPill status={login.login_status} /><span className="rounded-full border border-gray-200 bg-gray-50 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide text-gray-600">{login.login_method ?? "Password"}</span></div>
+                        <p className="break-words text-xs text-gray-600">{login.ip_address ?? "No IP recorded"} · {[login.city, login.country].filter(Boolean).join(", ") || "Unknown location"}</p>
+                        {login.user_devices && <p className="mt-1 break-words text-xs text-gray-500">{login.user_devices.device_name ?? login.user_devices.device_type ?? "Unknown device"}{login.user_devices.operating_system && ` · ${login.user_devices.operating_system}`}{login.user_devices.browser && ` · ${login.user_devices.browser}`}</p>}
+                      </div>
+                      <time dateTime={login.login_at} title={new Date(login.login_at).toLocaleString()} className="shrink-0 text-xs text-gray-400 sm:text-right">{timeAgo(login.login_at)}</time>
+                    </div>
+                  </article>
+                ))}
+              </div>
+              {pageControls(logins.length, page, setPage)}
+            </>)}
+
+            {tab === "activity" && (activities.length === 0 ? <EmptyState icon="/icons/history.svg" text="No activity recorded yet." /> : <>
+              <div className="space-y-2">
+                {activities.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE).map((activity) => (
+                  <article key={activity.id} className="rounded-xl border border-gray-100 p-3 sm:p-4">
+                    <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+                      <div className="min-w-0 flex-1"><h3 className="text-sm font-semibold capitalize text-gray-900">{activity.activity_type.replace(/_/g, " ")}</h3>{activity.activity_description && <p className="mt-1 break-words text-xs leading-5 text-gray-500">{activity.activity_description}</p>}{activity.ip_address && <p className="mt-1 break-all text-[11px] text-gray-400">IP: {activity.ip_address}</p>}</div>
+                      <time dateTime={activity.created_at} title={new Date(activity.created_at).toLocaleString()} className="shrink-0 text-xs text-gray-400 sm:text-right">{timeAgo(activity.created_at)}</time>
+                    </div>
+                  </article>
+                ))}
+              </div>
+              {pageControls(activities.length, page, setPage)}
+            </>)}
+
+            {tab === "applications" && (
+              <div className="space-y-4">
+                <div className="rounded-xl border border-blue-100 bg-blue-50/70 p-3 text-xs leading-5 text-blue-900 sm:p-4">Connected apps use a verified BINZEO identity token; your password and temporary login tokens are not shared.</div>
+                {applications.length === 0 ? <EmptyState icon="/icons/globe.svg" text="No connected application activity yet." /> : <>
+                  <div className="grid gap-2 sm:grid-cols-2">
+                    {applications.slice((applicationsPage - 1) * PAGE_SIZE, applicationsPage * PAGE_SIZE).map((app) => (
+                      <article key={`${app.project_key}:${app.client_key}`} className="min-w-0 rounded-xl border border-gray-100 p-3 sm:p-4">
+                        <div className="flex items-start justify-between gap-2"><div className="min-w-0"><h3 className="break-words text-sm font-semibold text-gray-900">{app.brand_name}</h3><p className="mt-1 break-words text-xs text-gray-500">{app.client_name ?? app.project_name}</p></div><StatusPill status="success" /></div>
+                        <p className="mt-3 break-words text-[11px] text-gray-500">Last used {timeAgo(app.last_used_at)} · {app.event_count} recorded event{app.event_count === 1 ? "" : "s"}</p>
+                        <p className="mt-1 break-words text-[11px] text-gray-400">{app.last_ip ?? "No IP"}{app.last_city ? ` · ${app.last_city}` : ""}</p>
+                      </article>
+                    ))}
+                  </div>
+                  {pageControls(applications.length, applicationsPage, setApplicationsPage)}
+                </>}
+
+                <details className="rounded-xl border border-gray-100 bg-gray-50/60">
+                  <summary className="flex cursor-pointer list-none items-center justify-between gap-3 p-3 text-sm font-medium text-gray-800 sm:p-4"><span>Detailed access history</span><span className="shrink-0 rounded-full bg-white px-2 py-1 text-[10px] text-gray-500">{projectEvents.length} records</span></summary>
+                  <div className="space-y-2 border-t border-gray-100 p-3 sm:p-4">
+                    {projectEvents.length === 0 ? <p className="text-xs text-gray-500">No detailed access records yet.</p> : <>
+                      {projectEvents.slice((eventsPage - 1) * PAGE_SIZE, eventsPage * PAGE_SIZE).map((event) => {
+                        const project = Array.isArray(event.platform_projects) ? event.platform_projects[0] : event.platform_projects;
+                        const client = Array.isArray(event.platform_clients) ? event.platform_clients[0] : event.platform_clients;
+                        return (
+                          <article key={event.id} className="rounded-lg border border-gray-100 bg-white p-3">
+                            <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+                              <div className="min-w-0"><h3 className="break-words text-xs font-semibold capitalize text-gray-900">{event.event_type.replace(/_/g, " ")} · {project?.brand_name ?? "Application"}</h3><p className="mt-1 break-words text-[11px] text-gray-500">{client?.client_name ?? "Client"} · {event.outcome}</p><p className="mt-1 break-words text-[11px] text-gray-400">{event.ip_address ?? "No IP"} · {[event.city, event.region, event.country].filter(Boolean).join(", ") || "Unknown location"}</p><p className="mt-1 break-words text-[11px] text-gray-400">{[event.device_name, event.operating_system, event.browser].filter(Boolean).join(" · ") || "Unknown device"}</p></div>
+                              <time dateTime={event.occurred_at} title={new Date(event.occurred_at).toLocaleString()} className="shrink-0 text-xs text-gray-400">{timeAgo(event.occurred_at)}</time>
+                            </div>
+                          </article>
+                        );
+                      })}
+                      {pageControls(projectEvents.length, eventsPage, setEventsPage)}
+                    </>}
+                  </div>
+                </details>
+              </div>
+            )}
+
+            {tab === "methods" && (methods.length === 0 ? <EmptyState icon="/icons/lock.svg" text="No authentication methods linked yet." /> : <>
+              <div className="space-y-2">
+                {methods.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE).map((method) => (
+                  <article key={method.id} className="rounded-xl border border-gray-100 p-3 sm:p-4">
+                    <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between"><div className="min-w-0"><div className="flex flex-wrap items-center gap-x-2 gap-y-1"><h3 className="text-sm font-semibold capitalize text-gray-900">{method.auth_method.replace(/_/g, " ")}</h3><span className="text-xs text-gray-500">via {method.provider}</span></div>{method.provider_email && <p className="mt-1 break-words text-xs text-gray-500">{method.provider_email}</p>}<p className="mt-1 text-xs text-gray-400">{method.login_count} sign-in{method.login_count === 1 ? "" : "s"}{method.last_sign_in_at && ` · Last ${timeAgo(method.last_sign_in_at)}`}</p></div><StatusPill status={method.last_event ?? "linked"} /></div>
+                  </article>
+                ))}
+              </div>
+              {pageControls(methods.length, page, setPage)}
+            </>)}
+
+            {tab === "verifications" && (verifications.length === 0 ? <EmptyState icon="/icons/check.svg" text="No verification records yet." /> : <>
+              <div className="space-y-2">
+                {verifications.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE).map((verification) => (
+                  <article key={verification.id} className="rounded-xl border border-gray-100 p-3 sm:p-4">
+                    <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between"><div className="min-w-0"><div className="flex flex-wrap items-center gap-2"><h3 className="text-sm font-semibold capitalize text-gray-900">{verification.verification_type.replace(/_/g, " ")}</h3><StatusPill status={verification.verification_status} /></div><p className="mt-1 text-xs text-gray-500">{verification.verified_at ? `Verified ${timeAgo(verification.verified_at)}` : verification.last_requested_at ? `Requested ${timeAgo(verification.last_requested_at)}` : "No activity"}</p><p className="mt-1 text-[11px] text-gray-400">Attempts: {verification.attempt_count}{verification.expires_at ? ` · Expires ${new Date(verification.expires_at).toLocaleDateString()}` : ""}</p></div></div>
+                  </article>
+                ))}
+              </div>
+              {pageControls(verifications.length, page, setPage)}
+            </>)}
+          </div>
+        </div>
+      </section>
     </div>
   );
 }
