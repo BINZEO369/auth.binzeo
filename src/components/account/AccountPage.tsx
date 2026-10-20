@@ -9,6 +9,7 @@ import Loader from "@/components/ui/Loader";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { apiFetch } from "@/lib/api/client";
+import ConnectedWebsitesSection from "@/components/account/ConnectedWebsitesSection";
 
 type Profile = {
   binzeo_user_id: string | null;
@@ -778,7 +779,7 @@ function SecuritySection() {
 /* ================================================================== */
 export default function AccountPage() {
   const router = useRouter();
-  const [activeSection, setActiveSection] = useState<"menu" | "profile" | "security" | "contacts" | "addresses" | "devices" | "sectors" | "privacy">("menu");
+  const [activeSection, setActiveSection] = useState<"menu" | "profile" | "security" | "contacts" | "addresses" | "devices" | "sectors" | "connected" | "privacy">("menu");
   const [data, setData] = useState<Data | null>(null);
   const [form, setForm] = useState<Partial<Profile>>({});
   const [loading, setLoading] = useState(true);
@@ -799,6 +800,7 @@ export default function AccountPage() {
     ["addresses", "Addresses"],
     ["devices", "Devices"],
     ["sectors", "Sectors"],
+    ["connected", "Connected Websites"],
     ["privacy", "Privacy"],
   ] as const;
 
@@ -1005,6 +1007,7 @@ export default function AccountPage() {
             <div className={cardCls}>
               <MenuItem icon={<Icons.Agents />} label="Devices" onClick={() => setActiveSection("devices")} />
               <MenuItem icon={<Icons.Explore />} label="Sectors" onClick={() => setActiveSection("sectors")} />
+              <MenuItem icon={<Icons.Globe />} label="Connected Websites" onClick={() => setActiveSection("connected")} />
             </div>
           </div>
 
@@ -1143,6 +1146,7 @@ export default function AccountPage() {
           {activeSection === "addresses" && <AddressesSection />}
           {activeSection === "devices" && <DevicesSection />}
           {activeSection === "sectors" && <SectorsSection />}
+          {activeSection === "connected" && <ConnectedWebsitesSection />}
         </div>
       )}
       <div id="cookie-controls-slot" className={activeSection === "privacy" ? "mx-auto w-full min-w-0 max-w-2xl px-4 pb-8" : "hidden"} />
