@@ -1228,42 +1228,33 @@ export default function RegisterForm() {
                   </p>
 
                   <div className="mt-7 space-y-3">
-                    <button
-                      type="button"
-                      onClick={() => setAcceptTerms((v) => !v)}
-                      className={`w-full flex items-start gap-3 rounded-2xl border px-4 py-4 text-left transition-all duration-300 ${
-                        acceptTerms
-                          ? "border-white/30 bg-white/[0.10]"
-                          : "border-white/12 bg-white/[0.04] hover:bg-white/[0.07]"
-                      }`}
-                    >
-                      <div
-                        className={`mt-0.5 w-5 h-5 rounded-md border flex items-center justify-center shrink-0 transition-all duration-300 ${
-                          acceptTerms
-                            ? "bg-white border-white"
-                            : "bg-transparent border-white/30"
+                    <div className={`flex w-full min-w-0 items-start gap-3 rounded-2xl border px-3 py-3.5 transition-colors sm:px-4 sm:py-4 ${
+                      acceptTerms
+                        ? "border-white/30 bg-white/[0.10]"
+                        : "border-white/12 bg-white/[0.04]"
+                    }`}>
+                      <button
+                        type="button"
+                        role="checkbox"
+                        aria-checked={acceptTerms}
+                        aria-label="Agree to the Terms of Service and Privacy Policy"
+                        onClick={() => setAcceptTerms((v) => !v)}
+                        className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-md border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black ${
+                          acceptTerms ? "border-white bg-white" : "border-white/30 bg-transparent"
                         }`}
                       >
                         {acceptTerms && (
-                          <svg
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="black"
-                            strokeWidth="3"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            className="w-3 h-3"
-                          >
+                          <svg viewBox="0 0 24 24" fill="none" stroke="black" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="h-3 w-3" aria-hidden="true">
                             <path d="M20 6 9 17l-5-5" />
                           </svg>
                         )}
-                      </div>
-                      <span className="text-[13px] text-white/80 leading-relaxed">
+                      </button>
+                      <p className="min-w-0 flex-1 break-words text-[13px] leading-relaxed text-white/80">
                         I agree to the{" "}
                         <Link
                           href="/terms"
                           onClick={(e) => e.stopPropagation()}
-                          className="text-white underline underline-offset-2 hover:no-underline"
+                          className="break-words text-white underline underline-offset-2 hover:no-underline"
                         >
                           Terms of Service
                         </Link>{" "}
@@ -1271,12 +1262,12 @@ export default function RegisterForm() {
                         <Link
                           href="/privacy"
                           onClick={(e) => e.stopPropagation()}
-                          className="text-white underline underline-offset-2 hover:no-underline"
+                          className="break-words text-white underline underline-offset-2 hover:no-underline"
                         >
                           Privacy Policy
                         </Link>
-                      </span>
-                    </button>
+                      </p>
+                    </div>
 
                     {error && (
                       <div className="rounded-2xl border border-red-400/25 bg-red-500/10 px-4 py-3 text-sm text-red-200">

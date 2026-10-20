@@ -99,7 +99,7 @@ export default function TemporaryLoginTokens() {
         <select value={duration} onChange={(e) => setDuration(Number(e.target.value))} className="flex-1 rounded-lg border border-[#dddddd] bg-[#f3f3f3] px-3 py-2 text-sm text-[#111111]">
           {DURATIONS.map((item) => <option key={item.value} value={item.value}>{item.label}</option>)}
         </select>
-        <button onClick={createToken} disabled={working} className="rounded-lg bg-[#111111] px-4 py-2 text-sm font-medium text-white disabled:opacity-60">
+        <button onClick={createToken} disabled={working} className="min-h-11 rounded-xl bg-gray-900 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-gray-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-900 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60">
           {working ? "Creating..." : "Create token"}
         </button>
       </div>
@@ -108,7 +108,7 @@ export default function TemporaryLoginTokens() {
           <div className="text-xs font-medium text-[#333333]">Copy this token now</div>
           <code className="block break-all rounded-lg bg-white p-2 text-xs text-[#111111]">{newToken}</code>
           <div className="flex flex-wrap items-center gap-3">
-            <button onClick={copy} className="rounded-lg border border-[#aaaaaa] px-3 py-1.5 text-xs text-[#333333]">Copy token</button>
+            <button onClick={copy} className="min-h-9 rounded-lg border border-gray-200 bg-white px-4 py-2 text-xs font-semibold text-gray-700 transition hover:border-gray-300 hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-900 focus-visible:ring-offset-2">Copy token</button>
             {qrImage && <Image src={qrImage} alt="QR code for temporary login token" width={160} height={160} unoptimized className="h-40 w-40 rounded-lg border border-[#cccccc] bg-white p-2" />}
           </div>
           <div className="text-[11px] text-[#333333]">Google Lens or any QR camera can open this BINZEO login URL directly and complete login. Anyone who scans it can enter the account, so keep it private.</div>
@@ -129,7 +129,7 @@ export default function TemporaryLoginTokens() {
                   </div>
                   <div className="mt-1 text-[11px] text-[#888888]">Expires {new Date(token.expires_at).toLocaleString()}</div>
                 </div>
-                {active && <button onClick={() => revoke(token.id)} disabled={working} className="shrink-0 text-xs text-[#333333]">Revoke</button>}
+                {active && <button onClick={() => revoke(token.id)} disabled={working} className="min-h-9 shrink-0 rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-xs font-semibold text-rose-700 transition hover:bg-rose-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">Revoke</button>}
               </div>
             );
           })}

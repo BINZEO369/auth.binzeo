@@ -617,30 +617,27 @@ function SecuritySection() {
           <p id="protection-heading" className="text-xs leading-5 text-gray-500">Open a control only when you need it; detailed setup and device lists stay tucked away until selected.</p>
         </div>
         <div className="grid gap-3 xl:grid-cols-2">
-          <details className="group min-w-0 overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
-            <summary className="flex min-h-20 cursor-pointer list-none items-center gap-3 p-4 sm:p-5">
-              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gray-50 text-gray-700"><LockIcon /></span>
-              <span className="min-w-0 flex-1"><span className="block text-sm font-semibold text-gray-900">Temporary access</span><span className="mt-1 block text-xs leading-5 text-gray-500">Create or revoke time-limited full-login tokens.</span></span>
-              <span className="shrink-0 rounded-full bg-gray-100 px-2.5 py-1 text-[10px] font-semibold text-gray-600 group-open:hidden">Manage</span>
-              <span aria-hidden="true" className="shrink-0 text-gray-400 transition-transform group-open:rotate-180">⌄</span>
+          <details className="group min-w-0 overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm transition-shadow hover:shadow-md">
+            <summary className="flex min-h-20 cursor-pointer list-none items-center gap-3 p-4 outline-none transition-colors hover:bg-gray-50 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-gray-900 group-open:bg-gray-50 sm:gap-4 sm:p-5">
+              <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-gray-900 text-white shadow-sm"><LockIcon className="h-5 w-5" /></span>
+              <span className="min-w-0 flex-1"><span className="block break-words text-sm font-semibold text-gray-900">Temporary access</span><span className="mt-1 block break-words text-xs leading-5 text-gray-500">Create or revoke time-limited full-login tokens.</span></span>
+              <span className="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-full border border-gray-200 bg-white px-3 text-xs font-semibold text-gray-700 transition group-hover:border-gray-300 group-hover:bg-gray-50"><span className="hidden sm:inline">Manage</span><span className="sm:hidden">Open</span><svg aria-hidden="true" viewBox="0 0 20 20" fill="none" className="h-4 w-4 transition-transform group-open:rotate-180"><path d="m5 7.5 5 5 5-5" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" /></svg></span>
             </summary>
             <div className="border-t border-gray-100 bg-gray-50/50 p-3 sm:p-4"><TemporaryLoginTokens /></div>
           </details>
-          <details className="group min-w-0 overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
-            <summary className="flex min-h-20 cursor-pointer list-none items-center gap-3 p-4 sm:p-5">
-              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gray-50 text-gray-700"><LockIcon /></span>
-              <span className="min-w-0 flex-1"><span className="block text-sm font-semibold text-gray-900">Passkeys</span><span className="mt-1 block text-xs leading-5 text-gray-500">Manage fingerprint passkeys on your devices.</span></span>
-              <span className="shrink-0 rounded-full bg-gray-100 px-2.5 py-1 text-[10px] font-semibold text-gray-600 group-open:hidden">Manage</span>
-              <span aria-hidden="true" className="shrink-0 text-gray-400 transition-transform group-open:rotate-180">⌄</span>
+          <details className="group min-w-0 overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm transition-shadow hover:shadow-md">
+            <summary className="flex min-h-20 cursor-pointer list-none items-center gap-3 p-4 outline-none transition-colors hover:bg-gray-50 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-gray-900 group-open:bg-gray-50 sm:gap-4 sm:p-5">
+              <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-gray-900 text-white shadow-sm"><LockIcon className="h-5 w-5" /></span>
+              <span className="min-w-0 flex-1"><span className="block break-words text-sm font-semibold text-gray-900">Passkeys</span><span className="mt-1 block break-words text-xs leading-5 text-gray-500">Manage fingerprint passkeys on your devices.</span></span>
+              <span className="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-full border border-gray-200 bg-white px-3 text-xs font-semibold text-gray-700 transition group-hover:border-gray-300 group-hover:bg-gray-50"><span className="hidden sm:inline">Manage</span><span className="sm:hidden">Open</span><svg aria-hidden="true" viewBox="0 0 20 20" fill="none" className="h-4 w-4 transition-transform group-open:rotate-180"><path d="m5 7.5 5 5 5-5" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" /></svg></span>
             </summary>
             <div className="border-t border-gray-100 bg-gray-50/50 p-3 sm:p-4"><PasskeyManager /></div>
           </details>
-          <details className="group min-w-0 overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
-            <summary className="flex min-h-20 cursor-pointer list-none items-center gap-3 p-4 sm:p-5">
-              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gray-50 text-gray-700"><LockIcon /></span>
-              <span className="min-w-0 flex-1"><span className="block text-sm font-semibold text-gray-900">Two-factor authentication</span><span className="mt-1 block text-xs leading-5 text-gray-500">Add an email verification step to password sign-ins.</span></span>
-              <span className="shrink-0 rounded-full bg-gray-100 px-2.5 py-1 text-[10px] font-semibold text-gray-600 group-open:hidden">Manage</span>
-              <span aria-hidden="true" className="shrink-0 text-gray-400 transition-transform group-open:rotate-180">⌄</span>
+          <details className="group min-w-0 overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm transition-shadow hover:shadow-md">
+            <summary className="flex min-h-20 cursor-pointer list-none items-center gap-3 p-4 outline-none transition-colors hover:bg-gray-50 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-gray-900 group-open:bg-gray-50 sm:gap-4 sm:p-5">
+              <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-gray-900 text-white shadow-sm"><LockIcon className="h-5 w-5" /></span>
+              <span className="min-w-0 flex-1"><span className="block break-words text-sm font-semibold text-gray-900">Two-factor authentication</span><span className="mt-1 block break-words text-xs leading-5 text-gray-500">Add an email verification step to password sign-ins.</span></span>
+              <span className="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-full border border-gray-200 bg-white px-3 text-xs font-semibold text-gray-700 transition group-hover:border-gray-300 group-hover:bg-gray-50"><span className="hidden sm:inline">Manage</span><span className="sm:hidden">Open</span><svg aria-hidden="true" viewBox="0 0 20 20" fill="none" className="h-4 w-4 transition-transform group-open:rotate-180"><path d="m5 7.5 5 5 5-5" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" /></svg></span>
             </summary>
             <div className="border-t border-gray-100 bg-gray-50/50 p-3 sm:p-4"><TwoFactorSettings /></div>
           </details>
@@ -1135,7 +1132,7 @@ export default function AccountPage() {
           )}
 
           {activeSection === "privacy" && (
-            <div className="mx-auto max-w-md px-4 pt-2 pb-4">
+            <div className="mx-auto w-full min-w-0 max-w-2xl px-4 pt-2 pb-4">
               <p className="rounded-2xl border border-gray-100 bg-white p-4 text-[13px] leading-6 text-gray-500">
                 Manage essential and optional cookie permissions for your BINZEO account here.
               </p>
@@ -1148,7 +1145,7 @@ export default function AccountPage() {
           {activeSection === "sectors" && <SectorsSection />}
         </div>
       )}
-      <div id="cookie-controls-slot" className={activeSection === "privacy" ? "mx-auto max-w-md px-4 pb-8" : "hidden"} />
+      <div id="cookie-controls-slot" className={activeSection === "privacy" ? "mx-auto w-full min-w-0 max-w-2xl px-4 pb-8" : "hidden"} />
     </div>
   );
 }
