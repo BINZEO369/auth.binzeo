@@ -13,7 +13,7 @@ const partnerLogos = [
 
 /* ================================================================== */
 /*  Hero frame-sequence animation (inline, no separate file)           */
-/*  - ফাইল থাকতে হবে: /public/frames/hero/frame_0001.webp ... 0300     */
+/*  - ফাইল থাকতে হবে: /public/frames/hero/frame_0001.webp ... 0024     */
 /*  - FRAME_COUNT / FPS নিচে নিজের মতো বদলাতে পারো                     */
 /* ================================================================== */
 
@@ -24,10 +24,10 @@ const HERO_FRAME_ANIM_SCRIPT = String.raw`(() => {
   const context = canvas.getContext("2d", { alpha: false });
   if (!context) return;
 
-  const FRAME_COUNT = 300;
+  const FRAME_COUNT = 24;
   const FPS = 30;
   const FRAME_DURATION = 1000 / FPS;
-  const CACHE_LIMIT = 24;
+  const CACHE_LIMIT = 12;
   const PREFETCH_AHEAD = 8;
   const frameCache = new Map();
   const pendingFrames = new Map();
