@@ -66,7 +66,7 @@ export default async function PaymentPage({
       {/* Full-width edge-to-edge banner — same as checkout/payment pages */}
       <div className="w-full h-[140px] md:h-[320px] overflow-hidden bg-gray-100">
         <img
-          src="https://raw.githubusercontent.com/BINZEO369/auth.binzeo/main/public/images/connected-accounts-checkout.jpg"
+          src="https://raw.githubusercontent.com/BINZEO369/auth.binzeo/main/public/images/connected-accounts-payment-confirm.jpg"
           alt="Secure Payment"
           className="w-full h-full object-cover block"
         />
