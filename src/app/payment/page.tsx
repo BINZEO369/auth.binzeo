@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import PaymentForm from "@/components/payment/PaymentForm";
+import PaymentReturnStatus from "@/components/payment/PaymentReturnStatus";
 import { getCentralSession } from "@/lib/central-session";
 
 export const metadata: Metadata = {
@@ -11,6 +12,7 @@ export const metadata: Metadata = {
 type PaymentSearchParams = Promise<{
   order_number?: string | string[];
   payment?: string | string[];
+  request_id?: string | string[];
 }>;
 
 function firstValue(value: string | string[] | undefined): string {
@@ -25,9 +27,15 @@ export default async function PaymentPage({
   const [query, user] = await Promise.all([searchParams, getCentralSession()]);
   const orderNumber = firstValue(query.order_number).trim().slice(0, 80);
   const paymentState = firstValue(query.payment);
-  const nextPath = orderNumber
-    ? `/payment?order_number=${encodeURIComponent(orderNumber)}`
-    : "/payment";
+  const rawRequestId = firstValue(query.request_id).trim();
+  const requestId = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(rawRequestId)
+    ? rawRequestId
+    : "";
+  const nextParams = new URLSearchParams();
+  if (orderNumber) nextParams.set("order_number", orderNumber);
+  if (paymentState === "success" || paymentState === "cancelled") nextParams.set("payment", paymentState);
+  if (requestId) nextParams.set("request_id", requestId);
+  const nextPath = nextParams.size ? `/payment?${nextParams.toString()}` : "/payment";
 
   if (!user) {
     redirect(`/signin?next=${encodeURIComponent(nextPath)}`);
@@ -57,20 +65,25 @@ export default async function PaymentPage({
 
         {isReturned && (
           <div className="mb-5 rounded-xl border border-blue-200 bg-blue-50 px-4 py-3 text-sm leading-6 text-blue-900" role="status">
-            Stripe returned you to BINZEO Central. We are confirming the payment with Stripe. Please do not submit another payment while this confirmation is pending.
+            Stripe returned you to BINZEO Central. The central payment record must confirm the transaction before you continue to JABIYEN.
           </div>
         )}
 
-        <h1 className="text-2xl font-semibold tracking-tight text-gray-950">Continue to payment</h1>
+        <h1 className="text-2xl font-semibold tracking-tight text-gray-950">
+          {isReturned ? "Payment confirmation" : "Continue to payment"}
+        </h1>
         <p className="mt-3 text-sm leading-6 text-gray-600">
-          Enter the order number from JABIYEN or use the order link. BINZEO Central checks the saved order and amount, then sends you to Stripe’s hosted checkout.
+          {isReturned
+            ? "We verify payment with the central Stripe webhook. Once confirmed, use the button below to return to your JABIYEN order confirmation."
+            : "Enter the order number from JABIYEN or use the order link. BINZEO Central checks the saved order and amount, then sends you to Stripe’s hosted checkout."}
         </p>
 
         <div className="mt-7">
           {isReturned ? (
-            <div className="rounded-xl bg-gray-50 px-4 py-3 text-sm leading-6 text-gray-600">
-              {orderNumber ? `Order ${orderNumber}: payment confirmation is in progress.` : "Payment confirmation is in progress."}
-            </div>
+            <PaymentReturnStatus
+              paymentRequestId={requestId}
+              expectedOrderNumber={orderNumber}
+            />
           ) : (
             <PaymentForm initialOrderNumber={orderNumber} />
           )}
