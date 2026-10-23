@@ -8,6 +8,12 @@ All authentication, identity, profile, security, database, email, upload and sch
 
 Requests under `/api/*` are rewritten to `${CENTRAL_API_BASE_URL}/v1/*`. If the Central API is unavailable, the frontend fails closed with HTTP 503.
 
+## Frontend stack allowlist
+
+Frontend implementation is limited to TypeScript, React, Next.js, Tailwind CSS, semantic HTML5, CSS3, and Motion for React (`motion`) only. Do not add new plain JavaScript/JSX frontend source, another framework, another CSS/styling system, or another animation library. Motion is an allowed dependency; its presence alone is not a reason to redesign the interface or add animations.
+
+This repository is frontend-only. API, database, and other backend responsibilities remain in `api.binzeo`. Existing Python logo-generation tooling is tooling, not part of the frontend runtime, and does not expand the frontend stack allowlist.
+
 ## Local setup
 
 ```bash
