@@ -45,40 +45,70 @@ export default async function PaymentPage({
   const isReturned = paymentState === "success";
 
   return (
-    <main className="flex flex-1 items-center justify-center bg-gray-50 px-4 py-12 sm:px-6">
-      <section className="w-full max-w-lg rounded-3xl border border-gray-200 bg-white p-6 shadow-sm sm:p-9">
-        <div className="mb-7 flex items-center gap-3">
-          <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gray-950 text-sm font-bold tracking-wide text-white">
-            B
-          </div>
-          <div>
-            <p className="text-sm font-semibold text-gray-950">BINZEO Central</p>
-            <p className="text-xs text-gray-500">Secure payment</p>
-          </div>
-        </div>
+    <main className="min-h-screen bg-white text-black">
+      {/* Custom keyframes for fadeUp animation */}
+      <style dangerouslySetInnerHTML={{ __html: `
+        @keyframes paymentFadeUp {
+          from { opacity: 0; transform: translateY(24px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        .payment-fade-up {
+          animation: paymentFadeUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+        }
+        .payment-fade-up-delay {
+          animation: paymentFadeUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.12s both;
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .payment-fade-up, .payment-fade-up-delay { animation: none !important; }
+        }
+      `}} />
 
+      {/* Full-width edge-to-edge banner — same as checkout/payment pages */}
+      <div className="w-full h-[140px] md:h-[320px] overflow-hidden bg-gray-100">
+        <img
+          src="https://raw.githubusercontent.com/BINZEO369/auth.binzeo/main/public/images/connected-accounts-checkout.jpg"
+          alt="Secure Payment"
+          className="w-full h-full object-cover block"
+        />
+      </div>
+
+      {/* Centered content shell — same max-width as checkout/payment */}
+      <div className="w-full max-w-[600px] md:max-w-[800px] mx-auto px-5 md:px-10 pt-8 md:pt-12 pb-16 md:pb-20">
+
+        {/* Page Title — centered, uppercase, letter-spaced */}
+        <h1 className="text-center text-[28px] md:text-[42px] font-light tracking-[2px] uppercase m-0 mb-10 md:mb-14 payment-fade-up">
+          {isReturned ? "Payment Confirmation" : "Payment"}
+        </h1>
+
+        {/* Cancelled status — sharp bordered box */}
         {isCancelled && (
-          <div className="mb-5 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900" role="status">
+          <div
+            className="payment-fade-up mb-6 md:mb-8 px-4 md:px-5 py-3 md:py-4 border border-black bg-gray-50 text-xs md:text-sm leading-relaxed text-black"
+            role="status"
+          >
             Checkout was cancelled. Your order has not been marked paid. You may try again below.
           </div>
         )}
 
+        {/* Returned status — sharp bordered box */}
         {isReturned && (
-          <div className="mb-5 rounded-xl border border-blue-200 bg-blue-50 px-4 py-3 text-sm leading-6 text-blue-900" role="status">
+          <div
+            className="payment-fade-up mb-6 md:mb-8 px-4 md:px-5 py-3 md:py-4 border border-black bg-gray-50 text-xs md:text-sm leading-relaxed text-black"
+            role="status"
+          >
             Stripe returned you to BINZEO Central. The central payment record must confirm the transaction before you continue to JABIYEN.
           </div>
         )}
 
-        <h1 className="text-2xl font-semibold tracking-tight text-gray-950">
-          {isReturned ? "Payment confirmation" : "Continue to payment"}
-        </h1>
-        <p className="mt-3 text-sm leading-6 text-gray-600">
+        {/* Description paragraph */}
+        <p className="payment-fade-up text-sm md:text-base text-gray-600 leading-relaxed mb-8 md:mb-10 text-center max-w-2xl mx-auto">
           {isReturned
             ? "We verify payment with the central Stripe webhook. Once confirmed, use the button below to return to your JABIYEN order confirmation."
-            : "Enter the order number from JABIYEN or use the order link. BINZEO Central checks the saved order and amount, then sends you to Stripe’s hosted checkout."}
+            : "Enter the order number from JABIYEN or use the order link. BINZEO Central checks the saved order and amount, then sends you to Stripe's hosted checkout."}
         </p>
 
-        <div className="mt-7">
+        {/* Form / Return Status */}
+        <div className="payment-fade-up-delay">
           {isReturned ? (
             <PaymentReturnStatus
               paymentRequestId={requestId}
@@ -89,10 +119,11 @@ export default async function PaymentPage({
           )}
         </div>
 
-        <p className="mt-6 text-center text-xs leading-5 text-gray-500">
+        {/* Footer privacy note */}
+        <p className="mt-8 md:mt-10 text-center text-[11px] md:text-xs leading-5 text-gray-500 tracking-wide">
           BINZEO does not collect or store your card number or security code.
         </p>
-      </section>
+      </div>
     </main>
   );
 }
