@@ -33,7 +33,6 @@ const nextConfig: NextConfig = {
   async rewrites() {
     return {
       beforeFiles: [
-        { source: "/api/admin/:path*", destination: `${centralOrigin}/api/admin/:path*` },
         { source: "/api/:path*", destination: `${centralOrigin}/v1/:path*` },
       ],
     };

@@ -786,7 +786,6 @@ export default function AccountPage() {
   const [saving, setSaving] = useState(false);
   const [photoUploading, setPhotoUploading] = useState(false);
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
-  const [canReadPayments, setCanReadPayments] = useState(false);
   const [binzeoIdVisible, setBinzeoIdVisible] = useState(false);
   const [binzeoIdCopyStatus, setBinzeoIdCopyStatus] = useState<"idle" | "copied" | "error">("idle");
 
@@ -832,16 +831,6 @@ export default function AccountPage() {
       }
       setLoading(false);
     })();
-  }, []);
-
-  useEffect(() => {
-    let active = true;
-    void apiFetch<{ access?: { roles?: string[]; permissions?: string[] } }>("/api/admin/me").then((res) => {
-      if (!active || !res.success || !res.data.access) return;
-      const { roles = [], permissions = [] } = res.data.access;
-      setCanReadPayments(roles.includes("super_admin") || permissions.includes("payments.read"));
-    });
-    return () => { active = false; };
   }, []);
 
   useEffect(() => {
@@ -1021,15 +1010,6 @@ export default function AccountPage() {
               <MenuItem icon={<Icons.Globe />} label="Connected Websites" onClick={() => setActiveSection("connected")} />
             </div>
           </div>
-
-          {canReadPayments && (
-            <div>
-              <h3 className="mb-2 px-4 text-[12px] font-medium text-gray-500 tracking-wide uppercase">Administration</h3>
-              <div className={cardCls}>
-                <MenuItem icon={<Icons.Explore />} label="Central payment records" onClick={() => router.push("/admin/payments")} />
-              </div>
-            </div>
-          )}
 
           {/* SECTION: Privacy */}
           <div>
