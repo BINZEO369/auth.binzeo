@@ -81,7 +81,7 @@ export default function PaymentReturnStatus({
 
   const orderNumber = payment?.external_order_reference;
   const orderConfirmationUrl = orderNumber
-    ? `https://www.jayenware.shop/order-confirmation?order=${encodeURIComponent(orderNumber)}`
+    ? `https://jabiyen-website.vercel.app/order-confirmation?order=${encodeURIComponent(orderNumber)}`
     : null;
   const displayState: ViewState = paymentRequestId ? viewState : "error";
   const displayMessage = paymentRequestId
